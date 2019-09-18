@@ -1,13 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\Task;
+namespace BetaKiller\Task\Import;
 
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Model\UrlElementZone;
 use BetaKiller\Repository\UrlElementZoneRepository;
+use BetaKiller\Task\AbstractTask;
 
-class ImportZones extends AbstractTask
+class Zones extends AbstractTask
 {
     /**
      * @var \BetaKiller\Config\ConfigProviderInterface
@@ -20,7 +21,7 @@ class ImportZones extends AbstractTask
     private $repo;
 
     /**
-     * ImportZones constructor.
+     * Zones constructor.
      *
      * @param \BetaKiller\Config\ConfigProviderInterface      $config
      * @param \BetaKiller\Repository\UrlElementZoneRepository $repo

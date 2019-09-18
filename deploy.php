@@ -420,11 +420,11 @@ task('daemon:supervisor:reload', static function () {
  * Import data
  */
 task('import:roles', static function () {
-    runMinionTask('importRoles');
+    runMinionTask('import:roles');
 })->desc('Import ACL roles data');
 
 task('import:zones', static function () {
-    runMinionTask('importZones');
+    runMinionTask('import:zones');
 })->desc('Import UrlElement zones');
 
 task('import:i18n', static function () {

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\Task;
+namespace BetaKiller\Task\Import;
 
 use BetaKiller\Auth\RoleConfig;
 use BetaKiller\Config\ConfigProviderInterface;
@@ -9,9 +9,10 @@ use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Model\Role;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Repository\RoleRepositoryInterface;
+use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
 
-class ImportRoles extends AbstractTask
+class Roles extends AbstractTask
 {
     /**
      * @var \BetaKiller\Config\ConfigProviderInterface
@@ -34,12 +35,12 @@ class ImportRoles extends AbstractTask
     private $entityFactory;
 
     /**
-     * ImportRoles constructor.
+     * Roles constructor.
      *
-     * @param \BetaKiller\Config\ConfigProviderInterface $config
-     * @param \BetaKiller\Repository\RoleRepositoryInterface      $roleRepo
-     * @param \BetaKiller\Factory\EntityFactoryInterface $entityFactory
-     * @param \Psr\Log\LoggerInterface                   $logger
+     * @param \BetaKiller\Config\ConfigProviderInterface     $config
+     * @param \BetaKiller\Repository\RoleRepositoryInterface $roleRepo
+     * @param \BetaKiller\Factory\EntityFactoryInterface     $entityFactory
+     * @param \Psr\Log\LoggerInterface                       $logger
      */
     public function __construct(
         ConfigProviderInterface $config,
