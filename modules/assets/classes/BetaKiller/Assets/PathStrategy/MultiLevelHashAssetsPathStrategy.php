@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace BetaKiller\Assets\PathStrategy;
 
 use BetaKiller\Assets\Exception\AssetsException;
+use BetaKiller\Assets\Exception\AssetsModelException;
 use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Assets\Model\HashBasedAssetsModelInterface;
 use BetaKiller\Assets\MultiLevelPath;
 use BetaKiller\Repository\HashStrategyAssetsRepositoryInterface;
 
@@ -57,6 +59,13 @@ class MultiLevelHashAssetsPathStrategy implements AssetsPathStrategyInterface
      */
     public function makeModelPath(AssetsModelInterface $model): string
     {
+        if (!$model instanceof HashBasedAssetsModelInterface) {
+            throw new AssetsModelException('Model ":name" must implement :must for using hash URL strategy', [
+                ':name' => $model::getModelName(),
+                ':must' => HashBasedAssetsModelInterface::class,
+            ]);
+        }
+
         $hash = $model->getHash();
 
         if (!$hash) {

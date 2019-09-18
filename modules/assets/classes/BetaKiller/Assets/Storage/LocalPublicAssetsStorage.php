@@ -6,7 +6,7 @@ use BetaKiller\Helper\AppEnvInterface;
 
 class LocalPublicAssetsStorage extends AbstractLocalAssetsStorage
 {
-    public const CODENAME = 'Public';
+    public const CODENAME = 'LocalPublic';
 
     /**
      * @var \BetaKiller\Helper\AppEnvInterface

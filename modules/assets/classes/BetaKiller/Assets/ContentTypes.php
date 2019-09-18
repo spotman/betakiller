@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace BetaKiller\Assets;
 
 use BetaKiller\Assets\Exception\AssetsException;
-use function finfo_file;
-use function finfo_open;
 use Mimey\MimeMappingBuilder;
 use Mimey\MimeTypes;
+use function finfo_file;
+use function finfo_open;
 
 class ContentTypes
 {
@@ -93,7 +93,11 @@ class ContentTypes
             $extensions[] = $this->getExtensions($mimeType);
         }
 
-        return array_unique(array_merge(...$extensions));
+        $extensions = array_unique(array_merge(...$extensions));
+
+        sort($extensions);
+
+        return $extensions;
     }
 
     /**

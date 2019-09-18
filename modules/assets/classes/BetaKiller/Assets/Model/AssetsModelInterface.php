@@ -11,11 +11,12 @@ use DateTimeInterface;
  *
  * Abstract model interface for asset file
  */
-interface AssetsModelInterface extends AbstractEntityInterface, HashBasedAssetsModelInterface
+interface AssetsModelInterface extends AbstractEntityInterface
 {
-    public const API_KEY_ID           = 'id';
-    public const API_KEY_ORIGINAL_URL = 'url';
-    public const API_KEY_DELETE_URL   = 'delete_url';
+    public const API_KEY_ID            = 'id';
+    public const API_KEY_ORIGINAL_URL  = 'url';
+    public const API_KEY_ORIGINAL_NAME = 'name';
+    public const API_KEY_DELETE_URL    = 'delete_url';
 
     /**
      * Returns User model, who uploaded the file
@@ -80,22 +81,6 @@ interface AssetsModelInterface extends AbstractEntityInterface, HashBasedAssetsM
      * @return AssetsModelInterface
      */
     public function setOriginalName(string $name): AssetsModelInterface;
-
-    /**
-     * Returns unique hash
-     *
-     * @return string|null
-     */
-    public function getHash(): ?string;
-
-    /**
-     * Stores unique hash
-     *
-     * @param string $hash
-     *
-     * @return \BetaKiller\Assets\Model\AssetsModelInterface
-     */
-    public function setHash(string $hash): AssetsModelInterface;
 
     /**
      * Returns MIME-type of the file

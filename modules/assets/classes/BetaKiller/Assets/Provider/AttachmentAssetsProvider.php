@@ -2,6 +2,7 @@
 namespace BetaKiller\Assets\Provider;
 
 use BetaKiller\Assets\Model\HasPreviewAssetsModelInterface;
+use BetaKiller\Exception\NotImplementedHttpException;
 
 /**
  * Class AttachmentAssetsProvider
@@ -37,6 +38,6 @@ final class AttachmentAssetsProvider extends AbstractHasPreviewAssetsProvider im
     public function makePreviewContent(HasPreviewAssetsModelInterface $model, string $size): string
     {
         // TODO Detect preview image by mime-type and return its contents
-        return '';
+        throw new NotImplementedHttpException('Attachments has no preview logic yet');
     }
 }

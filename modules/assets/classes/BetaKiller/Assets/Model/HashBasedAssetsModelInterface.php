@@ -16,11 +16,11 @@ interface HashBasedAssetsModelInterface
     public function getHash(): ?string;
 
     /**
-     * Stores unique hash
+     * Returns unique hash for provided content
      *
-     * @param string $hash
+     * @param string $content
      *
-     * @return \BetaKiller\Assets\Model\AssetsModelInterface
+     * @return string
      */
-    public function setHash(string $hash): AssetsModelInterface;
+    public function setHashFromContent(string $content): string;
 }

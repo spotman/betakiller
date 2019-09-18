@@ -56,6 +56,8 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     public const CONFIG_MODEL_UPLOAD_KEY   = 'upload';
     public const CONFIG_MODEL_MAX_SIZE_KEY = 'max-size';
 
+    private const SIZE_LETTERS = 'bkmgtpezy';
+
     /**
      * @var string
      */
@@ -442,15 +444,16 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
 
         // Process hash-based assets
         if ($model instanceof HashBasedAssetsModelInterface) {
-            // Calculate hash for processed content
-            $hash = $this->calculateHash($content);
-
+            // Check repository type
             if (!$this->repository instanceof HashStrategyAssetsRepositoryInterface) {
                 throw new AssetsProviderException('Repository ":name" must implement :must', [
                     ':name' => $model::getModelName(),
                     ':must' => HashStrategyAssetsRepositoryInterface::class,
                 ]);
             }
+
+            // Calculate hash for processed content
+            $hash = $model->setHashFromContent($content);
 
             // Check for duplicates
             if ($this->repository->findByHash($hash)) {
@@ -459,8 +462,6 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
                     ':hash'     => $hash,
                 ]);
             }
-
-            $model->setHash($hash);
         }
 
         $currentTime = new DateTimeImmutable;
@@ -481,11 +482,6 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         $this->deploymentService->deploy($this, $model, $content, self::ACTION_ORIGINAL);
 
         return $model;
-    }
-
-    private function calculateHash(string $content): string
-    {
-        return sha1($content);
     }
 
     /**
@@ -809,9 +805,10 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     public function getInfo(AssetsModelInterface $model): array
     {
         return [
-            AssetsModelInterface::API_KEY_ID           => $this->converter->encode($model),
-            AssetsModelInterface::API_KEY_ORIGINAL_URL => $this->getOriginalUrl($model),
-            AssetsModelInterface::API_KEY_DELETE_URL   => $this->getDeleteUrl($model),
+            AssetsModelInterface::API_KEY_ID            => $this->converter->encode($model),
+            AssetsModelInterface::API_KEY_ORIGINAL_NAME => $model->getOriginalName(),
+            AssetsModelInterface::API_KEY_ORIGINAL_URL  => $this->getOriginalUrl($model),
+            AssetsModelInterface::API_KEY_DELETE_URL    => $this->getDeleteUrl($model),
         ];
     }
 
@@ -851,12 +848,15 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
 
     private function parseIniSize(string $value): int
     {
-        $unit = preg_replace('/[^bkmgtpezy]/i', '', $value); // Remove the non-unit characters from the size.
-        $size = preg_replace('/[^0-9\.]/', '', $value); // Remove the non-numeric characters from the size.
+        // Remove the non-unit characters from the size.
+        $unit = preg_replace('/[^'.self::SIZE_LETTERS.']/i', '', $value);
+
+        // Remove the non-numeric characters from the size.
+        $size = preg_replace('/[^0-9.]/', '', $value);
 
         if ($unit) {
             // Find the position of the unit in the ordered string which is the power of magnitude to multiply a kilobyte by.
-            return round($size * (1024 ** stripos($unit[0], 'bkmgtpezy')));
+            return round($size * (1024 ** stripos(self::SIZE_LETTERS, $unit[0])));
         }
 
         return (int)round($size);
