@@ -68,8 +68,11 @@ final class StatusWorkflow implements StatusWorkflowInterface
         }
     }
 
-    public function isTransitionAllowed(HasWorkflowStateModelInterface $model, string $codename, UserInterface $user): bool
-    {
+    public function isTransitionAllowed(
+        HasWorkflowStateModelInterface $model,
+        string $codename,
+        UserInterface $user
+    ): bool {
         $resource = $this->acl->getEntityAclResource($model);
 
         if (!$resource instanceof HasWorkflowStateAclResourceInterface) {
@@ -79,11 +82,7 @@ final class StatusWorkflow implements StatusWorkflowInterface
             ]);
         }
 
-        $currentState = $model->getWorkflowState();
-
-        $permission = $resource->makeTransitionPermissionIdentity($currentState, $codename);
-
-        return $this->acl->isPermissionAllowed($user, $resource, $permission);
+        return $this->acl->isPermissionAllowed($user, $resource, $codename);
     }
 
     public function setStartState(HasWorkflowStateModelInterface $model): void
