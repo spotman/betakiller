@@ -2,6 +2,7 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Assets\Model\HashBasedAssetsModelInterface;
 use BetaKiller\Helper\AssetsHelper;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -13,14 +14,17 @@ use Spotman\Api\ApiResponseItemInterface;
  *
  * Abstract class for all ORM-based asset models
  */
-abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInterface, ApiResponseItemInterface
+abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInterface, HashBasedAssetsModelInterface,
+    ApiResponseItemInterface
 {
+    public const COL_UPLOADED_BY = 'uploaded_by';
+
     protected function configure(): void
     {
         $this->belongs_to([
             'uploaded_by_user' => [
-                'model'       => 'User',
-                'foreign_key' => 'uploaded_by',
+                'model'       => User::getModelName(),
+                'foreign_key' => self::COL_UPLOADED_BY,
             ],
         ]);
     }
@@ -60,17 +64,29 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
     }
 
     /**
-     * Stores unique hash
+     * Returns unique hash for provided content
      *
-     * @param string $hash
+     * @param string $content
      *
-     * @return \BetaKiller\Assets\Model\AssetsModelInterface
+     * @return string
      */
-    public function setHash(string $hash): AssetsModelInterface
+    public function setHashFromContent(string $content): string
+    {
+        $hash = $this->calculateContentHash($content);
+
+        $this->setHash($hash);
+
+        return $hash;
+    }
+
+    protected function calculateContentHash(string $content): string
+    {
+        return sha1($content);
+    }
+
+    protected function setHash(string $hash): void
     {
         $this->set('hash', $hash);
-
-        return $this;
     }
 
     /**
