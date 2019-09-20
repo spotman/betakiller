@@ -14,6 +14,7 @@ use DateTimeInterface;
 interface AssetsModelInterface extends AbstractEntityInterface
 {
     public const API_KEY_ID            = 'id';
+    public const API_KEY_SIZE          = 'size';
     public const API_KEY_ORIGINAL_URL  = 'url';
     public const API_KEY_ORIGINAL_NAME = 'name';
     public const API_KEY_DELETE_URL    = 'delete_url';
@@ -40,6 +41,13 @@ interface AssetsModelInterface extends AbstractEntityInterface
      * @return \DateTimeImmutable
      */
     public function getUploadedAt(): DateTimeImmutable;
+
+    /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return bool
+     */
+    public function isUploadedBy(UserInterface $user): bool;
 
     /**
      * Sets the date and time when asset was uploaded

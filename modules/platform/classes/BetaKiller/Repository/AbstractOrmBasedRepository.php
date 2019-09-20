@@ -6,6 +6,7 @@ use BetaKiller\Helper\ExceptionTranslator;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
+use ORM\PaginateHelper;
 
 abstract class AbstractOrmBasedRepository extends AbstractRepository
 {
@@ -194,7 +195,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
             }
 
             // Wrap in a pager
-            $pager = \ORM\PaginateHelper::create(
+            $pager = PaginateHelper::create(
                 $orm,
                 $currentPage,
                 $itemsPerPage

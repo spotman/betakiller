@@ -138,6 +138,16 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
     }
 
     /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return bool
+     */
+    public function isUploadedBy(UserInterface $user): bool
+    {
+        return $this->getUploadedBy()->getID() === $user->getID();
+    }
+
+    /**
      * Returns the date and time when asset was uploaded
      *
      * @return DateTimeImmutable

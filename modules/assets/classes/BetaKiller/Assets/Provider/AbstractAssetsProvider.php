@@ -806,6 +806,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     {
         return [
             AssetsModelInterface::API_KEY_ID            => $this->converter->encode($model),
+            AssetsModelInterface::API_KEY_SIZE          => $model->getSize(),
             AssetsModelInterface::API_KEY_ORIGINAL_NAME => $model->getOriginalName(),
             AssetsModelInterface::API_KEY_ORIGINAL_URL  => $this->getOriginalUrl($model),
             AssetsModelInterface::API_KEY_DELETE_URL    => $this->getDeleteUrl($model),
