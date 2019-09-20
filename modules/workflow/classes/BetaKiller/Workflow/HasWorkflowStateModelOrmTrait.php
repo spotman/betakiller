@@ -79,7 +79,7 @@ trait HasWorkflowStateModelOrmTrait
 
     public static function getWorkflowStateRelationKey(): string
     {
-        return 'status';
+        return static::getModelName().'-status';
     }
 
     /**

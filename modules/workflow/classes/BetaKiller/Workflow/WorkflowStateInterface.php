@@ -2,8 +2,9 @@
 namespace BetaKiller\Workflow;
 
 use BetaKiller\Model\AbstractEntityInterface;
+use BetaKiller\Model\HasI18nKeyNameInterface;
 
-interface WorkflowStateInterface extends AbstractEntityInterface
+interface WorkflowStateInterface extends AbstractEntityInterface, HasI18nKeyNameInterface
 {
     /**
      * @param string $codename
