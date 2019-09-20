@@ -86,7 +86,10 @@ class Import extends AbstractTask
                 ]);
             }
 
-            foreach ($this->config->getStates($modelName) as $stateName) {
+            $configStates = $this->config->getStates($modelName);
+
+            // Add new and update flags
+            foreach ($configStates as $stateName) {
                 $state = $stateRepo->findByCodename($stateName);
 
                 if (!$state) {
@@ -129,6 +132,19 @@ class Import extends AbstractTask
                 $this->logger->debug('State ":name" imported', [
                     ':name' => $stateName,
                 ]);
+            }
+
+            // Remove unused states
+            foreach ($stateRepo->getAll() as $existingState) {
+                $stateName = $existingState->getCodename();
+
+                if (!in_array($stateName, $configStates, true)) {
+                    $this->logger->debug('Removing unused state ":name"', [
+                        ':name' => $stateName,
+                    ]);
+
+                    $stateRepo->delete($existingState);
+                }
             }
         }
     }
