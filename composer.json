@@ -70,7 +70,7 @@
     "zendframework/zend-expressive-helpers": "^5.1",
     "zendframework/zend-expressive-session": "^1.1",
     "zendframework/zend-httphandlerrunner": "^1.0",
-    "zendframework/zend-permissions-acl": "^2.6"
+    "zendframework/zend-permissions-acl": "^2.7"
   },
   "require-dev": {
     "codedungeon/phpunit-result-printer": "^0.26",
