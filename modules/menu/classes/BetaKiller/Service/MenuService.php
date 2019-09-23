@@ -251,6 +251,7 @@ class MenuService
                         $availableUrl->getUrl(),
                         $this->elementHelper->getLabel($urlElement, $params, $this->user->getLanguage()),
                         $this->urlHelper->inStack($urlElement, $params),
+                        $urlElement->getCodename(),
                         $counter
                     );
 

@@ -33,19 +33,26 @@ class MenuItem implements JsonSerializable
     private $children = [];
 
     /**
+     * @var string
+     */
+    private $codename;
+
+    /**
      * MenuItem constructor.
      *
      * @param string   $url
      * @param string   $label
      * @param bool     $active
+     * @param string   $codename
      * @param int|null $counter
      */
-    public function __construct(string $url, string $label, bool $active, ?int $counter = null)
+    public function __construct(string $url, string $label, bool $active, string $codename, ?int $counter = null)
     {
-        $this->url     = $url;
-        $this->label   = $label;
-        $this->active  = $active;
-        $this->counter = $counter;
+        $this->url      = $url;
+        $this->label    = $label;
+        $this->active   = $active;
+        $this->codename = $codename;
+        $this->counter  = $counter;
     }
 
     /**
@@ -73,11 +80,11 @@ class MenuItem implements JsonSerializable
     }
 
     /**
-     * @param MenuItem[] $children
+     * @return string
      */
-    public function addChildren(array $children): void
+    public function getCodename(): string
     {
-        $this->children = array_merge($this->children, $children);
+        return $this->codename;
     }
 
     /**
@@ -86,6 +93,14 @@ class MenuItem implements JsonSerializable
     public function getCounter(): ?int
     {
         return $this->counter;
+    }
+
+    /**
+     * @param MenuItem[] $children
+     */
+    public function addChildren(array $children): void
+    {
+        $this->children = array_merge($this->children, $children);
     }
 
     /**
@@ -111,6 +126,7 @@ class MenuItem implements JsonSerializable
             'label'    => $this->getLabel(),
             'active'   => $this->isActive(),
             'counter'  => $this->getCounter(),
+            'name'     => $this->getCodename(),
             'children' => array_map(static function (MenuItem $item) {
                 return $item->jsonSerialize();
             }, $this->getChildren()),
