@@ -2,17 +2,17 @@
 
 return [
 
-	/**
-	 * Twig Loader options
-	 */
-	'loader' => [
-		'extension' => 'twig',  // Extension for Twig files
-		'path'      => 'views', // Path within cascading filesystem for Twig files
+    /**
+     * Twig Loader options
+     */
+    'loader'      => [
+        'extension'  => 'twig',  // Extension for Twig files
+        'path'       => 'views', // Path within cascading filesystem for Twig files
 
         /**
          * Enable caching of directories list
          */
-        'cache' =>  true,
+        'cache'      => true,
 
         /**
          * Namespaces to add
@@ -22,43 +22,44 @@ return [
          *          'layouts'   =>  array('base/layouts', 'admin/layouts'),
          *      )
          */
-        'namespaces'    =>  [
-            'layouts'   =>  'layouts',
-            'wrappers'  =>  'wrappers',
-            'ifaces'    =>  'ifaces',
-            'widgets'   =>  'widgets',
-            'templates' =>  'templates',
-            'macros'    =>  'macros',
+        'namespaces' => [
+            'layouts'   => 'layouts',
+            'wrappers'  => 'wrappers',
+            'ifaces'    => 'ifaces',
+            'widgets'   => 'widgets',
+            'templates' => 'templates',
+            'macros'    => 'macros',
 
-            'statics'   =>  '../static-files',
+            'statics' => '../static-files',
         ],
     ],
 
-	/**
-	 * Twig Environment options
-	 *
-	 * http://twig.sensiolabs.org/doc/api.html#environment-options
-	 */
-	'environment' => [
-		'auto_reload'         => false,
-		'debug'               => false,
-		'autoescape'          => 'html',
-        'cache'               => MultiSite::instance()->getWorkingPath().DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'twig',
-		'optimizations'       => -1,
-		'strict_variables'    => true,
+    /**
+     * Twig Environment options
+     *
+     * http://twig.sensiolabs.org/doc/api.html#environment-options
+     */
+    'environment' => [
+        'auto_reload'      => false,
+        'debug'            => false,
+        'autoescape'       => 'html',
+        'cache'            => MultiSite::instance()
+                ->getWorkingPath().DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'twig',
+        'optimizations'    => -1,
+        'strict_variables' => true,
     ],
 
-	/**
-	 * Custom functions and filters
-	 *
-	 *      'functions' => array(
-	 *          'my_method' => array('MyClass', 'my_method'),
-	 *      ),
-	 */
-	'functions' => [
+    /**
+     * Custom functions and filters
+     *
+     *      'functions' => array(
+     *          'my_method' => array('MyClass', 'my_method'),
+     *      ),
+     */
+    'functions'   => [
     ],
 
-	'filters' => [],
+    'filters'    => [],
 
     /**
      * Twig extensions to register
@@ -68,8 +69,8 @@ return [
      *          'MyProject_Twig_Extension'
      *      )
      */
-    'extensions'    =>  [
-        \Twig_Extension_Debug::class,
+    'extensions' => [
+        \Twig\Extension\DebugExtension::class,
         \BetaKiller\TwigExtension::class,
         \BetaKiller\TwigCacheExtension::class,
         \Twig_Extensions_Extension_Text::class,
