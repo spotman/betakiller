@@ -81,4 +81,9 @@ class DateTimeHelper
     {
         return (new DateTimeImmutable())->setTimestamp($ts);
     }
+
+    public static function formatAtom(DateTimeImmutable $time): string
+    {
+        return $time->format(DateTimeImmutable::ATOM);
+    }
 }
