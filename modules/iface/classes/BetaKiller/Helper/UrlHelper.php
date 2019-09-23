@@ -12,6 +12,8 @@ use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\DummyModelInterface;
+use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
@@ -144,6 +146,11 @@ class UrlHelper
         ?bool $removeCyclingLinks = null
     ): string {
         $removeCyclingLinks = $removeCyclingLinks ?? true;
+
+        // Make link to Dummy redirect target (prevent browser redirects)
+        if ($urlElement instanceof DummyModelInterface) {
+            $urlElement = $this->detectDummyTarget($urlElement);
+        }
 
         if ($removeCyclingLinks && $this->stack->isCurrent($urlElement, $params)) {
             return $this->appConfig->getCircularLinkHref();
@@ -308,6 +315,49 @@ class UrlHelper
     public function getPreviewEntityUrl(DispatchableEntityInterface $entity): ?string
     {
         return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, ZoneInterface::PREVIEW);
+    }
+
+    public function detectDummyTarget(DummyModelInterface $element): UrlElementInterface
+    {
+        $redirectElement = $element;
+
+        // Process chained dummies to prevent multiple redirects in browser
+        do {
+            $redirectTarget = $redirectElement->getRedirectTarget();
+
+            $redirectElement = $redirectTarget
+                ? $this->getUrlElementByCodename($redirectTarget)
+                : null;
+        } while ($redirectElement && $redirectElement instanceof DummyModelInterface && $redirectElement->getRedirectTarget());
+
+        // Fallback to parent if redirect is not defined
+        if (!$redirectElement) {
+            $redirectElement = $this->getParentIFace($element);
+        }
+
+        return $redirectElement;
+    }
+
+    private function getParentIFace(UrlElementInterface $model): UrlElementInterface
+    {
+        // Find nearest IFace
+        foreach ($this->tree->getReverseBreadcrumbsIterator($model) as $parent) {
+            if ($parent instanceof IFaceModelInterface) {
+                return $parent;
+            }
+        }
+
+        $parent = $this->tree->getParent($model);
+
+        // Redirect root dummies to default element
+        if (!$parent) {
+            return $this->tree->getDefault();
+        }
+
+        throw new UrlElementException('No IFace found for Dummy with URI ":uri" and parent ":parent"', [
+            ':uri'    => $model->getUri(),
+            ':parent' => $model->getParentCodename() ?: 'root',
+        ]);
     }
 
     private function makeAbsoluteUrl(string $relativeUrl): string
