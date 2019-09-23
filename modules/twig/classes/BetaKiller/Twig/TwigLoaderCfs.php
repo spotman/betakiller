@@ -2,12 +2,12 @@
 namespace BetaKiller\Twig;
 
 use Kohana;
-use Twig_Loader_Filesystem;
+use Twig\Loader\FilesystemLoader;
 
 /**
  * Twig loader for Kohana's cascading filesystem
  */
-final class TwigLoaderCfs extends Twig_Loader_Filesystem
+final class TwigLoaderCfs extends FilesystemLoader
 {
     private $pathsCacheKey = 'twig_cfs_loader_paths';
 
@@ -19,7 +19,7 @@ final class TwigLoaderCfs extends Twig_Loader_Filesystem
     /**
      * Constructor
      *
-     * @param  array $config Loader configuration
+     * @param array $config Loader configuration
      */
     public function __construct($config)
     {
