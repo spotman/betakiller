@@ -8,10 +8,9 @@
 
 namespace BetaKiller\Search;
 
-use Spotman\Api\ApiResponseItemInterface;
 use Traversable;
 
-class SearchResults implements SearchResultsInterface, ApiResponseItemInterface
+class SearchResults implements SearchResultsInterface
 {
     /**
      * @var \BetaKiller\Search\SearchResultsItemInterface[]
@@ -46,20 +45,26 @@ class SearchResults implements SearchResultsInterface, ApiResponseItemInterface
      * @param int   $totalPages
      * @param bool  $hasNextPage
      */
-    public function __construct(array $items, int $totalCount, int $totalPages, bool $hasNextPage)
+    public function __construct(array $items, int $totalCount, int $totalPages, bool $hasNextPage, string $url = null)
     {
         $this->totalCount  = $totalCount;
         $this->totalPages  = $totalPages;
         $this->hasNextPage = $hasNextPage;
+        $this->url         = $url;
 
         foreach ($items as $item) {
             $this->addItem($item);
         }
     }
 
-    public static function factory(array $items, int $totalItems, int $totalPages, bool $hasNextPage): SearchResultsInterface
-    {
-        return new self($items, $totalItems, $totalPages, $hasNextPage);
+    public static function factory(
+        array $items,
+        int $totalItems,
+        int $totalPages,
+        bool $hasNextPage,
+        string $url = null
+    ): SearchResultsInterface {
+        return new self($items, $totalItems, $totalPages, $hasNextPage, $url);
     }
 
     /**
@@ -95,7 +100,7 @@ class SearchResults implements SearchResultsInterface, ApiResponseItemInterface
         return $this->hasNextPage;
     }
 
-    public function getURL(): string
+    public function getURL(): ?string
     {
         return $this->url;
     }
@@ -123,28 +128,22 @@ class SearchResults implements SearchResultsInterface, ApiResponseItemInterface
     }
 
     /**
-     * @return callable
+     * Specify data which should be serialized to JSON
+     *
+     * @link  https://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
      */
-    public function getApiResponseData(): callable
+    public function jsonSerialize()
     {
-        return function() {
-            return [
-                'items'       => $this->getItemsData(),
-                'totalItems'  => $this->getTotalCount(),
-                'totalPages'  => $this->getTotalPages(),
-                'hasNextPage' => $this->hasNextPage(),
-                'url'         => $this->getURL(),
-            ];
-        };
-    }
-
-    /**
-     * @return \DateTimeImmutable|null
-     */
-    public function getApiLastModified(): \DateTimeImmutable
-    {
-        // Not done yet
-        return null;
+        return [
+            'items'       => $this->getItemsData(),
+            'totalItems'  => $this->getTotalCount(),
+            'totalPages'  => $this->getTotalPages(),
+            'hasNextPage' => $this->hasNextPage(),
+            'url'         => $this->getURL(),
+        ];
     }
 
     /**

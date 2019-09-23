@@ -5,6 +5,7 @@ use BetaKiller\Factory\OrmFactory;
 use BetaKiller\Helper\ExceptionTranslator;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\ExtendedOrmInterface;
+use BetaKiller\Search\SearchResultsInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use ORM\PaginateHelper;
 
@@ -157,6 +158,11 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         return $model;
     }
 
+    protected function countAll(OrmInterface $orm): int
+    {
+        return $orm->count_all();
+    }
+
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      *
@@ -202,6 +208,23 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
             );
 
             return $pager->getResults();
+        } catch (\Kohana_Exception $e) {
+            throw RepositoryException::wrap($e);
+        }
+    }
+
+    /**
+     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     * @param int                                    $currentPage
+     * @param int                                    $itemsPerPage
+     *
+     * @return \BetaKiller\Search\SearchResultsInterface
+     * @throws \BetaKiller\Exception
+     */
+    protected function findAllResults(ExtendedOrmInterface $orm, int $currentPage, int $itemsPerPage): SearchResultsInterface
+    {
+        try {
+            return $orm->getSearchResults($currentPage, $itemsPerPage);
         } catch (\Kohana_Exception $e) {
             throw RepositoryException::wrap($e);
         }

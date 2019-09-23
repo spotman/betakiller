@@ -9,7 +9,7 @@
 namespace BetaKiller\Search;
 
 
-interface SearchResultsInterface extends \IteratorAggregate
+interface SearchResultsInterface extends \IteratorAggregate, \JsonSerializable
 {
     public function addItem(SearchResultsItemInterface $item): void;
 
@@ -31,7 +31,7 @@ interface SearchResultsInterface extends \IteratorAggregate
     /**
      * @return string
      */
-    public function getURL(): string;
+    public function getURL(): ?string;
 
     /**
      * @return SearchResultsItemInterface[]|\Traversable
