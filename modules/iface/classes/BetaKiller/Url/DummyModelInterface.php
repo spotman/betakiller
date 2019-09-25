@@ -7,6 +7,7 @@ interface DummyModelInterface extends EntityLinkedUrlElementInterface, UrlElemen
     UrlElementWithLayoutInterface
 {
     public const OPTION_REDIRECT = 'redirect';
+    public const OPTION_FORWARD  = 'forward';
 
     /**
      * Returns UrlElement codename (if defined)
@@ -14,4 +15,11 @@ interface DummyModelInterface extends EntityLinkedUrlElementInterface, UrlElemen
      * @return string|null
      */
     public function getRedirectTarget(): ?string;
+
+    /**
+     * Returns UrlElement codename to proceed instead of current Dummy (if defined)
+     *
+     * @return string|null
+     */
+    public function getForwardTarget(): ?string;
 }

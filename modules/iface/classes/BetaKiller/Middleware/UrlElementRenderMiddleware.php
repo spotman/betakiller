@@ -11,6 +11,8 @@ use BetaKiller\Factory\UrlElementProcessorFactory;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Url\AfterProcessingInterface;
 use BetaKiller\Url\BeforeProcessingInterface;
+use BetaKiller\Url\DummyModelInterface;
+use BetaKiller\Url\UrlElementTreeInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -29,17 +31,25 @@ class UrlElementRenderMiddleware implements MiddlewareInterface
     private $instanceFactory;
 
     /**
+     * @var \BetaKiller\Url\UrlElementTreeInterface
+     */
+    private $tree;
+
+    /**
      * UrlElementRenderMiddleware constructor.
      *
      * @param \BetaKiller\Factory\UrlElementProcessorFactory $processorFactory
      * @param \BetaKiller\Factory\UrlElementInstanceFactory  $instanceFactory
+     * @param \BetaKiller\Url\UrlElementTreeInterface        $tree
      */
     public function __construct(
         UrlElementProcessorFactory $processorFactory,
-        UrlElementInstanceFactory $instanceFactory
+        UrlElementInstanceFactory $instanceFactory,
+        UrlElementTreeInterface $tree
     ) {
         $this->processorFactory = $processorFactory;
         $this->instanceFactory  = $instanceFactory;
+        $this->tree             = $tree;
     }
 
     /**
@@ -62,6 +72,15 @@ class UrlElementRenderMiddleware implements MiddlewareInterface
         }
 
         $urlElement = $stack->getCurrent();
+
+        // Use forward target if Dummy defined it
+        if ($urlElement instanceof DummyModelInterface) {
+            $targetCodename = $urlElement->getForwardTarget();
+
+            if ($targetCodename) {
+                $urlElement = $this->tree->getByCodename($targetCodename);
+            }
+        }
 
         $path = $request->getUri()->getPath();
 

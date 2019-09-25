@@ -319,6 +319,11 @@ class UrlHelper
 
     public function detectDummyTarget(DummyModelInterface $element): UrlElementInterface
     {
+        // Keep current element if forward target defined
+        if ($element->getForwardTarget()) {
+            return $element;
+        }
+
         $redirectElement = $element;
 
         // Process chained dummies to prevent multiple redirects in browser

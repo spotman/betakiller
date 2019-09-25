@@ -27,6 +27,11 @@ class DummyPlainModel extends AbstractPlainEntityLinkedUrlElement implements Dum
     /**
      * @var string|null
      */
+    private $forward;
+
+    /**
+     * @var string|null
+     */
     private $layoutCodename;
 
     /**
@@ -70,6 +75,16 @@ class DummyPlainModel extends AbstractPlainEntityLinkedUrlElement implements Dum
     }
 
     /**
+     * Returns UrlElement codename to proceed instead of current Dummy (if defined)
+     *
+     * @return string|null
+     */
+    public function getForwardTarget(): ?string
+    {
+        return $this->forward;
+    }
+
+    /**
      * Returns layout codename
      *
      * @return string
@@ -95,6 +110,10 @@ class DummyPlainModel extends AbstractPlainEntityLinkedUrlElement implements Dum
             $this->redirect = $data[self::OPTION_REDIRECT];
         }
 
+        if (isset($data[self::OPTION_FORWARD])) {
+            $this->forward = $data[self::OPTION_FORWARD];
+        }
+
         parent::fromArray($data);
     }
 
@@ -106,10 +125,11 @@ class DummyPlainModel extends AbstractPlainEntityLinkedUrlElement implements Dum
     public function asArray(): array
     {
         return array_merge(parent::asArray(), [
-            self::OPTION_LABEL                   => $this->getLabel(),
-            self::OPTION_MENU                    => $this->getMenuName(),
+            self::OPTION_LABEL    => $this->getLabel(),
+            self::OPTION_MENU     => $this->getMenuName(),
             self::OPTION_REDIRECT => $this->getRedirectTarget(),
-            self::OPTION_LAYOUT                  => $this->getLayoutCodename(),
+            self::OPTION_FORWARD  => $this->getForwardTarget(),
+            self::OPTION_LAYOUT   => $this->getLayoutCodename(),
         ]);
     }
 }
