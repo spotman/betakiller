@@ -40,7 +40,7 @@ class CompleteApiMethod extends AbstractEntityBasedApiMethod
      *
      * @return \Spotman\Api\ApiMethodResponse|null
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Workflow\StatusException

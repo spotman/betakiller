@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Url;
 
-use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\Container\UrlContainerInterface;
 
 class UrlElementStack implements \IteratorAggregate
@@ -34,7 +33,7 @@ class UrlElementStack implements \IteratorAggregate
     /**
      * @param \BetaKiller\Url\UrlElementInterface $model
      *
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function push(UrlElementInterface $model): void
     {

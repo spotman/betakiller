@@ -7,12 +7,12 @@ use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Helper\UrlHelper;
-use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\EntityLinkedUrlElementInterface;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
@@ -65,7 +65,7 @@ class BarWidget extends AbstractAdminWidget
      * @param array                                    $context
      *
      * @return array
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \Spotman\Acl\Exception
      */
@@ -115,7 +115,7 @@ class BarWidget extends AbstractAdminWidget
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|null
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     protected function detectPrimaryEntity(
         EntityLinkedUrlElementInterface $urlElement,
@@ -139,7 +139,7 @@ class BarWidget extends AbstractAdminWidget
      *
      * @return array
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \Spotman\Acl\Exception
      */
@@ -170,7 +170,7 @@ class BarWidget extends AbstractAdminWidget
     /**
      * @return array|null
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \Spotman\Acl\Exception
      */
 //    private function getCommentsData(): ?array
@@ -200,7 +200,7 @@ class BarWidget extends AbstractAdminWidget
      * @param \BetaKiller\Helper\UrlHelper $helper
      *
      * @return IFaceModelInterface
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @uses \BetaKiller\IFace\Admin\Content\CommentListByStatusIFace
      */
     private function getCommentsListByStatusIface(UrlHelper $helper): UrlElementInterface
@@ -212,7 +212,7 @@ class BarWidget extends AbstractAdminWidget
      * @param \BetaKiller\Helper\UrlHelper $helper
      *
      * @return \BetaKiller\Url\UrlElementInterface
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @uses \BetaKiller\IFace\Admin\Content\CommentIndexIFace
      */
     private function getCommentsRootIface(UrlHelper $helper): UrlElementInterface
@@ -226,7 +226,7 @@ class BarWidget extends AbstractAdminWidget
      * @param \BetaKiller\Helper\UrlHelper                       $helper
      *
      * @return null|string
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function getAdminEditButtonUrl(
         ?DispatchableEntityInterface $entity,
@@ -248,7 +248,7 @@ class BarWidget extends AbstractAdminWidget
      * @param \BetaKiller\Helper\UrlHelper                       $helper
      *
      * @return null|string
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function getPublicReadButtonUrl(
         ?DispatchableEntityInterface $entity,
@@ -271,7 +271,7 @@ class BarWidget extends AbstractAdminWidget
      * @param \BetaKiller\Helper\UrlHelper                       $helper
      *
      * @return null|string
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function getPreviewButtonUrl(
         ?DispatchableEntityInterface $entity,
@@ -295,7 +295,7 @@ class BarWidget extends AbstractAdminWidget
      * @param string                                             $targetAction
      *
      * @return null|string
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function getPrimaryEntityActionUrl(
         UrlElementStack $stack,

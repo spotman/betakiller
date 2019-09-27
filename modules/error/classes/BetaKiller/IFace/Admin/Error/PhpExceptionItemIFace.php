@@ -33,7 +33,7 @@ class PhpExceptionItemIFace extends AbstractErrorAdminIFace
      *
      * @return array
      * @throws \BetaKiller\Exception
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Repository\RepositoryException
      * @uses \BetaKiller\IFace\Admin\Error\UnresolvedPhpExceptionIndexIFace
      * @uses \BetaKiller\IFace\Admin\Error\ResolvedPhpExceptionIndexIFace

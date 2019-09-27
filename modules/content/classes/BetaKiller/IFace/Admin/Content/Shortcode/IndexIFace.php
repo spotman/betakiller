@@ -31,7 +31,7 @@ class IndexIFace extends AbstractAdminIFace
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return array
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getData(ServerRequestInterface $request): array
     {
@@ -57,7 +57,7 @@ class IndexIFace extends AbstractAdminIFace
      * @param \BetaKiller\Content\Shortcode\ShortcodeEntityInterface $shortcode
      *
      * @return array
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function makeShortcodeData(ShortcodeEntityInterface $shortcode): array
     {

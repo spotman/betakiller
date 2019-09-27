@@ -14,7 +14,7 @@ class WampRpcManagerIFace extends AbstractIFace
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return string[]
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getData(ServerRequestInterface $request): array
     {

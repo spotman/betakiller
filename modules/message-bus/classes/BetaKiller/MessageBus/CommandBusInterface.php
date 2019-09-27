@@ -8,8 +8,14 @@ interface CommandBusInterface extends AbstractMessageBusInterface
     /**
      * @param \BetaKiller\MessageBus\CommandMessageInterface $message
      *
-     * @throws \BetaKiller\MessageBus\MessageBusException
-     * @return mixed|null
+     * @return void
      */
-    public function run(CommandMessageInterface $message);
+    public function enqueue(CommandMessageInterface $message): void;
+
+    /**
+     * @param \BetaKiller\MessageBus\CommandMessageInterface $command
+     *
+     * @throws \BetaKiller\MessageBus\MessageBusException
+     */
+    public function handle(CommandMessageInterface $command): void;
 }

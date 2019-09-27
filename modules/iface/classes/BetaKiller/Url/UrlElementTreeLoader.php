@@ -5,7 +5,6 @@ namespace BetaKiller\Url;
 
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
-use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\ModelProvider\UrlElementProviderDatabase;
 use BetaKiller\Url\ModelProvider\UrlElementProviderXmlConfig;
 use Psr\Log\LoggerInterface;
@@ -70,7 +69,7 @@ class UrlElementTreeLoader
 
     /**
      * @return \BetaKiller\Url\UrlElementTreeInterface
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function load(): UrlElementTreeInterface
@@ -136,7 +135,7 @@ class UrlElementTreeLoader
      * @param string $key
      *
      * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function storeTreeInCache(string $key): void
     {
@@ -153,7 +152,7 @@ class UrlElementTreeLoader
     }
 
     /**
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function loadTreeFromProviders(): void
     {

@@ -26,7 +26,7 @@ class UrlElementTreeRecursiveIterator extends UrlElementTreeLayerIterator implem
      * @param \BetaKiller\Url\UrlElementInterface|null                     $parent  [optional]
      * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filters [optional]
      *
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function __construct(
         UrlElementTreeInterface $tree,
@@ -57,7 +57,7 @@ class UrlElementTreeRecursiveIterator extends UrlElementTreeLayerIterator implem
      * @link  http://php.net/manual/en/recursiveiterator.getchildren.php
      * @return \RecursiveIterator An iterator for the current entry.
      * @since 5.1.0
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getChildren(): \RecursiveIterator
     {

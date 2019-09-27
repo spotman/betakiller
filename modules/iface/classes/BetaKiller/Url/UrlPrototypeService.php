@@ -2,7 +2,6 @@
 namespace BetaKiller\Url;
 
 use BetaKiller\IdentityConverterInterface;
-use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\SingleParentTreeModelInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -57,7 +56,7 @@ class UrlPrototypeService
      * @param \BetaKiller\Url\UrlElementInterface $urlElement
      *
      * @return \BetaKiller\Url\UrlPrototype
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function createPrototypeFromUrlElement(UrlElementInterface $urlElement): UrlPrototype
@@ -183,7 +182,8 @@ class UrlPrototypeService
         return preg_replace_callback(
             UrlPrototype::REGEX,
             function ($matches) use ($parameters) {
-                $value = $this->getCompiledPrototypeValue($matches[0], $parameters);
+                $proto = $this->createPrototypeFromString($matches[0]);
+                $value = $this->getCompiledPrototypeValue($proto, $parameters);
 
                 // Prevent loops
                 return \preg_replace(UrlPrototype::REGEX, '', $value);
@@ -193,31 +193,28 @@ class UrlPrototypeService
     }
 
     /**
-     * @param string                                          $proto
+     * @param \BetaKiller\Url\UrlPrototype                    $prototype
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function getCompiledPrototypeValue(string $proto, UrlContainerInterface $params): string
+    public function getCompiledPrototypeValue(UrlPrototype $prototype, UrlContainerInterface $params): string
     {
-        $prototype = $this->createPrototypeFromString($proto);
-
         $param = $this->getParamByPrototype($prototype, $params);
 
         return $this->calculateParameterKeyValue($prototype, $param);
     }
 
     /**
-     * @param string                                               $proto
+     * @param \BetaKiller\Url\UrlPrototype                         $prototype
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function getCompiledTreePrototypeValue(string $proto, UrlContainerInterface $params): string
+    public function getCompiledTreePrototypeValue(UrlPrototype $prototype, UrlContainerInterface $params): string
     {
-        $prototype = $this->createPrototypeFromString($proto);
         $parameter = $this->getParamByPrototype($prototype, $params);
 
         if (!($parameter instanceof SingleParentTreeModelInterface)) {
@@ -237,6 +234,13 @@ class UrlPrototypeService
         return implode('/', array_reverse($parts));
     }
 
+    public function hasProtoInParameters(UrlPrototype $proto, UrlContainerInterface $params): bool
+    {
+        $name = $proto->getDataSourceName();
+
+        return $params->hasParameter($name);
+    }
+
     /**
      * @param \BetaKiller\Url\UrlPrototype                    $prototype
      * @param \BetaKiller\Url\Container\UrlContainerInterface $parameters
@@ -250,10 +254,10 @@ class UrlPrototypeService
     ): UrlParameterInterface {
         $name = $prototype->getDataSourceName();
 
-        $instance = $parameters ? $parameters->getParameter($name) : null;
+        $instance = $parameters->getParameter($name);
 
         if (!$instance) {
-            throw new UrlPrototypeException('Can not find :name parameter', [':name' => $name]);
+            throw new UrlPrototypeException('Can not find ":name" parameter', [':name' => $name]);
         }
 
         return $instance;

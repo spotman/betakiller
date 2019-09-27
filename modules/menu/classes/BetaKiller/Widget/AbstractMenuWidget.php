@@ -33,7 +33,7 @@ abstract class AbstractMenuWidget extends AbstractWidget
      *
      * @return array [[string url, string label, bool active, array children], ...]
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\ElementFilter\UrlElementFilterException
      */
     public function getData(ServerRequestInterface $request, array $context): array

@@ -37,7 +37,7 @@ abstract class AbstractChildrenListingIFace extends AbstractIFace
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return array
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function getData(ServerRequestInterface $request): array

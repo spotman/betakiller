@@ -1,16 +1,56 @@
 <?php
 namespace BetaKiller\MessageBus;
 
+use BetaKiller\Daemon\CommandBusWorkerDaemon;
+use Interop\Queue\Context;
+use Interop\Queue\Producer;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
+
 class CommandBus extends AbstractMessageBus implements CommandBusInterface
 {
     /**
-     * @param \BetaKiller\MessageBus\CommandMessageInterface $message
-     *
-     * @throws \BetaKiller\MessageBus\MessageBusException
+     * @var \Interop\Queue\Context
      */
-    public function run(CommandMessageInterface $message): void
+    private $queueContext;
+
+    /**
+     * @var \Interop\Queue\Producer|null
+     */
+    private $queueProducer;
+
+    /**
+     * @var \Interop\Queue\Queue
+     */
+    private $queue;
+
+    /**
+     * CommandBus constructor.
+     *
+     * @param \Interop\Queue\Context            $context
+     * @param \Psr\Container\ContainerInterface $container
+     * @param \Psr\Log\LoggerInterface          $logger
+     */
+    public function __construct(Context $context, ContainerInterface $container, LoggerInterface $logger)
     {
-        $this->handle($message);
+        parent::__construct($container, $logger);
+
+        $this->queueContext = $context;
+        $this->queue        = $this->queueContext->createQueue(CommandBusWorkerDaemon::QUEUE_NAME);
+    }
+
+    /**
+     * @param \BetaKiller\MessageBus\CommandMessageInterface $command
+     */
+    public function enqueue(CommandMessageInterface $command): void
+    {
+        // Execute command through ESB bus
+        $body = \serialize($command);
+
+        $queueMessage = $this->queueContext->createMessage($body);
+
+        // Enqueue
+        $this->getProducer()->send($this->queue, $queueMessage);
     }
 
     protected function getHandlerInterface(): string
@@ -25,44 +65,27 @@ class CommandBus extends AbstractMessageBus implements CommandBusInterface
     }
 
     /**
-     * @param \BetaKiller\MessageBus\CommandMessageInterface $message
+     * @param \BetaKiller\MessageBus\CommandMessageInterface $command
      *
      * @throws \BetaKiller\MessageBus\MessageBusException
-     * @return mixed|null
      */
-    private function handle(CommandMessageInterface $message)
+    public function handle(CommandMessageInterface $command): void
     {
         // Only one handler per message
-        $handlerClassName = $this->getMessageHandlersClassNames($message)[0];
+        $handlerClassName = $this->getMessageHandlersClassNames($command)[0];
 
+        /** @var callable $handler */
         $handler = $this->getHandlerInstance($handlerClassName);
 
-        return $this->process($message, $handler);
+        $handler($command);
     }
 
-    /**
-     * @param \BetaKiller\MessageBus\CommandMessageInterface $command
-     * @param \BetaKiller\MessageBus\CommandHandlerInterface $handler
-     *
-     * @return mixed|null
-     */
-    private function process(CommandMessageInterface $command, CommandHandlerInterface $handler)
+    private function getProducer(): Producer
     {
-        // Wrap every message bus processing with try-catch block and log exceptions
-        try {
-            $result = $handler->handleCommand($command);
-
-            if ($result && $command->isAsync()) {
-                throw new MessageBusException('Async command :name must not return result', [
-                    ':name' => $this->getMessageName($command),
-                ]);
-            }
-
-            return $result;
-        } catch (\Throwable $e) {
-            $this->logException($this->logger, $e);
+        if (!$this->queueProducer) {
+            $this->queueProducer = $this->queueContext->createProducer()->setTimeToLive(600 * 1000);
         }
 
-        return null;
+        return $this->queueProducer;
     }
 }

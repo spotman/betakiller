@@ -123,7 +123,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
      * @param \BetaKiller\Helper\UrlHelper $helper
      *
      * @return string
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function getRelatedEntityPublicUrl(UrlHelper $helper): string
     {

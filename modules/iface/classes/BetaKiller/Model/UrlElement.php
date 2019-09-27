@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace BetaKiller\Model;
 
 use BetaKiller\Exception\NotImplementedHttpException;
-use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\EntityLinkedUrlElementInterface;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementInterface;
 
 /**
@@ -94,6 +94,17 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements Entity
     }
 
     /**
+     * Returns key-value pairs for "query param name" => "Url parameter binding"
+     * Example: [ "u" => "User.id", "r" => "Role.codename" ]
+     *
+     * @return array
+     */
+    public function getQueryParams(): array
+    {
+        throw new NotImplementedHttpException();
+    }
+
+    /**
      * Returns TRUE if iface is marked as "default"
      *
      * @return bool
@@ -175,7 +186,7 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements Entity
 
     /**
      * @return IFaceModelInterface
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getIFaceModel(): IFaceModelInterface
     {

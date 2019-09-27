@@ -2,10 +2,10 @@
 namespace BetaKiller\Helper;
 
 use BetaKiller\I18n\I18nFacade;
-use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
@@ -50,7 +50,7 @@ class UrlElementHelper
      * @param \BetaKiller\Url\UrlElementStack $stack
      *
      * @return \BetaKiller\Url\IFaceModelInterface|null
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public static function getCurrentIFaceModel(UrlElementStack $stack): ?IFaceModelInterface
     {
@@ -71,7 +71,7 @@ class UrlElementHelper
      * @param \BetaKiller\Url\UrlElementStack $stack
      *
      * @return bool
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public static function isCurrentZone(string $zone, UrlElementStack $stack): bool
     {
@@ -85,7 +85,7 @@ class UrlElementHelper
      * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @return string|null
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function detectLayoutCodename(UrlElementInterface $model): ?string
     {
@@ -109,7 +109,7 @@ class UrlElementHelper
      *
      * @return string
      * @throws \BetaKiller\I18n\I18nException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function getLabel(
@@ -139,7 +139,7 @@ class UrlElementHelper
      *
      * @return string
      * @throws \BetaKiller\I18n\I18nException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function getTitle(
@@ -201,7 +201,7 @@ class UrlElementHelper
      *
      * @return string
      * @throws \BetaKiller\I18n\I18nException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     private function makeTitleFromLabels(

@@ -24,7 +24,7 @@ class UrlElementProviderDatabase implements UrlElementProviderInterface
 
     /**
      * @return \BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getAll(): array
@@ -43,7 +43,7 @@ class UrlElementProviderDatabase implements UrlElementProviderInterface
      * @param \BetaKiller\Model\UrlElement $element
      *
      * @return \BetaKiller\Url\UrlElementInterface
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function detectDedicatedObject(UrlElement $element): UrlElementInterface
     {

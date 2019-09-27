@@ -5,11 +5,11 @@ use BetaKiller\Assets\StaticAssetsFactory;
 use BetaKiller\Dev\Profiler;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
-use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Repository\IFaceLayoutRepository;
 use BetaKiller\Repository\RepositoryException;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementException;
 use Meta;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -76,7 +76,7 @@ class IFaceView
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return string
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function render(IFaceInterface $iface, ServerRequestInterface $request): string

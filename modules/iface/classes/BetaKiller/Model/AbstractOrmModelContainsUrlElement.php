@@ -65,6 +65,17 @@ abstract class AbstractOrmModelContainsUrlElement extends \ORM implements Entity
     }
 
     /**
+     * Returns key-value pairs for "query param name" => "Url parameter binding"
+     * Example: [ "u" => "User.id", "r" => "Role.codename" ]
+     *
+     * @return array
+     */
+    public function getQueryParams(): array
+    {
+        return $this->getUrlElement()->getQueryParams();
+    }
+
+    /**
      * Returns TRUE if iface is marked as "default"
      *
      * @return bool

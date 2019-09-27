@@ -1,11 +1,11 @@
 <?php
 namespace BetaKiller\Factory;
 
-use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\ActionModelInterface;
 use BetaKiller\Url\DummyModelInterface;
 use BetaKiller\Url\ElementProcessor\UrlElementProcessorInterface;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementInterface;
 
 /**

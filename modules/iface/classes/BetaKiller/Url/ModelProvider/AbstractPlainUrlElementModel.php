@@ -11,6 +11,7 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     public const OPTION_CODENAME           = 'name';
     public const OPTION_PARENT             = 'parent';
     public const OPTION_URI                = 'uri';
+    public const OPTION_QUERY              = 'query';
     public const OPTION_HAS_TREE_BEHAVIOUR = 'hasTreeBehaviour';
     public const OPTION_HIDE_IN_SITEMAP    = 'hideInSiteMap';
     public const OPTION_IS_DEFAULT         = 'isDefault';
@@ -38,6 +39,11 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     private $uri;
 
     /**
+     * @var string[]
+     */
+    private $query = [];
+
+    /**
      * @var bool
      */
     private $hasDynamicUrl = false;
@@ -57,7 +63,12 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
      */
     private $aclRules = [];
 
-    public static function factory(array $data)
+    /**
+     * @param array $data
+     *
+     * @return \BetaKiller\Url\UrlElementInterface|static
+     */
+    public static function factory(array $data): UrlElementInterface
     {
         /** @var static $instance */
         $instance = new static;
@@ -102,6 +113,17 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     public function getUri(): string
     {
         return $this->uri;
+    }
+
+    /**
+     * Returns key-value pairs for "query param name" => "Url parameter binding"
+     * Example: [ "u" => "User.id", "r" => "Role.codename" ]
+     *
+     * @return array
+     */
+    public function getQueryParams(): array
+    {
+        return $this->query;
     }
 
     /**
@@ -174,6 +196,7 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
         return [
             self::OPTION_CODENAME           => $this->getCodename(),
             self::OPTION_URI                => $this->getUri(),
+            self::OPTION_QUERY              => $this->getQueryParams(),
             self::OPTION_HAS_TREE_BEHAVIOUR => $this->hasTreeBehaviour(),
             self::OPTION_PARENT             => $this->getParentCodename(),
             self::OPTION_HIDE_IN_SITEMAP    => $this->isHiddenInSiteMap(),
@@ -194,6 +217,21 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
 
         if (\mb_strpos($this->uri, '{') === 0 && \mb_strpos($this->uri, '}', -1) !== false) {
             $this->hasDynamicUrl = true;
+        }
+
+        if (isset($data[self::OPTION_QUERY])) {
+            $query  = [];
+            $values = explode(',', (string)$data[self::OPTION_QUERY]);
+            // Remove unnecessary spaces
+            $values = array_filter(array_map('trim', $values));
+
+            foreach ($values as $value) {
+                [$queryName, $binding] = explode('=', $value, 2);
+
+                $query[$queryName] = $binding;
+            }
+
+            $this->query = $query;
         }
 
         if (isset($data[self::OPTION_HAS_TREE_BEHAVIOUR])) {

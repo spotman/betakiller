@@ -81,8 +81,8 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
 
         $handlers = $this->bindings[$name] ?? [];
 
-        if (!$handlers && $message->handlersRequired()) {
-            throw new MessageBusException('No handlers found for :name message', [':name' => $name]);
+        if (!$handlers && $message instanceof EventMessageInterface && $message->handlersRequired()) {
+            throw new MessageBusException('No handlers found for :name event', [':name' => $name]);
         }
 
         return $handlers;

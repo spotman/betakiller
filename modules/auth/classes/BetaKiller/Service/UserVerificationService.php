@@ -127,7 +127,7 @@ class UserVerificationService
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return string
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     protected function getActionUrl(UrlHelper $urlHelper, UrlContainerInterface $params): string
     {

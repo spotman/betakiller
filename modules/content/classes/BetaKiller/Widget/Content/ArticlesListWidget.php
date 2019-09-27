@@ -6,7 +6,6 @@ use BetaKiller\Helper\ContentHelper;
 use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlHelper;
-use BetaKiller\Model\ContentCategory;
 use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Repository\ContentCategoryRepository;
@@ -125,7 +124,7 @@ final class ArticlesListWidget extends AbstractPublicWidget
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Kohana_Exception
      */

@@ -25,7 +25,7 @@ class SitemapIFace extends AbstractIFace
      *
      * @return array
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getData(ServerRequestInterface $request): array
     {

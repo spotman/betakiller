@@ -46,7 +46,7 @@ class DefaultUserUrlDetector implements UserUrlDetectorInterface
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return string|null
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     protected function commonChecks(UserInterface $user): ?string
     {

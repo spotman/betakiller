@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url;
 
-use BetaKiller\IFace\Exception\UrlElementException;
-
 class MissingUrlElementException extends UrlElementException
 {
     /**

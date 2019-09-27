@@ -39,6 +39,14 @@ interface UrlElementInterface
     public function setUri(string $value): void;
 
     /**
+     * Returns key-value pairs for "query param name" => "Url parameter binding"
+     * Example: [ "u" => "User.id", "r" => "Role.codename" ]
+     *
+     * @return array
+     */
+    public function getQueryParams(): array;
+
+    /**
      * Returns TRUE if URL element provides dynamic url mapping
      *
      * @return bool

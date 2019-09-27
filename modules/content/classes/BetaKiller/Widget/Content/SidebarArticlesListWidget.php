@@ -36,7 +36,7 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getData(ServerRequestInterface $request, array $context): array
     {

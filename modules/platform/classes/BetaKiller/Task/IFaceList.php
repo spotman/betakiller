@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task;
 
-use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\ActionModelInterface;
 use BetaKiller\Url\DummyModelInterface;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementTreeInterface;
 use Psr\Log\LoggerInterface;
 
@@ -44,7 +44,7 @@ class IFaceList extends AbstractTask
 
     /**
      *
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function run(): void
     {

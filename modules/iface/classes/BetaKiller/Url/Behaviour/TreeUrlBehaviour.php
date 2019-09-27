@@ -17,7 +17,7 @@ class TreeUrlBehaviour extends MultipleUrlBehaviour
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return bool
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function parseUri(
@@ -50,14 +50,16 @@ class TreeUrlBehaviour extends MultipleUrlBehaviour
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface             $ifaceModel
+     * @param \BetaKiller\Url\UrlElementInterface             $urlElement
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    protected function getUri(UrlElementInterface $ifaceModel, UrlContainerInterface $params): string
+    protected function getUri(UrlElementInterface $urlElement, UrlContainerInterface $params): string
     {
-        return $this->prototypeService->getCompiledTreePrototypeValue($ifaceModel->getUri(), $params);
+        $proto = $this->prototypeService->createPrototypeFromUrlElement($urlElement);
+
+        return $this->prototypeService->getCompiledTreePrototypeValue($proto, $params);
     }
 }

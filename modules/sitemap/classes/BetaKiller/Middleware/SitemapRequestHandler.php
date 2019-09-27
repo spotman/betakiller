@@ -32,7 +32,7 @@ class SitemapRequestHandler implements RequestHandlerInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Service\ServiceException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface

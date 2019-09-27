@@ -88,7 +88,7 @@ class AbstractUpdateItemAction extends AbstractAction implements PostRequestActi
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Exception\BadRequestHttpException
      * @throws \BetaKiller\I18n\I18nException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {

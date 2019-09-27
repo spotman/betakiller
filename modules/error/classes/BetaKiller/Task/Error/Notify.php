@@ -6,7 +6,6 @@ namespace BetaKiller\Task\Error;
 use BetaKiller\Error\PhpExceptionStorageHandler;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
-use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
 use BetaKiller\Task\AbstractTask;
@@ -90,7 +89,7 @@ class Notify extends AbstractTask
     /**
      * @param \BetaKiller\Model\PhpExceptionModelInterface $model
      *
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException

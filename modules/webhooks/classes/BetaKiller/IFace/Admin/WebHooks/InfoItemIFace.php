@@ -49,7 +49,7 @@ class InfoItemIFace extends AbstractAdminIFace
      *
      * @return array
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getData(ServerRequestInterface $request): array

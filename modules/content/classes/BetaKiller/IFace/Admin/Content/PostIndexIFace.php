@@ -29,7 +29,7 @@ class PostIndexIFace extends AbstractContentAdminIFace
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return array
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Kohana_Exception
      * @uses \BetaKiller\IFace\Admin\Content\PostCreateIFace

@@ -51,7 +51,7 @@ class AccessRecoveryService
      *
      * @throws \BetaKiller\Exception\DomainException
      * @throws \BetaKiller\Exception\ValidationException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      */

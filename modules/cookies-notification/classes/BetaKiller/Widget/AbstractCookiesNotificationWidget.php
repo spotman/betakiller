@@ -11,7 +11,7 @@ abstract class AbstractCookiesNotificationWidget extends AbstractPublicWidget
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return string
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     abstract public function getPrivacyUrl(ServerRequestInterface $request): string;
 

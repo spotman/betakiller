@@ -13,7 +13,7 @@ class PhpExceptionIndexIFace extends AbstractErrorAdminIFace
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return array
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @uses \BetaKiller\IFace\Admin\Test\PhpExceptionHttp500IFace
      * @uses \BetaKiller\IFace\Admin\Test\PhpExceptionLoggerIFace
      */

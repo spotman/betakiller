@@ -53,7 +53,7 @@ class SendRecoveryEmailAction extends AbstractAction implements PostRequestActio
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Exception
      * @throws \BetaKiller\Exception\ValidationException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      */

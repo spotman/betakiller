@@ -1,8 +1,8 @@
 <?php
 
-use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementStack;
 
 class UrlElementStackTest extends \BetaKiller\Test\AbstractTestCase

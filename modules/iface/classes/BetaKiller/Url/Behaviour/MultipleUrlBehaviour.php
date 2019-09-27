@@ -39,7 +39,7 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return bool
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function parseUri(
@@ -59,7 +59,7 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
      *
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
      *
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     protected function parseUriParameterPart(
@@ -99,7 +99,9 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
         UrlElementInterface $ifaceModel,
         UrlContainerInterface $params
     ): string {
-        return $this->prototypeService->getCompiledPrototypeValue($ifaceModel->getUri(), $params);
+        $proto = $this->prototypeService->createPrototypeFromUrlElement($ifaceModel);
+
+        return $this->prototypeService->getCompiledPrototypeValue($proto, $params);
     }
 
     /**
@@ -108,7 +110,7 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */

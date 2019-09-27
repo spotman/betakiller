@@ -2,7 +2,6 @@
 namespace BetaKiller\Url;
 
 use ArrayIterator;
-use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\ElementFilter\UrlElementFilterInterface;
 use RecursiveCallbackFilterIterator;
 use RecursiveIterator;
@@ -24,7 +23,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param \BetaKiller\Url\UrlElementInterface $model
      * @param bool|null                           $warnIfExists
      *
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function add(UrlElementInterface $model, ?bool $warnIfExists = null): void
     {
@@ -50,7 +49,7 @@ class UrlElementTree implements UrlElementTreeInterface
     }
 
     /**
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function validate(): void
     {
@@ -60,7 +59,7 @@ class UrlElementTree implements UrlElementTreeInterface
     /**
      * @param \BetaKiller\Url\UrlElementInterface $parent
      *
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function validateBranch(UrlElementInterface $parent = null): void
     {
@@ -77,7 +76,7 @@ class UrlElementTree implements UrlElementTreeInterface
     /**
      * @param \BetaKiller\Url\UrlElementInterface[] $models
      *
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function validateLayer(array $models): void
     {
@@ -108,7 +107,7 @@ class UrlElementTree implements UrlElementTreeInterface
     /**
      * @param \BetaKiller\Url\UrlElementInterface $model
      *
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function validateModel(UrlElementInterface $model): void
     {
@@ -153,7 +152,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * Returns default iface model
      *
      * @return \BetaKiller\Url\IFaceModelInterface
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getDefault(): UrlElementInterface
     {
@@ -170,7 +169,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * Returns list of root elements
      *
      * @return \BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getRoot(): array
     {
@@ -225,7 +224,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param \BetaKiller\Url\UrlElementInterface $child
      *
      * @return \BetaKiller\Url\UrlElementInterface|null
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getParent(UrlElementInterface $child): ?UrlElementInterface
     {
@@ -242,7 +241,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param string $codename
      *
      * @return \BetaKiller\Url\UrlElementInterface
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getByCodename(string $codename): UrlElementInterface
     {
@@ -292,7 +291,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param string $zone
      *
      * @return \BetaKiller\Url\IFaceModelInterface
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getByEntityActionAndZone(
         string $entityName,
@@ -361,7 +360,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @return \ArrayIterator|\BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getReverseBreadcrumbsIterator(UrlElementInterface $model): ArrayIterator
     {
@@ -402,7 +401,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filter
      *
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getRecursiveIteratorIterator(
         UrlElementInterface $parent = null,
@@ -420,7 +419,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filter
      *
      * @return \RecursiveIterator
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function getRecursiveIterator(
         UrlElementInterface $parent = null,
@@ -433,7 +432,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param \BetaKiller\Url\UrlElementInterface|NULL $parent
      *
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\IFaceModelInterface[]
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getPublicIFaceIterator(UrlElementInterface $parent = null): RecursiveIteratorIterator
     {
@@ -444,7 +443,7 @@ class UrlElementTree implements UrlElementTreeInterface
 
     /**
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\IFaceModelInterface[]
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getRecursiveSitemapIterator(): RecursiveIteratorIterator
     {
@@ -457,7 +456,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param \BetaKiller\Url\UrlElementInterface|NULL $parent
      *
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\IFaceModelInterface[]
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getAdminIFaceIterator(UrlElementInterface $parent = null): RecursiveIteratorIterator
     {
@@ -471,7 +470,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param UrlElementInterface|NULL $parent
      *
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     protected function getRecursiveFilterIterator(callable $callback, UrlElementInterface $parent = null)
     {
@@ -512,7 +511,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param string $key
      *
      * @return \BetaKiller\Url\IFaceModelInterface|null
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function getLinkedElementFromCache(string $key): ?EntityLinkedUrlElementInterface
     {

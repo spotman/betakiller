@@ -188,7 +188,7 @@ class Wordpress extends AbstractTask
     /**
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Workflow\StatusException
@@ -493,7 +493,7 @@ class Wordpress extends AbstractTask
 
     /**
      * @throws \BetaKiller\Notification\NotificationException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \BetaKiller\Workflow\WorkflowStateException

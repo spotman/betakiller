@@ -67,7 +67,7 @@ class SitemapService
     /**
      * @return \BetaKiller\Service\SitemapService
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Service\ServiceException
      */
     public function generate(): self

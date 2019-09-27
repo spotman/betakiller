@@ -63,7 +63,7 @@ class ContentPostWorkflow
      * @param \BetaKiller\Model\ContentPostInterface $post
      * @param \BetaKiller\Model\UserInterface        $user
      *
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Workflow\StatusException
      * @throws \BetaKiller\Workflow\WorkflowStateException
      */
@@ -82,7 +82,7 @@ class ContentPostWorkflow
     /**
      * @param \BetaKiller\Model\ContentPostInterface $post
      *
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      */
     private function notifyModeratorAboutCompletePost(ContentPostInterface $post): void

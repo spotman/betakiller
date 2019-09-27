@@ -1,8 +1,8 @@
 <?php
 namespace BetaKiller\Url\ModelProvider;
 
-use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementWithLayoutInterface;
 use Kohana;
@@ -27,7 +27,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
 
     /**
      * @return \BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function getAll(): array
     {
@@ -39,7 +39,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
     }
 
     /**
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function loadAll(): void
     {
@@ -57,7 +57,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
     /**
      * @param string $file
      *
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function loadXmlConfig(string $file): void
     {
@@ -69,7 +69,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
      * @param \SimpleXMLElement                        $branch
      * @param \BetaKiller\Url\UrlElementInterface|null $parentModel
      *
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function parseXmlBranch(SimpleXMLElement $branch, ?UrlElementInterface $parentModel = null): void
     {
@@ -91,7 +91,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
      * @param \BetaKiller\Url\UrlElementInterface|null $xmlParent
      *
      * @return \BetaKiller\Url\UrlElementInterface
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function parseXmlItem(SimpleXMLElement $branch, ?UrlElementInterface $xmlParent = null): UrlElementInterface
     {
@@ -182,7 +182,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
      * @param array  $config
      *
      * @return UrlElementInterface
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     private function createModelFromConfig(string $tagName, array $config): UrlElementInterface
     {

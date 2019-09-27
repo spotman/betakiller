@@ -7,7 +7,6 @@ use BetaKiller\Factory\UrlElementInstanceFactory;
 use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Helper\UrlHelper;
-use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Menu\MenuItem;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
@@ -16,6 +15,7 @@ use BetaKiller\Url\ElementFilter\AggregateUrlElementFilter;
 use BetaKiller\Url\ElementFilter\MenuCodenameUrlElementFilter;
 use BetaKiller\Url\ElementFilter\UrlElementFilterInterface;
 use BetaKiller\Url\HasMenuCounterInterface;
+use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlElementTreeRecursiveIterator;
@@ -112,7 +112,7 @@ class MenuService
      * @return \BetaKiller\Menu\MenuItem[]
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\I18n\I18nException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\ElementFilter\UrlElementFilterException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
@@ -167,7 +167,7 @@ class MenuService
      * @return MenuItem[]
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\I18n\I18nException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      * @link https://github.com/MarkBaker/GeneratorQuadTrees/blob/master/src/PointQuadTree.php
      */

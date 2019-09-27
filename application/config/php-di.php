@@ -85,7 +85,7 @@ return [
 
         ExternalEventTransportInterface::class => DI\autowire(EsbExternalEventTransport::class),
 
-        EventBusInterface::class => DI\factory(static function (EventBus $bus, ConfigProviderInterface $config) {
+        EventBusInterface::class   => DI\factory(static function (EventBus $bus, ConfigProviderInterface $config) {
             foreach ((array)$config->load(['events']) as $event => $handlers) {
                 foreach ($handlers as $handler) {
                     $bus->on($event, $handler);
@@ -95,13 +95,8 @@ return [
             return $bus;
         }),
 
-        CommandBusInterface::class => DI\factory(static function (CommandBus $bus, ConfigProviderInterface $config) {
-            foreach ((array)$config->load(['commands']) as $event => $handler) {
-                $bus->on($event, $handler);
-            }
-
-            return $bus;
-        }),
+        // Handlers will be added in workers
+        CommandBusInterface::class => DI\autowire(CommandBus::class),
     ],
 
 ];

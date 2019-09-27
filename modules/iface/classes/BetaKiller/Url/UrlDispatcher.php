@@ -23,6 +23,11 @@ class UrlDispatcher implements UrlDispatcherInterface
     private $behaviourFactory;
 
     /**
+     * @var \BetaKiller\Url\UrlPrototypeService
+     */
+    private $prototypeService;
+
+    /**
      * @var \BetaKiller\Url\UrlElementTreeInterface
      */
     private $tree;
@@ -30,11 +35,16 @@ class UrlDispatcher implements UrlDispatcherInterface
     /**
      * @param \BetaKiller\Url\UrlElementTreeInterface       $tree
      * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
+     * @param \BetaKiller\Url\UrlPrototypeService           $prototypeService
      */
-    public function __construct(UrlElementTreeInterface $tree, UrlBehaviourFactory $behaviourFactory)
-    {
+    public function __construct(
+        UrlElementTreeInterface $tree,
+        UrlBehaviourFactory $behaviourFactory,
+        UrlPrototypeService $prototypeService
+    ) {
         $this->tree             = $tree;
         $this->behaviourFactory = $behaviourFactory;
+        $this->prototypeService = $prototypeService;
     }
 
     /**
@@ -45,7 +55,7 @@ class UrlDispatcher implements UrlDispatcherInterface
      *
      * @return void
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\MissingUrlElementException
      */
     public function process(string $uri, UrlElementStack $stack, UrlContainerInterface $params): void
@@ -55,21 +65,63 @@ class UrlDispatcher implements UrlDispatcherInterface
 
         $path = parse_url($uri, PHP_URL_PATH);
 
+        // Parse path first and detect target UrlElement
         $this->parseUriPath($path, $stack, $params);
+
+        // Parse query parts for target UrlElement
+        $this->parseQueryParts($stack->getCurrent(), $params);
     }
 
     /**
-     * Performs parsing of requested url
-     * Returns IFace
+     * Performs parsing of requested url query parts
+     *
+     * @param \BetaKiller\Url\UrlElementInterface             $element
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     *
+     * @throws \BetaKiller\Url\UrlPrototypeException
+     */
+    private function parseQueryParts(UrlElementInterface $element, UrlContainerInterface $params): void
+    {
+        foreach ($element->getQueryParams() as $key => $binding) {
+            $this->processQueryPart($key, $binding, $params);
+        }
+    }
+
+    private function processQueryPart(string $key, string $binding, UrlContainerInterface $urlParams): void
+    {
+        $partValue = $urlParams->getQueryPart($key);
+
+        // Skip missing parts
+        if (!$partValue) {
+            return;
+        }
+
+        $prototype = $this->prototypeService->createPrototypeFromString(sprintf('{%s}', $binding));
+
+        $item = $this->prototypeService->createParameterInstance($prototype, $partValue, $urlParams);
+
+        if (!$item) {
+            throw new UrlBehaviourException('Can not find item for ":proto" by ":value" in query key ":key"', [
+                ':proto' => $prototype->asString(),
+                ':value' => $partValue,
+                ':key'   => $key,
+            ]);
+        }
+
+        // Store parameter in registry
+        $urlParams->setParameter($item, false);
+    }
+
+    /**
+     * Performs parsing of requested url path
      *
      * @param string                                          $uri
-     *
      * @param \BetaKiller\Url\UrlElementStack                 $stack
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParams
      *
      * @return void
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\MissingUrlElementException
      */
     private function parseUriPath(string $uri, UrlElementStack $stack, UrlContainerInterface $urlParams): void
@@ -103,7 +155,7 @@ class UrlDispatcher implements UrlDispatcherInterface
      *
      * @return \BetaKiller\Url\UrlElementInterface
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \BetaKiller\Url\MissingUrlElementException
      */
