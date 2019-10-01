@@ -4,6 +4,7 @@ namespace BetaKiller\IFace;
 use BetaKiller\Url\AbstractUrlElementInstance;
 use BetaKiller\Url\IFaceModelInterface;
 use DateInterval;
+use DateTimeImmutable;
 
 abstract class AbstractIFace extends AbstractUrlElementInstance implements IFaceInterface
 {
@@ -43,7 +44,7 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
      *
      * @return $this
      */
-    final public function setLastModified(\DateTimeImmutable $lastModified): IFaceInterface
+    final public function setLastModified(DateTimeImmutable $lastModified): IFaceInterface
     {
         // Check current last modified and update it if provided one is newer
         if ($this->lastModified && $this->lastModified > $lastModified) {
@@ -58,7 +59,7 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
     /**
      * @return \DateTimeImmutable
      */
-    final public function getLastModified(): \DateTimeImmutable
+    final public function getLastModified(): DateTimeImmutable
     {
         return $this->lastModified ?: $this->getDefaultLastModified();
     }
@@ -88,9 +89,9 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
      * @return \DateTimeImmutable
      * @throws \Exception
      */
-    final public function getExpiresDateTime(): \DateTimeImmutable
+    final public function getExpiresDateTime(): DateTimeImmutable
     {
-        return (new \DateTimeImmutable())->add($this->getExpiresInterval());
+        return (new DateTimeImmutable())->add($this->getExpiresInterval());
     }
 
     /**
@@ -99,7 +100,7 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
      */
     final public function getExpiresSeconds(): int
     {
-        $reference = new \DateTimeImmutable;
+        $reference = new DateTimeImmutable;
         $endTime   = $reference->add($this->getExpiresInterval());
 
         return $endTime->getTimestamp() - $reference->getTimestamp();
@@ -137,6 +138,7 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
     final protected function disableHttpCache(): void
     {
         $this->setExpiresInPast();
+        $this->setLastModified(new DateTimeImmutable);
     }
 
     /**
@@ -144,7 +146,7 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
      */
     private function setExpiresInPast(): void
     {
-        $interval         = new \DateInterval('PT1H');
+        $interval         = new DateInterval('PT1H');
         $interval->invert = 1;
 
         $this->setExpiresInterval($interval);
@@ -156,14 +158,14 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
      */
     private function getDefaultExpiresInterval(): DateInterval
     {
-        return new \DateInterval('PT1H'); // 1 hour
+        return new DateInterval('PT1H'); // 1 hour
     }
 
     /**
      * @return \DateTimeImmutable
      */
-    private function getDefaultLastModified(): \DateTimeImmutable
+    private function getDefaultLastModified(): DateTimeImmutable
     {
-        return new \DateTimeImmutable(); // Now
+        return new DateTimeImmutable(); // Now
     }
 }
