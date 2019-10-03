@@ -2,7 +2,7 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\Workflow\HasWorkflowStateModelInterface;
+use BetaKiller\Workflow\HasWorkflowStateInterface;
 use Spotman\Api\ApiResponseItemInterface;
 
 interface ContentPostInterface extends
@@ -10,7 +10,7 @@ interface ContentPostInterface extends
     RelatedEntityInterface,
     ApiResponseItemInterface,
     EntityHasWordpressIdInterface,
-    HasWorkflowStateModelInterface,
+    HasWorkflowStateInterface,
     ModelWithRevisionsInterface,
     SeoMetaInterface,
     HasPublicZoneAccessSpecInterface

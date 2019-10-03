@@ -26,12 +26,12 @@ class StatusWorkflowFactory
     }
 
     /**
-     * @param HasWorkflowStateModelInterface $model
+     * @param HasWorkflowStateInterface $model
      *
      * @return StatusWorkflowInterface|mixed
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function createFor(HasWorkflowStateModelInterface $model)
+    public function createFor(HasWorkflowStateInterface $model)
     {
         return $this->factory->create($model::getModelName());
     }

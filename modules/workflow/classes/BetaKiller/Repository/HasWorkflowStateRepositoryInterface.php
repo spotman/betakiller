@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
-use BetaKiller\Workflow\HasWorkflowStateModelInterface;
+use BetaKiller\Workflow\HasWorkflowStateInterface;
 
 /**
  * Interface HasWorkflowStateRepositoryInterface
  *
  * @package BetaKiller\Repository
- * @method HasWorkflowStateModelInterface[] getAll()
- * @method save(HasWorkflowStateModelInterface $entity)
+ * @method HasWorkflowStateInterface[] getAll()
+ * @method save(HasWorkflowStateInterface $entity)
  */
 interface HasWorkflowStateRepositoryInterface extends RepositoryInterface
 {

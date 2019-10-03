@@ -26,6 +26,13 @@ final class StatusWorkflow implements StatusWorkflowInterface
      */
     private $repoFactory;
 
+    /**
+     * StatusWorkflow constructor.
+     *
+     * @param \BetaKiller\Config\WorkflowConfigInterface $config
+     * @param \BetaKiller\Helper\AclHelper               $acl
+     * @param \BetaKiller\Factory\RepositoryFactory      $repoFactory
+     */
     public function __construct(WorkflowConfigInterface $config, AclHelper $acl, RepositoryFactory $repoFactory)
     {
         $this->config      = $config;
@@ -34,13 +41,13 @@ final class StatusWorkflow implements StatusWorkflowInterface
     }
 
     /**
-     * @param \BetaKiller\Workflow\HasWorkflowStateModelInterface $model
-     * @param string                                              $transition
-     * @param \BetaKiller\Model\UserInterface                     $user
+     * @param \BetaKiller\Workflow\HasWorkflowStateInterface $model
+     * @param string                                         $transition
+     * @param \BetaKiller\Model\UserInterface                $user
      *
      * @throws \BetaKiller\Workflow\StatusException
      */
-    public function doTransition(HasWorkflowStateModelInterface $model, string $transition, UserInterface $user): void
+    public function doTransition(HasWorkflowStateInterface $model, string $transition, UserInterface $user): void
     {
         $modelName = $model::getModelName();
 
@@ -61,7 +68,7 @@ final class StatusWorkflow implements StatusWorkflowInterface
         $model->changeWorkflowState($targetState);
 
         // Write history record if needed
-        if ($model->isWorkflowStateHistoryEnabled()) {
+        if ($model instanceof HasWorkflowStateWithHistoryInterface) {
             // TODO Model_Status_Workflow_History + tables in selected projects
             // TODO Store user, transition, related model_id (auto timestamp in mysql column)
             throw new NotImplementedHttpException();
@@ -69,7 +76,7 @@ final class StatusWorkflow implements StatusWorkflowInterface
     }
 
     public function isTransitionAllowed(
-        HasWorkflowStateModelInterface $model,
+        HasWorkflowStateInterface $model,
         string $codename,
         UserInterface $user
     ): bool {
@@ -85,7 +92,7 @@ final class StatusWorkflow implements StatusWorkflowInterface
         return $this->acl->isPermissionAllowed($user, $resource, $codename);
     }
 
-    public function setStartState(HasWorkflowStateModelInterface $model): void
+    public function setStartState(HasWorkflowStateInterface $model): void
     {
         if ($model->hasWorkflowState()) {
             throw new WorkflowStateException(
@@ -103,7 +110,7 @@ final class StatusWorkflow implements StatusWorkflowInterface
         $model->initWorkflowState($startState);
     }
 
-    private function createStateRepositoryFor(HasWorkflowStateModelInterface $model): WorkflowStateRepositoryInterface
+    private function createStateRepositoryFor(HasWorkflowStateInterface $model): WorkflowStateRepositoryInterface
     {
         $stateModelName = $model::getWorkflowStateModelName();
         $stateRepo      = $this->repoFactory->create($stateModelName);

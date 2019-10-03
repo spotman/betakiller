@@ -3,7 +3,7 @@ namespace BetaKiller\Workflow;
 
 use ORM;
 
-abstract class HasWorkflowStateModelOrm extends ORM implements HasWorkflowStateModelInterface
+abstract class HasWorkflowStateModelOrm extends ORM implements HasWorkflowStateInterface
 {
     use HasWorkflowStateModelOrmTrait;
 

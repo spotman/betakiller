@@ -3,7 +3,7 @@ namespace BetaKiller\Workflow;
 
 use BetaKiller\Model\AbstractEntityInterface;
 
-interface HasWorkflowStateModelInterface extends AbstractEntityInterface
+interface HasWorkflowStateInterface extends AbstractEntityInterface
 {
     /**
      * @param \BetaKiller\Workflow\WorkflowStateInterface $target
@@ -35,11 +35,4 @@ interface HasWorkflowStateModelInterface extends AbstractEntityInterface
      * @return string
      */
     public static function getWorkflowStateModelName(): string;
-
-    /**
-     * Return TRUE if you need status transition history
-     *
-     * @return bool
-     */
-    public function isWorkflowStateHistoryEnabled(): bool;
 }
