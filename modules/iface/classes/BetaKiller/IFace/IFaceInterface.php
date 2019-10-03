@@ -25,23 +25,9 @@ interface IFaceInterface extends UrlElementInstanceInterface
     public function getData(ServerRequestInterface $request): array;
 
     /**
-     * @param \DateTimeImmutable $lastModified
-     *
-     * @return $this
-     */
-    public function setLastModified(\DateTimeImmutable $lastModified): self;
-
-    /**
      * @return \DateTimeImmutable
      */
     public function getLastModified(): \DateTimeImmutable;
-
-    /**
-     * @param \DateInterval|NULL $expires
-     *
-     * @return $this
-     */
-    public function setExpiresInterval(\DateInterval $expires): self;
 
     /**
      * @return \DateInterval
@@ -73,4 +59,9 @@ interface IFaceInterface extends UrlElementInstanceInterface
      * @return $this
      */
     public function setModel(IFaceModelInterface $model): self;
+
+    /**
+     * @return bool
+     */
+    public function isHttpCachingEnabled(): bool;
 }

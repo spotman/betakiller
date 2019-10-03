@@ -85,10 +85,8 @@ final class IFaceCache
             return;
         }
 
-        $expires = $iface->getExpiresSeconds();
-
-        // Skip caching if content expired already (admin interfaces and non-cachable pages)
-        if ($expires < 0) {
+        // Skip caching (admin interfaces and non-cachable pages)
+        if (!$iface->isHttpCachingEnabled()) {
             return;
         }
 
@@ -99,7 +97,7 @@ final class IFaceCache
         $cachePath = $this->appEnv->getAppRootPath().\DIRECTORY_SEPARATOR.$this->appConfig->getPageCachePath();
 
         $this->pageCache->config()
-            ->setCacheExpirationInSeconds($expires)
+            ->setCacheExpirationInSeconds($iface->getExpiresSeconds())
             ->setCachePath($cachePath)
             ->setEnableLog(true)
             ->setSendHeaders(true)

@@ -96,8 +96,17 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
             }
 
             $response = ResponseHelper::html($output);
-            $response = ResponseHelper::setLastModified($response, $iface->getLastModified());
             $response = ResponseHelper::setExpires($response, $iface->getExpiresDateTime());
+
+            if ($iface->isHttpCachingEnabled()) {
+                $maxAge = $iface->getExpiresSeconds();
+
+                $response = ResponseHelper::setLastModified($response, $iface->getLastModified());
+                $response = ResponseHelper::setCacheControl($response, 'private, must-revalidate, max-age='.$maxAge);
+            } else {
+                $response = ResponseHelper::setCacheControl($response, 'no-cache, no-store, must-revalidate');
+                $response = ResponseHelper::setPragmaNoCache($response);
+            }
         } catch (Throwable $e) {
             // Prevent response caching
             $this->ifaceCache->disable();

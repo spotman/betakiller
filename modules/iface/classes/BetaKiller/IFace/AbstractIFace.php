@@ -24,6 +24,11 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
     private $expiresInterval;
 
     /**
+     * @var bool
+     */
+    private $isHttpCacheEnabled = true;
+
+    /**
      * @return string
      */
     final public static function getSuffix(): string
@@ -44,7 +49,7 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
      *
      * @return $this
      */
-    final public function setLastModified(DateTimeImmutable $lastModified): IFaceInterface
+    final protected function setLastModified(DateTimeImmutable $lastModified): IFaceInterface
     {
         // Check current last modified and update it if provided one is newer
         if ($this->lastModified && $this->lastModified > $lastModified) {
@@ -69,7 +74,7 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
      *
      * @return $this
      */
-    final public function setExpiresInterval(DateInterval $expires): IFaceInterface
+    final protected function setExpiresInterval(DateInterval $expires): IFaceInterface
     {
         $this->expiresInterval = $expires;
 
@@ -131,14 +136,22 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
     }
 
     /**
+     * @return bool
+     */
+    final public function isHttpCachingEnabled(): bool
+    {
+        return $this->isHttpCacheEnabled;
+    }
+
+    /**
      * Use this method for disable HTTP caching
      *
      * @throws \Exception
      */
     final protected function disableHttpCache(): void
     {
+        $this->isHttpCacheEnabled = false;
         $this->setExpiresInPast();
-        $this->setLastModified(new DateTimeImmutable);
     }
 
     /**
