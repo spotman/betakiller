@@ -9,7 +9,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use IntlDateFormatter;
 
-class DateTimeHelper
+final class DateTimeHelper
 {
     public static function getNow(DateTimeZone $tz = null): DateTimeImmutable
     {
@@ -43,12 +43,12 @@ class DateTimeHelper
         return $fmt->format($time);
     }
 
-    public static function formatDateUser(DateTimeImmutable $time, UserInterface $user, ?int $format = null): string
+    public static function formatDateUser(DateTimeImmutable $date, UserInterface $user, ?int $format = null): string
     {
-        return self::formatDateLang($time, $user->getLanguage(), $format);
+        return self::formatDateLang($date, $user->getLanguage(), $format);
     }
 
-    public static function formatDateLang(DateTimeImmutable $time, LanguageInterface $lang, ?int $format = null): string
+    public static function formatDateLang(DateTimeImmutable $date, LanguageInterface $lang, ?int $format = null): string
     {
         $fmt = new IntlDateFormatter(
             $lang->getLocale(),
@@ -57,7 +57,7 @@ class DateTimeHelper
             self::getUtcTimezone()
         );
 
-        return $fmt->format($time);
+        return $fmt->format($date);
     }
 
     public static function formatTimeUser(DateTimeImmutable $time, UserInterface $user, ?int $format = null): string
@@ -85,5 +85,10 @@ class DateTimeHelper
     public static function formatAtom(DateTimeImmutable $time): string
     {
         return $time->format(DateTimeImmutable::ATOM);
+    }
+
+    public static function formatJsDate(DateTimeImmutable $time): string
+    {
+        return self::formatAtom($time);
     }
 }
