@@ -136,6 +136,16 @@ class ResponseHelper
         return $response->withHeader('Expires', self::makeHeaderDate($expiresAt));
     }
 
+    public static function setCacheControl(ResponseInterface $response, string $value): ResponseInterface
+    {
+        return $response->withHeader('Cache-Control', $value);
+    }
+
+    public static function setPragmaNoCache(ResponseInterface $response): ResponseInterface
+    {
+        return $response->withHeader('Pragma', 'no-cache');
+    }
+
     public static function successJson($message = null): ResponseInterface
     {
         return self::prepareJson(self::JSON_SUCCESS, $message);
