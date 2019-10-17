@@ -7,6 +7,7 @@ use Aidantwoods\SecureHeaders\SecureHeaders;
 use BetaKiller\Dev\DebugBarCookiesDataCollector;
 use BetaKiller\Dev\DebugBarHttpDriver;
 use BetaKiller\Dev\DebugBarSessionDataCollector;
+use BetaKiller\Dev\DebugBarTwigDataCollector;
 use BetaKiller\Dev\DebugBarUserDataCollector;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\CookieHelper;
@@ -29,6 +30,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Twig\Environment;
 
 class DebugMiddleware implements MiddlewareInterface
 {
@@ -63,11 +65,17 @@ class DebugMiddleware implements MiddlewareInterface
     private $userService;
 
     /**
+     * @var \Twig\Environment
+     */
+    private $twigEnv;
+
+    /**
      * DebugMiddleware constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
      * @param \BetaKiller\Helper\CookieHelper            $cookieHelper
      * @param \BetaKiller\Service\UserService            $userService
+     * @param \Twig\Environment                          $twigEnv
      * @param \Psr\Http\Message\ResponseFactoryInterface $responseFactory
      * @param \Psr\Http\Message\StreamFactoryInterface   $streamFactory
      * @param \BetaKiller\Log\LoggerInterface            $logger
@@ -76,6 +84,7 @@ class DebugMiddleware implements MiddlewareInterface
         AppEnvInterface $appEnv,
         CookieHelper $cookieHelper,
         UserService $userService,
+        Environment $twigEnv,
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface $streamFactory,
         LoggerInterface $logger
@@ -85,6 +94,7 @@ class DebugMiddleware implements MiddlewareInterface
         $this->userService     = $userService;
         $this->streamFactory   = $streamFactory;
         $this->appEnv          = $appEnv;
+        $this->twigEnv         = $twigEnv;
         $this->logger          = $logger;
     }
 
@@ -141,7 +151,8 @@ class DebugMiddleware implements MiddlewareInterface
             ->addCollector(new DebugBarUserDataCollector($user))
             ->addCollector(new DebugBarSessionDataCollector($session))
             ->addCollector(new DebugBarCookiesDataCollector($this->cookieHelper, $request))
-            ->addCollector(new MemoryCollector());
+            ->addCollector(new MemoryCollector())
+            ->addCollector(new DebugBarTwigDataCollector($debugBar, $this->twigEnv));
 
         // Temporary disable storage for testing purposes
         // Storage for processing data for AJAX calls and redirects
