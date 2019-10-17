@@ -151,8 +151,11 @@ class DebugMiddleware implements MiddlewareInterface
             ->addCollector(new DebugBarUserDataCollector($user))
             ->addCollector(new DebugBarSessionDataCollector($session))
             ->addCollector(new DebugBarCookiesDataCollector($this->cookieHelper, $request))
-            ->addCollector(new MemoryCollector())
-            ->addCollector(new DebugBarTwigDataCollector($debugBar, $this->twigEnv));
+            ->addCollector(new MemoryCollector());
+
+        if (ServerRequestHelper::isHtmlPreferred($request)) {
+            $debugBar->addCollector(new DebugBarTwigDataCollector($debugBar, $this->twigEnv));
+        }
 
         // Temporary disable storage for testing purposes
         // Storage for processing data for AJAX calls and redirects

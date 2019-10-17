@@ -7,9 +7,12 @@ use DebugBar\Bridge\Twig\TimeableTwigExtensionProfiler;
 use DebugBar\Bridge\TwigProfileCollector;
 use DebugBar\DebugBar;
 use Twig\Environment;
+use Twig\Profiler\Dumper\TextDumper;
 
 final class DebugBarTwigDataCollector extends TwigProfileCollector
 {
+    private $prof;
+
     /**
      * DebugBarTwigDataCollector constructor.
      *
@@ -21,6 +24,16 @@ final class DebugBarTwigDataCollector extends TwigProfileCollector
         $profile = new \Twig_Profiler_Profile();
         $twigEnv->addExtension(new TimeableTwigExtensionProfiler($profile, $debugBar['time']));
 
-        parent::__construct($profile);
+        $this->prof = $profile;
+
+        parent::__construct($profile, $twigEnv);
+
+        // Force AJAX
+        $this->setXdebugLinkTemplate('idea', true);
+    }
+
+    public function getHtmlCallGraph()
+    {
+        return '<pre>'.(new TextDumper())->dump($this->prof).'<br /></pre>';
     }
 }
