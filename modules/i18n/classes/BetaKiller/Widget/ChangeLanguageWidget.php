@@ -41,18 +41,11 @@ class ChangeLanguageWidget extends AbstractPublicWidget
             ? $stack->getCurrent()
             : $urlHelper->getDefaultUrlElement();
 
-        // Add query parameters if exists
-        $currentQuery = $request->getUri()->getQuery();
-
         $links = [];
 
         foreach ($this->languageRepo->getAppLanguages() as $lang) {
             $params = $urlHelper->createUrlContainer()->setEntity($lang);
             $url    = $urlHelper->makeUrl($element, $params, false);
-
-            if ($currentQuery) {
-                $url .= '?'.$currentQuery;
-            }
 
             $data = [
                 'url'   => $url,
