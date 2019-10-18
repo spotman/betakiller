@@ -135,7 +135,7 @@ class SupervisorDaemon implements DaemonInterface
         // Increment failed attempts counter
         $this->failureCounter[$name]++;
 
-        if ($this->failureCounter[$name] > self::RETRY_LIMIT) {
+        if ($this->isRetryLimitReached($this->failureCounter[$name])) {
             // Do not try to restart this failing task
             $this->setStatus($name, self::STATUS_STOPPED);
 
@@ -363,5 +363,18 @@ class SupervisorDaemon implements DaemonInterface
                 yield $taskName;
             }
         }
+    }
+
+    private function isRetryLimitReached(int $count): bool
+    {
+        // Retry until it will be fixed in dev mode
+        if ($this->appEnv->inDevelopmentMode()) {
+            // Prevent high CPU usage
+            sleep(1);
+
+            return false;
+        }
+
+        return $count > self::RETRY_LIMIT;
     }
 }
