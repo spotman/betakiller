@@ -35,6 +35,14 @@ class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFa
     private $menu;
 
     /**
+     * @return string
+     */
+    public static function getXmlTagName(): string
+    {
+        return 'iface';
+    }
+
+    /**
      * Returns label for using in breadcrumbs and etc
      *
      * @return string

@@ -6,7 +6,7 @@ namespace BetaKiller\Url\Parameter;
 class IdUrlParameter extends AbstractRawUrlParameter
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -17,15 +17,13 @@ class IdUrlParameter extends AbstractRawUrlParameter
      *
      * @throws \BetaKiller\Url\Parameter\UrlParameterException
      */
-    public function importUriValue(string $uriValue): void
+    protected function importUriValue(string $uriValue): void
     {
-        $id = (int)$uriValue;
-
-        if (!$id) {
+        if (!$uriValue) {
             throw new UrlParameterException('Incorrect IdUrlParameter uri: :value', [':value' => $uriValue]);
         }
 
-        $this->id = $id;
+        $this->id = $uriValue;
     }
 
     /**
@@ -35,13 +33,13 @@ class IdUrlParameter extends AbstractRawUrlParameter
      */
     public function exportUriValue(): string
     {
-        return (string)$this->id;
+        return $this->id;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getValue(): int
+    public function getValue(): string
     {
         return $this->id;
     }

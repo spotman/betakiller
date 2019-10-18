@@ -26,6 +26,12 @@ class UrlHelperFactory
         $this->container = $container;
     }
 
+    /**
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     * @param \BetaKiller\Url\UrlElementStack|null                 $stack
+     *
+     * @return \BetaKiller\Helper\UrlHelper
+     */
     public function create(UrlContainerInterface $params = null, UrlElementStack $stack = null): UrlHelper
     {
         $params = $params ?? new ResolvingUrlContainer;

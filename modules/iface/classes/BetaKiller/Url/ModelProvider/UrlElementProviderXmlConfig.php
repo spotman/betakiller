@@ -10,20 +10,27 @@ use SimpleXMLElement;
 
 class UrlElementProviderXmlConfig implements UrlElementProviderInterface
 {
-    private const TAG_IFACE  = 'iface';
-    private const TAG_DUMMY  = 'dummy';
-    private const TAG_ACTION = 'action';
-
     /**
      * @var AbstractPlainUrlElementModel[]
      */
     private $models;
 
-    private $allowedTags = [
-        self::TAG_IFACE,
-        self::TAG_DUMMY,
-        self::TAG_ACTION,
-    ];
+    /**
+     * @var string[]
+     */
+    private $allowedTags = [];
+
+    /**
+     * UrlElementProviderXmlConfig constructor.
+     */
+    public function __construct()
+    {
+        $this->allowedTags = [
+            IFacePlainModel::getXmlTagName(),
+            DummyPlainModel::getXmlTagName(),
+            ActionPlainModel::getXmlTagName(),
+        ];
+    }
 
     /**
      * @return \BetaKiller\Url\UrlElementInterface[]
@@ -101,13 +108,6 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
 
         $codename = $config[AbstractPlainUrlElementModel::OPTION_CODENAME] ?? null;
 
-        if (!$codename) {
-            throw new UrlElementException('Missing codename for ":tag" with attributes :args', [
-                ':tag'  => $tag,
-                ':args' => json_encode($config),
-            ]);
-        }
-
         if (!in_array($tag, $this->allowedTags, true)) {
             throw new UrlElementException('Only tags <:allowed> are allowed for XML-based config, but <:tag> is used', [
                 ':tag'     => $tag,
@@ -115,7 +115,15 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
             ]);
         }
 
+        $extends = $config[AbstractPlainUrlElementModel::OPTION_EXTENDS] ?? null;
+
         if ($xmlParent) {
+            if ($extends) {
+                throw new UrlElementException('UrlElement extending ":name" must be placed in a root', [
+                    ':name' => $extends,
+                ]);
+            }
+
             // Parent codename is not needed if nested in XML
             if (isset($config[AbstractPlainUrlElementModel::OPTION_PARENT])) {
                 throw new UrlElementException('UrlElement ":name" is already nested; no "parent" attribute please', [
@@ -125,6 +133,19 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
 
             // Preset parent codename
             $config[AbstractPlainUrlElementModel::OPTION_PARENT] = $xmlParent->getCodename();
+        }
+
+        if ($extends) {
+            $source = $this->getModelByCodename($extends);
+
+            return $this->extendWith($source, $tag, $config);
+        }
+
+        if (!$codename) {
+            throw new UrlElementException('Missing codename for ":tag" with attributes :args', [
+                ':tag'  => $tag,
+                ':args' => json_encode($config),
+            ]);
         }
 
         $realParent = $this->getParentModel($config);
@@ -187,13 +208,13 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
     private function createModelFromConfig(string $tagName, array $config): UrlElementInterface
     {
         switch ($tagName) {
-            case self::TAG_IFACE:
+            case IFacePlainModel::getXmlTagName():
                 return IFacePlainModel::factory($config);
 
-            case self::TAG_ACTION:
+            case ActionPlainModel::getXmlTagName():
                 return ActionPlainModel::factory($config);
 
-            case self::TAG_DUMMY:
+            case DummyPlainModel::getXmlTagName():
                 return DummyPlainModel::factory($config);
 
             default:
@@ -201,5 +222,38 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
                     ':tag' => $tagName,
                 ]);
         }
+    }
+
+    private function getModelByCodename(string $codename): AbstractPlainUrlElementModel
+    {
+        $element = $this->models[$codename] ?? null;
+
+        if (!$element) {
+            throw new UrlElementException('Missing ":codename" UrlElement', [
+                ':codename' => $codename,
+            ]);
+        }
+
+        return $element;
+    }
+
+    protected function extendWith(
+        AbstractPlainUrlElementModel $element,
+        string $tagName,
+        array $config
+    ): AbstractPlainUrlElementModel {
+        if ($element::getXmlTagName() !== $tagName) {
+            throw new UrlElementException('Can not extend ":tag" from ":name" coz of different types', [
+                ':tag'  => $tagName,
+                ':name' => $element->getCodename(),
+            ]);
+        }
+
+        // Prevent loops
+        unset($config[AbstractPlainUrlElementModel::OPTION_EXTENDS]);
+
+        $element->fromArray(array_merge($element->asArray(), $config));
+
+        return $element;
     }
 }

@@ -26,7 +26,7 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
     /**
      * @var bool
      */
-    private $isHttpCacheEnabled = true;
+    private $isHttpCacheEnabled = false;
 
     /**
      * @return string
@@ -142,27 +142,17 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
     {
         return $this->isHttpCacheEnabled;
     }
-
     /**
-     * Use this method for disable HTTP caching
+     * Use this method for enable HTTP caching
+     *
+     * @param \DateInterval|null $expiresIn
      *
      * @throws \Exception
      */
-    final protected function disableHttpCache(): void
+    final protected function enableHttpCache(DateInterval $expiresIn = null): void
     {
-        $this->isHttpCacheEnabled = false;
-        $this->setExpiresInPast();
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function setExpiresInPast(): void
-    {
-        $interval         = new DateInterval('PT1H');
-        $interval->invert = 1;
-
-        $this->setExpiresInterval($interval);
+        $this->isHttpCacheEnabled = true;
+        $this->setExpiresInterval($expiresIn ?? $this->getOneHourExpiresInterval());
     }
 
     /**
@@ -171,7 +161,16 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
      */
     private function getDefaultExpiresInterval(): DateInterval
     {
-        return new DateInterval('PT1H'); // 1 hour
+        $interval         = new DateInterval('PT1H');
+        $interval->invert = 1;
+
+        // Expires in past, no caching
+        return $interval;
+    }
+
+    private function getOneHourExpiresInterval(): DateInterval
+    {
+        return new DateInterval('PT1H'); // 1 hour caching
     }
 
     /**

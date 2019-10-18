@@ -182,17 +182,6 @@ class UrlContainer implements UrlContainerInterface
 //    }
 
     /**
-     * @return \BetaKiller\Url\Container\UrlContainerInterface
-     * @deprecated Url dispatching must be persistent
-     */
-    public function clear(): UrlContainerInterface
-    {
-        $this->paramsRegistry->clear();
-
-        return $this;
-    }
-
-    /**
      * @return \BetaKiller\Url\Parameter\UrlParameterInterface[]
      */
     public function getAllParameters(): array
@@ -230,6 +219,12 @@ class UrlContainer implements UrlContainerInterface
         return $this->hasParameter($instance::getUrlContainerKey());
     }
 
+    /**
+     * @param \BetaKiller\Url\Parameter\UrlParameterInterface $param
+     * @param string                                          $key
+     *
+     * @return bool
+     */
     public function isKey(UrlParameterInterface $param, string $key): bool
     {
         return $param::getUrlContainerKey() === $key;
@@ -269,7 +264,7 @@ class UrlContainer implements UrlContainerInterface
      * @return string|string[]
      * @throws \BetaKiller\Url\Container\UrlContainerException
      */
-    public function getQueryPart($key, $required = null)
+    public function getQueryPart(string $key, bool $required = null)
     {
         if (isset($this->queryParts[$key])) {
             $this->usedQueryParts[] = $key;
@@ -305,8 +300,10 @@ class UrlContainer implements UrlContainerInterface
     /**
      * @param \BetaKiller\Url\Container\UrlContainerInterface $from
      * @param bool|null                                       $overwrite
+     *
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
-    public function import(UrlContainerInterface $from, bool $overwrite = null): void
+    public function import(UrlContainerInterface $from, bool $overwrite = null): UrlContainerInterface
     {
         foreach ($from->getAllParameters() as $param) {
             // Skip existing params
@@ -316,5 +313,7 @@ class UrlContainer implements UrlContainerInterface
 
             $this->setParameter($param);
         }
+
+        return $this;
     }
 }

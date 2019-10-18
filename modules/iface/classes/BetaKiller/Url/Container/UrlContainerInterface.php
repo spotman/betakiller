@@ -86,6 +86,14 @@ interface UrlContainerInterface
     public function hasParameterInstance(UrlParameterInterface $instance): bool;
 
     /**
+     * @param \BetaKiller\Url\Parameter\UrlParameterInterface $param
+     * @param string                                          $key
+     *
+     * @return bool
+     */
+    public function isKey(UrlParameterInterface $param, string $key): bool;
+
+    /**
      * Returns keys of currently added Entity items
      *
      * @return string[]
@@ -104,12 +112,12 @@ interface UrlContainerInterface
     /**
      * Returns query part value
      *
-     * @param string $key
+     * @param string    $key
      * @param bool|null $required
      *
      * @return string|int|array
      */
-    public function getQueryPart($key, $required = null);
+    public function getQueryPart(string $key, bool $required = null);
 
     /**
      * @return string[]
@@ -126,6 +134,8 @@ interface UrlContainerInterface
     /**
      * @param \BetaKiller\Url\Container\UrlContainerInterface $from
      * @param bool|null                                       $overwrite
+     *
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
-    public function import(UrlContainerInterface $from, bool $overwrite = null): void;
+    public function import(UrlContainerInterface $from, bool $overwrite = null): UrlContainerInterface;
 }

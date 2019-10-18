@@ -38,10 +38,9 @@ class RawUrlParameterFactory
     public function create(string $codename, string $uriValue): RawUrlParameterInterface
     {
         /** @var \BetaKiller\Url\Parameter\RawUrlParameterInterface $instance */
-        $instance = $this->factory->create($codename);
-
-        // Inject uri value and parse it
-        $instance->importUriValue($uriValue);
+        $instance = $this->factory->create($codename, [
+            'value' => $uriValue,
+        ]);
 
         return $instance;
     }

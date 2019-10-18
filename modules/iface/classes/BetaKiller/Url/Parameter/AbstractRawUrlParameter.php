@@ -5,14 +5,6 @@ namespace BetaKiller\Url\Parameter;
 
 abstract class AbstractRawUrlParameter implements RawUrlParameterInterface
 {
-    public static function getCodename(): string
-    {
-        $className = static::class;
-        $pos = strrpos($className, '\\');
-        $baseName = substr($className, $pos + 1);
-        return str_replace(self::CLASS_SUFFIX, '', $baseName);
-    }
-
     /**
      * Returns key which will be used for storing model in UrlContainer registry.
      *
@@ -21,6 +13,18 @@ abstract class AbstractRawUrlParameter implements RawUrlParameterInterface
     public static function getUrlContainerKey(): string
     {
         return static::getCodename();
+    }
+
+    /**
+     * AbstractRawUrlParameter constructor.
+     *
+     * @param string $value
+     */
+    public function __construct(string $value = null)
+    {
+        if ($value !== null) {
+            $this->importUriValue($value);
+        }
     }
 
     /**
@@ -39,4 +43,20 @@ abstract class AbstractRawUrlParameter implements RawUrlParameterInterface
 
         return $this->exportUriValue() === $parameter->exportUriValue();
     }
+
+    protected static function getCodename(): string
+    {
+        $className = static::class;
+        $pos       = strrpos($className, '\\');
+        $baseName  = substr($className, $pos + 1);
+
+        return str_replace(self::CLASS_SUFFIX, '', $baseName);
+    }
+
+    /**
+     * Process uri and set internal state
+     *
+     * @param string $value
+     */
+    abstract protected function importUriValue(string $value): void;
 }

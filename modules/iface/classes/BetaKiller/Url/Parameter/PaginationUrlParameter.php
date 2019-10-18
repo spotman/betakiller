@@ -17,7 +17,7 @@ class PaginationUrlParameter extends AbstractRawUrlParameter
      *
      * @throws \BetaKiller\Url\Parameter\UrlParameterException
      */
-    public function importUriValue(string $uriValue): void
+    protected function importUriValue(string $uriValue): void
     {
         $page = (int)str_replace(static::URI_PREFIX, '', $uriValue);
 

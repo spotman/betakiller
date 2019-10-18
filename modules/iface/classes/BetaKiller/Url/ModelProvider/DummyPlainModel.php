@@ -35,6 +35,14 @@ class DummyPlainModel extends AbstractPlainEntityLinkedUrlElement implements Dum
     private $layoutCodename;
 
     /**
+     * @return string
+     */
+    public static function getXmlTagName(): string
+    {
+        return 'dummy';
+    }
+
+    /**
      * Returns label for using in breadcrumbs and etc
      *
      * @return string

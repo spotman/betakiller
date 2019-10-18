@@ -142,6 +142,20 @@ class UrlHelper
     }
 
     /**
+     * @param string                                               $codename
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     *
+     * @return string
+     * @throws \BetaKiller\Url\UrlElementException
+     */
+    public function makeCodenameUrl(string $codename, ?UrlContainerInterface $params = null): string
+    {
+        $element = $this->getUrlElementByCodename($codename);
+
+        return $this->makeUrl($element, $params);
+    }
+
+    /**
      * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      * @param bool|null                                            $removeCyclingLinks
@@ -363,38 +377,37 @@ class UrlHelper
         do {
             $redirectTarget = $redirectElement->getRedirectTarget();
 
+            // Fallback to parent if redirect is not defined
             $redirectElement = $redirectTarget
                 ? $this->getUrlElementByCodename($redirectTarget)
-                : null;
-        } while ($redirectElement && $redirectElement instanceof DummyModelInterface && $redirectElement->getRedirectTarget());
+                : $this->tree->getParent($redirectElement);
 
-        // Fallback to parent if redirect is not defined
-        if (!$redirectElement) {
-            $redirectElement = $this->getParentIFace($element);
+            // Redirect root dummies to default element
+            if (!$redirectElement) {
+                $redirectElement = $this->tree->getDefault();
+            }
+        } while ($redirectElement instanceof DummyModelInterface);
+
+        if ($redirectElement instanceof DummyModelInterface) {
+            $redirectElement = $this->getDummyParentTarget($redirectElement);
         }
 
         return $redirectElement;
     }
 
-    private function getParentIFace(UrlElementInterface $model): UrlElementInterface
+    private function getDummyParentTarget(UrlElementInterface $model): IFaceModelInterface
     {
-        // Find nearest IFace
+        // Find nearest IFace or Action
         foreach ($this->tree->getReverseBreadcrumbsIterator($model) as $parent) {
-            if ($parent instanceof IFaceModelInterface) {
-                return $parent;
+            if ($parent instanceof DummyModelInterface) {
+                continue;
             }
+
+            return $parent;
         }
 
-        $parent = $this->tree->getParent($model);
-
-        // Redirect root dummies to default element
-        if (!$parent) {
-            return $this->tree->getDefault();
-        }
-
-        throw new UrlElementException('No IFace found for Dummy with URI ":uri" and parent ":parent"', [
-            ':uri'    => $model->getUri(),
-            ':parent' => $model->getParentCodename() ?: 'root',
+        throw new UrlElementException('No target UrlElement found found for Dummy ":name"', [
+            ':name' => $model->getCodename(),
         ]);
     }
 

@@ -18,6 +18,8 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     public const OPTION_ZONE               = 'zone';
     public const OPTION_ACL_RULES          = 'aclRules';
 
+    public const OPTION_EXTENDS = 'extends';
+
     /**
      * @var string
      */
@@ -75,24 +77,6 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
         $instance->fromArray($data);
 
         return $instance;
-    }
-
-    /**
-     * @return string
-     * @throws \BetaKiller\Exception\NotImplementedHttpException
-     */
-    public function getID(): string
-    {
-        throw new NotImplementedHttpException('Config-based URL element model have no ID');
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasID(): bool
-    {
-        // Config-based models can not obtain ID
-        return false;
     }
 
     /**
@@ -196,11 +180,11 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
         return [
             self::OPTION_CODENAME           => $this->getCodename(),
             self::OPTION_URI                => $this->getUri(),
-            self::OPTION_QUERY              => $this->getQueryParams(),
+            self::OPTION_QUERY              => $this->exportQuery(),
             self::OPTION_HAS_TREE_BEHAVIOUR => $this->hasTreeBehaviour(),
             self::OPTION_PARENT             => $this->getParentCodename(),
             self::OPTION_HIDE_IN_SITEMAP    => $this->isHiddenInSiteMap(),
-            self::OPTION_ACL_RULES          => $this->getAdditionalAclRules(),
+            self::OPTION_ACL_RULES          => $this->exportAclRules(),
             self::OPTION_IS_DEFAULT         => $this->isDefault(),
             self::OPTION_ZONE               => $this->getZoneName(),
         ];
@@ -211,32 +195,19 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
         $this->uri      = $data[self::OPTION_URI];
         $this->codename = $data[self::OPTION_CODENAME];
 
-        if (isset($data[self::OPTION_IS_DEFAULT])) {
-            $this->isDefault = true;
-        }
+        $this->isDefault = $this->validateBooleanOption($data, self::OPTION_IS_DEFAULT, false);
 
         if (\mb_strpos($this->uri, '{') === 0 && \mb_strpos($this->uri, '}', -1) !== false) {
             $this->hasDynamicUrl = true;
+        } else {
+            $this->hasDynamicUrl = false;
         }
 
         if (isset($data[self::OPTION_QUERY])) {
-            $query  = [];
-            $values = explode(',', (string)$data[self::OPTION_QUERY]);
-            // Remove unnecessary spaces
-            $values = array_filter(array_map('trim', $values));
-
-            foreach ($values as $value) {
-                [$queryName, $binding] = explode('=', $value, 2);
-
-                $query[$queryName] = $binding;
-            }
-
-            $this->query = $query;
+            $this->importQuery((string)$data[self::OPTION_QUERY]);
         }
 
-        if (isset($data[self::OPTION_HAS_TREE_BEHAVIOUR])) {
-            $this->hasTreeBehaviour = true;
-        }
+        $this->hasTreeBehaviour = $this->validateBooleanOption($data, self::OPTION_HAS_TREE_BEHAVIOUR, false);
 
         if (isset($data[self::OPTION_PARENT])) {
             $this->parentCodename = (string)$data[self::OPTION_PARENT];
@@ -247,8 +218,7 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
         }
 
         if (isset($data[self::OPTION_ACL_RULES])) {
-            $values         = explode(',', (string)$data[self::OPTION_ACL_RULES]);
-            $this->aclRules = array_filter(array_map('trim', $values));
+            $this->importAclRules((string)$data[self::OPTION_ACL_RULES]);
         }
     }
 
@@ -259,5 +229,57 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     public function getAdditionalAclRules(): array
     {
         return $this->aclRules;
+    }
+
+    /**
+     * @return string
+     */
+    abstract public static function getXmlTagName(): string;
+
+    protected function validateBooleanOption(array $data, string $key, bool $default): bool
+    {
+        if (!isset($data[$key])) {
+            return $default;
+        }
+
+        return \mb_strtolower((string)$data[$key]) === 'true';
+    }
+
+    protected function importQuery(string $queryString): void
+    {
+        $query  = [];
+        $values = explode(',', $queryString);
+        // Remove unnecessary spaces
+        $values = array_filter(array_map('trim', $values));
+
+        foreach ($values as $value) {
+            [$queryName, $binding] = explode('=', $value, 2);
+
+            $query[$queryName] = $binding;
+        }
+
+        $this->query = $query;
+    }
+
+    protected function exportQuery(): string
+    {
+        $items = [];
+
+        foreach ($this->query as $name => $binding) {
+            $items[] = sprintf('%s=%s', $name, $binding);
+        }
+
+        return implode(',', $items);
+    }
+
+    protected function importAclRules(string $rulesString): void
+    {
+        $values         = explode(',', $rulesString);
+        $this->aclRules = array_filter(array_map('trim', $values));
+    }
+
+    protected function exportAclRules(): string
+    {
+        return implode(',', $this->aclRules);
     }
 }
