@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Spotman\Defence;
 
 use Spotman\Defence\Filter\BooleanFilter;
+use Spotman\Defence\Filter\DateTimeFilter;
 use Spotman\Defence\Filter\EmailFilter;
 use Spotman\Defence\Filter\FilterInterface;
 use Spotman\Defence\Filter\FloatFilter;
@@ -144,6 +145,20 @@ class DefinitionBuilder implements DefinitionBuilderInterface
         return $this
             ->addSingleType($name, ArgumentDefinitionInterface::TYPE_HTML)
             ->addFilter(new HtmlFilter);
+    }
+
+    /**
+     * Define datetime argument (string convert to DateTimeImmutable)
+     *
+     * @param string $name
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function datetime(string $name): DefinitionBuilderInterface
+    {
+        return $this
+            ->addSingleType($name, ArgumentDefinitionInterface::TYPE_DATETIME)
+            ->addFilter(new DateTimeFilter);
     }
 
     /**

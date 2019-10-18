@@ -59,6 +59,13 @@ interface ArgumentsInterface
     /**
      * @param string $key
      *
+     * @return \DateTimeImmutable
+     */
+    public function getDateTime(string $key): \DateTimeImmutable;
+
+    /**
+     * @param string $key
+     *
      * @return array
      */
     public function getArray(string $key): array;

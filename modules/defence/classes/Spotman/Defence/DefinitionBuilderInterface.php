@@ -69,6 +69,15 @@ interface DefinitionBuilderInterface
     public function html(string $name): DefinitionBuilderInterface;
 
     /**
+     * Define datetime argument (string convert to DateTimeImmutable)
+     *
+     * @param string $name
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function datetime(string $name): DefinitionBuilderInterface;
+
+    /**
      * Define bool argument
      *
      * @param string $name

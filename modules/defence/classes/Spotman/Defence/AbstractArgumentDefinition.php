@@ -158,6 +158,16 @@ abstract class AbstractArgumentDefinition implements ArgumentDefinitionInterface
     }
 
     /**
+     * Returns true if rule defines a string containing datetime
+     *
+     * @return bool
+     */
+    public function isDateTime(): bool
+    {
+        return $this->getType() === self::TYPE_DATETIME;
+    }
+
+    /**
      * Returns true if rule defines string containing html
      *
      * @return bool

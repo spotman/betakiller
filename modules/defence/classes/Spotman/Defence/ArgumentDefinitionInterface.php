@@ -9,11 +9,12 @@ interface ArgumentDefinitionInterface
     public const TYPE_IDENTITY = 'id';
     public const TYPE_BOOLEAN  = 'bool';
     public const TYPE_INTEGER  = 'int';
-    public const TYPE_FLOAT  = 'float';
+    public const TYPE_FLOAT    = 'float';
     public const TYPE_STRING   = 'string';
     public const TYPE_EMAIL    = 'email';
     public const TYPE_TEXT     = 'text';
     public const TYPE_HTML     = 'html';
+    public const TYPE_DATETIME = 'datetime';
 
     // Named collection of scalars
     public const TYPE_COMPOSITE = 'composite';
@@ -33,6 +34,7 @@ interface ArgumentDefinitionInterface
         self::TYPE_EMAIL,
         self::TYPE_TEXT,
         self::TYPE_HTML,
+        self::TYPE_DATETIME,
         self::TYPE_COMPOSITE,
         self::TYPE_SINGLE_ARRAY,
         self::TYPE_COMPOSITE_ARRAY,
@@ -133,6 +135,13 @@ interface ArgumentDefinitionInterface
      * @return bool
      */
     public function isEmail(): bool;
+
+    /**
+     * Returns true if rule defines a string containing datetime
+     *
+     * @return bool
+     */
+    public function isDateTime(): bool;
 
     /**
      * Returns true if rule defines an array argument

@@ -86,6 +86,16 @@ class Arguments implements ArgumentsInterface
     /**
      * @param string $key
      *
+     * @return \DateTimeImmutable
+     */
+    public function getDateTime(string $key): \DateTimeImmutable
+    {
+        return $this->args[$key];
+    }
+
+    /**
+     * @param string $key
+     *
      * @return bool
      */
     public function getBool(string $key): bool
