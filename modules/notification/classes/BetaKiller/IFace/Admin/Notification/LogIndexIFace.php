@@ -7,7 +7,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Model\NotificationLogInterface;
-use BetaKiller\Repository\NotificationLogRepository;
+use BetaKiller\Repository\NotificationLogRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Url\Parameter\PaginationUrlParameter;
 use BetaKiller\Url\ZoneInterface;
@@ -31,10 +31,10 @@ class LogIndexIFace extends AbstractAdminIFace
     /**
      * LogIndexIFace constructor.
      *
-     * @param \BetaKiller\Repository\NotificationLogRepository $logRepo
-     * @param \BetaKiller\Repository\UserRepositoryInterface   $userRepo
+     * @param \BetaKiller\Repository\NotificationLogRepositoryInterface $logRepo
+     * @param \BetaKiller\Repository\UserRepositoryInterface            $userRepo
      */
-    public function __construct(NotificationLogRepository $logRepo, UserRepositoryInterface $userRepo)
+    public function __construct(NotificationLogRepositoryInterface $logRepo, UserRepositoryInterface $userRepo)
     {
         $this->logRepo  = $logRepo;
         $this->userRepo = $userRepo;
@@ -57,6 +57,7 @@ class LogIndexIFace extends AbstractAdminIFace
         $messageCodename = $urlParams->getQueryPart(self::ARG_MESSAGE);
         $userID          = $urlParams->getQueryPart(self::ARG_USER);
 
+        /** @var PaginationUrlParameter $pageParam */
         $pageParam   = ServerRequestHelper::getParameter($request, PaginationUrlParameter::class);
         $currentPage = $pageParam ? $pageParam->getValue() : 1;
 

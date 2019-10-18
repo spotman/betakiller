@@ -20,9 +20,10 @@ class RegularWidget extends AbstractPublicWidget
     {
         $urlHelper     = ServerRequestHelper::getUrlHelper($request);
         $recoveryIFace = $urlHelper->getUrlElementByCodename(AccessRecoveryRequestIFace::codename());
+        $loginAction   = $urlHelper->getUrlElementByCodename(RegularLoginAction::codename());
 
         return [
-            'login_url'           => RegularLoginAction::URL,
+            'login_url'           => $urlHelper->makeUrl($loginAction),
             'access_recovery_url' => $urlHelper->makeUrl($recoveryIFace),
         ];
     }

@@ -10,7 +10,6 @@ use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\IFace\Auth\LoginIFace;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Service\AuthService;
 use Psr\Http\Message\ResponseInterface;
@@ -25,7 +24,6 @@ use Spotman\Defence\DefinitionBuilderInterface;
  */
 class RegularLoginAction extends AbstractAction implements PostRequestActionInterface
 {
-    public const  URL          = LoginIFace::URL.'regular';
     private const ARG_LOGIN    = 'user-login';
     private const ARG_PASSWORD = 'user-password';
 

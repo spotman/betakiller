@@ -7,21 +7,9 @@ use BetaKiller\Url\BeforeProcessingInterface;
 use BetaKiller\Widget\AuthWidget;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractHttpErrorIFace extends AbstractIFace implements BeforeProcessingInterface
+abstract class AbstractHttpErrorIFace extends AbstractIFace
 {
     protected $exception;
-
-    /**
-     * This hook executed before IFace processing (on every request regardless of caching)
-     * Place here code that needs to be executed on every IFace request (increment views counter, etc)
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function beforeProcessing(ServerRequestInterface $request): void
-    {
-        // No caching for error pages
-        $this->disableHttpCache();
-    }
 
     /**
      * Returns data for View

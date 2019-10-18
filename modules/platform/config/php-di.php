@@ -10,6 +10,8 @@ use BetaKiller\Log\Logger;
 use BetaKiller\Middleware\CspReportBodyParamsStrategy;
 use BetaKiller\Repository\RoleRepository;
 use BetaKiller\Repository\RoleRepositoryInterface;
+use BetaKiller\Repository\TokenRepository;
+use BetaKiller\Repository\TokenRepositoryInterface;
 use BetaKiller\Repository\UserRepository;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Session\DatabaseSessionStorage;
@@ -190,8 +192,9 @@ return [
             return $factory->createContext();
         }),
 
-        UserRepositoryInterface::class => autowire(UserRepository::class),
-        RoleRepositoryInterface::class => autowire(RoleRepository::class),
+        UserRepositoryInterface::class  => autowire(UserRepository::class),
+        RoleRepositoryInterface::class  => autowire(RoleRepository::class),
+        TokenRepositoryInterface::class => autowire(TokenRepository::class),
 
         BetaKiller\IdentityConverterInterface::class => autowire(BetaKiller\DummyIdentityConverter::class),
 

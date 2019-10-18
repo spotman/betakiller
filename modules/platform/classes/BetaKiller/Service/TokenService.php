@@ -6,21 +6,21 @@ namespace BetaKiller\Service;
 use BetaKiller\Model\Token;
 use BetaKiller\Model\TokenInterface;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Repository\TokenRepository;
+use BetaKiller\Repository\TokenRepositoryInterface;
 use DateInterval;
 use DateTimeImmutable;
 
 class TokenService
 {
     /**
-     * @var \BetaKiller\Repository\TokenRepository
+     * @var \BetaKiller\Repository\TokenRepositoryInterface
      */
     private $tokenRepo;
 
     /**
-     * @param \BetaKiller\Repository\TokenRepository $tokenRepo
+     * @param \BetaKiller\Repository\TokenRepositoryInterface $tokenRepo
      */
-    public function __construct(TokenRepository $tokenRepo)
+    public function __construct(TokenRepositoryInterface $tokenRepo)
     {
         $this->tokenRepo = $tokenRepo;
     }
@@ -33,7 +33,6 @@ class TokenService
      * @param \DateInterval                   $ttl
      *
      * @return \BetaKiller\Model\TokenInterface
-     * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function create(UserInterface $user, DateInterval $ttl): TokenInterface

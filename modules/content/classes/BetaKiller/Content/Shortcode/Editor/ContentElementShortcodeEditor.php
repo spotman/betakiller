@@ -55,14 +55,14 @@ class ContentElementShortcodeEditor extends AbstractShortcodeEditor
      * Returns data for IndexItem IFace
      *
      * @param \BetaKiller\Model\EntityModelInterface|null $relatedEntity
-     * @param int|null                                    $itemID
+     * @param string|null                                 $itemID
      *
      * @return array
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function getIndexIFaceData(?EntityModelInterface $relatedEntity, ?int $itemID): array
+    public function getIndexIFaceData(?EntityModelInterface $relatedEntity, ?string $itemID): array
     {
         $shortcode = $this->shortcodeFacade->createFromEntity($this->shortcodeEntity);
 

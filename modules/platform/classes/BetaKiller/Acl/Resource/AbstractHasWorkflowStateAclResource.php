@@ -53,7 +53,7 @@ abstract class AbstractHasWorkflowStateAclResource extends AbstractEntityRelated
     public function isPermissionAllowed(string $permissionIdentity): bool
     {
         // Read/Update/Delete permissions rely on model status permissions
-        if (in_array($permissionIdentity, $this->getReservedStatusActionsList(), true)) {
+        if (in_array($permissionIdentity, $this->getStateRelatedActionsList(), true)) {
             $state = $this->getCurrentState();
 
             return $this->isStateActionAllowed($state, $permissionIdentity);
@@ -109,13 +109,13 @@ abstract class AbstractHasWorkflowStateAclResource extends AbstractEntityRelated
     /**
      * @return string[]
      */
-    public function getReservedStatusActionsList(): array
+    public function getStateRelatedActionsList(): array
     {
-        return [
+        return array_merge($this->getAdditionalStateRelatedActions(), [
             self::ACTION_READ,
             self::ACTION_UPDATE,
             self::ACTION_DELETE,
-        ];
+        ]);
     }
 
     /**
@@ -129,6 +129,11 @@ abstract class AbstractHasWorkflowStateAclResource extends AbstractEntityRelated
     }
 
     protected function getAdditionalAccessList(): array
+    {
+        return [];
+    }
+
+    protected function getAdditionalStateRelatedActions(): array
     {
         return [];
     }

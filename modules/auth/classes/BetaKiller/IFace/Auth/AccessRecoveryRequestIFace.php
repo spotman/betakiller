@@ -27,11 +27,14 @@ class AccessRecoveryRequestIFace extends AbstractIFace
 
         $actionElement = $urlHelper->getUrlElementByCodename(SendRecoveryEmailAction::codename());
 
+        $user = ServerRequestHelper::getUser($request);
+
         return [
             'app_state' => [
                 'actionUrl' => $urlHelper->makeUrl($actionElement),
                 'isOk'      => $status && $status === self::FLASH_STATUS_OK,
                 'isMissing' => $status && $status === self::FLASH_STATUS_MISSING,
+                'userEmail' => !$user->isGuest() ? $user->getEmail() : null,
             ],
         ];
     }

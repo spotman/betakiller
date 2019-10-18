@@ -292,7 +292,8 @@ class DatabaseSessionStorage implements SessionStorageInterface
         $userID = SessionHelper::getUserID($oldSession);
 
         if ($userID) {
-            // Copy data from old session if user is authorized
+            // Copy data from old session on login to allow flash messages and other markers to be saved
+            // Clear session data on logout
             SessionHelper::transferData($oldSession, $newSession);
         }
 

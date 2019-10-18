@@ -7,11 +7,11 @@ use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 /**
- * @method TokenInterface findById(string $id)
- * @method TokenInterface[] getAll()
- * @method void save(TokenInterface $entity)
+ * Class TokenRepository
+ *
+ * @package BetaKiller\Repository
  */
-class TokenRepository extends AbstractOrmBasedMultipleParentsTreeRepository
+class TokenRepository extends AbstractOrmBasedDispatchableRepository implements TokenRepositoryInterface
 {
     /**
      * @return string

@@ -154,7 +154,8 @@ class DebugMiddleware implements MiddlewareInterface
             ->addCollector(new MemoryCollector());
 
         if (ServerRequestHelper::isHtmlPreferred($request)) {
-            $debugBar->addCollector(new DebugBarTwigDataCollector($debugBar, $this->twigEnv));
+            // Temp disable coz of error
+//            $debugBar->addCollector(new DebugBarTwigDataCollector($debugBar, $this->twigEnv));
         }
 
         // Temporary disable storage for testing purposes

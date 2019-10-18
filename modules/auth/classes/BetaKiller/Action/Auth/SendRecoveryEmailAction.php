@@ -60,6 +60,7 @@ class SendRecoveryEmailAction extends AbstractAction implements PostRequestActio
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
+        $urlParams = ServerRequestHelper::getUrlContainer($request);
         $post      = ActionRequestHelper::postArguments($request);
         $flash     = ServerRequestHelper::getFlash($request);
 
@@ -78,7 +79,7 @@ class SendRecoveryEmailAction extends AbstractAction implements PostRequestActio
             return $response;
         }
 
-        $this->recovery->sendEmail($user, $urlHelper);
+        $this->recovery->sendEmail($user, $urlParams);
 
         $flash->flash(AccessRecoveryRequestIFace::FLASH_STATUS, AccessRecoveryRequestIFace::FLASH_STATUS_OK);
 

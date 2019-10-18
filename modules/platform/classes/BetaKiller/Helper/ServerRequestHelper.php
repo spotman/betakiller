@@ -132,6 +132,13 @@ class ServerRequestHelper
         return \mb_strpos($type, 'json') !== false;
     }
 
+    public static function isHtmlPreferred(ServerRequestInterface $request): bool
+    {
+        $type = self::getPreferredContentType($request);
+
+        return \mb_strpos($type, 'html') !== false;
+    }
+
     private static function getPreferredContentType(ServerRequestInterface $request): string
     {
         // Fetched from ContentType middleware

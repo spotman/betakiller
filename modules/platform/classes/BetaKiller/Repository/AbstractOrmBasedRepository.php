@@ -29,7 +29,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     /**
      * @param string $id
      *
-     * @return ExtendedOrmInterface|AbstractEntityInterface|mixed
+     * @return AbstractEntityInterface|mixed
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function findById(string $id)
@@ -44,7 +44,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     /**
      * @param string $id
      *
-     * @return ExtendedOrmInterface|mixed
+     * @return AbstractEntityInterface|mixed
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getByID(string $id)

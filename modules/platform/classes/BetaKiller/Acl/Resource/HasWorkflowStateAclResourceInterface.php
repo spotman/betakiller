@@ -8,7 +8,7 @@ interface HasWorkflowStateAclResourceInterface extends EntityRelatedAclResourceI
     /**
      * @return string[]
      */
-    public function getReservedStatusActionsList(): array;
+    public function getStateRelatedActionsList(): array;
 
     /**
      * @param \BetaKiller\Workflow\WorkflowStateInterface $state
