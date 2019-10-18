@@ -101,7 +101,7 @@ class UrlElementRenderMiddleware implements MiddlewareInterface
 
         // Final hook
         if ($instance && $instance instanceof AfterProcessingInterface) {
-            $instance->beforeProcessing($request);
+            $instance->afterProcessing($request);
         }
 
         Profiler::end($pid);
