@@ -43,7 +43,7 @@ class ApproveApiMethod extends AbstractEntityBasedApiMethod
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\WorkflowException
      */
     public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
     {

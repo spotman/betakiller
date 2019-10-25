@@ -3,4 +3,4 @@ namespace BetaKiller\Workflow;
 
 use BetaKiller\Exception;
 
-class StatusException extends Exception {}
+class WorkflowException extends Exception {}

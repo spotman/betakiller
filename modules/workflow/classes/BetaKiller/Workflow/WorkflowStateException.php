@@ -1,4 +1,4 @@
 <?php
 namespace BetaKiller\Workflow;
 
-class WorkflowStateException extends StatusException {}
+class WorkflowStateException extends WorkflowException {}

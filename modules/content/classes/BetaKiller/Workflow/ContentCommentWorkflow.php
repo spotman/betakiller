@@ -61,7 +61,7 @@ class ContentCommentWorkflow
     /**
      * @param \BetaKiller\Model\ContentCommentInterface $comment
      *
-     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\WorkflowException
      * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function draft(ContentCommentInterface $comment): void
@@ -74,7 +74,7 @@ class ContentCommentWorkflow
      * @param \BetaKiller\Model\UserInterface           $user
      *
      * @throws \BetaKiller\Notification\NotificationException
-     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\WorkflowException
      */
     public function approve(ContentCommentInterface $comment, UserInterface $user): void
     {
@@ -151,7 +151,7 @@ class ContentCommentWorkflow
      * @param \BetaKiller\Model\ContentCommentInterface $comment
      * @param \BetaKiller\Model\UserInterface           $user
      *
-     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\WorkflowException
      */
     public function reject(ContentCommentInterface $comment, UserInterface $user): void
     {
@@ -163,7 +163,7 @@ class ContentCommentWorkflow
      * @param \BetaKiller\Model\ContentCommentInterface $comment
      * @param \BetaKiller\Model\UserInterface           $user
      *
-     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\WorkflowException
      */
     public function markAsSpam(ContentCommentInterface $comment, UserInterface $user): void
     {
@@ -175,7 +175,7 @@ class ContentCommentWorkflow
      * @param \BetaKiller\Model\ContentCommentInterface $comment
      * @param \BetaKiller\Model\UserInterface           $user
      *
-     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\WorkflowException
      */
     public function moveToTrash(ContentCommentInterface $comment, UserInterface $user): void
     {
@@ -187,7 +187,7 @@ class ContentCommentWorkflow
      * @param \BetaKiller\Model\ContentCommentInterface $comment
      * @param \BetaKiller\Model\UserInterface           $user
      *
-     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\WorkflowException
      */
     public function restoreFromTrash(ContentCommentInterface $comment, UserInterface $user): void
     {

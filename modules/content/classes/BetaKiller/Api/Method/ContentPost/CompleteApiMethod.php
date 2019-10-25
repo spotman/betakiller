@@ -43,7 +43,7 @@ class CompleteApiMethod extends AbstractEntityBasedApiMethod
      * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\WorkflowException
      * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse

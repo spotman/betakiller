@@ -191,7 +191,7 @@ class Wordpress extends AbstractTask
      * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\WorkflowException
      * @throws \BetaKiller\Workflow\WorkflowStateException
      * @throws \BetaKiller\Task\TaskException
      * @throws \Kohana_Exception
@@ -497,7 +497,7 @@ class Wordpress extends AbstractTask
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \BetaKiller\Workflow\WorkflowStateException
-     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\WorkflowException
      * @throws \LogicException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException

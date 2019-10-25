@@ -45,7 +45,7 @@ final class StatusWorkflow implements StatusWorkflowInterface
      * @param string                                         $transition
      * @param \BetaKiller\Model\UserInterface                $user
      *
-     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\WorkflowException
      */
     public function doTransition(HasWorkflowStateInterface $model, string $transition, UserInterface $user): void
     {

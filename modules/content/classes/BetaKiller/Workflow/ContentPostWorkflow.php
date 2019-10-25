@@ -64,7 +64,7 @@ class ContentPostWorkflow
      * @param \BetaKiller\Model\UserInterface        $user
      *
      * @throws \BetaKiller\Url\UrlElementException
-     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\WorkflowException
      * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function complete(ContentPostInterface $post, UserInterface $user): void
@@ -97,7 +97,7 @@ class ContentPostWorkflow
      * @param \BetaKiller\Model\ContentPostInterface $post
      * @param \BetaKiller\Model\UserInterface        $user
      *
-     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\WorkflowException
      * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function publish(ContentPostInterface $post, UserInterface $user): void

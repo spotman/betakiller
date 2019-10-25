@@ -41,7 +41,7 @@ class MarkAsSpamApiMethod extends AbstractEntityBasedApiMethod
      * @return \Spotman\Api\ApiMethodResponse|null
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\WorkflowException
      */
     public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
     {
