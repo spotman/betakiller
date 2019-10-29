@@ -165,7 +165,13 @@ final class QueryCondition implements QueryConditionInterface
         $regionName  = $adminLevels->count() > 0 ? $adminLevels->first()->getName() : null;
         $cityName    = $point->getLocality();
 
-        return $cityName && $regionName && $cityName === $regionName;
+        if (!$cityName || !$regionName) {
+            return false;
+        }
+
+        \similar_text($cityName, $regionName, $similarity);
+
+        return $similarity >= 90;
     }
 
     private function hasBuilding(Location $location): bool

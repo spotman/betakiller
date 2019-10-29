@@ -12,7 +12,7 @@ use BetaKiller\Task\TaskException;
 use Psr\Log\LoggerInterface;
 use Worknector\Service\GeoService;
 
-class GeoCoder extends AbstractTask
+final class GeoCoder extends AbstractTask
 {
     /**
      * @var \Worknector\Service\GeoService
