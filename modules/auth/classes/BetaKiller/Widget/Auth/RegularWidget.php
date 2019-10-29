@@ -18,13 +18,19 @@ class RegularWidget extends AbstractPublicWidget
      */
     public function getData(ServerRequestInterface $request, array $context): array
     {
+        $i18n          = ServerRequestHelper::getI18n($request);
         $urlHelper     = ServerRequestHelper::getUrlHelper($request);
         $recoveryIFace = $urlHelper->getUrlElementByCodename(AccessRecoveryRequestIFace::codename());
         $loginAction   = $urlHelper->getUrlElementByCodename(RegularLoginAction::codename());
 
+        $lang = $i18n->getLang();
+
+        $params = $urlHelper->createUrlContainer()
+            ->setEntity($lang);
+
         return [
-            'login_url'           => $urlHelper->makeUrl($loginAction),
-            'access_recovery_url' => $urlHelper->makeUrl($recoveryIFace),
+            'login_url'           => $urlHelper->makeUrl($loginAction, $params),
+            'access_recovery_url' => $urlHelper->makeUrl($recoveryIFace, $params),
         ];
     }
 }
