@@ -33,11 +33,11 @@ interface PhpExceptionHistoryModelInterface
     public function getTimestamp(): \DateTimeImmutable;
 
     /**
-     * @param \DateTimeInterface $time
+     * @param \DateTimeImmutable $time
      *
      * @return PhpExceptionHistoryModelInterface
      */
-    public function setTimestamp(\DateTimeInterface $time): PhpExceptionHistoryModelInterface;
+    public function setTimestamp(\DateTimeImmutable $time): PhpExceptionHistoryModelInterface;
 
     /**
      * @return string

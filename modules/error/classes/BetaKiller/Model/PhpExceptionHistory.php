@@ -79,11 +79,11 @@ class PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModelInterf
     }
 
     /**
-     * @param \DateTimeInterface $time
+     * @param \DateTimeImmutable $time
      *
      * @return PhpExceptionHistoryModelInterface
      */
-    public function setTimestamp(\DateTimeInterface $time): PhpExceptionHistoryModelInterface
+    public function setTimestamp(\DateTimeImmutable $time): PhpExceptionHistoryModelInterface
     {
         $this->set_datetime_column_value('ts', $time);
 

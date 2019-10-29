@@ -618,7 +618,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
         return $historyModel
             ->setPhpException($this)
             ->setStatus($this->getStatus())
-            ->setTimestamp(new DateTime)
+            ->setTimestamp(new DateTimeImmutable)
             ->setUser($user)
             ->save();
     }
