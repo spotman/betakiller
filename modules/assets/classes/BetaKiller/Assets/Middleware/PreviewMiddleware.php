@@ -6,6 +6,7 @@ namespace BetaKiller\Assets\Middleware;
 use BetaKiller\Assets\Exception\AssetsException;
 use BetaKiller\Assets\Provider\HasPreviewProviderInterface;
 use BetaKiller\Helper\ResponseHelper;
+use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -28,11 +29,13 @@ class PreviewMiddleware extends AbstractAssetMiddleware
             ]);
         }
 
-        $this->checkAction(HasPreviewProviderInterface::ACTION_PREVIEW);
+        $user = ServerRequestHelper::getUser($request);
 
         $size   = $this->getSizeParam($request);
         $model  = $this->fromItemDeployUrl($request);
         $action = HasPreviewProviderInterface::ACTION_PREVIEW;
+
+        $this->checkAction($action, $user, $model);
 
         $this->checkExtension($model, $request);
 

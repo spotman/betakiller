@@ -5,6 +5,7 @@ namespace BetaKiller\Assets\Middleware;
 
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Helper\ResponseHelper;
+use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -21,9 +22,11 @@ class DownloadMiddleware extends AbstractAssetMiddleware
     {
         $this->detectProvider($request);
 
-        $this->checkAction(AssetsProviderInterface::ACTION_DOWNLOAD);
+        $user = ServerRequestHelper::getUser($request);
 
         $model = $this->fromItemDeployUrl($request);
+
+        $this->checkAction(AssetsProviderInterface::ACTION_DOWNLOAD, $user, $model);
 
         $this->checkExtension($model, $request);
 

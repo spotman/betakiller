@@ -7,15 +7,19 @@ use BetaKiller\Assets\AssetsDeploymentService;
 use BetaKiller\Assets\AssetsProviderFactory;
 use BetaKiller\Assets\Exception\AssetsException;
 use BetaKiller\Assets\Exception\AssetsModelException;
+use BetaKiller\Assets\Exception\AssetsProviderException;
 use BetaKiller\Assets\Exception\AssetsStorageException;
 use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Assets\Model\HasPreviewAssetsModelInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
-use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
+use BetaKiller\Assets\Provider\HasPreviewProviderInterface;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Exception\NotImplementedHttpException;
+use BetaKiller\Exception\SecurityException;
 use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Model\UserInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -184,17 +188,63 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
     }
 
     /**
-     * @param string $action
+     * @param string                                             $action
+     *
+     * @param \BetaKiller\Model\UserInterface                    $user
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface|null $model
      *
      * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
-    protected function checkAction(string $action): void
+    protected function checkAction(string $action, UserInterface $user, ?AssetsModelInterface $model): void
     {
         if (!$this->provider->hasAction($action)) {
             throw new NotImplementedHttpException('Action :name is not allowed for provider :codename', [
                 ':name'     => $action,
                 ':codename' => $this->provider->getCodename(),
             ]);
+        }
+
+        $actionsWithModel = [
+            AssetsProviderInterface::ACTION_ORIGINAL,
+            AssetsProviderInterface::ACTION_DOWNLOAD,
+            HasPreviewProviderInterface::ACTION_PREVIEW,
+        ];
+
+        if (!$model && \in_array($action, $actionsWithModel, true)) {
+            throw new AssetsProviderException('Assets provider ":prov" action ":act" requires a model', [
+                ':prov' => $this->provider->getCodename(),
+                ':act'  => $action,
+            ]);
+        }
+
+        if (!$this->isActionAllowed($action, $user, $model)) {
+            throw new SecurityException('Assets provider ":prov" action ":act" is not allowed to ":who"', [
+                ':prov' => $this->provider->getCodename(),
+                ':act'  => $action,
+                ':who'  => $user->getID(),
+            ]);
+        }
+    }
+
+    private function isActionAllowed(string $action, UserInterface $user, AssetsModelInterface $model): bool
+    {
+        switch ($action) {
+            case AssetsProviderInterface::ACTION_UPLOAD:
+                return $this->provider->isUploadAllowed($user);
+
+            case AssetsProviderInterface::ACTION_ORIGINAL:
+            case AssetsProviderInterface::ACTION_DOWNLOAD:
+            case HasPreviewProviderInterface::ACTION_PREVIEW:
+                return $this->provider->isReadAllowed($user, $model);
+
+            case AssetsProviderInterface::ACTION_DELETE:
+                return $this->provider->isDeleteAllowed($user, $model);
+
+            default:
+                throw new AssetsProviderException('Unknown assets provider ":prov" action ":act"', [
+                    ':prov' => $this->provider->getCodename(),
+                    ':act'  => $action,
+                ]);
         }
     }
 
@@ -237,10 +287,17 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
             case AssetsProviderInterface::ACTION_ORIGINAL:
                 return $this->provider->getOriginalUrl($model);
 
-            case ImageAssetsProviderInterface::ACTION_PREVIEW:
-                if (!($this->provider instanceof ImageAssetsProviderInterface)) {
-                    throw new BadRequestHttpException('Action :name may be used on images only', [
+            case HasPreviewProviderInterface::ACTION_PREVIEW:
+                if (!$this->provider instanceof HasPreviewProviderInterface) {
+                    throw new BadRequestHttpException('Action ":name" may be used on images only', [
                         ':name' => $action,
+                    ]);
+                }
+
+                if (!$model instanceof HasPreviewAssetsModelInterface) {
+                    throw new BadRequestHttpException('Action ":name" requires model implementing ":int" ', [
+                        ':name' => $action,
+                        ':int'  => HasPreviewAssetsModelInterface::class,
                     ]);
                 }
 
@@ -250,7 +307,9 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
                 return $this->provider->getDeleteUrl($model);
 
             default:
-                throw new NotFoundHttpException('Unknown action :value', [':value' => $action]);
+                throw new NotFoundHttpException('Unknown assets provider action ":value"', [
+                    ':value' => $action,
+                ]);
         }
     }
 

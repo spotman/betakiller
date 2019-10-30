@@ -24,10 +24,10 @@ class DeleteMiddleware extends AbstractAssetMiddleware
 
         $this->detectProvider($request);
 
-        $this->checkAction(AssetsProviderInterface::ACTION_DELETE);
-
         // Get file model by hash value
         $model = $this->fromItemDeployUrl($request);
+
+        $this->checkAction(AssetsProviderInterface::ACTION_DELETE, $user, $model);
 
         // Delete file through provider
         $this->provider->delete($model, $user);

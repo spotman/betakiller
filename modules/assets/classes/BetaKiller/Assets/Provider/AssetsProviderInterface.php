@@ -241,6 +241,17 @@ interface AssetsProviderInterface
     public function isCreateAllowed(UserInterface $user): bool;
 
     /**
+     * Returns TRUE if read is granted for provided model
+     *
+     * @param \BetaKiller\Model\UserInterface               $user
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return bool
+     * @throws \BetaKiller\Assets\Exception\AssetsException
+     */
+    public function isReadAllowed(UserInterface $user, AssetsModelInterface $model): bool;
+
+    /**
      * Returns TRUE if delete operation granted
      *
      * @param \BetaKiller\Model\UserInterface $user

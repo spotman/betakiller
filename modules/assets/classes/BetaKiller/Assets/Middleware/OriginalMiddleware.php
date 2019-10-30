@@ -5,6 +5,7 @@ namespace BetaKiller\Assets\Middleware;
 
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Helper\ResponseHelper;
+use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -19,11 +20,13 @@ class OriginalMiddleware extends AbstractAssetMiddleware
      */
     public function process(ServerRequestInterface $request): ResponseInterface
     {
+        $user = ServerRequestHelper::getUser($request);
+
         $this->detectProvider($request);
 
-        $this->checkAction(AssetsProviderInterface::ACTION_ORIGINAL);
-
         $model = $this->fromItemDeployUrl($request);
+
+        $this->checkAction(AssetsProviderInterface::ACTION_ORIGINAL, $user, $model);
 
         $this->checkExtension($model, $request);
 

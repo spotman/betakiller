@@ -8,7 +8,6 @@ use BetaKiller\Assets\AssetsProviderFactory;
 use BetaKiller\Assets\ContentTypes;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
-use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
@@ -50,23 +49,19 @@ class UploadInfoMiddleware extends AbstractAssetMiddleware
      */
     public function process(ServerRequestInterface $request): ResponseInterface
     {
-        $this->detectProvider($request);
-
-        $this->checkAction(AssetsProviderInterface::ACTION_UPLOAD);
-
         $user = ServerRequestHelper::getUser($request);
 
-        if (!$this->provider->isUploadAllowed($user)) {
-            throw new AccessDeniedException('Fetching upload info is not allowed');
-        }
+        $this->detectProvider($request);
+
+        $this->checkAction(AssetsProviderInterface::ACTION_UPLOAD, $user, null);
 
         $mimeTypes = $this->provider->getAllowedMimeTypes();
         $maxSize   = $this->provider->getUploadMaxSize();
 
         $data = [
-            'types' => $mimeTypes === true ? ['*'] : $mimeTypes,
+            'types'      => $mimeTypes === true ? ['*'] : $mimeTypes,
             'extensions' => $mimeTypes === true ? ['*'] : $this->types->getTypesExtensions($mimeTypes),
-            'size' => $maxSize,
+            'size'       => $maxSize,
         ];
 
         if ($this->provider instanceof ImageAssetsProviderInterface) {

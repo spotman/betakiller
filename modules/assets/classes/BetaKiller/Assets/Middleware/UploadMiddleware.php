@@ -35,7 +35,7 @@ class UploadMiddleware extends AbstractAssetMiddleware
 
         $this->detectProvider($request);
 
-        $this->checkAction(AssetsProviderInterface::ACTION_UPLOAD);
+        $this->checkAction(AssetsProviderInterface::ACTION_UPLOAD, $user, null);
 
         // Getting first uploaded file
         $file = array_shift($files);
