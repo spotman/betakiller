@@ -4,7 +4,7 @@ namespace BetaKiller\Assets\Storage;
 use BetaKiller\Assets\Exception\AssetsStorageException;
 use BetaKiller\Helper\AppEnvInterface;
 
-class LocalProtectedAssetsStorage extends AbstractLocalAssetsStorage
+final class LocalProtectedAssetsStorage extends AbstractLocalAssetsStorage
 {
     public const CODENAME = 'LocalProtected';
 
@@ -28,7 +28,7 @@ class LocalProtectedAssetsStorage extends AbstractLocalAssetsStorage
      *
      * @return bool
      */
-    public function isPublic(): bool
+    public function isInsideDocRoot(): bool
     {
         // Protected assets are located outside of document root
         return false;

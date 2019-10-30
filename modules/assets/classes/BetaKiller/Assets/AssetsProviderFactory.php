@@ -176,14 +176,14 @@ class AssetsProviderFactory
         $providerInstance->setCodename($modelName);
 
         // Check provider => storage matrix
-        if ($providerInstance->isProtected() && $storage->isPublic()) {
+        if ($providerInstance->isProtected() && $storage->isInsideDocRoot()) {
             throw new AssetsProviderException('Protected assets provider :name must have protected storage', [
                 ':name' => $modelName,
             ]);
         }
 
         // Public provider url key and public storage path must be the same to prevent collisions
-        if (!$providerInstance->isProtected() && $storage->isPublic()) {
+        if (!$providerInstance->isProtected() && $storage->isInsideDocRoot()) {
             $storagePathKey = $storageConfig[AssetsConfig::CONFIG_MODEL_STORAGE_PATH_KEY];
             $providerUrlKey = $modelConfig[AssetsConfig::CONFIG_MODEL_URL_KEY];
 

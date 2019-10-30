@@ -4,7 +4,7 @@ namespace BetaKiller\Assets\Storage;
 use BetaKiller\Assets\Exception\AssetsStorageException;
 use BetaKiller\Helper\AppEnvInterface;
 
-class LocalPublicAssetsStorage extends AbstractLocalAssetsStorage
+final class LocalPublicAssetsStorage extends AbstractLocalAssetsStorage
 {
     public const CODENAME = 'LocalPublic';
 
@@ -40,7 +40,7 @@ class LocalPublicAssetsStorage extends AbstractLocalAssetsStorage
      *
      * @return bool
      */
-    public function isPublic(): bool
+    public function isInsideDocRoot(): bool
     {
         // Public files are located under docroot
         return true;

@@ -8,7 +8,7 @@ interface AssetsStorageInterface
      *
      * @return bool
      */
-    public function isPublic(): bool;
+    public function isInsideDocRoot(): bool;
 
     /**
      * Model path would be prepended with this

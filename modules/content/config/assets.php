@@ -1,6 +1,7 @@
 <?php
 
 use BetaKiller\Assets\Handler\SaveEntityItemRelationHandler;
+use BetaKiller\Assets\Storage\LocalPublicAssetsStorage;
 
 return [
     'models' => [
@@ -18,7 +19,7 @@ return [
             ],
 
             'storage' => [
-                'name' => 'LocalPublic',
+                'name' => LocalPublicAssetsStorage::CODENAME,
                 'path' => 'post-thumbnails',
             ],
         ],
@@ -38,7 +39,7 @@ return [
             ],
 
             'storage' => [
-                'name' => 'LocalPublic',
+                'name' => LocalPublicAssetsStorage::CODENAME,
                 'path' => 'content-images',
             ],
         ],
@@ -55,7 +56,7 @@ return [
             ],
 
             'storage' => [
-                'name' => 'LocalPublic',
+                'name' => LocalPublicAssetsStorage::CODENAME,
                 'path' => 'content-attachments',
             ],
 

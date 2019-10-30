@@ -179,7 +179,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         }
 
         // Deployment allowed only for protected assets in public storage (like static files, located in modules)
-        return $this->storage->isPublic() && $this->isProtected();
+        return $this->storage->isInsideDocRoot() && $this->isProtected();
     }
 
     /**

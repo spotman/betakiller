@@ -23,7 +23,7 @@ class LocalCfsAssetsStorage implements AssetsStorageInterface
      *
      * @return bool
      */
-    public function isPublic(): bool
+    public function isInsideDocRoot(): bool
     {
         // Static assets are located outside of the docroot
         return false;
