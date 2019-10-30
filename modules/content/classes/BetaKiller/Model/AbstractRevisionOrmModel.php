@@ -7,18 +7,18 @@ abstract class AbstractRevisionOrmModel extends \ORM implements RevisionModelInt
      * Prepares the model database connection, determines the table name,
      * and loads column information.
      *
-     * @throws \Exception
      * @return void
+     * @throws \Exception
      */
     protected function configure(): void
     {
         $this->belongs_to([
-            'owner'  =>  [
-                'model' => 'User',
+            'owner'  => [
+                'model'       => 'User',
                 'foreign_key' => 'created_by',
             ],
-            'entity'  =>  [
-                'model' => $this->getRelatedEntityModelName(),
+            'entity' => [
+                'model'       => $this->getRelatedEntityModelName(),
                 'foreign_key' => $this->getRelatedEntityForeignKey(),
             ],
         ]);
@@ -79,7 +79,7 @@ abstract class AbstractRevisionOrmModel extends \ORM implements RevisionModelInt
         return $this->get('owner');
     }
 
-    public function setCreatedAt(\DateTime $time)
+    public function setCreatedAt(\DateTimeImmutable $time)
     {
         $this->set_datetime_column_value('created_at', $time);
 
@@ -87,9 +87,9 @@ abstract class AbstractRevisionOrmModel extends \ORM implements RevisionModelInt
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeImmutable
      */
-    public function getCreatedAt(): \DateTimeInterface
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->get_datetime_column_value('created_at');
     }
@@ -106,9 +106,10 @@ abstract class AbstractRevisionOrmModel extends \ORM implements RevisionModelInt
      *
      * @return $this
      */
-    public function filterPending(RevisionModelInterface $actual)
+    public function filterPending(RevisionModelInterface $actual): RevisionModelInterface
     {
         $this->filter_datetime_column_value('created_at', $actual->getCreatedAt(), '>');
+
         return $this;
     }
 

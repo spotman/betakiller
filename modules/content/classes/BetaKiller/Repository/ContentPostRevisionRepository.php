@@ -58,7 +58,7 @@ class ContentPostRevisionRepository extends AbstractOrmBasedDispatchableReposito
         return $this;
     }
 
-    private function filterBeforeCreatedAt(OrmInterface $orm, DateTimeInterface $before): self
+    private function filterBeforeCreatedAt(OrmInterface $orm, \DateTimeImmutable $before): self
     {
         $orm->filter_datetime_column_value('created_at', $before, '<');
 

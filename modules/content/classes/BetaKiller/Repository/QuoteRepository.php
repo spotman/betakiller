@@ -19,11 +19,11 @@ class QuoteRepository extends AbstractOrmBasedRepository implements RepositoryHa
     use OrmBasedRepositoryHasWordpressIdTrait;
 
     /**
-     * @param \DateTimeInterface|null $before
+     * @param \DateTimeImmutable|null $before
      *
      * @return \BetaKiller\Model\QuoteInterface|mixed
      */
-    public function getLatestQuote(?DateTimeInterface $before = null): QuoteInterface
+    public function getLatestQuote(?\DateTimeImmutable $before = null): QuoteInterface
     {
         $orm = $this->getOrmInstance();
 
@@ -41,7 +41,7 @@ class QuoteRepository extends AbstractOrmBasedRepository implements RepositoryHa
         $orm->order_by('created_at', $asc ? 'ASC' : 'DESC');
     }
 
-    private function filterBeforeCreatedAt(OrmInterface $orm, DateTimeInterface $before): void
+    private function filterBeforeCreatedAt(OrmInterface $orm, \DateTimeImmutable $before): void
     {
         $orm->filter_datetime_column_value('created_at', $before, '<');
     }

@@ -50,7 +50,7 @@ class QuotesWidget extends AbstractPublicWidget
         $this->response->sendSuccessJson($data);
     }
 
-    protected function getQuoteData(?DateTimeInterface $beforeDate = null): array
+    protected function getQuoteData(?\DateTimeImmutable $beforeDate = null): array
     {
         $quote = $this->repository->getLatestQuote($beforeDate);
 

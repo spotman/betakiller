@@ -30,12 +30,12 @@ interface RevisionModelInterface extends DispatchableEntityInterface
      */
     public function getCreatedBy(): UserInterface;
 
-    public function setCreatedAt(\DateTime $time);
+    public function setCreatedAt(\DateTimeImmutable $time);
 
     /**
-     * @return \DateTime
+     * @return \DateTimeImmutable
      */
-    public function getCreatedAt(): \DateTimeInterface;
+    public function getCreatedAt(): \DateTimeImmutable;
 
     /**
      * @return \BetaKiller\Model\AbstractEntityInterface

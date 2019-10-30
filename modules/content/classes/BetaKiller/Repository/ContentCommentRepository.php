@@ -217,7 +217,7 @@ class ContentCommentRepository extends AbstractOrmBasedSingleParentTreeRepositor
      */
     private function filterLastRecords(OrmInterface $orm, DateInterval $interval): self
     {
-        $time = new DateTime();
+        $time = new \DateTimeImmutable;
         $time->sub($interval);
 
         $orm->filter_datetime_column_value($orm->object_column('created_at'), $time, '>');

@@ -9,7 +9,6 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\UserSession;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use DateInterval;
-use DateTime;
 
 /**
  * Class UserSessionRepository
@@ -129,7 +128,7 @@ class UserSessionRepository extends AbstractOrmBasedRepository
 
     private function filterLastActive(OrmInterface $orm, DateInterval $interval, bool $getExpired): self
     {
-        $threshold = (new DateTime())->sub($interval);
+        $threshold = (new \DateTimeImmutable)->sub($interval);
 
         $orm->filter_datetime_column_value('last_active_at', $threshold, $getExpired ? '<' : '>=');
 
