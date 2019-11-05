@@ -167,6 +167,13 @@ class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
                 $stack->push($elementModel);
             }
 
+            // Emulate fetching to prevent warnings about unused query params
+            foreach ($stack->getCurrent()->getQueryParams() as $key => $name) {
+                if ($urlParameters->hasParameter($name)) {
+                    $urlParameters->getQueryPart($key);
+                }
+            }
+
             return true;
         } catch (\Throwable $e) {
             // Log and keep processing as no cache was found
