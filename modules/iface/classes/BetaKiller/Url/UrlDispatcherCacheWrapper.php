@@ -167,8 +167,10 @@ class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
             }
 
             // Emulate fetching to prevent warnings about unused query params
-            foreach ($stack->getCurrent()->getQueryParams() as $key => $name) {
-                if ($urlParameters->hasParameter($name)) {
+            foreach ($stack->getCurrent()->getQueryParams() as $key => $binding) {
+                $proto = UrlPrototype::fromString($binding);
+
+                if ($urlParameters->hasParameter($proto->getDataSourceName())) {
                     $urlParameters->getQueryPart($key, true); // Param should be defined in URL
                 }
             }
