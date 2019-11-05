@@ -204,6 +204,17 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
             ]);
         }
 
+        if (!$this->isActionAllowed($action, $user, $model)) {
+            throw new SecurityException('Assets provider ":prov" action ":act" is not allowed to ":who"', [
+                ':prov' => $this->provider->getCodename(),
+                ':act'  => $action,
+                ':who'  => $user->getID(),
+            ]);
+        }
+    }
+
+    private function isActionAllowed(string $action, UserInterface $user, ?AssetsModelInterface $model): bool
+    {
         $actionsWithModel = [
             AssetsProviderInterface::ACTION_ORIGINAL,
             AssetsProviderInterface::ACTION_DOWNLOAD,
@@ -217,17 +228,6 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
             ]);
         }
 
-        if (!$this->isActionAllowed($action, $user, $model)) {
-            throw new SecurityException('Assets provider ":prov" action ":act" is not allowed to ":who"', [
-                ':prov' => $this->provider->getCodename(),
-                ':act'  => $action,
-                ':who'  => $user->getID(),
-            ]);
-        }
-    }
-
-    private function isActionAllowed(string $action, UserInterface $user, AssetsModelInterface $model): bool
-    {
         switch ($action) {
             case AssetsProviderInterface::ACTION_UPLOAD:
                 return $this->provider->isUploadAllowed($user);
