@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Url;
 
 use BetaKiller\Helper\LoggerHelperTrait;
-use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
 use Psr\Log\LoggerInterface;
@@ -129,7 +128,7 @@ class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
 
         $data = unserialize($serializedData, [
             UrlElementInterface::class,
-            DispatchableEntityInterface::class,
+            UrlParameterInterface::class,
         ]);
 
         if (!$data || !\is_array($data)) {
@@ -161,7 +160,7 @@ class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
                 $urlParameters->setParameter($value);
             }
 
-            // Restore ifaces and push them into stack (with access check)
+            // Restore UrlElements and push them into stack
             foreach ($stackData as $elementCodename) {
                 $elementModel = $this->tree->getByCodename($elementCodename);
                 $stack->push($elementModel);
