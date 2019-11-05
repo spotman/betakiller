@@ -162,15 +162,15 @@ class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
             }
 
             // Restore ifaces and push them into stack (with access check)
-            foreach ($stackData as $ifaceCodename) {
-                $elementModel = $this->tree->getByCodename($ifaceCodename);
+            foreach ($stackData as $elementCodename) {
+                $elementModel = $this->tree->getByCodename($elementCodename);
                 $stack->push($elementModel);
             }
 
             // Emulate fetching to prevent warnings about unused query params
             foreach ($stack->getCurrent()->getQueryParams() as $key => $name) {
                 if ($urlParameters->hasParameter($name)) {
-                    $urlParameters->getQueryPart($key);
+                    $urlParameters->getQueryPart($key, true); // Param should be defined in URL
                 }
             }
 
