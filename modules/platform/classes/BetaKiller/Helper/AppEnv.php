@@ -50,6 +50,7 @@ class AppEnv implements AppEnvInterface
         $this->isCoreRunning = $isCoreRunning;
 
         $this->initDotEnv();
+        $this->detectDebugMode();
         $this->detectAppMode();
         $this->detectCliEnv(); // Cli options can override app configuration
     }
@@ -69,6 +70,13 @@ class AppEnv implements AppEnvInterface
 
         // Current git revision (set upon deployment process)
         $dotEnv->required(self::APP_REVISION)->notEmpty();
+    }
+
+    private function detectDebugMode(): void
+    {
+        if (\getenv('APP_DEBUG')) {
+            $this->enableDebug();
+        }
     }
 
     private function detectAppMode(): void
