@@ -184,7 +184,7 @@ class ApiWorkerDaemon implements DaemonInterface
             $method    = $arrayArgs[self::KEY_API_METHOD];
             $arguments = (array)$arrayArgs[self::KEY_API_DATA];
 
-            $this->logger->debug('User is ":name"', [':name' => $user->getUsername()]);
+            $this->logger->debug('User is ":name"', [':name' => $user->getID()]);
             $this->logger->debug('Resource is ":name"', [':name' => $resource]);
             $this->logger->debug('Method is ":name"', [':name' => $method]);
             $this->logger->debug('Arguments are :value', [':value' => json_encode($arguments)]);

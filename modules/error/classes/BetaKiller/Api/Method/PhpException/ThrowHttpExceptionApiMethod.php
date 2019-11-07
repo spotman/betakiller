@@ -4,8 +4,8 @@ namespace BetaKiller\Api\Method\PhpException;
 use BetaKiller\Exception\HttpException;
 use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 
 class ThrowHttpExceptionApiMethod extends AbstractPhpExceptionApiMethod
 {
@@ -31,8 +31,8 @@ class ThrowHttpExceptionApiMethod extends AbstractPhpExceptionApiMethod
     {
         $code = $arguments->getInt(self::ARG_CODE);
 
-        throw new HttpException($code, 'This is a test from :username', [
-            ':username' => $user->getUsername(),
+        throw new HttpException($code, 'This is a test from :user', [
+            ':user' => $user->getEmail(),
         ]);
     }
 }

@@ -213,7 +213,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         }
 
         if ($target instanceof UserInterface) {
-            return sprintf('%s <%s> aka %s', $target->getFullName(), $target->getEmail(), $target->getUsername());
+            return sprintf('%s <%s>', $target->getFullName(), $target->getEmail());
         }
 
         throw new DomainException('Unknown target type ":type"', [

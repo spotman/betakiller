@@ -66,18 +66,19 @@ class UserService
     }
 
     /**
-     * @param string $login
-     * @param string $email
-     * @param string $createdFromIp
+     * @param string      $email
+     * @param string      $createdFromIp
+     *
+     * @param string|null $username
      *
      * @return \BetaKiller\Model\UserInterface
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function createUser(
-        string $login,
         string $email,
-        string $createdFromIp
+        string $createdFromIp,
+        string $username = null
     ): UserInterface {
         $basicRoles = [
             $this->roleRepository->getGuestRole(),
@@ -89,9 +90,12 @@ class UserService
 
         $user
             ->setCreatedAt()
-            ->setUsername($login)
             ->setEmail($email)
             ->setCreatedFromIP($createdFromIp);
+
+        if ($username) {
+            $user->setUsername($username);
+        }
 
         // Enable email notifications by default
         $user->enableEmailNotification();
@@ -121,7 +125,7 @@ class UserService
         $user = $this->userRepository->searchBy($cliUserName);
 
         if (!$user) {
-            $user = $this->createUser($cliUserName, $email, '8.8.8.8')
+            $user = $this->createUser($email, '8.8.8.8', $cliUserName)
                 ->setFirstName('Minion')
                 ->setLastName('Server');
         }

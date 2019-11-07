@@ -53,9 +53,9 @@ class DebugBarUserDataCollector extends DataCollector implements Renderable
     private function getData(UserInterface $user): array
     {
         return [
-            'id'       => $user->getID(),
-            'username' => $user->getUsername(),
-            'roles'    => implode('", "', $this->getAssignedRoles()),
+            'id'    => $user->getID(),
+            'email' => $user->getEmail(),
+            'roles' => implode('", "', $this->getAssignedRoles()),
         ];
     }
 
@@ -72,7 +72,7 @@ class DebugBarUserDataCollector extends DataCollector implements Renderable
 
     /**
      * Returns a hash where keys are control names and their values
-     * an array of options as defined in {@see DebugBar\JavascriptRenderer::addControl()}
+     * an array of options as defined in {@see \DebugBar\JavascriptRenderer::addControl()}
      *
      * @return array
      */

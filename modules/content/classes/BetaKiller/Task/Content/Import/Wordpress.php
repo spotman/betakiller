@@ -1697,10 +1697,10 @@ class Wordpress extends AbstractTask
             $userModel = $this->userRepository->searchBy($wpEmail) ?: $this->userRepository->searchBy($wpLogin);
 
             if (!$userModel) {
-                $userModel = $this->userService->createUser($wpLogin, $wpEmail, UserService::DEFAULT_IP);
-                $this->logger->info('User :login successfully imported', [':login' => $userModel->getUsername()]);
+                $userModel = $this->userService->createUser($wpEmail, UserService::DEFAULT_IP, $wpLogin);
+                $this->logger->info('User :login successfully imported', [':login' => $userModel->getEmail()]);
             } else {
-                $this->logger->info('User :login already exists', [':login' => $userModel->getUsername()]);
+                $this->logger->info('User :login already exists', [':login' => $userModel->getEmail()]);
             }
         }
     }

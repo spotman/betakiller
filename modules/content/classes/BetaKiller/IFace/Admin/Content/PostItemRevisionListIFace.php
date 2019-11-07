@@ -44,7 +44,7 @@ class PostItemRevisionListIFace extends AbstractContentAdminIFace
                 'diff_url'   => $this->urlHelper->getReadEntityUrl($revision, ZoneInterface::ADMIN),
                 'is_actual'  => $post->isActualRevision($revision),
                 'created_at' => $revision->getCreatedAt()->format('d.m.Y H:i:s'),
-                'created_by' => $revision->getCreatedBy()->getUsername(),
+                'created_by' => $revision->getCreatedBy()->getFullName(),
             ];
         }
 
