@@ -76,7 +76,7 @@ class User extends \ORM implements UserInterface
                 [[$this, 'unique'], ['email', ':value']],
             ],
             self::TABLE_FIELD_USERNAME        => [
-                ['not_empty'],
+//                ['not_empty'],
                 ['max_length', [':value', 41]],
                 [[$this, 'unique'], ['username', ':value']],
             ],
@@ -267,11 +267,11 @@ class User extends \ORM implements UserInterface
     }
 
     /**
-     * @todo Переписать на кешированный ACL ибо слишком затратно делать запрос в БД на проверку роли
-     *
      * @param RoleInterface $role
      *
      * @return bool
+     * @todo Переписать на кешированный ACL ибо слишком затратно делать запрос в БД на проверку роли
+     *
      */
     public function hasRole(RoleInterface $role): bool
     {
@@ -559,8 +559,8 @@ class User extends \ORM implements UserInterface
     /**
      * Forces authorization if user is not logged in
      *
-     * @throws \BetaKiller\Auth\AuthorizationRequiredException
      * @return void
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
      */
     public function forceAuthorization(): void
     {
