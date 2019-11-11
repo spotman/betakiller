@@ -403,7 +403,9 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         $current = $this->get($key);
 
         if ((is_scalar($current) && $current) || ($current instanceof self && $current->loaded())) {
-            throw new LogicException(sprintf('Can not reassign key "%s"', $key));
+            throw new LogicException(
+                sprintf('Can not reassign key "%s" in "%s" model', $key, static::getModelName())
+            );
         }
 
         $this->set($key, $value);

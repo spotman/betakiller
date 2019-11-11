@@ -5,7 +5,6 @@ use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\Model\HashBasedAssetsModelInterface;
 use BetaKiller\Helper\AssetsHelper;
 use DateTimeImmutable;
-use DateTimeInterface;
 use ORM;
 use Spotman\Api\ApiResponseItemInterface;
 
@@ -48,7 +47,7 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
      */
     public function setOriginalName(string $name): AssetsModelInterface
     {
-        $this->set('original_name', $name);
+        $this->setOnce('original_name', $name);
 
         return $this;
     }
@@ -66,27 +65,13 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
     /**
      * Returns unique hash for provided content
      *
-     * @param string $content
+     * @param string $hash
      *
-     * @return string
+     * @return void
      */
-    public function setHashFromContent(string $content): string
+    public function setHash(string $hash): void
     {
-        $hash = $this->calculateContentHash($content);
-
-        $this->setHash($hash);
-
-        return $hash;
-    }
-
-    protected function calculateContentHash(string $content): string
-    {
-        return sha1($content);
-    }
-
-    protected function setHash(string $hash): void
-    {
-        $this->set('hash', $hash);
+        $this->setOnce('hash', $hash);
     }
 
     /**
@@ -108,7 +93,7 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
      */
     public function setMime(string $mime): AssetsModelInterface
     {
-        $this->set('mime', $mime);
+        $this->setOnce('mime', $mime);
 
         return $this;
     }
@@ -160,11 +145,11 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
     /**
      * Sets the date and time when asset was uploaded
      *
-     * @param \DateTimeInterface $time
+     * @param \DateTimeImmutable $time
      *
      * @return AssetsModelInterface
      */
-    public function setUploadedAt(DateTimeInterface $time): AssetsModelInterface
+    public function setUploadedAt(DateTimeImmutable $time): AssetsModelInterface
     {
         $this->set_datetime_column_value('uploaded_at', $time);
 
@@ -184,11 +169,11 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
     /**
      * Sets the date and time when asset was modified
      *
-     * @param \DateTimeInterface $time
+     * @param \DateTimeImmutable $time
      *
      * @return AssetsModelInterface
      */
-    public function setLastModifiedAt(DateTimeInterface $time): AssetsModelInterface
+    public function setLastModifiedAt(DateTimeImmutable $time): AssetsModelInterface
     {
         $this->set_datetime_column_value('last_modified_at', $time);
 
@@ -214,7 +199,7 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
      */
     public function setSize(int $size): AssetsModelInterface
     {
-        $this->set('size', $size);
+        $this->setOnce('size', $size);
 
         return $this;
     }

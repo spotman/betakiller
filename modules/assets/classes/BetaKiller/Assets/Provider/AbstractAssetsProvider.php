@@ -453,7 +453,10 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
             }
 
             // Calculate hash for processed content
-            $hash = $model->setHashFromContent($content);
+            $hash = $this->config->isDuplicateAllowed($this->getCodename())
+                // Use random hash and allow files to be uploaded multiple times
+                ? $this->calculateContentHash(\microtime())
+                : $this->calculateContentHash($content);
 
             // Check for duplicates
             if ($this->repository->findByHash($hash)) {
@@ -462,6 +465,8 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
                     ':hash'     => $hash,
                 ]);
             }
+
+            $model->setHash($hash);
         }
 
         $currentTime = new DateTimeImmutable;
@@ -888,6 +893,16 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         ], true);
 
         return $size ? $this->parseIniSize($size) : null;
+    }
+
+    /**
+     * @param string $content
+     *
+     * @return string
+     */
+    protected function calculateContentHash(string $content): string
+    {
+        return sha1($content);
     }
 
     /**

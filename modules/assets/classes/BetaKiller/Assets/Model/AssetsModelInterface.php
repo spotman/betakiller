@@ -52,11 +52,11 @@ interface AssetsModelInterface extends AbstractEntityInterface
     /**
      * Sets the date and time when asset was uploaded
      *
-     * @param \DateTimeInterface $time
+     * @param \DateTimeImmutable $time
      *
      * @return AssetsModelInterface
      */
-    public function setUploadedAt(DateTimeInterface $time): AssetsModelInterface;
+    public function setUploadedAt(\DateTimeImmutable $time): AssetsModelInterface;
 
     /**
      * Returns the date and time when asset was last modified
@@ -68,11 +68,11 @@ interface AssetsModelInterface extends AbstractEntityInterface
     /**
      * Sets the date and time when asset was last modified
      *
-     * @param \DateTimeInterface $time
+     * @param \DateTimeImmutable $time
      *
      * @return AssetsModelInterface
      */
-    public function setLastModifiedAt(DateTimeInterface $time): AssetsModelInterface;
+    public function setLastModifiedAt(\DateTimeImmutable $time): AssetsModelInterface;
 
     /**
      * Returns original file name (user-defined filename of uploaded file)

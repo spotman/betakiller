@@ -16,11 +16,11 @@ interface HashBasedAssetsModelInterface
     public function getHash(): ?string;
 
     /**
-     * Returns unique hash for provided content
+     * Assigns unique hash
      *
-     * @param string $content
+     * @param string $hash
      *
-     * @return string
+     * @return void
      */
-    public function setHashFromContent(string $content): string;
+    public function setHash(string $hash): void;
 }

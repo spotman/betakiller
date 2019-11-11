@@ -320,8 +320,8 @@ class Wordpress extends AbstractTask
         $model->setWpId($wpID);
 
         // Save created_at + updated_at
-        $createdAt = new DateTime($wpData['post_date']);
-        $updatedAt = new DateTime($wpData['post_modified']);
+        $createdAt = new DateTimeImmutable($wpData['post_date']);
+        $updatedAt = new DateTimeImmutable($wpData['post_modified']);
 
         $model->setUploadedAt($createdAt);
         $model->setLastModifiedAt($updatedAt);

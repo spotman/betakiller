@@ -7,6 +7,7 @@ use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Config\AbstractConfig;
 use BetaKiller\Config\ConfigProviderInterface;
 use Psr\Http\Message\UriFactoryInterface;
+use Psr\Http\Message\UriInterface;
 
 class AssetsConfig extends AbstractConfig
 {
@@ -83,6 +84,11 @@ class AssetsConfig extends AbstractConfig
     public const CONFIG_MODEL_POST_UPLOAD_KEY = 'post_upload';
 
     /**
+     * Bool flag for enabling duplicate uploads
+     */
+    public const CONFIG_MODEL_ALLOW_DUPLICATE = 'duplicates';
+
+    /**
      * @var \Psr\Http\Message\UriFactoryInterface
      */
     private $uriFactory;
@@ -140,7 +146,7 @@ class AssetsConfig extends AbstractConfig
     /**
      * @return \Psr\Http\Message\UriInterface
      */
-    public function getBaseUri(): \Psr\Http\Message\UriInterface
+    public function getBaseUri(): UriInterface
     {
         $url = (string)$this->get([self::CONFIG_URL_PATH_KEY]);
 
@@ -163,6 +169,17 @@ class AssetsConfig extends AbstractConfig
     public function getModelStorage(string $modelName): string
     {
         return (string)$this->getModelConfigValue($modelName, [self::CONFIG_MODEL_PROVIDER_KEY]);
+    }
+
+    /**
+     * @param string $modelName
+     *
+     * @return bool
+     * @throws \BetaKiller\Exception
+     */
+    public function isDuplicateAllowed(string $modelName): bool
+    {
+        return (bool)$this->getModelConfigValue($modelName, [self::CONFIG_MODEL_ALLOW_DUPLICATE], true);
     }
 
     private function getUrlKeyConfigValue(AssetsProviderInterface $provider): string
