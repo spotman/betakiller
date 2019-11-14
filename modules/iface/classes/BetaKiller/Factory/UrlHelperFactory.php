@@ -9,7 +9,7 @@ use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
 
-class UrlHelperFactory
+final class UrlHelperFactory
 {
     /**
      * @var \BetaKiller\DI\ContainerInterface

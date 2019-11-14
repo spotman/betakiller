@@ -4,18 +4,9 @@ declare(strict_types=1);
 namespace BetaKiller\WebHook;
 
 use BetaKiller\Model\WebHookModelInterface;
-use BetaKiller\Url\AbstractUrlElementInstance;
 
-abstract class AbstractWebHook extends AbstractUrlElementInstance implements WebHookInterface
+abstract class AbstractWebHook implements WebHookInterface
 {
-    /**
-     * @return string
-     */
-    public static function getSuffix(): string
-    {
-        return self::SUFFIX;
-    }
-
     /**
      * @var \BetaKiller\Model\WebHookModelInterface
      */
