@@ -4,7 +4,7 @@ namespace BetaKiller\Widget\Admin\Menu;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Widget\AbstractMenuWidget;
 
-class MainWidget extends AbstractMenuWidget
+final class MainWidget extends AbstractMenuWidget
 {
     /**
      * Returns array of roles` codenames which are allowed to use this widget

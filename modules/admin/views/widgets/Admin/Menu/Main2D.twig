@@ -1,18 +1,18 @@
 <ul class="admin-main-menu-widget collapsible collapsible-accordion">
   {% for item in items %}
-    {% set has_children = item.children and item.children|length > 0  %}
-    {% set icon = item.icon|default() %}
+    {% set has_children = item.children and item.children|length > 0 %}
+{#    {% set icon = item.icon|default() %}#}
 
     <li class="{{ item.active ? 'active' : '' }}">
       {% if has_children %}
-      <a class="collapsible-header white-text">
-        <i class="material-icons right white-text">arrow_drop_down</i>
-        <i class="material-icons white-text">{{ icon }}</i>
-        {{ item.label }}
-      </a>
+        <a class="collapsible-header white-text">
+          <i class="material-icons right white-text">arrow_drop_down</i>
+{#          <i class="material-icons white-text">{{ icon }}</i>#}
+          {{ item.label }}
+        </a>
       {% else %}
         <a href="{{ item.url }}" class="collapsible-header white-text">
-          <i class="material-icons white-text">{{ icon }}</i>
+{#          <i class="material-icons white-text">{{ icon }}</i>#}
           {{ item.label }}
         </a>
       {% endif %}
