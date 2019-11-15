@@ -148,6 +148,12 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
             ]);
         }
 
+        if (isset($this->models[$codename])) {
+            throw new UrlElementException('Duplicate codename ":name"', [
+                ':name' => $codename,
+            ]);
+        }
+
         $realParent = $this->getParentModel($config);
 
         if ($realParent) {

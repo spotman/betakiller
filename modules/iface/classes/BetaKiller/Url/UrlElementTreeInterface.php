@@ -107,7 +107,7 @@ interface UrlElementTreeInterface
     /**
      * @param \BetaKiller\Url\UrlElementInterface $model
      *
-     * @return \ArrayIterator
+     * @return \ArrayIterator|UrlElementInterface[]
      */
     public function getBranchIterator(UrlElementInterface $model): ArrayIterator;
 

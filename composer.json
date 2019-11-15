@@ -78,6 +78,7 @@
     "jolicode/jolinotif": "^2.0",
     "kint-php/kint": "^3.0",
     "kint-php/kint-twig": "^2.0",
+    "php-school/cli-menu": "^3.2",
     "phpstan/phpstan": "0.10.3",
     "phpunit/php-code-coverage": "^7.0",
     "phpunit/phpunit": "^8.0",

@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Url;
 
-interface UrlElementInterface
+interface UrlElementInterface extends \JsonSerializable
 {
     public const URL_KEY = 'codename';
 
