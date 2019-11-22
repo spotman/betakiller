@@ -5,14 +5,14 @@ interface MessageRendererInterface
 {
     public function makeBody(
         MessageInterface $message,
-        TargetInterface $target,
+        MessageTargetInterface $target,
         TransportInterface $transport,
         string $hash
     ): string;
 
     public function makeSubject(
         MessageInterface $message,
-        TargetInterface $target
+        MessageTargetInterface $target
     ): string;
 
     public function hasLocalizedTemplate(

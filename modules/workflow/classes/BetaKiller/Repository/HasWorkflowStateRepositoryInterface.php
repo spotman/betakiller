@@ -14,5 +14,8 @@ use BetaKiller\Workflow\HasWorkflowStateInterface;
  */
 interface HasWorkflowStateRepositoryInterface extends RepositoryInterface
 {
-
+    /**
+     * @return HasWorkflowStateInterface[]
+     */
+    public function getAllMissingState(): array;
 }

@@ -14,28 +14,28 @@ interface MessageInterface
     public function getCodename(): string;
 
     /**
-     * @return TargetInterface
+     * @return MessageTargetInterface
      */
-    public function getFrom(): ?TargetInterface;
+    public function getFrom(): ?MessageTargetInterface;
 
     /**
-     * @param TargetInterface $value
+     * @param MessageTargetInterface $value
      *
      * @return MessageInterface
      */
-    public function setFrom(TargetInterface $value): MessageInterface;
+    public function setFrom(MessageTargetInterface $value): MessageInterface;
 
     /**
-     * @return \BetaKiller\Notification\TargetInterface
+     * @return \BetaKiller\Notification\MessageTargetInterface
      */
-    public function getTarget(): TargetInterface;
+    public function getTarget(): MessageTargetInterface;
 
     /**
-     * @param TargetInterface $value
+     * @param MessageTargetInterface $value
      *
      * @return MessageInterface
      */
-    public function setTarget(TargetInterface $value): MessageInterface;
+    public function setTarget(MessageTargetInterface $value): MessageInterface;
 
     /**
      * @return array
@@ -84,9 +84,9 @@ interface MessageInterface
     public function getBaseI18nKey(): string;
 
     /**
-     * @param \BetaKiller\Notification\TargetInterface $targetUser
+     * @param \BetaKiller\Notification\MessageTargetInterface $targetUser
      *
      * @return array
      */
-    public function getFullDataForTarget(TargetInterface $targetUser): array;
+    public function getFullDataForTarget(MessageTargetInterface $targetUser): array;
 }

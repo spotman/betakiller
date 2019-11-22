@@ -32,16 +32,6 @@ interface UserStatusInterface extends HasI18nKeyNameInterface
     /**
      * @return bool
      */
-    public function isApproved(): bool;
-
-    /**
-     * @return bool
-     */
-    public function isVerified(): bool;
-
-    /**
-     * @return bool
-     */
     public function isConfirmed(): bool;
 
     /**

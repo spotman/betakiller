@@ -77,7 +77,8 @@ class Import extends AbstractTask
 
             // Get state repo
             $stateModelName = $this->config->getStateModelName($modelName);
-            $stateRepo      = $this->repoFactory->create($stateModelName);
+            /** @var WorkflowStateRepositoryInterface $stateRepo */
+            $stateRepo = $this->repoFactory->create($stateModelName);
 
             if (!$stateRepo instanceof WorkflowStateRepositoryInterface) {
                 throw new WorkflowStateException('Repo ":name" must implement :class', [
@@ -145,6 +146,17 @@ class Import extends AbstractTask
 
                     $stateRepo->delete($existingState);
                 }
+            }
+
+            /** @var \BetaKiller\Repository\HasWorkflowStateRepositoryInterface $modelRepo */
+            $modelRepo = $this->repoFactory->create($modelName);
+
+            $startState = $stateRepo->getStartState();
+
+            // Fetch models without state and preset start state
+            foreach ($modelRepo->getAllMissingState() as $model) {
+                $model->initWorkflowState($startState);
+                $modelRepo->save($model);
             }
         }
     }

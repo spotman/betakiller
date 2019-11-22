@@ -77,6 +77,16 @@ trait HasWorkflowStateModelOrmTrait
         $this->set(static::getWorkflowStateRelationKey(), $target);
     }
 
+    /**
+     * @param string $state
+     *
+     * @return bool
+     */
+    protected function isInWorkflowState(string $state): bool
+    {
+        return $this->getWorkflowState()->getCodename() === $state;
+    }
+
     public static function getWorkflowStateRelationKey(): string
     {
         return static::getModelName().'-status';

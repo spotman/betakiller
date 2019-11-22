@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-use BetaKiller\Notification\TargetInterface;
+use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Spotman\Acl\AclUserInterface;
 
-interface UserInterface extends DispatchableEntityInterface, OrmInterface, TargetInterface, AclUserInterface
+interface UserInterface extends DispatchableEntityInterface, OrmInterface, MessageTargetInterface, AclUserInterface
 {
     public function completeLogin(): void;
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace BetaKiller\Model;
 
 use BetaKiller\Exception\DomainException;
-use BetaKiller\Notification\TargetEmail;
-use BetaKiller\Notification\TargetInterface;
+use BetaKiller\Notification\MessageTargetEmail;
+use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\TransportInterface;
 use Database;
 use DateTimeImmutable;
@@ -88,7 +88,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         return $this;
     }
 
-    public function setTarget(TargetInterface $target): NotificationLogInterface
+    public function setTarget(MessageTargetInterface $target): NotificationLogInterface
     {
         $this->set(self::TABLE_COLUMN_TARGET, $this->makeTargetString($target));
 
@@ -177,7 +177,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     }
 
     /**
-     * @return \BetaKiller\Notification\TargetInterface
+     * @return \BetaKiller\Notification\MessageTargetInterface
      * @throws \Kohana_Exception
      */
     public function getTargetString(): string
@@ -206,9 +206,9 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         return $this->get(self::TABLE_COLUMN_STATUS) === self::STATUS_SUCCEEDED;
     }
 
-    private function makeTargetString(TargetInterface $target): string
+    private function makeTargetString(MessageTargetInterface $target): string
     {
-        if ($target instanceof TargetEmail) {
+        if ($target instanceof MessageTargetEmail) {
             return sprintf('%s <%s>', $target->getFullName(), $target->getEmail());
         }
 

@@ -137,17 +137,17 @@ class NotificationFacade
     /**
      * Create raw message
      *
-     * @param string                                   $name
-     * @param \BetaKiller\Notification\TargetInterface $target
-     * @param array                                    $data
-     * @param array|null                               $attachments Array of files to attach
+     * @param string                                          $name
+     * @param \BetaKiller\Notification\MessageTargetInterface $target
+     * @param array                                           $data
+     * @param array|null                                      $attachments Array of files to attach
      *
      * @return \BetaKiller\Notification\MessageInterface
      * @throws \BetaKiller\Notification\NotificationException
      */
     public function createMessage(
         string $name,
-        TargetInterface $target,
+        MessageTargetInterface $target,
         array $data,
         array $attachments = null
     ): MessageInterface {
@@ -313,7 +313,7 @@ class NotificationFacade
     /**
      * @param \BetaKiller\Model\NotificationGroupInterface $group
      *
-     * @return \BetaKiller\Notification\TargetInterface[]
+     * @return \BetaKiller\Notification\MessageTargetInterface[]
      * @throws \BetaKiller\Exception
      * @throws \BetaKiller\Factory\FactoryException
      */
@@ -456,7 +456,7 @@ class NotificationFacade
 
     private function isMessageEnabledForUser(
         MessageInterface $message,
-        TargetInterface $user
+        MessageTargetInterface $user
     ): bool {
         if (!$user instanceof UserInterface) {
             // Custom target types can not be checked here and always allowed
@@ -496,7 +496,7 @@ class NotificationFacade
 
     private function calculateHash(
         MessageInterface $message,
-        TargetInterface $target,
+        MessageTargetInterface $target,
         TransportInterface $transport
     ): string {
         return sha1(implode('-', [

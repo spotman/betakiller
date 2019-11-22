@@ -76,7 +76,7 @@ class MessageSerializer
         return $message;
     }
 
-    private function serializeTarget(TargetInterface $target): array
+    private function serializeTarget(MessageTargetInterface $target): array
     {
         switch (true) {
             case $target instanceof UserInterface:
@@ -85,7 +85,7 @@ class MessageSerializer
                     self::KEY_USER_ID     => $target->getID(),
                 ];
 
-            case $target instanceof TargetEmail:
+            case $target instanceof MessageTargetEmail:
                 return [
                     self::KEY_TARGET_TYPE   => self::TARGET_TYPE_EMAIL,
                     self::KEY_EMAIL_ADDRESS => $target->getEmail(),
@@ -100,7 +100,7 @@ class MessageSerializer
         }
     }
 
-    private function unserializeTarget(array $data): TargetInterface
+    private function unserializeTarget(array $data): MessageTargetInterface
     {
         $type = $data[self::KEY_TARGET_TYPE];
 
@@ -109,7 +109,7 @@ class MessageSerializer
                 return $this->userRepo->getById($data[self::KEY_USER_ID]);
 
             case self::TARGET_TYPE_EMAIL:
-                return new TargetEmail(
+                return new MessageTargetEmail(
                     $data[self::KEY_EMAIL_ADDRESS],
                     $data[self::KEY_EMAIL_NAME],
                     $data[self::KEY_EMAIL_LANG]

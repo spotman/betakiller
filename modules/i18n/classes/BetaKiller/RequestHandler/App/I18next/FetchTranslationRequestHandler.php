@@ -4,7 +4,10 @@ declare(strict_types=1);
 namespace BetaKiller\RequestHandler\App\I18next;
 
 use BetaKiller\Helper\ResponseHelper;
+use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\TextHelper;
 use BetaKiller\I18n\I18nFacade;
+use BetaKiller\Model\RoleInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -37,20 +40,31 @@ class FetchTranslationRequestHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $user = ServerRequestHelper::getUser($request);
+
         $langIsoCode = $request->getAttribute('lang');
 
         $lang = $this->facade->getLanguageByIsoCode($langIsoCode);
+
+        $keys = [
+            'frontend.',
+        ];
+
+        if ($user->hasRoleName(RoleInterface::ADMIN_PANEL)) {
+            $keys[] = 'admin.frontend.';
+        }
 
         $data = [];
 
         foreach ($this->facade->getAllTranslationKeys() as $item) {
             $name = $item->getI18nKeyName();
 
-            if (\mb_strpos($name, 'frontend.') !== 0) {
-                continue;
+            foreach ($keys as $key) {
+                if (TextHelper::startsWith($name, $key)) {
+                    $data[$name] = $this->facade->translateKey($lang, $item);
+                    break;
+                }
             }
-
-            $data[$name] = $this->facade->translateKey($lang, $item);
         }
 
         return ResponseHelper::json($data);

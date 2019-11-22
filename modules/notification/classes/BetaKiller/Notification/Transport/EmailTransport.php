@@ -2,7 +2,7 @@
 namespace BetaKiller\Notification\Transport;
 
 use BetaKiller\Notification\MessageInterface;
-use BetaKiller\Notification\TargetInterface;
+use BetaKiller\Notification\MessageTargetInterface;
 
 class EmailTransport extends AbstractTransport
 {
@@ -11,7 +11,7 @@ class EmailTransport extends AbstractTransport
         return 'email';
     }
 
-    public function isEnabledFor(TargetInterface $user): bool
+    public function isEnabledFor(MessageTargetInterface $user): bool
     {
         return $user->isEmailNotificationAllowed();
     }
@@ -27,16 +27,16 @@ class EmailTransport extends AbstractTransport
     }
 
     /**
-     * @param \BetaKiller\Notification\MessageInterface $message
-     * @param \BetaKiller\Notification\TargetInterface  $target
-     * @param string                                    $body
+     * @param \BetaKiller\Notification\MessageInterface       $message
+     * @param \BetaKiller\Notification\MessageTargetInterface $target
+     * @param string                                          $body
      *
      * @return bool Number of messages sent
      * @throws \BetaKiller\Exception
      */
     public function send(
         MessageInterface $message,
-        TargetInterface $target,
+        MessageTargetInterface $target,
         string $body
     ): bool {
         $fromUser = $message->getFrom();

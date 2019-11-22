@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Notification;
 
-class TargetEmail implements TargetInterface
+class MessageTargetEmail implements MessageTargetInterface
 {
     /**
      * @var string
@@ -24,7 +24,7 @@ class TargetEmail implements TargetInterface
     private $langIsoCode;
 
     /**
-     * TargetEmail constructor.
+     * MessageTargetEmail constructor.
      *
      * @param string $email
      * @param string $fullName

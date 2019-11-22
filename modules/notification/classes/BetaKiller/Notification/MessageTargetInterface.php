@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Notification;
 
-interface TargetInterface
+interface MessageTargetInterface
 {
     /**
      * Returns user email

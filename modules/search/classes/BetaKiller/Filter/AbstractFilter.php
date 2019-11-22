@@ -9,21 +9,6 @@ use BetaKiller\Model\UserInterface;
 abstract class AbstractFilter implements FilterInterface
 {
     /**
-     * @var UserInterface
-     */
-    protected $_user;
-
-    /**
-     * AbstractFilter constructor.
-     *
-     * @param \BetaKiller\Model\UserInterface $_user
-     */
-    public function __construct(UserInterface $_user = null)
-    {
-        $this->_user = $_user;
-    }
-
-    /**
      * @return string
      */
     public function getCodename(): string
@@ -45,14 +30,6 @@ abstract class AbstractFilter implements FilterInterface
     protected function availableValuesGroupFactory($label, array $values): ValuesGroup
     {
         return ValuesGroup::factory($label, $values);
-    }
-
-    /**
-     * @return UserInterface
-     */
-    public function getUser(): UserInterface
-    {
-        return $this->_user;
     }
 
     /**

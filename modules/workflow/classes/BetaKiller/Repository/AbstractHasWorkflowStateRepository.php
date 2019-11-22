@@ -4,11 +4,27 @@ declare(strict_types=1);
 namespace BetaKiller\Repository;
 
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
+use BetaKiller\Workflow\HasWorkflowStateInterface;
 use BetaKiller\Workflow\WorkflowStateInterface;
 
 abstract class AbstractHasWorkflowStateRepository extends AbstractOrmBasedDispatchableRepository implements
     HasWorkflowStateRepositoryInterface
 {
+    /**
+     * @return HasWorkflowStateInterface[]
+     */
+    public function getAllMissingState(): array
+    {
+        $orm = $this->getOrmInstance();
+
+        $rel = $this->getStateRelationKey();
+        $col = $this->getStateCodenameColumnName();
+
+        $orm->where($rel.'.'.$col, 'IS', null);
+
+        return $this->findAll($orm);
+    }
+
     protected function filterState(OrmInterface $orm, WorkflowStateInterface $state): self
     {
         return $this->filterStateCodename($orm, $state->getCodename());

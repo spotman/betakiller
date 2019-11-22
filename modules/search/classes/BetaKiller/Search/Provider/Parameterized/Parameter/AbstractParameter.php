@@ -4,17 +4,11 @@ namespace BetaKiller\Search\Provider\Parameterized\Parameter;
 use BetaKiller\Filter\FilterFactory;
 use BetaKiller\Filter\FilterInterface;
 use BetaKiller\Filter\Model\Value;
-use BetaKiller\Model\UserInterface;
 use BetaKiller\Search\ApplicableSearchModelInterface;
 use BetaKiller\Search\Provider\Parameterized\ParameterInterface;
 
 abstract class AbstractParameter implements ParameterInterface
 {
-    /**
-     * @var \BetaKiller\Model\User
-     */
-    protected $_user;
-
     /**
      * @var \BetaKiller\Filter\FilterFactory
      */
@@ -24,16 +18,6 @@ abstract class AbstractParameter implements ParameterInterface
      * @var FilterInterface
      */
     protected $_filterInstance;
-
-    /**
-     * ParameterInterface constructor.
-     *
-     * @param \BetaKiller\Model\UserInterface $_user
-     */
-    public function __construct(UserInterface $_user = null)
-    {
-        $this->_user = $_user;
-    }
 
     /**
      * @return \BetaKiller\Filter\FilterFactory

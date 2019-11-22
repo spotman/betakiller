@@ -95,13 +95,16 @@
     ],
     "qa": [
       "@testEnv",
-      "@phpstan"
+      "@phpstan",
+      "@testEnvCleanup"
     ],
     "test": [
       "@testEnv",
-      "@phpunit"
+      "@phpunit",
+      "@testEnvCleanup"
     ],
     "testEnv": "ln -sf ./../.env.testing ./application/.env",
+    "testEnvCleanup": "rm ./application/.env",
     "phpunit": "APP_ENV=testing ./vendor/bin/phpunit --colors=always",
     "phpstan": "APP_ENV=testing ./vendor/bin/phpstan analyze"
   },

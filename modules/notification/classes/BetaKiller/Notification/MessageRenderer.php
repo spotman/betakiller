@@ -31,18 +31,18 @@ class MessageRenderer implements MessageRendererInterface
     /**
      * Render message for sending via provided transport
      *
-     * @param \BetaKiller\Notification\MessageInterface   $message
-     * @param \BetaKiller\Notification\TargetInterface    $target
-     * @param \BetaKiller\Notification\TransportInterface $transport
+     * @param \BetaKiller\Notification\MessageInterface       $message
+     * @param \BetaKiller\Notification\MessageTargetInterface $target
+     * @param \BetaKiller\Notification\TransportInterface     $transport
      *
-     * @param string                                      $hash
+     * @param string                                          $hash
      *
      * @return string
      * @throws \BetaKiller\Notification\NotificationException
      */
     public function makeBody(
         MessageInterface $message,
-        TargetInterface $target,
+        MessageTargetInterface $target,
         TransportInterface $transport,
         string $hash
     ): string {
@@ -101,7 +101,7 @@ class MessageRenderer implements MessageRendererInterface
         return $this->getTemplatePath().DIRECTORY_SEPARATOR.$templateName;
     }
 
-    public function makeSubject(MessageInterface $message, TargetInterface $target): string
+    public function makeSubject(MessageInterface $message, MessageTargetInterface $target): string
     {
         $key      = $message->getBaseI18nKey().'.subj';
         $data     = $message->getFullDataForTarget($target);
@@ -133,7 +133,7 @@ class MessageRenderer implements MessageRendererInterface
 
     private function detectTemplateFile(
         MessageInterface $message,
-        TargetInterface $target,
+        MessageTargetInterface $target,
         TransportInterface $transport
     ): string {
         // User language in templates

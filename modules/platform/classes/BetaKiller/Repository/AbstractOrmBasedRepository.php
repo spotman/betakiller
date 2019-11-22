@@ -71,7 +71,26 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     {
         $orm = $this->getOrmInstance();
 
+        // Add ordering
+        $this->customOrderBy($orm);
+
         return $this->findAll($orm);
+    }
+
+    /**
+     * @param int|null $currentPage
+     * @param int|null $itemsPerPage
+     *
+     * @return \BetaKiller\Model\AbstractEntityInterface[]
+     */
+    public function getAllPaginated(int $currentPage, int $itemsPerPage): array
+    {
+        $orm = $this->getOrmInstance();
+
+        // Add ordering
+        $this->customOrderBy($orm);
+
+        return $this->findAll($orm, $currentPage, $itemsPerPage);
     }
 
     /**
@@ -195,6 +214,9 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     protected function findAll(ExtendedOrmInterface $orm, int $currentPage = null, int $itemsPerPage = null): array
     {
         try {
+            // Add ordering
+            $this->customOrderBy($orm);
+
             if (!$currentPage || !$itemsPerPage) {
                 // Raw data
                 return $orm->find_all()->as_array();
@@ -293,5 +315,10 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         $orm->filter_related_multiple($relationName, $relatedModels);
 
         return $this;
+    }
+
+    protected function customOrderBy(OrmInterface $orm): void
+    {
+        // Empty by default
     }
 }

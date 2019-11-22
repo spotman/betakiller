@@ -213,7 +213,7 @@ class UrlElementHelper
         $current = $model;
 
         do {
-            if ($current instanceof IFaceModelInterface) {
+            if ($current instanceof UrlElementWithLabelInterface) {
                 $labels[] = $this->getLabel($current, $params, $lang);
             }
             $current = $this->tree->getParent($current);

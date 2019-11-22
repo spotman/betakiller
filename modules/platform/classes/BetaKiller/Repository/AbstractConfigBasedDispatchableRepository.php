@@ -2,6 +2,7 @@
 namespace BetaKiller\Repository;
 
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Model\ConfigBasedDispatchableEntityInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
@@ -96,6 +97,17 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractReadOnl
     public function getAll(): array
     {
         return $this->items;
+    }
+
+    /**
+     * @param int|null $currentPage
+     * @param int|null $itemsPerPage
+     *
+     * @return \BetaKiller\Model\AbstractEntityInterface[]
+     */
+    public function getAllPaginated(int $currentPage, int $itemsPerPage): array
+    {
+        throw new NotImplementedHttpException;
     }
 
     /**

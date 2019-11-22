@@ -30,6 +30,14 @@ interface RepositoryInterface
     public function getAll(): array;
 
     /**
+     * @param int|null $currentPage
+     * @param int|null $itemsPerPage
+     *
+     * @return \BetaKiller\Model\AbstractEntityInterface[]
+     */
+    public function getAllPaginated(int $currentPage, int $itemsPerPage): array;
+
+    /**
      * @param $entity
      *
      * @throws \BetaKiller\Repository\RepositoryException

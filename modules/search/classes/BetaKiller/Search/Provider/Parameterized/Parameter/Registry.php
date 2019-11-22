@@ -17,16 +17,9 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     use ConvertibleHelperTrait;
 
     /**
-     * @var \BetaKiller\Model\User
-     * @deprecated
-     * @todo DI
-     */
-    protected $_user;
-
-    /**
      * @var \BetaKiller\Search\Provider\Parameterized\Parameter\Factory
      */
-    protected $_parameterFactory;
+    protected $parameterFactory;
 
     /**
      * @var Utils\Registry\BasicRegistry
@@ -44,27 +37,13 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     abstract public function init();
 
     /**
-     * @param \BetaKiller\Model\User|NULL $user
-     *
-     * @return $this
-     * @deprecated
-     * @todo DI
-     */
-    public function setUser(User $user = null)
-    {
-        $this->_user = $user;
-
-        return $this;
-    }
-
-    /**
      * @param \BetaKiller\Search\Provider\Parameterized\Parameter\Factory $parameterFactory
      *
      * @return $this
      */
     public function setParameterFactory(Factory $parameterFactory)
     {
-        $this->_parameterFactory = $parameterFactory;
+        $this->parameterFactory = $parameterFactory;
 
         return $this;
     }
@@ -251,21 +230,13 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     /**
      * @return string
      */
-    protected function getParameterNamespace()
-    {
-        // Empty by default
-        return '';
-    }
+    abstract protected function getParameterNamespace(): string;
 
     protected function parameterFactory($codename)
     {
         $ns = $this->getParameterNamespace();
 
-        if ($ns) {
-            $codename = $ns.'\\'.$codename;
-        }
-
-        return $this->_parameterFactory->create($codename, $this->_user);
+        return $this->parameterFactory->create($ns, $codename);
     }
 
     /**

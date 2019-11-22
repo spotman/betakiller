@@ -11,7 +11,7 @@ class Subscribe extends AbstractEventTest
     protected function doEventTest(WampClient $client, ClientSession $session, string $topicName): void
     {
         // Subscribe first
-        $promise = $session->subscribe($topicName, function () use ($client, $session) {
+        $promise = $session->subscribe($topicName, function () {
             $this->logger->notice('Message received :data', [
                 ':data' => \json_encode(\func_get_args()),
             ]);

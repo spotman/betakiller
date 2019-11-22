@@ -35,6 +35,10 @@ class ZoneAccessSpecFactory
 
     public function create(string $zoneName): ZoneAccessSpecInterface
     {
-        return $this->factory->create(\ucfirst($zoneName));
+        $names    = explode('-', $zoneName);
+        $names    = \array_map('ucfirst', $names);
+        $codename = implode('', $names);
+
+        return $this->factory->create($codename);
     }
 }

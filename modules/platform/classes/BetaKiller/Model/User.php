@@ -9,21 +9,24 @@ use DateTimeImmutable;
 
 class User extends \ORM implements UserInterface
 {
-    public const TABLE_NAME                  = 'users';
-    public const TABLE_FIELD_STATUS_ID       = 'status_id';
-    public const TABLE_FIELD_CREATED_AT      = 'created_at';
-    public const TABLE_FIELD_USERNAME        = 'username';
-    public const TABLE_FIELD_PASSWORD        = 'password';
-    public const TABLE_FIELD_LANGUAGE_ID     = 'language_id';
-    public const TABLE_FIELD_FIRST_NAME      = 'first_name';
-    public const TABLE_FIELD_LAST_NAME       = 'last_name';
-    public const TABLE_FIELD_MIDDLE_NAME     = 'middle_name';
-    public const TABLE_FIELD_EMAIL           = 'email';
-    public const TABLE_FIELD_PHONE           = 'phone';
-    public const TABLE_FIELD_NOTIFY_BY_EMAIL = 'notify_by_email';
-    public const TABLE_FIELD_LOGINS          = 'logins';
-    public const TABLE_FIELD_LAST_LOGIN      = 'last_login';
-    public const TABLE_FIELD_CREATED_FROM_IP = 'created_from_ip';
+    public const TABLE_NAME          = 'users';
+    public const COL_STATUS_ID       = 'status_id';
+    public const COL_CREATED_AT      = 'created_at';
+    public const COL_USERNAME        = 'username';
+    public const COL_PASSWORD        = 'password';
+    public const COL_LANGUAGE_ID     = 'language_id';
+    public const COL_FIRST_NAME      = 'first_name';
+    public const COL_LAST_NAME       = 'last_name';
+    public const COL_MIDDLE_NAME     = 'middle_name';
+    public const COL_EMAIL           = 'email';
+    public const COL_PHONE           = 'phone';
+    public const COL_NOTIFY_BY_EMAIL = 'notify_by_email';
+    public const COL_LOGINS          = 'logins';
+    public const COL_LAST_LOGIN      = 'last_login';
+    public const COL_CREATED_FROM_IP = 'created_from_ip';
+
+    public const  REL_LANGUAGE = 'language';
+    private const REL_STATUS   = 'status';
 
     protected $allUserRolesNames = [];
 
@@ -33,13 +36,13 @@ class User extends \ORM implements UserInterface
         $this->_reload_on_wakeup = true;
 
         $this->belongs_to([
-            'status'   => [
-                'model'       => 'UserStatus',
-                'foreign_key' => self::TABLE_FIELD_STATUS_ID,
+            self::REL_STATUS   => [
+                'model'       => UserStatus::getModelName(),
+                'foreign_key' => self::COL_STATUS_ID,
             ],
-            'language' => [
-                'model'       => 'Language',
-                'foreign_key' => self::TABLE_FIELD_LANGUAGE_ID,
+            self::REL_LANGUAGE => [
+                'model'       => Language::getModelName(),
+                'foreign_key' => self::COL_LANGUAGE_ID,
             ],
         ]);
 
@@ -56,8 +59,8 @@ class User extends \ORM implements UserInterface
         ]);
 
         $this->load_with([
-            'status',
-            'language',
+            self::REL_STATUS,
+            self::REL_LANGUAGE,
         ]);
     }
 
@@ -67,52 +70,52 @@ class User extends \ORM implements UserInterface
     public function rules(): array
     {
         return [
-            self::TABLE_FIELD_STATUS_ID       => [
+            self::COL_STATUS_ID       => [
                 ['max_length', [':value', 1]],
             ],
-            self::TABLE_FIELD_EMAIL           => [
+            self::COL_EMAIL           => [
                 ['not_empty'],
                 ['email'],
                 [[$this, 'unique'], ['email', ':value']],
             ],
-            self::TABLE_FIELD_USERNAME        => [
+            self::COL_USERNAME        => [
 //                ['not_empty'],
                 ['max_length', [':value', 41]],
                 [[$this, 'unique'], ['username', ':value']],
             ],
-            self::TABLE_FIELD_PASSWORD        => [
+            self::COL_PASSWORD        => [
 //                ['not_empty'],
                 ['max_length', [':value', 64]],
             ],
-            self::TABLE_FIELD_LANGUAGE_ID     => [
+            self::COL_LANGUAGE_ID     => [
                 ['max_length', [':value', 11]],
             ],
-            self::TABLE_FIELD_FIRST_NAME      => [
+            self::COL_FIRST_NAME      => [
                 ['max_length', [':value', 32]],
             ],
-            self::TABLE_FIELD_LAST_NAME       => [
+            self::COL_LAST_NAME       => [
                 ['max_length', [':value', 32]],
             ],
-            self::TABLE_FIELD_MIDDLE_NAME     => [
+            self::COL_MIDDLE_NAME     => [
                 ['max_length', [':value', 32]],
             ],
-            self::TABLE_FIELD_PHONE           => [
+            self::COL_PHONE           => [
                 ['max_length', [':value', 32]],
             ],
-            self::TABLE_FIELD_NOTIFY_BY_EMAIL => [
+            self::COL_NOTIFY_BY_EMAIL => [
                 ['max_length', [':value', 1]],
             ],
-            self::TABLE_FIELD_CREATED_AT      => [
+            self::COL_CREATED_AT      => [
                 ['not_empty'],
                 ['date'],
             ],
-            self::TABLE_FIELD_LOGINS          => [
+            self::COL_LOGINS          => [
                 ['max_length', [':value', 10]],
             ],
-            self::TABLE_FIELD_LAST_LOGIN      => [
+            self::COL_LAST_LOGIN      => [
                 ['max_length', [':value', 10]],
             ],
-            self::TABLE_FIELD_CREATED_FROM_IP => [
+            self::COL_CREATED_FROM_IP => [
                 ['not_empty'],
 //                ['ip', [':value', true]], // Allow local IPs (not working with local dev)
                 ['max_length', [':value', 46]], // @see https://stackoverflow.com/a/7477384
@@ -184,7 +187,7 @@ class User extends \ORM implements UserInterface
     public function setCreatedAt(\DateTimeInterface $value = null): UserInterface
     {
         $value = $value ?: new \DateTimeImmutable;
-        $this->set_datetime_column_value(self::TABLE_FIELD_CREATED_AT, $value);
+        $this->set_datetime_column_value(self::COL_CREATED_AT, $value);
 
         return $this;
     }
@@ -195,7 +198,7 @@ class User extends \ORM implements UserInterface
      */
     public function getCreatedAt(): DateTimeImmutable
     {
-        $createdAt = $this->get_datetime_column_value(self::TABLE_FIELD_CREATED_AT);
+        $createdAt = $this->get_datetime_column_value(self::COL_CREATED_AT);
 
         if (!$createdAt) {
             throw new DomainException('User::createdAt can not be empty');
@@ -211,7 +214,7 @@ class User extends \ORM implements UserInterface
      */
     public function setUsername(string $value): UserInterface
     {
-        return $this->set(self::TABLE_FIELD_USERNAME, $value);
+        return $this->set(self::COL_USERNAME, $value);
     }
 
     /**
@@ -219,7 +222,7 @@ class User extends \ORM implements UserInterface
      */
     public function getUsername(): string
     {
-        return (string)$this->get(self::TABLE_FIELD_USERNAME);
+        return (string)$this->get(self::COL_USERNAME);
     }
 
     /**
@@ -229,7 +232,7 @@ class User extends \ORM implements UserInterface
      */
     public function setPassword(string $value): UserInterface
     {
-        return $this->set(self::TABLE_FIELD_PASSWORD, $value);
+        return $this->set(self::COL_PASSWORD, $value);
     }
 
     /**
@@ -237,7 +240,7 @@ class User extends \ORM implements UserInterface
      */
     public function getPassword(): string
     {
-        return (string)$this->get(self::TABLE_FIELD_PASSWORD);
+        return (string)$this->get(self::COL_PASSWORD);
     }
 
     /**
@@ -245,7 +248,7 @@ class User extends \ORM implements UserInterface
      */
     public function hasPassword(): bool
     {
-        return (bool)$this->get(self::TABLE_FIELD_PASSWORD);
+        return (bool)$this->get(self::COL_PASSWORD);
     }
 
     /**
@@ -364,7 +367,7 @@ class User extends \ORM implements UserInterface
      */
     public function setLanguage(LanguageInterface $languageModel): UserInterface
     {
-        return $this->set(self::TABLE_FIELD_LANGUAGE_ID, $languageModel);
+        return $this->set(self::COL_LANGUAGE_ID, $languageModel);
     }
 
     /**
@@ -414,7 +417,7 @@ class User extends \ORM implements UserInterface
      */
     public function setFirstName(string $value): UserInterface
     {
-        return $this->set(self::TABLE_FIELD_FIRST_NAME, $value);
+        return $this->set(self::COL_FIRST_NAME, $value);
     }
 
     /**
@@ -422,7 +425,7 @@ class User extends \ORM implements UserInterface
      */
     public function getFirstName(): string
     {
-        return (string)$this->get(self::TABLE_FIELD_FIRST_NAME);
+        return (string)$this->get(self::COL_FIRST_NAME);
     }
 
     /**
@@ -432,7 +435,7 @@ class User extends \ORM implements UserInterface
      */
     public function setLastName(string $value): UserInterface
     {
-        return $this->set(self::TABLE_FIELD_LAST_NAME, $value);
+        return $this->set(self::COL_LAST_NAME, $value);
     }
 
     /**
@@ -440,7 +443,7 @@ class User extends \ORM implements UserInterface
      */
     public function getLastName(): string
     {
-        return (string)$this->get(self::TABLE_FIELD_LAST_NAME);
+        return (string)$this->get(self::COL_LAST_NAME);
     }
 
     /**
@@ -450,7 +453,7 @@ class User extends \ORM implements UserInterface
      */
     public function setMiddleName(string $value): UserInterface
     {
-        return $this->set(self::TABLE_FIELD_MIDDLE_NAME, $value);
+        return $this->set(self::COL_MIDDLE_NAME, $value);
     }
 
     /**
@@ -458,7 +461,7 @@ class User extends \ORM implements UserInterface
      */
     public function getMiddleName(): string
     {
-        return (string)$this->get(self::TABLE_FIELD_MIDDLE_NAME);
+        return (string)$this->get(self::COL_MIDDLE_NAME);
     }
 
     /**
@@ -468,7 +471,7 @@ class User extends \ORM implements UserInterface
      */
     public function setEmail(string $value): UserInterface
     {
-        return $this->set(self::TABLE_FIELD_EMAIL, $value);
+        return $this->set(self::COL_EMAIL, $value);
     }
 
     /**
@@ -476,7 +479,7 @@ class User extends \ORM implements UserInterface
      */
     public function getEmail(): string
     {
-        return (string)$this->get(self::TABLE_FIELD_EMAIL);
+        return (string)$this->get(self::COL_EMAIL);
     }
 
     /**
@@ -486,7 +489,7 @@ class User extends \ORM implements UserInterface
      */
     public function setPhone(string $number): UserInterface
     {
-        return $this->set(self::TABLE_FIELD_PHONE, $number);
+        return $this->set(self::COL_PHONE, $number);
     }
 
     /**
@@ -496,7 +499,7 @@ class User extends \ORM implements UserInterface
      */
     public function getPhone(): string
     {
-        return (string)$this->get(self::TABLE_FIELD_PHONE);
+        return (string)$this->get(self::COL_PHONE);
     }
 
     /**
@@ -504,7 +507,7 @@ class User extends \ORM implements UserInterface
      */
     public function isEmailNotificationAllowed(): bool
     {
-        return (bool)$this->get(self::TABLE_FIELD_NOTIFY_BY_EMAIL);
+        return (bool)$this->get(self::COL_NOTIFY_BY_EMAIL);
     }
 
     /**
@@ -518,12 +521,12 @@ class User extends \ORM implements UserInterface
 
     public function enableEmailNotification(): void
     {
-        $this->set(self::TABLE_FIELD_NOTIFY_BY_EMAIL, true);
+        $this->set(self::COL_NOTIFY_BY_EMAIL, true);
     }
 
     public function disableEmailNotification(): void
     {
-        $this->set(self::TABLE_FIELD_NOTIFY_BY_EMAIL, false);
+        $this->set(self::COL_NOTIFY_BY_EMAIL, false);
     }
 
     /**
@@ -584,7 +587,7 @@ class User extends \ORM implements UserInterface
      */
     public function getCreatedFromIP(): string
     {
-        return (string)$this->get(self::TABLE_FIELD_CREATED_FROM_IP);
+        return (string)$this->get(self::COL_CREATED_FROM_IP);
     }
 
     /**
@@ -594,7 +597,7 @@ class User extends \ORM implements UserInterface
      */
     public function setCreatedFromIP(string $ip): UserInterface
     {
-        $this->set(self::TABLE_FIELD_CREATED_FROM_IP, $ip);
+        $this->set(self::COL_CREATED_FROM_IP, $ip);
 
         return $this;
     }

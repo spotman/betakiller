@@ -67,11 +67,32 @@ abstract class AbstractWorkflowStateRepository extends AbstractOrmBasedDispatcha
 
         foreach ($this->getAll() as $state) {
             if ($resource->isStateActionAllowed($state, $action)) {
-                $allowedStates[] = $state->getID();
+                $allowedStates[] = $state->getCodename();
             }
         }
 
         return $allowedStates;
+    }
+
+    /**
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     * @param string[]                                  $codenames
+     *
+     * @param bool|null                                 $order
+     *
+     * @return $this
+     */
+    protected function filterCodenames(OrmInterface $orm, array $codenames, bool $order = null): self
+    {
+        $col = $orm->object_column(AbstractWorkflowStateOrm::COL_CODENAME);
+
+        $orm->where($orm->object_column(AbstractWorkflowStateOrm::COL_CODENAME), 'IN', $codenames);
+
+        if ($order) {
+            $orm->order_by_field_sequence($col, $codenames);
+        }
+
+        return $this;
     }
 
     private function filterCodename(OrmInterface $orm, string $codename): self

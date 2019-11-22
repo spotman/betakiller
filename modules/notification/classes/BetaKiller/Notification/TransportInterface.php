@@ -9,22 +9,22 @@ interface TransportInterface
     public function getName(): string;
 
     /**
-     * @param \BetaKiller\Notification\TargetInterface $user
+     * @param \BetaKiller\Notification\MessageTargetInterface $user
      *
      * @return bool
      */
-    public function isEnabledFor(TargetInterface $user): bool;
+    public function isEnabledFor(MessageTargetInterface $user): bool;
 
     /**
-     * @param \BetaKiller\Notification\MessageInterface $message
-     * @param \BetaKiller\Notification\TargetInterface  $target
-     * @param string                                    $body
+     * @param \BetaKiller\Notification\MessageInterface       $message
+     * @param \BetaKiller\Notification\MessageTargetInterface $target
+     * @param string                                          $body
      *
      * @return bool Number of messages sent
      */
     public function send(
         MessageInterface $message,
-        TargetInterface $target,
+        MessageTargetInterface $target,
         string $body
     ): bool;
 

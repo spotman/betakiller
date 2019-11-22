@@ -16,7 +16,7 @@ class Message implements MessageInterface
     private $codename;
 
     /**
-     * @var TargetInterface
+     * @var MessageTargetInterface
      */
     private $from;
 
@@ -26,7 +26,7 @@ class Message implements MessageInterface
     private $subject;
 
     /**
-     * @var TargetInterface
+     * @var MessageTargetInterface
      */
     private $target;
 
@@ -85,19 +85,19 @@ class Message implements MessageInterface
     }
 
     /**
-     * @return TargetInterface
+     * @return MessageTargetInterface
      */
-    public function getFrom(): ?TargetInterface
+    public function getFrom(): ?MessageTargetInterface
     {
         return $this->from;
     }
 
     /**
-     * @param TargetInterface $value
+     * @param MessageTargetInterface $value
      *
      * @return MessageInterface
      */
-    public function setFrom(TargetInterface $value): MessageInterface
+    public function setFrom(MessageTargetInterface $value): MessageInterface
     {
         $this->from = $value;
 
@@ -105,9 +105,9 @@ class Message implements MessageInterface
     }
 
     /**
-     * @return \BetaKiller\Notification\TargetInterface
+     * @return \BetaKiller\Notification\MessageTargetInterface
      */
-    public function getTarget(): TargetInterface
+    public function getTarget(): MessageTargetInterface
     {
         if (!$this->target) {
             throw new NotificationException('Message target must be specified');
@@ -117,11 +117,11 @@ class Message implements MessageInterface
     }
 
     /**
-     * @param TargetInterface $value
+     * @param MessageTargetInterface $value
      *
      * @return MessageInterface
      */
-    public function setTarget(TargetInterface $value): MessageInterface
+    public function setTarget(MessageTargetInterface $value): MessageInterface
     {
         $this->target = $value;
 
@@ -209,11 +209,11 @@ class Message implements MessageInterface
     }
 
     /**
-     * @param \BetaKiller\Notification\TargetInterface $targetUser
+     * @param \BetaKiller\Notification\MessageTargetInterface $targetUser
      *
      * @return array
      */
-    public function getFullDataForTarget(TargetInterface $targetUser): array
+    public function getFullDataForTarget(MessageTargetInterface $targetUser): array
     {
         return array_merge($this->getTemplateData(), [
             'targetName'  => $targetUser->getFullName(),

@@ -8,8 +8,8 @@ use BetaKiller\Model\NotificationGroupUserConfigInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\MessageInterface;
 use BetaKiller\Notification\NotificationFacade;
-use BetaKiller\Notification\TargetEmail;
-use BetaKiller\Notification\TargetInterface;
+use BetaKiller\Notification\MessageTargetEmail;
+use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 
 class NotificationHelper
@@ -83,16 +83,16 @@ class NotificationHelper
     /**
      * Send direct message to a single user
      *
-     * @param string                                   $name
-     * @param \BetaKiller\Notification\TargetInterface $target
-     * @param array                                    $templateData
-     * @param string[]                                 $attachments Array of files to attach
+     * @param string                                          $name
+     * @param \BetaKiller\Notification\MessageTargetInterface $target
+     * @param array                                           $templateData
+     * @param string[]                                        $attachments Array of files to attach
      *
      * @throws \BetaKiller\Notification\NotificationException
      */
     public function directMessage(
         string $name,
-        TargetInterface $target,
+        MessageTargetInterface $target,
         array $templateData,
         array $attachments = null
     ): void {
@@ -109,13 +109,13 @@ class NotificationHelper
      * @param string      $name Full name of recipient
      * @param null|string $lang Target language alpha-2 ISO code
      *
-     * @return \BetaKiller\Notification\TargetInterface
+     * @return \BetaKiller\Notification\MessageTargetInterface
      */
-    public function emailTarget(string $email, string $name, ?string $lang = null): TargetInterface
+    public function emailTarget(string $email, string $name, ?string $lang = null): MessageTargetInterface
     {
         $lang = $lang ?? $this->i18n->getPrimaryLanguage()->getIsoCode();
 
-        return new TargetEmail($email, $name, $lang);
+        return new MessageTargetEmail($email, $name, $lang);
     }
 
     public function getGroupUserConfig(

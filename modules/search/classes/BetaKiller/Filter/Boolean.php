@@ -29,7 +29,7 @@ abstract class Boolean extends Value {
      * @param string|int|null $value
      * @return bool
      */
-    public function isSelected($value = NULL)
+    public function isSelected($value = NULL): bool
     {
         return ($this->getValue() !== null);
     }
