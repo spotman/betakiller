@@ -17,21 +17,26 @@ class DateTimeFilterTest extends AbstractFilterTest
 
         return [
             $date->format($date::ATOM),
+            $date->format($date::ISO8601),
+            $date->format('Y-m-d'),
         ];
+    }
+
+    public function passDataUnchanged(): array
+    {
+        // Filter converts string to DateTimeImmutable
+        return [];
     }
 
     public function sanitizeData(): array
     {
+        // Filter converts string to DateTimeImmutable, they can not be compared
         return [];
     }
 
     public function invalidData(): array
     {
-        $date = new \DateTimeImmutable;
-
         return [
-            $date->format($date::ISO8601),
-            $date->format('Y-m-d'),
             false,
             148,
             [],

@@ -21,6 +21,11 @@ abstract class AbstractArgumentDefinition implements ArgumentDefinitionInterface
     private $optional = false;
 
     /**
+     * @var bool
+     */
+    private $nullable = false;
+
+    /**
      * @var mixed|null
      */
     private $defaultValue;
@@ -95,6 +100,24 @@ abstract class AbstractArgumentDefinition implements ArgumentDefinitionInterface
     public function hasDefaultValue(): bool
     {
         return $this->defaultValue !== null;
+    }
+
+    /**
+     * Returns true if rule defines nullable argument
+     *
+     * @return bool
+     */
+    public function isNullable(): bool
+    {
+        return $this->nullable;
+    }
+
+    /**
+     * Defines nullable argument
+     */
+    public function markAsNullable(): void
+    {
+        $this->nullable = true;
     }
 
     /**

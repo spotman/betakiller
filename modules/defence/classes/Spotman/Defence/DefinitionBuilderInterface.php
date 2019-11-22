@@ -96,6 +96,15 @@ interface DefinitionBuilderInterface
     public function intArray(string $name): DefinitionBuilderInterface;
 
     /**
+     * Define indexed array of floats
+     *
+     * @param string $name
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function floatArray(string $name): DefinitionBuilderInterface;
+
+    /**
      * Define indexed array of strings like ['asd', 'qwe']
      *
      * @param string $name
@@ -128,6 +137,13 @@ interface DefinitionBuilderInterface
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
     public function endComposite(): DefinitionBuilderInterface;
+
+    /**
+     * Mark last argument as nullable
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function nullable(): DefinitionBuilderInterface;
 
     /**
      * Mark last argument as optional

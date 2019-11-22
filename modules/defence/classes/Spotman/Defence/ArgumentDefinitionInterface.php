@@ -61,6 +61,18 @@ interface ArgumentDefinitionInterface
     public function markAsOptional(): void;
 
     /**
+     * Returns true if rule defines nullable argument
+     *
+     * @return bool
+     */
+    public function isNullable(): bool;
+
+    /**
+     * Defines nullable argument
+     */
+    public function markAsNullable(): void;
+
+    /**
      * @return mixed|null
      */
     public function getDefaultValue();

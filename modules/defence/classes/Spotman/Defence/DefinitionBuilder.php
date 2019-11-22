@@ -7,6 +7,7 @@ use Spotman\Defence\Filter\BooleanFilter;
 use Spotman\Defence\Filter\DateTimeFilter;
 use Spotman\Defence\Filter\EmailFilter;
 use Spotman\Defence\Filter\FilterInterface;
+use Spotman\Defence\Filter\FloatArrayFilter;
 use Spotman\Defence\Filter\FloatFilter;
 use Spotman\Defence\Filter\HtmlFilter;
 use Spotman\Defence\Filter\IdentityFilter;
@@ -190,6 +191,20 @@ class DefinitionBuilder implements DefinitionBuilderInterface
     }
 
     /**
+     * Define indexed array of floats
+     *
+     * @param string $name
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function floatArray(string $name): DefinitionBuilderInterface
+    {
+        return $this
+            ->addSingleType($name, ArgumentDefinitionInterface::TYPE_SINGLE_ARRAY)
+            ->addFilter(new FloatArrayFilter);
+    }
+
+    /**
      * Define indexed array of strings like ['asd', 'qwe']
      *
      * @param string $name
@@ -257,6 +272,33 @@ class DefinitionBuilder implements DefinitionBuilderInterface
         }
 
         $this->last = $top;
+
+        return $this;
+    }
+
+    /**
+     * Mark last argument as nullable
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function nullable(): DefinitionBuilderInterface
+    {
+        $argument = $this->getLastArgument();
+
+        $type   = $argument->getType();
+        $denied = [
+            ArgumentDefinitionInterface::TYPE_SINGLE_ARRAY,
+            ArgumentDefinitionInterface::TYPE_COMPOSITE_ARRAY,
+        ];
+
+        if (\in_array($type, $denied, true)) {
+            throw new \DomainException(sprintf(
+                'Nullable flag can not be applied to these argument types: "%s"',
+                \implode('", "', $denied)
+            ));
+        }
+
+        $argument->markAsNullable();
 
         return $this;
     }

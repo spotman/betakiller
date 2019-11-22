@@ -50,7 +50,19 @@ class Arguments implements ArgumentsInterface
      */
     public function has(string $key): bool
     {
-        return isset($this->args[$key]);
+        return \array_key_exists($key, $this->args);
+    }
+
+    /**
+     * Returns true if provided key value is null
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function isNull(string $key): bool
+    {
+        return $this->args[$key] === null;
     }
 
     /**

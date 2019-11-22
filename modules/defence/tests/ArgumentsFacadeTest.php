@@ -106,19 +106,45 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
     {
         return [
             // Bool
-            'bool'            => [
+            'bool' => [
                 $this->def()->bool('a'),
                 ['a' => true],
             ],
 
+            'bool + nullable' => [
+                $this->def()->bool('a')->nullable(),
+                ['a' => null],
+            ],
+
             // Int
-            'int'             => [
+            'int'           => [
                 $this->def()->int('a'),
                 ['a' => 12345],
             ],
 
+            'int + nullable' => [
+                $this->def()->int('a')->nullable(),
+                ['a' => null],
+            ],
+
+            // Float
+            'float'           => [
+                $this->def()->float('a'),
+                ['a' => 123.45],
+            ],
+
+            'float + nullable' => [
+                $this->def()->float('a')->nullable(),
+                ['a' => null],
+            ],
+
             // String
-            'string'          => [
+            'string'       => [
+                $this->def()->string('a'),
+                ['a' => 'qwerty'],
+            ],
+
+            'string + nullable' => [
                 $this->def()->string('a'),
                 ['a' => 'qwerty'],
             ],
@@ -137,12 +163,17 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
 
             // Composite
             'composite'       => [
-                $this->def()->composite('a')->int('b')->string('c'),
+                $this->def()->composite('a')->int('b')->string('c')->endComposite(),
                 ['a' => ['b' => 123, 'c' => 'qwe']],
             ],
 
+            'composite + nullable' => [
+                $this->def()->composite('a')->nullable()->int('b')->endComposite(),
+                ['a' => null],
+            ],
+
             // Composite array
-            'composite array' => [
+            'composite array'    => [
                 $this->def()->compositeArray('a')->int('b')->string('c'),
                 [
                     'a' => [
@@ -185,6 +216,16 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             'integer + default' => [
                 $this->def()->int('a')->optional()->default(10),
                 ['a' => 10],
+            ],
+
+            'float' => [
+                $this->def()->float('a')->optional(),
+                [],
+            ],
+
+            'float + default' => [
+                $this->def()->float('a')->optional()->default(10.2),
+                ['a' => 10.2],
             ],
 
             'string' => [
@@ -247,12 +288,19 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             // Int array
             [$this->def()->intArray('a'), ['asd', 'qwe']],
             [$this->def()->intArray('a'), [true, false]],
+            [$this->def()->intArray('a'), [1.2, -2.5]],
+            [$this->def()->intArray('a'), [null]],
+            // Float array
+            [$this->def()->intArray('a'), ['asd', 'qwe']],
+            [$this->def()->intArray('a'), [true, false]],
+            [$this->def()->intArray('a'), [null]],
             // String array
             [$this->def()->stringArray('a'), [123, 456]],
-            [$this->def()->stringArray('a'), [true, false]],
+            [$this->def()->stringArray('a'), [true, false, null]],
+            [$this->def()->stringArray('a'), [null]],
             // Composite
-            [$this->def()->composite('a')->int('b'), [123, 456]],
-            [$this->def()->composite('a')->int('b'), [false, true]],
+            [$this->def()->composite('a')->int('b')->endComposite(), [123, 456]],
+            [$this->def()->composite('a')->int('b')->endComposite(), [false, true]],
         ];
     }
 
@@ -270,6 +318,9 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             // Int array
             [$this->def()->intArray('a')->lengthBetween(2, 5), [1]],
             [$this->def()->intArray('a')->lengthBetween(1, 3), [1, 2, 3, 4]],
+            // Int array
+            [$this->def()->floatArray('a')->lengthBetween(2, 5), [1.0]],
+            [$this->def()->floatArray('a')->lengthBetween(1, 3), [1.2, 2.3, 3.4, 4.5]],
             // String array
             [$this->def()->stringArray('a')->lengthBetween(2, 5), ['asd']],
             [$this->def()->stringArray('a')->lengthBetween(1, 3), ['asd', 'qwe', 'asd', 'qwe']],

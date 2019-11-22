@@ -37,6 +37,7 @@ class IntegerFilterTest extends AbstractFilterTest
     {
         return [
             false,
+            3.14159,
             'string',
             [],
             new \stdClass(),

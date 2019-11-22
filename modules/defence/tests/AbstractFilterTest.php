@@ -12,6 +12,20 @@ abstract class AbstractFilterTest extends AbstractDefenceTest
      *
      * @dataProvider passDataProvider
      */
+    public function testPass($input): void
+    {
+        $filter = $this->makeInstance();
+
+        $filter->apply($input);
+
+        self::assertTrue(true);
+    }
+
+    /**
+     * @param mixed $input
+     *
+     * @dataProvider passDataUnchangedProvider
+     */
     public function testPassUnchanged($input): void
     {
         $filter = $this->makeInstance();
@@ -58,6 +72,18 @@ abstract class AbstractFilterTest extends AbstractDefenceTest
         return $output;
     }
 
+    final public function passDataUnchangedProvider(): array
+    {
+        $output = [];
+
+        foreach ($this->passDataUnchanged() as $value) {
+            // Wrap for dataProvider
+            $output[] = [$value];
+        }
+
+        return $output;
+    }
+
     /**
      * @return mixed[][]
      */
@@ -92,6 +118,12 @@ abstract class AbstractFilterTest extends AbstractDefenceTest
      * @return mixed[]
      */
     abstract public function passData(): array;
+
+    public function passDataUnchanged(): array
+    {
+        // Same data by default
+        return $this->passData();
+    }
 
     /**
      * Key => value pairs

@@ -91,7 +91,7 @@ class ArgumentsFacade
                 ? ArgumentsInterface::IDENTITY_KEY
                 : $name;
 
-            if (isset($data[$name])) {
+            if (\array_key_exists($name, $data)) {
                 // Value exists => preprocess it
                 $filtered[$targetKey] = $this->processValue($argument, $data[$name]);
             } elseif (!$argument->isOptional()) {
@@ -114,10 +114,20 @@ class ArgumentsFacade
      * @param \Spotman\Defence\ArgumentDefinitionInterface $argument
      * @param mixed                                        $value
      *
-     * @return array|mixed|mixed[]
+     * @return array|mixed|mixed[]|null
      */
     private function processValue(ArgumentDefinitionInterface $argument, $value)
     {
+        if ($value === null) {
+            if ($argument->isNullable()) {
+                return null;
+            }
+
+            throw new \InvalidArgumentException(
+                sprintf('NULL value is provided for non-nullable argument "%s"', $argument->getName())
+            );
+        }
+
         switch (true) {
             case $argument instanceof SingleArgumentDefinitionInterface:
                 return $this->processSingleValue($argument, $value);
@@ -144,7 +154,7 @@ class ArgumentsFacade
         return $value;
     }
 
-    private function processCompositeValue(CompositeArgumentDefinitionInterface $argument, $value): array
+    private function processCompositeValue(CompositeArgumentDefinitionInterface $argument, $value): ?array
     {
         $children = $argument->getChildren();
 
@@ -156,6 +166,10 @@ class ArgumentsFacade
         if (\is_object($value)) {
             // Cast any incoming object to array for simplicity
             $value = (array)$value;
+        }
+
+        if ($value === null) {
+            return null;
         }
 
         // Check for nested data type
@@ -195,7 +209,19 @@ class ArgumentsFacade
 
         foreach ($value as $index => $item) {
             // All items share the same composite definition
-            $output[$index] = $this->processCompositeValue($composite, $item);
+            $itemValue = $this->processCompositeValue($composite, $item);
+
+            // Prevent null values in composite arrays
+            if ($itemValue === null) {
+                throw new \InvalidArgumentException(sprintf(
+                    'CompositeArray data for "%s" contains NULL item at index [%d]: %s',
+                    $argument->getName(),
+                    $index,
+                    \json_encode($value)
+                ));
+            }
+
+            $output[$index] = $itemValue;
         }
 
         return $output;

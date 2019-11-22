@@ -28,6 +28,16 @@ class DefinitionBuilderTest extends AbstractDefenceTest
         $this->checkSingleDefinition($def);
     }
 
+    public function testFloat(): void
+    {
+        $def = $this->definitionBuilder()
+            ->int('a')
+            ->int('b')->optional()
+            ->int('c')->optional()->default(10.5);
+
+        $this->checkSingleDefinition($def);
+    }
+
     public function testString(): void
     {
         $def = $this->definitionBuilder()
@@ -80,6 +90,16 @@ class DefinitionBuilderTest extends AbstractDefenceTest
         $this->checkSingleDefinition($def);
     }
 
+    public function testFloatArray(): void
+    {
+        $def = $this->definitionBuilder()
+            ->floatArray('a')
+            ->floatArray('b')->optional()
+            ->floatArray('c')->optional()->default([1.2, 2.3]);
+
+        $this->checkSingleDefinition($def);
+    }
+
     public function testStringArray(): void
     {
         $def = $this->definitionBuilder()
@@ -106,6 +126,82 @@ class DefinitionBuilderTest extends AbstractDefenceTest
             ->compositeArray('b')->optional()->endComposite();
 
         $this->checkCompositeDefinition($def);
+    }
+
+    public function testBoolNullable(): void
+    {
+        $this->definitionBuilder()
+            ->bool('a')->nullable();
+
+        self::assertTrue(true);
+    }
+
+    public function testIntNullable(): void
+    {
+        $this->definitionBuilder()
+            ->int('a')->nullable();
+
+        self::assertTrue(true);
+    }
+
+    public function testFloatNullable(): void
+    {
+        $this->definitionBuilder()
+            ->float('a')->nullable();
+
+        self::assertTrue(true);
+    }
+
+    public function testStringNullable(): void
+    {
+        $this->definitionBuilder()
+            ->string('a')->nullable();
+
+        self::assertTrue(true);
+    }
+
+    public function testCompositeNullable(): void
+    {
+        $this->definitionBuilder()
+            ->composite('a')->nullable()
+            ->int('b')
+            ->endComposite();
+
+        self::assertTrue(true);
+    }
+
+    public function testNonNullableIntArray(): void
+    {
+        $this->expectException(\DomainException::class);
+
+        $this->definitionBuilder()
+            ->intArray('a')->nullable();
+    }
+
+    public function testNonNullableFloatArray(): void
+    {
+        $this->expectException(\DomainException::class);
+
+        $this->definitionBuilder()
+            ->floatArray('a')->nullable();
+    }
+
+    public function testNonNullableStringArray(): void
+    {
+        $this->expectException(\DomainException::class);
+
+        $this->definitionBuilder()
+            ->stringArray('a')->nullable();
+    }
+
+    public function testNonNullableCompositeArray(): void
+    {
+        $this->expectException(\DomainException::class);
+
+        $this->definitionBuilder()
+            ->compositeArray('a')->nullable()
+            ->int('a')
+            ->endComposite();
     }
 
     private function checkSingleDefinition(DefinitionBuilderInterface $def, $default = null): void

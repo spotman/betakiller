@@ -29,6 +29,15 @@ interface ArgumentsInterface
     public function has(string $key): bool;
 
     /**
+     * Returns true if provided key value is null
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function isNull(string $key): bool;
+
+    /**
      * @param string $key
      *
      * @return int
