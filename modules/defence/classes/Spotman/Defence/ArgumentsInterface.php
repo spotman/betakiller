@@ -20,7 +20,7 @@ interface ArgumentsInterface
     public function hasID(): bool;
 
     /**
-     * Returns true if current arguments set contains value for provided key
+     * Returns true if current arguments set contains non-null value for provided key
      *
      * @param string $key
      *

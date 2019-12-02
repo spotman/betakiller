@@ -42,7 +42,7 @@ class Arguments implements ArgumentsInterface
     }
 
     /**
-     * Returns true if current arguments set contains value for provided key
+     * Returns true if current arguments set contains non-null value for provided key
      *
      * @param string $key
      *
@@ -50,7 +50,8 @@ class Arguments implements ArgumentsInterface
      */
     public function has(string $key): bool
     {
-        return \array_key_exists($key, $this->args);
+        // Check for non-null value also to simplify client logic
+        return isset($this->args[$key]);
     }
 
     /**
