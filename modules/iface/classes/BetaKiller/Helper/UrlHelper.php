@@ -326,16 +326,18 @@ final class UrlHelper
     }
 
     /**
-     * @param string $entityName
-     * @param string $zone
+     * @param string                                               $entityName
+     * @param string                                               $zone
+     *
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return string
      * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      */
-    public function getListEntityUrl(string $entityName, string $zone): string
+    public function getListEntityUrl(string $entityName, string $zone, ?UrlContainerInterface $params = null): string
     {
-        return $this->getEntityNameUrl($entityName, CrudlsActionsInterface::ACTION_LIST, $zone);
+        return $this->getEntityNameUrl($entityName, CrudlsActionsInterface::ACTION_LIST, $zone, $params);
     }
 
     /**

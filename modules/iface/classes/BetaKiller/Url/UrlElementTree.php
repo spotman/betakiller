@@ -125,6 +125,11 @@ class UrlElementTree implements UrlElementTreeInterface
         if ($model instanceof IFaceModelInterface) {
             $this->validateIFaceModel($model);
         }
+
+        // Check label exists
+        if ($model instanceof UrlElementWithLabelInterface) {
+            $model->getLabel();
+        }
     }
 
     private function validateIFaceModel(IFaceModelInterface $model): void

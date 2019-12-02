@@ -85,7 +85,10 @@ class UrlProcessor
         $this->aclHelper->forceAuthorizationIfNeeded($urlElement, $user);
 
         if (!$this->aclHelper->isUrlElementAllowed($user, $urlElement, $urlParameters)) {
-            throw new AccessDeniedException();
+            throw new AccessDeniedException('UrlElement :name is not allowed to User ":who"', [
+                ':name' => $urlElement->getCodename(),
+                ':who'  => $user->isGuest() ? 'Guest' : $user->getID(),
+            ]);
         }
     }
 }

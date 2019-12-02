@@ -52,31 +52,27 @@ class UrlElementStack implements \IteratorAggregate
             return false;
         }
 
+        // No params check for static URls
+        if (!$model->hasDynamicUrl()) {
+            return true;
+        }
+
         // No optional params => check passed
         if (!$params || $params->countParameters() === 0) {
             return true;
         }
 
-        // No current parameters => nothing to check => check passed
-        if ($this->parameters->countParameters() === 0) {
-            return true;
+        $key = UrlPrototype::fromString($model->getUri())->getDataSourceName();
+
+        // If no bound UrlParameter in current set => check failed
+        if (!$this->parameters->hasParameter($key)) {
+            return false;
         }
 
-        // Find parameters intersection
-        foreach ($params->getAllParameters() as $key => $providedParam) {
-            if (!$this->parameters->hasParameter($key)) {
-                continue;
-            }
+        $elementParam = $params->getParameter($key);
+        $currentParam = $this->parameters->getParameter($key);
 
-            $currentParam = $this->parameters->getParameter($key);
-
-            if ($currentParam->isSameAs($providedParam)) {
-                return true;
-            }
-        }
-
-        // No params intersection found => check failed
-        return false;
+        return $currentParam->isSameAs($elementParam);
     }
 
     /**

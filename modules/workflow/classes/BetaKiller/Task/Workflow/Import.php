@@ -106,6 +106,19 @@ class Import extends AbstractTask
                     $state->setCodename($stateName);
                 }
 
+                /** @noinspection OneTimeUseVariablesInspection */
+                $transitions = $this->config->getStateTargetTransitions($modelName, $stateName);
+
+                // Check state has transitions defined
+                foreach ($transitions as $transitionName => $transitionTarget) {
+                    $this->logger->debug('[:source]--- :name --->[:target] is allowed to: :roles', [
+                        ':name'   => $transitionName,
+                        ':source' => $stateName,
+                        ':target' => $transitionTarget,
+                        ':roles'  => implode(', ', $this->config->getTransitionRoles($modelName, $transitionName)),
+                    ]);
+                }
+
                 // Update flags
                 switch (true) {
                     case $this->config->isStartState($modelName, $stateName):

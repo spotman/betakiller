@@ -14,6 +14,7 @@ use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\EntityLinkedUrlElementInterface;
 use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\UrlPrototypeService;
 use BetaKiller\Url\Zone\ZoneAccessSpecFactory;
 use BetaKiller\Url\Zone\ZoneAccessSpecInterface;
 use Spotman\Acl\AclInterface;
@@ -39,20 +40,28 @@ class AclHelper
     private $specFactory;
 
     /**
+     * @var \BetaKiller\Url\UrlPrototypeService
+     */
+    private $prototypeService;
+
+    /**
      * AclHelper constructor.
      *
      * @param \Spotman\Acl\AclInterface                  $acl
+     * @param \BetaKiller\Url\UrlPrototypeService        $prototypeService
      * @param \BetaKiller\Url\Zone\ZoneAccessSpecFactory $specFactory
      * @param \BetaKiller\Factory\GuestUserFactory       $guestFactory
      */
     public function __construct(
         AclInterface $acl,
+        UrlPrototypeService $prototypeService,
         ZoneAccessSpecFactory $specFactory,
         GuestUserFactory $guestFactory
     ) {
-        $this->acl          = $acl;
-        $this->specFactory  = $specFactory;
-        $this->guestFactory = $guestFactory;
+        $this->acl              = $acl;
+        $this->specFactory      = $specFactory;
+        $this->guestFactory     = $guestFactory;
+        $this->prototypeService = $prototypeService;
     }
 
     /**
@@ -89,7 +98,7 @@ class AclHelper
     {
         $name = $entity::getModelName();
 
-        $resource = $this->getAclResourceFromEntityName($name);
+        $resource = $this->getAclResourceForEntityName($name);
         $resource->setEntity($entity);
 
         return $resource;
@@ -101,7 +110,7 @@ class AclHelper
      * @return \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface
      * @throws \Spotman\Acl\Exception
      */
-    private function getAclResourceFromEntityName(string $name): EntityRelatedAclResourceInterface
+    private function getAclResourceForEntityName(string $name): EntityRelatedAclResourceInterface
     {
         $resource = $this->acl->getResource($name);
 
@@ -137,6 +146,20 @@ class AclHelper
             return false;
         }
 
+        // Check DataSource item access
+        if ($urlElement->hasDynamicUrl()) {
+            $entityName = $this->prototypeService
+                ->createPrototypeFromUrlElement($urlElement)
+                ->getDataSourceName();
+
+            // Default is READ, everything else can be defined in "aclRules" section of UrlElement config
+            $actionName = CrudlsActionsInterface::ACTION_READ;
+
+            if (!$this->checkUrlElementEntityPermissions($urlElement, $params, $entityName, $actionName, $user)) {
+                return false;
+            }
+        }
+
         // Custom ACL rules => protection defined
         $protectionDefined = (bool)$urlElementCustomRules;
 
@@ -144,39 +167,9 @@ class AclHelper
             $entityName = $urlElement->getEntityModelName();
             $actionName = $urlElement->getEntityActionName();
 
-            $entityActionDefined = $entityName && $actionName;
-
             // Check entity access (if defined)
-            if ($entityActionDefined) {
-                $resource = $this->getAclResourceFromEntityName($entityName);
-
-                // Copy entity from UrlContainer if required
-                if ($resource->isEntityRequiredForAction($actionName)) {
-                    if (!$params) {
-                        throw new Exception('UrlContainer is required for action ":action"', [
-                            ':action' => $actionName,
-                        ]);
-                    }
-
-                    $entityInstance = $params->getEntity($entityName);
-
-                    if (!$entityInstance) {
-                        throw new Exception('Entity instance ":entity" is absent for action ":action" in ":el"', [
-                            ':entity' => $entityName,
-                            ':action' => $actionName,
-                            ':el'     => $urlElement->getCodename(),
-                        ]);
-                    }
-
-                    // Check zone access
-                    if (!$this->isEntityAllowedInZone($entityInstance, $urlElement)) {
-                        return false;
-                    }
-
-                    $resource->setEntity($entityInstance);
-                }
-
-                if (!$this->isPermissionAllowed($user, $resource, $actionName)) {
+            if ($entityName && $actionName) {
+                if (!$this->checkUrlElementEntityPermissions($urlElement, $params, $entityName, $actionName, $user)) {
                     return false;
                 }
 
@@ -227,16 +220,52 @@ class AclHelper
         return true;
     }
 
+    private function checkUrlElementEntityPermissions(
+        UrlElementInterface $urlElement,
+        ?UrlContainerInterface $params,
+        string $entityName,
+        string $actionName,
+        AclUserInterface $user
+    ): bool {
+        $resource = $this->getAclResourceForEntityName($entityName);
+
+        // Fetch entity from UrlContainer if required
+        if ($resource->isEntityRequiredForAction($actionName)) {
+            if (!$params) {
+                throw new Exception('UrlContainer is required for action ":action"', [
+                    ':action' => $actionName,
+                ]);
+            }
+
+            $entityInstance = $params->getEntity($entityName);
+
+            if (!$entityInstance) {
+                throw new Exception('Entity instance ":entity" is absent for action ":action" in ":el"', [
+                    ':entity' => $entityName,
+                    ':action' => $actionName,
+                    ':el'     => $urlElement->getCodename(),
+                ]);
+            }
+
+            // Check zone access
+            if (!$this->isEntityAllowedInZone($entityInstance, $urlElement)) {
+                return false;
+            }
+
+            $resource->setEntity($entityInstance);
+        }
+
+        return $this->isPermissionAllowed($user, $resource, $actionName);
+    }
+
     /**
-     * @param \BetaKiller\Model\DispatchableEntityInterface   $entity
-     * @param \BetaKiller\Url\EntityLinkedUrlElementInterface $urlElement
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param \BetaKiller\Url\UrlElementInterface           $urlElement
      *
      * @return bool
      */
-    private function isEntityAllowedInZone(
-        DispatchableEntityInterface $entity,
-        EntityLinkedUrlElementInterface $urlElement
-    ): bool {
+    private function isEntityAllowedInZone(DispatchableEntityInterface $entity, UrlElementInterface $urlElement): bool
+    {
         $spec   = $this->getZoneAccessSpec($urlElement);
         $result = $spec->isEntityAllowed($entity);
 

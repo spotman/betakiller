@@ -23,6 +23,9 @@ class LanguageResource extends AbstractEntityRelatedAclResource
             ],
 
             self::ACTION_READ => [
+                // For lang-based paths
+                RoleInterface::GUEST,
+                RoleInterface::LOGIN,
                 I18nFacade::ROLE_TRANSLATOR,
             ],
 

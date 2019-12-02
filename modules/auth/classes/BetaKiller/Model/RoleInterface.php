@@ -29,6 +29,7 @@ interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, Multi
 
     /**
      * Role with access to log in
+     * @deprecated
      */
     public const LOGIN = 'login';
 
