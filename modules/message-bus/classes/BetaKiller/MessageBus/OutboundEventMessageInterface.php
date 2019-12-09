@@ -9,7 +9,15 @@ use JsonSerializable;
  *
  * @package BetaKiller\MessageBus
  */
-interface OutboundEventMessageInterface extends EventMessageInterface, JsonSerializable
+interface OutboundEventMessageInterface extends EventMessageInterface
 {
+    /**
+     * @return string
+     */
     public function getExternalName(): string;
+
+    /**
+     * @return array|null
+     */
+    public function getExternalData(): ?array;
 }

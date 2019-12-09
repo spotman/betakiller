@@ -7,7 +7,7 @@ use BetaKiller\IdentityConverterInterface;
 use BetaKiller\MessageBus\OutboundEventMessageInterface;
 use BetaKiller\Model\AbstractEntityInterface;
 
-class EntityChanged implements OutboundEventMessageInterface
+class EntityChangedEvent implements OutboundEventMessageInterface
 {
     /**
      * @var string
@@ -20,7 +20,7 @@ class EntityChanged implements OutboundEventMessageInterface
     private $id;
 
     /**
-     * EntityChanged constructor.
+     * EntityChangedEvent constructor.
      *
      * @param \BetaKiller\Model\AbstractEntityInterface $entity
      * @param \BetaKiller\IdentityConverterInterface    $converter
@@ -47,16 +47,10 @@ class EntityChanged implements OutboundEventMessageInterface
     }
 
     /**
-     * Specify data which should be serialized to JSON
-     *
-     * @link  https://php.net/manual/en/jsonserializable.jsonserialize.php
-     * @return mixed data which can be serialized by <b>json_encode</b>,
-     * which is a value of any type other than a resource.
-     * @since 5.4.0
+     * @return array|null
      */
-    public function jsonSerialize()
+    public function getExternalData(): ?array
     {
-        // No data
-        return [];
+        return null;
     }
 }

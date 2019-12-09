@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace BetaKiller\Auth\Event;
 
-use BetaKiller\MessageBus\EventMessageInterface;
 use BetaKiller\MessageBus\OutboundEventMessageInterface;
+use Zend\Expressive\Session\SessionIdentifierAwareInterface;
 use Zend\Expressive\Session\SessionInterface;
 
 // WAMP/Websocket daemon needs this events
 abstract class AbstractUserSessionEvent implements OutboundEventMessageInterface
 {
     /**
-     * @var SessionInterface
+     * @var SessionInterface|SessionIdentifierAwareInterface
      */
     private $session;
 
@@ -22,15 +22,11 @@ abstract class AbstractUserSessionEvent implements OutboundEventMessageInterface
      */
     public function __construct(SessionInterface $session)
     {
-        $this->session = $session;
-    }
+      if (!$session instanceof SessionIdentifierAwareInterface) {
+        throw new InvaldArgumentException();
+      }
 
-    /**
-     * @return SessionInterface
-     */
-    public function getSession(): SessionInterface
-    {
-        return $this->session;
+        $this->session = $session;
     }
 
     /**
@@ -41,5 +37,15 @@ abstract class AbstractUserSessionEvent implements OutboundEventMessageInterface
     public function handlersRequired(): bool
     {
         return false;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getExternalData(): ?array
+    {
+        return [
+            'session' => $this->session->getId(),
+        ];
     }
 }

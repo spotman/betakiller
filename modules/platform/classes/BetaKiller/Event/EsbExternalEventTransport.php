@@ -46,7 +46,9 @@ class EsbExternalEventTransport implements ExternalEventTransportInterface
      */
     public function emit(OutboundEventMessageInterface $event): void
     {
-        $msg = $this->context->createMessage(json_encode($event), [
+        $data = $event->getExternalData();
+
+        $msg = $this->context->createMessage(json_encode($data), [
             self::PROPERTY_MESSAGE_NAME => $event->getExternalName(),
         ]);
 
