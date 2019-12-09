@@ -83,8 +83,8 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         NotificationHelper $notificationHelper
     ) {
         $this->entityFactory = $entityFactory;
-        $this->repository   = $repository;
-        $this->notification = $notificationHelper;
+        $this->repository    = $repository;
+        $this->notification  = $notificationHelper;
 
         parent::__construct(self::MIN_LEVEL);
     }
@@ -97,7 +97,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     /**
      * Writes the record down to the log of the implementing handler
      *
-     * @param  array $record
+     * @param array $record
      *
      * @return void
      */
@@ -192,19 +192,18 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
         if ($model) {
             // Mark exception as repeated
-            $model
-                ->markAsRepeated($user)
-                ->setLastSeenAt($currentTime);
+            $model->markAsRepeated($user);
         } else {
             /** @var PhpExceptionModelInterface $model */
             $model = $this->entityFactory->create(PhpException::getModelName());
             $model
                 ->setHash($hash)
                 ->setCreatedAt($currentTime)
-                ->setLastSeenAt($currentTime)
                 ->setMessage($message)
                 ->markAsNew($user);
         }
+
+        $model->setLastSeenAt($currentTime);
 
         // Increase occurrence counter
         $model->incrementCounter();

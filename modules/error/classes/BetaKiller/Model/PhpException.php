@@ -369,11 +369,11 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * Unix timestamp of last notification time
      *
-     * @param \DateTimeInterface|NULL $time
+     * @param \DateTimeImmutable $time
      *
      * @return $this
      */
-    public function setLastSeenAt(\DateTimeInterface $time): PhpExceptionModelInterface
+    public function setLastSeenAt(\DateTimeImmutable $time): PhpExceptionModelInterface
     {
         $this->set_datetime_column_value(self::COLUMN_LAST_SEEN_AT, $time);
 
@@ -388,21 +388,6 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     public function getLastSeenAt(): DateTimeImmutable
     {
         return $this->get_datetime_column_value(self::COLUMN_LAST_SEEN_AT);
-    }
-
-
-    /**
-     * Unix timestamp of last notification time
-     *
-     * @param \DateTimeInterface $time
-     *
-     * @return $this
-     */
-    public function setLastNotifiedAt(\DateTimeInterface $time): PhpExceptionModelInterface
-    {
-        $this->set_datetime_column_value('last_notified_at', $time);
-
-        return $this;
     }
 
     /**
@@ -456,9 +441,12 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function markAsRepeated(?UserInterface $user): PhpExceptionModelInterface
     {
-        // Reset resolved_by
-        $this->setResolvedBy(null);
-        $this->setStatus(self::STATE_REPEATED);
+        if (!$this->isIgnored()) {
+            // Reset resolved_by
+            $this->setResolvedBy(null);
+            $this->setStatus(self::STATE_REPEATED);
+        }
+
         $this->addHistoryRecord($user);
 
         return $this;
@@ -584,9 +572,13 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
 
     /**
      * Marks current exception instance as "notification required" = 0
+     *
+     * @param \DateTimeImmutable $time
      */
-    public function wasNotified(): void
+    public function wasNotified(DateTimeImmutable $time): void
     {
+        $this->setLastNotifiedAt($time);
+
         $this->set('notification_required', false);
     }
 
@@ -637,5 +629,19 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
         }
 
         return parent::delete();
+    }
+
+    /**
+     * Unix timestamp of last notification time
+     *
+     * @param \DateTimeImmutable $time
+     *
+     * @return $this
+     */
+    private function setLastNotifiedAt(\DateTimeImmutable $time): PhpExceptionModelInterface
+    {
+        $this->set_datetime_column_value('last_notified_at', $time);
+
+        return $this;
     }
 }

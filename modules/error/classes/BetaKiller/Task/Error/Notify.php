@@ -107,8 +107,7 @@ class Notify extends AbstractTask
         ]);
 
         // Saving last notification timestamp
-        $model->setLastNotifiedAt(new DateTimeImmutable);
-        $model->wasNotified();
+        $model->wasNotified(new DateTimeImmutable);
 
         $this->repository->save($model);
     }

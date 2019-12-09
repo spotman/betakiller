@@ -112,11 +112,11 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
     /**
      * Unix timestamp of last notification time
      *
-     * @param \DateTimeInterface $time
+     * @param \DateTimeImmutable $time
      *
      * @return PhpExceptionModelInterface
      */
-    public function setLastSeenAt(\DateTimeInterface $time): PhpExceptionModelInterface;
+    public function setLastSeenAt(\DateTimeImmutable $time): PhpExceptionModelInterface;
 
     /**
      * Unix timestamp of last notification time
@@ -124,15 +124,6 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
      * @return \DateTimeImmutable
      */
     public function getLastSeenAt(): \DateTimeImmutable;
-
-    /**
-     * Unix timestamp of last notification time
-     *
-     * @param \DateTimeInterface $time
-     *
-     * @return PhpExceptionModelInterface
-     */
-    public function setLastNotifiedAt(\DateTimeInterface $time): PhpExceptionModelInterface;
 
     /**
      * Unix timestamp of last notification time
@@ -224,8 +215,10 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
 
     /**
      * Marks current exception instance as "notification required" = 0
+     *
+     * @param \DateTimeImmutable $time
      */
-    public function wasNotified(): void;
+    public function wasNotified(\DateTimeImmutable $time): void;
 
     /**
      * Returns true if someone needs to be notified about current exception instance
