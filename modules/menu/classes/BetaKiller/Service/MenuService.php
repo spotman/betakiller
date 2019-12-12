@@ -243,7 +243,7 @@ class MenuService
 
                     // Calculate menu counter if needed
                     $counter = $instance instanceof HasMenuCounterInterface
-                        ? $instance->getMenuCounter($params)
+                        ? $instance->getMenuCounter($params, $this->user)
                         : null;
 
                     // Use current URL if item is in menu

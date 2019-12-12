@@ -10,7 +10,9 @@ interface HasMenuCounterInterface
     /**
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
+     * @param \BetaKiller\Model\UserInterface                 $user
+     *
      * @return int
      */
-    public function getMenuCounter(UrlContainerInterface $params): int;
+    public function getMenuCounter(UrlContainerInterface $params, \BetaKiller\Model\UserInterface $user): int;
 }
