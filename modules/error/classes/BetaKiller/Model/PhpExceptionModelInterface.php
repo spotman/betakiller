@@ -98,25 +98,9 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
     public function getTraceSize(): int;
 
     /**
-     * @param \DateTimeInterface $time
-     *
-     * @return PhpExceptionModelInterface
-     */
-    public function setCreatedAt(\DateTimeInterface $time): PhpExceptionModelInterface;
-
-    /**
      * @return \DateTimeImmutable
      */
     public function getCreatedAt(): \DateTimeImmutable;
-
-    /**
-     * Unix timestamp of last notification time
-     *
-     * @param \DateTimeImmutable $time
-     *
-     * @return PhpExceptionModelInterface
-     */
-    public function setLastSeenAt(\DateTimeImmutable $time): PhpExceptionModelInterface;
 
     /**
      * Unix timestamp of last notification time

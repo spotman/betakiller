@@ -20,18 +20,10 @@ class PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModelInterf
 
         $this->belongs_to([
             'error' => [
-                'model'       => 'PhpException',
+                'model'       => PhpException::getModelName(),
                 'foreign_key' => 'error_id',
             ],
         ]);
-    }
-
-    /**
-     * @return \BetaKiller\Model\PhpExceptionModelInterface
-     */
-    public function getPhpException(): PhpExceptionModelInterface
-    {
-        return $this->get('error');
     }
 
     /**
@@ -39,7 +31,7 @@ class PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModelInterf
      *
      * @return PhpExceptionHistoryModelInterface
      */
-    public function setPhpException(PhpExceptionModelInterface $phpException): PhpExceptionHistoryModelInterface
+    public function bindToPhpException(PhpExceptionModelInterface $phpException): PhpExceptionHistoryModelInterface
     {
         $this->set('error', $phpException);
 
@@ -83,7 +75,7 @@ class PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModelInterf
      *
      * @return PhpExceptionHistoryModelInterface
      */
-    public function setTimestamp(\DateTimeImmutable $time): PhpExceptionHistoryModelInterface
+    public function setTimestamp(DateTimeImmutable $time): PhpExceptionHistoryModelInterface
     {
         $this->set_datetime_column_value('ts', $time);
 

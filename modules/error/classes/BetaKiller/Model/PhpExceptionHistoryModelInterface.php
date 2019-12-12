@@ -4,16 +4,11 @@ namespace BetaKiller\Model;
 interface PhpExceptionHistoryModelInterface
 {
     /**
-     * @return PhpExceptionModelInterface
-     */
-    public function getPhpException(): PhpExceptionModelInterface;
-
-    /**
      * @param \BetaKiller\Model\PhpExceptionModelInterface $phpException
      *
      * @return PhpExceptionHistoryModelInterface
      */
-    public function setPhpException(PhpExceptionModelInterface $phpException): PhpExceptionHistoryModelInterface;
+    public function bindToPhpException(PhpExceptionModelInterface $phpException): PhpExceptionHistoryModelInterface;
 
     /**
      * @return null|string

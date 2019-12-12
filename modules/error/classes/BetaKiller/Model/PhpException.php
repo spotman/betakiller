@@ -2,7 +2,6 @@
 namespace BetaKiller\Model;
 
 use Database;
-use DateTime;
 use DateTimeImmutable;
 use DB;
 use ORM;
@@ -44,7 +43,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
 
         $this->has_many([
             'history' => [
-                'model'       => 'PhpExceptionHistory',
+                'model'       => PhpExceptionHistory::getModelName(),
                 'foreign_key' => 'error_id',
             ],
         ]);
@@ -347,37 +346,11 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     }
 
     /**
-     * @param \DateTimeInterface|NULL $time
-     *
-     * @return $this
-     */
-    public function setCreatedAt(\DateTimeInterface $time): PhpExceptionModelInterface
-    {
-        $this->set_datetime_column_value(self::COLUMN_CREATED_AT, $time);
-
-        return $this;
-    }
-
-    /**
      * @return \DateTimeImmutable
      */
     public function getCreatedAt(): DateTimeImmutable
     {
         return $this->get_datetime_column_value(self::COLUMN_CREATED_AT);
-    }
-
-    /**
-     * Unix timestamp of last notification time
-     *
-     * @param \DateTimeImmutable $time
-     *
-     * @return $this
-     */
-    public function setLastSeenAt(\DateTimeImmutable $time): PhpExceptionModelInterface
-    {
-        $this->set_datetime_column_value(self::COLUMN_LAST_SEEN_AT, $time);
-
-        return $this;
     }
 
     /**
@@ -400,13 +373,6 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
         return $this->get_datetime_column_value('last_notified_at');
     }
 
-    private function setResolvedBy(?UserInterface $user): PhpExceptionModelInterface
-    {
-        $this->set('resolved_by', $user ? $user->getID() : null);
-
-        return $this;
-    }
-
     /**
      * @return string|null
      */
@@ -426,6 +392,11 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function markAsNew(?UserInterface $user): PhpExceptionModelInterface
     {
+        $now = new DateTimeImmutable();
+
+        $this->setCreatedAt($now);
+        $this->setLastSeenAt($now);
+
         $this->setStatus(self::STATE_NEW);
         $this->addHistoryRecord($user);
 
@@ -441,6 +412,10 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function markAsRepeated(?UserInterface $user): PhpExceptionModelInterface
     {
+        $now = new DateTimeImmutable();
+
+        $this->setLastSeenAt($now);
+
         if (!$this->isIgnored()) {
             // Reset resolved_by
             $this->setResolvedBy(null);
@@ -527,34 +502,6 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     }
 
     /**
-     * @return string
-     */
-    public function getStatus(): string
-    {
-        return $this->get(self::COLUMN_STATUS);
-    }
-
-    /**
-     * @param string $status
-     *
-     * @return PhpExceptionModelInterface
-     */
-    private function setStatus(string $status): PhpExceptionModelInterface
-    {
-        $this->set(self::COLUMN_STATUS, $status);
-
-        return $this;
-    }
-
-    /**
-     * @return PhpExceptionHistory
-     */
-    private function getHistoryRelation(): PhpExceptionHistory
-    {
-        return $this->get('history');
-    }
-
-    /**
      * @return PhpExceptionHistoryModelInterface[]
      */
     public function getHistoricalRecords(): array
@@ -593,29 +540,6 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     }
 
     /**
-     * Adds record to history
-     *
-     * @param UserInterface|null $user
-     *
-     * @return \BetaKiller\Model\PhpExceptionHistoryModelInterface
-     * @internal
-     */
-    private function addHistoryRecord(UserInterface $user = null): PhpExceptionHistoryModelInterface
-    {
-        // Get error ID for new records
-        $this->save();
-
-        $historyModel = new PhpExceptionHistory;
-
-        return $historyModel
-            ->setPhpException($this)
-            ->setStatus($this->getStatus())
-            ->setTimestamp(new DateTimeImmutable)
-            ->setUser($user)
-            ->save();
-    }
-
-    /**
      * Deletes a single record while ignoring relationships.
      *
      * @chainable
@@ -632,16 +556,100 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     }
 
     /**
+     * @param \DateTimeImmutable $time
+     *
+     * @return $this
+     */
+    private function setCreatedAt(DateTimeImmutable $time): PhpExceptionModelInterface
+    {
+        $this->set_datetime_column_value(self::COLUMN_CREATED_AT, $time);
+
+        return $this;
+    }
+
+    /**
+     * @param string $status
+     *
+     * @return PhpExceptionModelInterface
+     */
+    private function setStatus(string $status): PhpExceptionModelInterface
+    {
+        $this->set(self::COLUMN_STATUS, $status);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    private function getStatus(): string
+    {
+        return $this->get(self::COLUMN_STATUS);
+    }
+
+    private function setResolvedBy(?UserInterface $user): PhpExceptionModelInterface
+    {
+        $this->set('resolved_by', $user ? $user->getID() : null);
+
+        return $this;
+    }
+
+    /**
      * Unix timestamp of last notification time
      *
      * @param \DateTimeImmutable $time
      *
      * @return $this
      */
-    private function setLastNotifiedAt(\DateTimeImmutable $time): PhpExceptionModelInterface
+    private function setLastNotifiedAt(DateTimeImmutable $time): PhpExceptionModelInterface
     {
         $this->set_datetime_column_value('last_notified_at', $time);
 
         return $this;
+    }
+
+    /**
+     * Unix timestamp of last notification time
+     *
+     * @param \DateTimeImmutable $time
+     *
+     * @return $this
+     */
+    private function setLastSeenAt(DateTimeImmutable $time): PhpExceptionModelInterface
+    {
+        $this->set_datetime_column_value(self::COLUMN_LAST_SEEN_AT, $time);
+
+        return $this;
+    }
+
+    /**
+     * @return PhpExceptionHistory
+     */
+    private function getHistoryRelation(): PhpExceptionHistory
+    {
+        return $this->get('history');
+    }
+
+    /**
+     * Adds record to history
+     *
+     * @param UserInterface|null $user
+     *
+     * @return \BetaKiller\Model\PhpExceptionHistoryModelInterface
+     * @internal
+     */
+    private function addHistoryRecord(UserInterface $user = null): PhpExceptionHistoryModelInterface
+    {
+        // Get error ID for new records
+        $this->save();
+
+        $historyModel = new PhpExceptionHistory;
+
+        return $historyModel
+            ->bindToPhpException($this)
+            ->setStatus($this->getStatus())
+            ->setTimestamp(new DateTimeImmutable)
+            ->setUser($user)
+            ->save();
     }
 }

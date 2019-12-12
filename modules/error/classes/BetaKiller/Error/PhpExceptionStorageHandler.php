@@ -9,8 +9,7 @@ use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\PhpException;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Notification\MessageTargetInterface;
-use BetaKiller\Repository\PhpExceptionRepository;
-use DateTimeImmutable;
+use BetaKiller\Repository\PhpExceptionRepositoryInterface;
 use Debug;
 use Email;
 use ErrorException;
@@ -73,13 +72,13 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     /**
      * PhpExceptionStorageHandler constructor.
      *
-     * @param \BetaKiller\Factory\EntityFactoryInterface    $entityFactory
-     * @param \BetaKiller\Repository\PhpExceptionRepository $repository
-     * @param \BetaKiller\Helper\NotificationHelper         $notificationHelper
+     * @param \BetaKiller\Factory\EntityFactoryInterface             $entityFactory
+     * @param \BetaKiller\Repository\PhpExceptionRepositoryInterface $repository
+     * @param \BetaKiller\Helper\NotificationHelper                  $notificationHelper
      */
     public function __construct(
         EntityFactoryInterface $entityFactory,
-        PhpExceptionRepository $repository,
+        PhpExceptionRepositoryInterface $repository,
         NotificationHelper $notificationHelper
     ) {
         $this->entityFactory = $entityFactory;
@@ -188,8 +187,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             ? ServerRequestHelper::getUser($request)
             : null;
 
-        $currentTime = new DateTimeImmutable;
-
         if ($model) {
             // Mark exception as repeated
             $model->markAsRepeated($user);
@@ -198,12 +195,9 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             $model = $this->entityFactory->create(PhpException::getModelName());
             $model
                 ->setHash($hash)
-                ->setCreatedAt($currentTime)
                 ->setMessage($message)
                 ->markAsNew($user);
         }
-
-        $model->setLastSeenAt($currentTime);
 
         // Increase occurrence counter
         $model->incrementCounter();
