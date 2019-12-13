@@ -68,23 +68,33 @@ class SupervisorDaemon implements DaemonInterface
     private $lockFactory;
 
     /**
+     * @var \BetaKiller\Daemon\FsWatcher
+     */
+    private $fsWatcher;
+
+    private $isRunning = false;
+
+    /**
      * Supervisor constructor.
      *
      * @param \BetaKiller\Config\ConfigProviderInterface $config
      * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
      * @param \BetaKiller\Daemon\LockFactory             $lockFactory
+     * @param \BetaKiller\Daemon\FsWatcher               $fsWatcher
      * @param \Psr\Log\LoggerInterface                   $logger
      */
     public function __construct(
         ConfigProviderInterface $config,
         AppEnvInterface $appEnv,
         LockFactory $lockFactory,
+        FsWatcher $fsWatcher,
         LoggerInterface $logger
     ) {
         $this->config      = $config;
         $this->appEnv      = $appEnv;
         $this->logger      = $logger;
         $this->lockFactory = $lockFactory;
+        $this->fsWatcher   = $fsWatcher;
     }
 
     public function start(LoopInterface $loop): void
@@ -100,14 +110,25 @@ class SupervisorDaemon implements DaemonInterface
 
         $this->addSupervisorTimer();
 
+        if ($this->appEnv->inDevelopmentMode()) {
+            $this->addFsWatcher($loop);
+        }
+
         foreach ($this->getDefinedDaemons() as $codename) {
             $this->startDaemon($codename, true);
         }
+
+        $this->isRunning = true;
     }
 
     private function addSupervisorTimer(): void
     {
         $this->loop->addPeriodicTimer(0.1, function () {
+            // Prevent auto-restart
+            if (!$this->isRunning) {
+                return;
+            }
+
             foreach ($this->statuses as $name => $data) {
                 $status = $this->getStatus($name);
 
@@ -167,15 +188,31 @@ class SupervisorDaemon implements DaemonInterface
         }
     }
 
-    public function stop(): void
+    private function stopAll(): void
     {
         $this->logger->debug('Shutting down daemons');
 
+        // Trying to restart failed daemons
         foreach ($this->filterStatus(self::STATUS_RUNNING) as $name) {
             $this->stopDaemon($name);
         }
 
-        $this->logger->info('All daemons are stopped, supervisor is shutting down');
+        $this->logger->info('All daemons are stopped');
+    }
+
+    public function stop(): void
+    {
+        // Prevent auto-restart
+        $this->isRunning = false;
+
+        // Stop FS watcher if enabled
+        if ($this->fsWatcher) {
+            $this->fsWatcher->stop();
+        }
+
+        $this->stopAll();
+
+        $this->logger->info('Supervisor is shutting down');
     }
 
     private function startDaemon(string $name, bool $clearCounter = null): void
@@ -376,5 +413,15 @@ class SupervisorDaemon implements DaemonInterface
         }
 
         return $count > self::RETRY_LIMIT;
+    }
+
+    private function addFsWatcher(LoopInterface $loop): void
+    {
+        $this->fsWatcher->start($loop, function () {
+            $this->logger->info('Restarting daemons after FS changes');
+
+            // Restart all daemons (auto-restart after stop)
+            $this->stopAll();
+        });
     }
 }

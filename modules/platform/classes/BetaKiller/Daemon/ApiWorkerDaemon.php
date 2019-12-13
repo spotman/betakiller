@@ -13,8 +13,6 @@ use BetaKiller\Wamp\WampClientBuilder;
 use BetaKiller\Wamp\WampClientHelper;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use ReactFilesystemMonitor\FilesystemMonitorFactory;
-use ReactFilesystemMonitor\FilesystemMonitorInterface;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiResourceProxyInterface;
 use stdClass;
@@ -32,27 +30,6 @@ class ApiWorkerDaemon implements DaemonInterface
     public const KEY_API_RESOURCE = 'resource';
     public const KEY_API_METHOD   = 'method';
     public const KEY_API_DATA     = 'data';
-
-    private const WATCH_EXTENSIONS = [
-        'php', // All
-        'xml', // Configs
-        'yml',
-    ];
-
-    private const WATCH_IGNORE_DIRS = [
-        'cache',
-        'logs',
-    ];
-
-    /**
-     * @var \ReactFilesystemMonitor\FilesystemMonitorInterface|null
-     */
-    private $fsWatcher;
-
-    /**
-     * @var \React\EventLoop\TimerInterface|null
-     */
-    private $watchTimer;
 
     /**
      * @var \BetaKiller\Wamp\WampClientBuilder
@@ -124,10 +101,6 @@ class ApiWorkerDaemon implements DaemonInterface
             $loop->stop();
         });
 
-        if ($this->appEnv->inDevelopmentMode()) {
-            $this->addFsWatcher($loop);
-        }
-
         // Use internal auth and connection coz it is an internal worker
         $this->clientBuilder->internalConnection()->internalAuth();
 
@@ -156,11 +129,6 @@ class ApiWorkerDaemon implements DaemonInterface
 
     public function stop(): void
     {
-        // Stop FS watcher if enabled
-        if ($this->fsWatcher) {
-            $this->fsWatcher->stop();
-        }
-
         // Stop clients and disconnect
         foreach ($this->wampClients as $wampClient) {
             $wampClient->onClose('Stopped');
@@ -222,69 +190,5 @@ class ApiWorkerDaemon implements DaemonInterface
         return [
             'error' => $error,
         ];
-    }
-
-    private function addFsWatcher(LoopInterface $loop): void
-    {
-        $path = $this->appEnv->getAppRootPath();
-
-        $this->logger->debug('Starting watcher for :path', [
-            ':path' => $path,
-        ]);
-
-        $this->fsWatcher = (new FilesystemMonitorFactory())->create($path, [
-            'create',
-            'modify',
-            'delete',
-            'move_from',
-            'move_to',
-        ]);
-
-        $this->fsWatcher->on(
-            'all',
-            function (string $path, bool $isDir, string $event, FilesystemMonitorInterface $monitor) use ($loop) {
-                // Skip directory events
-                if ($isDir) {
-                    return;
-                }
-
-                // Skip files in ignored directories
-                foreach (self::WATCH_IGNORE_DIRS as $ignoreDir) {
-                    if (strpos($path, DIRECTORY_SEPARATOR.$ignoreDir.DIRECTORY_SEPARATOR) !== false) {
-                        return;
-                    }
-                }
-
-                $ext = pathinfo($path, PATHINFO_EXTENSION);
-
-                // Skip logs/git/frontend update
-                if (!in_array($ext, self::WATCH_EXTENSIONS, true)) {
-                    return;
-                }
-
-                $this->logger->debug('API WATCHER :msg', [
-                    ':msg' => sprintf("%s:  %s%s\n", $event, $path, $isDir ? ' [dir]' : ''),
-                ]);
-
-                if ($this->watchTimer) {
-                    $loop->cancelTimer($this->watchTimer);
-                }
-
-                // Throttling for 1 second
-                $this->watchTimer = $loop->addTimer(1, function () use ($loop, $monitor) {
-                    // Prevent repeated events
-                    $monitor->stop();
-
-                    $this->logger->info('Restarting ApiWorker after FS changes');
-
-                    // Stop daemon
-                    $this->stop();
-
-                    // Stop loop for correct exit
-                    $loop->stop();
-                });
-            });
-
-        $this->fsWatcher->start($loop);
     }
 }
