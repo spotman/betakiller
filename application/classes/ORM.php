@@ -69,7 +69,7 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         return static::detectModelName();
     }
 
-    public static function detectModelName(OrmInterface $object = null): string
+    protected static function detectModelName(OrmInterface $object = null): string
     {
         $className = $object ? get_class($object) : static::class;
 
@@ -400,14 +400,28 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
 
     protected function setOnce(string $key, $value): void
     {
-        $current = $this->get($key);
-
-        if ((is_scalar($current) && $current) || ($current instanceof self && $current->loaded())) {
+        if ($this->hasKeyValue($key)) {
             throw new LogicException(
                 sprintf('Can not reassign key "%s" in "%s" model', $key, static::getModelName())
             );
         }
 
         $this->set($key, $value);
+    }
+
+    private function hasKeyValue(string $key): bool
+    {
+        $current = $this->get($key);
+
+        switch (true) {
+            case $current instanceof self:
+                return $current->loaded();
+
+            case is_scalar($current):
+                return (bool)$current;
+
+            default:
+                return !empty($current);
+        }
     }
 }
