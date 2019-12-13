@@ -46,20 +46,15 @@ return [
     'comment.action.edit' => 'Исправить',
     'comment.action.save' => 'Сохранить',
 
-    'comment.status.transition.approve'          => 'Опубликовать',
-    'comment.status.transition.reject'           => 'Отклонить',
+    'comment.status.transition.approve'            => 'Опубликовать',
+    'comment.status.transition.reject'             => 'Отклонить',
     'comment.status.transition.mark-as-spam'       => 'СПАМ',
     'comment.status.transition.move-to-trash'      => 'В корзину',
     'comment.status.transition.restore-from-trash' => 'Восстановить',
 
-    'notification.moderator.post.complete.subj' => 'Запись ":label" готова к публикации',
-    'notification.moderator.post.complete.text' => ':targetName, запись "<strong>:label</strong>" готова к публикации, проверьте её, пожалуйста, и опубликуйте <a href=":url">:url</a>.',
-
-    'notification.user.comment.author-approve.subj' => ':targetName, ваш комментарий от :created_at к записи ":label" утверждён и опубликован',
-    'notification.user.comment.author-approve.text' => ':targetName, ваш комментарий от :created_at к записи "<strong>:label</strong>" утверждён и опубликован по адресу <a href=":url">:url</a>',
-
-    'notification.user.comment.parent-author-reply.subj' => ':targetName, вам ответили на комментарий к записи ":label"',
-    'notification.user.comment.parent-author-reply.text' => ':targetName,<br />вам ответили на комментарий от :created_at к записи "<strong>:label</strong>".<br />Прочитать комментарий можно по адресу <a href=":url">:url</a>',
+    'notification.moderator.post.complete.subj'          => 'Запись ":label" готова к публикации',
+    'notification.user.comment.author-approve.subj'      => ':target_name, ваш комментарий от :created_at к записи ":label" утверждён и опубликован',
+    'notification.user.comment.parent-author-reply.subj' => ':target_name, вам ответили на комментарий к записи ":label"',
 
     'error.post.preview_not_allowed' => 'Предпросмотр статей разрешён только редакторам',
 

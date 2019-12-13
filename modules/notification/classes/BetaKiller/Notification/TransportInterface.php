@@ -9,11 +9,20 @@ interface TransportInterface
     public function getName(): string;
 
     /**
-     * @param \BetaKiller\Notification\MessageTargetInterface $user
+     * @param \BetaKiller\Notification\MessageTargetInterface $target
      *
      * @return bool
      */
-    public function isEnabledFor(MessageTargetInterface $user): bool;
+    public function isEnabledFor(MessageTargetInterface $target): bool;
+
+    /**
+     * Returns true if current transport can handle provided message
+     *
+     * @param \BetaKiller\Notification\MessageInterface $message
+     *
+     * @return bool
+     */
+    public function canHandle(MessageInterface $message): bool;
 
     /**
      * @param \BetaKiller\Notification\MessageInterface       $message

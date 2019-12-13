@@ -10,7 +10,7 @@ use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
 
-class TargetsFor extends AbstractTask
+final class TargetsFor extends AbstractTask
 {
     private const OPTION_MESSAGE = 'message';
 

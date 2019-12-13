@@ -13,6 +13,7 @@ class MessageSerializer
     private const KEY_FROM        = 'from';
     private const KEY_TARGET      = 'target';
     private const KEY_DATA        = 'data';
+    private const KEY_ACTION_URL  = 'action';
     private const KEY_ATTACHMENTS = 'attachments';
 
     private const KEY_TARGET_TYPE = 'type';
@@ -48,6 +49,7 @@ class MessageSerializer
             self::KEY_TARGET      => $this->serializeTarget($message->getTarget()),
             self::KEY_DATA        => $message->getTemplateData(),
             self::KEY_ATTACHMENTS => $message->getAttachments(),
+            self::KEY_ACTION_URL  => $message->hasActionUrl() ? $message->getActionUrl() : null,
         ];
 
         return json_encode($data);
@@ -71,6 +73,10 @@ class MessageSerializer
             foreach ($data->{self::KEY_ATTACHMENTS} as $attach) {
                 $message->addAttachment($attach);
             }
+        }
+
+        if ($data->{self::KEY_ACTION_URL}) {
+            $message->setActionUrl($data->{self::KEY_ACTION_URL});
         }
 
         return $message;

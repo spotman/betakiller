@@ -2,18 +2,20 @@
 declare(strict_types=1);
 
 namespace BetaKiller\Config;
- 
+
 use BetaKiller\Exception;
 
 class NotificationConfig extends AbstractConfig implements NotificationConfigInterface
 {
     public const CONFIG_GROUP_NAME    = 'notifications';
+    public const PATH_TRANSPORTS      = ['transports'];
     public const PATH_GROUPS          = ['groups'];
     public const PATH_GROUP_IS_SYSTEM = ['groups', 'groupCodename' => '', 'is_system'];
     public const PATH_GROUP_FREQ_CTRL = ['groups', 'groupCodename' => '', 'freq_control'];
     public const PATH_GROUP_ROLES     = ['groups', 'groupCodename' => '', 'roles'];
     public const PATH_MESSAGES        = ['messages'];
     public const PATH_MESSAGE_GROUP   = ['messages', 'messageCodename' => '', 'group'];
+    public const PATH_MESSAGE_ACTION   = ['messages', 'messageCodename' => '', 'action'];
 
     /**
      * @return string
@@ -21,6 +23,22 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     protected function getConfigRootGroup(): string
     {
         return self::CONFIG_GROUP_NAME;
+    }
+
+    /**
+     * @return string[] ['transportOneCodename','transportTwoCodename',..]
+     */
+    public function getTransports(): array
+    {
+        // "codename" => "priority" (lower - better)
+        $config = (array)$this->get(self::PATH_TRANSPORTS);
+
+        // "priority" => "codename"
+        $config = \array_flip($config);
+
+        \ksort($config, \SORT_ASC);
+
+        return $config;
     }
 
     /**
@@ -81,7 +99,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
      */
     public function isGroupFreqControlled(string $groupCodename): bool
     {
-        $path                    = self::PATH_GROUP_FREQ_CTRL;
+        $path                  = self::PATH_GROUP_FREQ_CTRL;
         $path['groupCodename'] = $groupCodename;
 
         return (bool)$this->get($path, true);
@@ -112,5 +130,16 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
         }
 
         return $messages;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getMessageAction(string $messageCodename): string
+    {
+        $path                    = self::PATH_MESSAGE_ACTION;
+        $path['messageCodename'] = $messageCodename;
+
+        return (string)$this->get($path, true);
     }
 }

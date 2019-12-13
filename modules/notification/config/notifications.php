@@ -1,9 +1,16 @@
 <?php
 declare(strict_types=1);
 
+use BetaKiller\Notification\Transport\EmailTransport;
+
 define('TEST_NOTIFICATIONS_GROUP', 'test-notifications');
 
 return [
+    'transports' => [
+        // Lowest priority by default
+        EmailTransport::CODENAME => 1000,
+    ],
+
     /**
      * Notification groups and relation to ACL roles
      *

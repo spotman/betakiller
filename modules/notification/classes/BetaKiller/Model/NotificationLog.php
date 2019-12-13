@@ -29,6 +29,8 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     public const STATUS_SUCCEEDED = 'succeeded';
     public const STATUS_FAILED    = 'failed';
 
+    public const MAX_LENGTH_CODENAME = 64;
+
     private static $tablesChecked = false;
 
     /**

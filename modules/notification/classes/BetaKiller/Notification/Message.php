@@ -31,6 +31,11 @@ class Message implements MessageInterface
     private $target;
 
     /**
+     * @var string|null
+     */
+    private $actionUrl;
+
+    /**
      * @var array
      */
     private $attachments = [];
@@ -63,8 +68,8 @@ class Message implements MessageInterface
         $codename         = strtolower(trim($codename));
         $codenameTemplate = self::CODENAME_TEMPLATE;
         $codenamePattern  = str_replace('/', '\/', $codenameTemplate);
-        preg_match('/[^'.$codenamePattern.']/', $codename, $isCodenameInvalid);
-        if ($isCodenameInvalid) {
+
+        if (preg_match('/[^'.$codenamePattern.']/', $codename)) {
             throw new NotificationException(
                 'Codename ":messageCodename" is invalid. Valid codename template is :codenameTemplate', [
                     ':messageCodename'  => $codename,
@@ -153,22 +158,6 @@ class Message implements MessageInterface
     }
 
     /**
-     * @return string
-     * @throws \BetaKiller\Notification\NotificationException
-     */
-    public function getBaseI18nKey(): string
-    {
-        $name = $this->getCodename();
-
-        if (!$name) {
-            throw new NotificationException('Can not make i18n key from empty template name');
-        }
-
-        // Make i18n key by replacing "slash" with "dot"
-        return 'notification.'.str_replace('/', '.', $name);
-    }
-
-    /**
      * @return array
      */
     public function getAttachments(): array
@@ -209,15 +198,28 @@ class Message implements MessageInterface
     }
 
     /**
-     * @param \BetaKiller\Notification\MessageTargetInterface $targetUser
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getFullDataForTarget(MessageTargetInterface $targetUser): array
+    public function setActionUrl(string $url): MessageInterface
     {
-        return array_merge($this->getTemplateData(), [
-            'targetName'  => $targetUser->getFullName(),
-            'targetEmail' => $targetUser->getEmail(),
-        ]);
+        $this->actionUrl = $url;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasActionUrl(): bool
+    {
+        return !empty($this->actionUrl);
+    }
+
+    /**
+     * @return string
+     */
+    public function getActionUrl(): string
+    {
+        return $this->actionUrl;
     }
 }

@@ -6,6 +6,11 @@ namespace BetaKiller\Config;
 interface NotificationConfigInterface
 {
     /**
+     * @return string[] ['transportOneCodename','transportTwoCodename',..]
+     */
+    public function getTransports(): array;
+
+    /**
      * @return string[] ['groupCodename1','groupCodename1',..]
      */
     public function getGroups(): array;
@@ -44,4 +49,13 @@ interface NotificationConfigInterface
      * @return string[]
      */
     public function getGroupMessages(string $groupCodename): array;
+
+    /**
+     * Returns UrlElement codename if action is defined
+     *
+     * @param string $messageCodename
+     *
+     * @return string
+     */
+    public function getMessageAction(string $messageCodename): string;
 }

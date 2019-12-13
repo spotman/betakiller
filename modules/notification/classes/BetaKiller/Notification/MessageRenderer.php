@@ -50,10 +50,7 @@ class MessageRenderer implements MessageRendererInterface
         $view = $this->viewFactory->create($file);
 
         // Get message data
-        $data = $message->getFullDataForTarget($target);
-
-        // Temp solution, would be removed
-        $data['baseI18nKey'] = $message->getBaseI18nKey();
+        $data = $this->getFullDataForTarget($message, $target);
 
         // Message hash (to distinguish messages)
         $data['__hash__'] = $hash;
@@ -61,6 +58,11 @@ class MessageRenderer implements MessageRendererInterface
         // Get additional transport data
         if ($transport->isSubjectRequired()) {
             $data['subject'] = $message->getSubject();
+        }
+
+        // Add action URL if defined
+        if ($message->hasActionUrl()) {
+            $data['action_url'] = $message->getActionUrl();
         }
 
         foreach ($data as $key => $value) {
@@ -103,8 +105,8 @@ class MessageRenderer implements MessageRendererInterface
 
     public function makeSubject(MessageInterface $message, MessageTargetInterface $target): string
     {
-        $key      = $message->getBaseI18nKey().'.subj';
-        $data     = $message->getFullDataForTarget($target);
+        $key      = $this->getBaseI18nKey($message).'.subj';
+        $data     = $this->getFullDataForTarget($message, $target);
         $langName = $target->getLanguageIsoCode();
 
         $lang = $this->i18n->getLanguageByIsoCode($langName);
@@ -155,6 +157,31 @@ class MessageRenderer implements MessageRendererInterface
             ':name'      => $message->getCodename(),
             ':transport' => $transport->getName(),
             ':lang'      => $langName,
+        ]);
+    }
+
+    /**
+     * @param \BetaKiller\Notification\MessageInterface $message
+     *
+     * @return string
+     */
+    private function getBaseI18nKey(MessageInterface $message): string
+    {
+        // Make i18n key by replacing "slash" with "dot"
+        return 'notification.'.str_replace('/', '.', $message->getCodename());
+    }
+
+    /**
+     * @param \BetaKiller\Notification\MessageInterface       $message
+     * @param \BetaKiller\Notification\MessageTargetInterface $targetUser
+     *
+     * @return array
+     */
+    private function getFullDataForTarget(MessageInterface $message, MessageTargetInterface $targetUser): array
+    {
+        return array_merge($message->getTemplateData(), [
+            'target_name'  => $targetUser->getFullName(),
+            'target_email' => $targetUser->getEmail(),
         ]);
     }
 }

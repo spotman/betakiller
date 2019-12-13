@@ -8,6 +8,8 @@ use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Log\Logger;
 use BetaKiller\Middleware\CspReportBodyParamsStrategy;
+use BetaKiller\Notification\MessageActionUrlGeneratorInterface;
+use BetaKiller\NotificationMessageActionUrlGenerator;
 use BetaKiller\Repository\RoleRepository;
 use BetaKiller\Repository\RoleRepositoryInterface;
 use BetaKiller\Repository\TokenRepository;
@@ -199,6 +201,8 @@ return [
         BetaKiller\IdentityConverterInterface::class => autowire(BetaKiller\DummyIdentityConverter::class),
 
         ApiLanguageDetectorInterface::class => autowire(ApiLanguageDetector::class),
+
+        MessageActionUrlGeneratorInterface::class => autowire(NotificationMessageActionUrlGenerator::class),
     ],
 
 ];

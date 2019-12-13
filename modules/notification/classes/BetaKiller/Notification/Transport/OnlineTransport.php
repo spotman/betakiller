@@ -28,6 +28,19 @@ class OnlineTransport extends AbstractTransport
     }
 
     /**
+     * Returns true if current transport can handle provided message
+     *
+     * @param \BetaKiller\Notification\MessageInterface $message
+     *
+     * @return bool
+     */
+    public function canHandle(MessageInterface $message): bool
+    {
+        // Temporary disabled
+        return false;
+    }
+
+    /**
      * @param \BetaKiller\Notification\MessageInterface       $message
      * @param \BetaKiller\Notification\MessageTargetInterface $target
      * @param string                                          $body

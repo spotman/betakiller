@@ -1,5 +1,7 @@
 {% extends "@notifications/default/email" %}
 
 {% block body %}
-    {{ (baseI18nKey ~ ".text")|i18n|raw }}
+  {{ target_name }},<br/>
+  вам ответили на комментарий от :created_at к записи "<strong>{{ label }}</strong>".<br/>
+  Прочитать комментарий можно по адресу <a href="{{ url }}">{{ url }}</a>
 {% endblock %}

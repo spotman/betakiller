@@ -62,6 +62,23 @@ interface MessageInterface
     public function getTemplateData(): array;
 
     /**
+     * @param string $url
+     *
+     * @return \BetaKiller\Notification\MessageInterface
+     */
+    public function setActionUrl(string $url): MessageInterface;
+
+    /**
+     * @return bool
+     */
+    public function hasActionUrl(): bool;
+
+    /**
+     * @return string
+     */
+    public function getActionUrl(): string;
+
+    /**
      * Returns optional subject line if exists
      *
      * @return null|string
@@ -76,17 +93,4 @@ interface MessageInterface
      * @return \BetaKiller\Notification\MessageInterface
      */
     public function setSubject(string $value): MessageInterface;
-
-    /**
-     * @return string
-     * @throws \BetaKiller\Notification\NotificationException
-     */
-    public function getBaseI18nKey(): string;
-
-    /**
-     * @param \BetaKiller\Notification\MessageTargetInterface $targetUser
-     *
-     * @return array
-     */
-    public function getFullDataForTarget(MessageTargetInterface $targetUser): array;
 }

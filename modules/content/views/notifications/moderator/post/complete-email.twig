@@ -1,5 +1,6 @@
 {% extends "@notifications/default/email" %}
 
 {% block body %}
-    {{ (baseI18nKey ~ ".text")|i18n|raw }}
+  {{ target_name }}, запись "<strong>{{ label }}</strong>" готова к публикации, проверьте её, пожалуйста, и опубликуйте
+  <a href="{{ url }}">{{ url }}</a>.
 {% endblock %}

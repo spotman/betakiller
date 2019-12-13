@@ -2,6 +2,7 @@
 namespace BetaKiller\Notification;
 
 use BetaKiller\Config\NotificationConfigInterface;
+use BetaKiller\Exception;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Model\NotificationFrequencyInterface;
@@ -10,8 +11,6 @@ use BetaKiller\Model\NotificationGroupUserConfig;
 use BetaKiller\Model\NotificationGroupUserConfigInterface;
 use BetaKiller\Model\NotificationLog;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Notification\Transport\EmailTransport;
-use BetaKiller\Notification\Transport\OnlineTransport;
 use BetaKiller\Repository\NotificationFrequencyRepositoryInterface;
 use BetaKiller\Repository\NotificationGroupRepository;
 use BetaKiller\Repository\NotificationGroupUserConfigRepositoryInterface;
@@ -22,7 +21,7 @@ use Interop\Queue\Context;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-class NotificationFacade
+final class NotificationFacade
 {
     use LoggerHelperTrait;
 
@@ -94,8 +93,19 @@ class NotificationFacade
     private $freqRepo;
 
     /**
+     * @var \BetaKiller\Notification\TransportFactory
+     */
+    private $transportFactory;
+
+    /**
+     * @var \BetaKiller\Notification\MessageActionUrlGeneratorInterface
+     */
+    private $actionUrlGenerator;
+
+    /**
      * NotificationFacade constructor.
      *
+     * @param \BetaKiller\Notification\TransportFactory                             $transportFactory
      * @param \BetaKiller\Notification\MessageFactory                               $messageFactory
      * @param \BetaKiller\Notification\MessageRendererInterface                     $renderer
      * @param \BetaKiller\Config\NotificationConfigInterface                        $config
@@ -105,9 +115,11 @@ class NotificationFacade
      * @param \BetaKiller\Repository\NotificationFrequencyRepositoryInterface       $freqRepo
      * @param \Interop\Queue\Context                                                $queueContext
      * @param \BetaKiller\Notification\MessageSerializer                            $serializer
+     * @param \BetaKiller\Notification\MessageActionUrlGeneratorInterface           $actionUrlGenerator
      * @param \Psr\Log\LoggerInterface                                              $logger
      */
     public function __construct(
+        TransportFactory $transportFactory,
         MessageFactory $messageFactory,
         MessageRendererInterface $renderer,
         NotificationConfigInterface $config,
@@ -117,18 +129,21 @@ class NotificationFacade
         NotificationFrequencyRepositoryInterface $freqRepo,
         Context $queueContext,
         MessageSerializer $serializer,
+        MessageActionUrlGeneratorInterface $actionUrlGenerator,
         LoggerInterface $logger
     ) {
-        $this->messageFactory = $messageFactory;
-        $this->userConfigRepo = $userConfigRepo;
-        $this->queueContext   = $queueContext;
-        $this->serializer     = $serializer;
-        $this->config         = $config;
-        $this->groupRepo      = $groupRepo;
-        $this->renderer       = $renderer;
-        $this->freqRepo       = $freqRepo;
-        $this->logRepo        = $logRepo;
-        $this->logger         = $logger;
+        $this->transportFactory   = $transportFactory;
+        $this->messageFactory     = $messageFactory;
+        $this->userConfigRepo     = $userConfigRepo;
+        $this->queueContext       = $queueContext;
+        $this->serializer         = $serializer;
+        $this->actionUrlGenerator = $actionUrlGenerator;
+        $this->config             = $config;
+        $this->groupRepo          = $groupRepo;
+        $this->renderer           = $renderer;
+        $this->freqRepo           = $freqRepo;
+        $this->logRepo            = $logRepo;
+        $this->logger             = $logger;
 
         $this->queueProducer = $this->queueContext->createProducer()->setTimeToLive(10000);
         $this->queue         = $this->queueContext->createQueue(self::QUEUE_NAME);
@@ -159,6 +174,12 @@ class NotificationFacade
             foreach ($attachments as $attach) {
                 $message->addAttachment($attach);
             }
+        }
+
+        $actionName = $this->config->getMessageAction($name);
+
+        if ($actionName) {
+            $message->setActionUrl($this->actionUrlGenerator->make($actionName, $target, $data));
         }
 
         return $message;
@@ -229,12 +250,18 @@ class NotificationFacade
         $attempts = 0;
 
         foreach ($this->getTransports() as $transport) {
+            if (!$transport->canHandle($message)) {
+                continue;
+            }
+
             if (!$transport->isEnabledFor($target)) {
                 continue;
             }
 
             if ($this->sendThrough($message, $transport)) {
                 $counter++;
+                // Stop processing if message was delivered
+                break;
             }
 
             $attempts++;
@@ -283,7 +310,7 @@ class NotificationFacade
             $this->logException($this->logger, $e);
 
             // Store exception as result
-            $log->markAsFailed($e->getMessage());
+            $log->markAsFailed(Exception::oneLiner($e));
         }
 
         $this->logRepo->save($log);
@@ -414,18 +441,6 @@ class NotificationFacade
     }
 
     /**
-     * @param string $name
-     *
-     * @return \BetaKiller\Notification\TransportInterface
-     */
-    protected function transportFactory($name): TransportInterface
-    {
-        $className = '\\BetaKiller\\Notification\\Transport\\'.ucfirst($name).'Transport';
-
-        return new $className;
-    }
-
-    /**
      * @return \BetaKiller\Notification\TransportInterface[]
      */
     public function getTransports(): array
@@ -442,16 +457,13 @@ class NotificationFacade
      */
     private function createTransports(): array
     {
-        /** @var OnlineTransport $online */
-//        $online = $this->transportFactory('online');
+        $instances = [];
 
-        /** @var EmailTransport $email */
-        $email = $this->transportFactory('email');
+        foreach ($this->config->getTransports() as $codename) {
+            $instances[] = $this->transportFactory->create($codename);
+        }
 
-        return [
-//            $online,
-            $email,
-        ];
+        return $instances;
     }
 
     private function isMessageEnabledForUser(

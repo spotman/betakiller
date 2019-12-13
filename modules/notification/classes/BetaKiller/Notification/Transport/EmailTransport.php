@@ -4,16 +4,31 @@ namespace BetaKiller\Notification\Transport;
 use BetaKiller\Notification\MessageInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 
-class EmailTransport extends AbstractTransport
+final class EmailTransport extends AbstractTransport
 {
+    public const CODENAME = 'email';
+
     public function getName(): string
     {
-        return 'email';
+        return self::CODENAME;
     }
 
     public function isEnabledFor(MessageTargetInterface $user): bool
     {
         return $user->isEmailNotificationAllowed();
+    }
+
+    /**
+     * Returns true if current transport can handle provided message
+     *
+     * @param \BetaKiller\Notification\MessageInterface $message
+     *
+     * @return bool
+     */
+    public function canHandle(MessageInterface $message): bool
+    {
+        // Any message can be handled if there is a template
+        return true;
     }
 
     /**
