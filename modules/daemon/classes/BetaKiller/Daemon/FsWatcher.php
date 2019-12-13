@@ -7,7 +7,7 @@ use BetaKiller\Helper\AppEnvInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use ReactFilesystemMonitor\FilesystemMonitorFactory;
-use ReactFilesystemMonitor\FilesystemMonitorInterface;
+// use ReactFilesystemMonitor\FilesystemMonitorInterface;
 
 final class FsWatcher
 {
@@ -84,7 +84,7 @@ final class FsWatcher
 
         $this->fsWatcher->on(
             'all',
-            function (string $path, bool $isDir, string $event, FilesystemMonitorInterface $monitor) use (
+            function (string $path, bool $isDir, string $event /*, FilesystemMonitorInterface $monitor */) use (
                 $onChange,
                 $loop
             ) {
@@ -116,9 +116,9 @@ final class FsWatcher
                 }
 
                 // Throttling for 1 second
-                $this->watchTimer = $loop->addTimer(1, function () use ($onChange, $monitor) {
+                $this->watchTimer = $loop->addTimer(1, function () use ($onChange /*, $monitor */) {
                     // Prevent repeated events
-                    $monitor->stop();
+//                    $monitor->stop();
 
                     $onChange();
                 });
