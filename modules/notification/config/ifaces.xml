@@ -12,7 +12,7 @@
         <iface uri="logs" name="Admin_Notification_LogIndex" label="Logs" menu="admin"
                entity="NotificationLog" entityAction="list">
             <iface uri="{Page}" name="Admin_Notification_LogPage" label="Page {Page}"/>
-            <dummy uri="item" name="Admin_Notification_ItemDummy">
+            <dummy uri="item" name="Admin_Notification_ItemDummy" label="Item">
                 <iface uri="{NotificationLog.id}" name="Admin_Notification_LogItem" label="Message"
                        entity="NotificationLog" entityAction="read"/>
             </dummy>

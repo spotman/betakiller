@@ -22,6 +22,7 @@ return [
     'notification.auth.password-change-request.subj' => 'Password change request',
 
     'iface.auth.password-change.label' => 'Change password',
+    'iface.auth.password-change.title' => 'Change password',
 
     'frontend.auth.suspended.header'   => 'Your account is suspended',
     'frontend.auth.suspended.message'  => 'You need to activate your account for getting access to all features.',

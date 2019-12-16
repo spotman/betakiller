@@ -8,18 +8,20 @@
     <action uri="logout" name="Auth_Logout" zone="public"/>
     <!--<action uri="change-account" name="Auth_ReLogin" layout="auth" hideInSiteMap="true" zone="personal" />-->
 
-    <dummy uri="change-password" name="Auth_ChangePasswordDummy" zone="public">
+    <dummy uri="change-password" name="Auth_ChangePasswordDummy" zone="public" label="Change password">
         <action uri="{Token.value}" name="Auth_VerifyPasswordChangeToken"/>
-        <iface uri="form" name="Auth_PasswordChange" label="iface.auth.password-change.label" zone="personal">
+        <iface uri="form" name="Auth_PasswordChange" zone="personal"
+               label="iface.auth.password-change.label" title="iface.auth.password-change.title">
             <action uri="update" name="Auth_ChangePassword"/>
         </iface>
         <!-- TODO 404 page here for missing token -->
     </dummy>
 
     <!--Verification-->
-    <dummy uri="verification" name="Auth_VerificationDummy" zone="public">
+    <dummy uri="verification" name="Auth_VerificationDummy" zone="public" label="Verification">
         <action uri="{Token.value}" name="Auth_ConfirmEmail"/>
-        <iface uri="missing" name="Auth_EmailConfirmationTokenError404" label="iface.auth.token-error.label"/>
+        <iface uri="missing" name="Auth_EmailConfirmationTokenError404"
+               label="iface.auth.token-error.label" title="iface.auth.token-error.label"/>
     </dummy>
 
     <!-- Access Recovery -->
@@ -35,7 +37,7 @@
         <iface uri="claim-thanks" name="Auth_RegistrationClaimThanks" label="iface.auth.claim-thanks.label"/>
     </action>
 
-    <dummy uri="auth" name="Auth_Dummy" zone="public" hideInSiteMap="true">
+    <dummy uri="auth" name="Auth_Dummy" zone="public" hideInSiteMap="true" label="Auth">
         <action uri="suspend" name="Auth_Suspend" zone="personal"/>
 
         <iface uri="blocked" name="Auth_Blocked" label="Blocked" zone="personal" layout="auth"/>

@@ -51,7 +51,6 @@ class UrlHelperMiddleware implements MiddlewareInterface
 
         $urlHelper = $this->factory->create($params, $stack);
 
-        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
         $request = $request
             ->withAttribute(UrlElementStack::class, $stack)
             ->withAttribute(UrlContainerInterface::class, $params)

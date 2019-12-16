@@ -100,7 +100,7 @@ class UrlElementTree implements UrlElementTreeInterface
         }
 
         if ($dynamicCounter > 1) {
-            throw new UrlElementException('Layer must have only one IFace with dynamic dispatching');
+            throw new UrlElementException('Layer must have only one UrlElement with dynamic dispatching');
         }
     }
 
@@ -122,23 +122,10 @@ class UrlElementTree implements UrlElementTreeInterface
 
         $this->validateZone($model);
 
-        if ($model instanceof IFaceModelInterface) {
-            $this->validateIFaceModel($model);
-        }
-
         // Check label exists
-        if ($model instanceof UrlElementWithLabelInterface) {
-            $model->getLabel();
-        }
-    }
-
-    private function validateIFaceModel(IFaceModelInterface $model): void
-    {
-        $codename = $model->getCodename();
-
-        if (!$model->getLabel()) {
-            throw new UrlElementException('Label is missing for IFace ":codename"', [
-                ':codename' => $codename,
+        if (($model instanceof UrlElementWithLabelInterface) && !$model->getLabel()) {
+            throw new UrlElementException('Label is missing for UrlElement ":codename"', [
+                ':codename' => $model->getCodename(),
             ]);
         }
     }

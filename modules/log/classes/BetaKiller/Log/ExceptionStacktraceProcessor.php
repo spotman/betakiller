@@ -6,7 +6,7 @@ use BetaKiller\ExceptionInterface;
 class ExceptionStacktraceProcessor
 {
     /**
-     * @param  string[][] $record
+     * @param string[][] $record
      *
      * @return array
      */
