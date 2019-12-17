@@ -74,6 +74,8 @@ class SupervisorDaemon implements DaemonInterface
 
     private $isRunning = false;
 
+    private $isStoppingDaemons = false;
+
     /**
      * Supervisor constructor.
      *
@@ -125,7 +127,7 @@ class SupervisorDaemon implements DaemonInterface
     {
         $this->loop->addPeriodicTimer(0.1, function () {
             // Prevent auto-restart
-            if (!$this->isRunning) {
+            if (!$this->isRunning || $this->isStoppingDaemons) {
                 return;
             }
 
@@ -182,14 +184,28 @@ class SupervisorDaemon implements DaemonInterface
 
     public function restartStopped(): void
     {
+        if ($this->isStoppingDaemons) {
+            return;
+        }
+
+        $this->isStoppingDaemons = true;
+
         // Trying to restart failed daemons
         foreach ($this->filterStatus(self::STATUS_STOPPED) as $name) {
             $this->startDaemon($name, true);
         }
+
+        $this->isStoppingDaemons = false;
     }
 
     private function stopAll(): void
     {
+        if ($this->isStoppingDaemons) {
+            return;
+        }
+
+        $this->isStoppingDaemons = true;
+
         $this->logger->debug('Shutting down daemons');
 
         // Trying to restart failed daemons
@@ -198,6 +214,8 @@ class SupervisorDaemon implements DaemonInterface
         }
 
         $this->logger->info('All daemons are stopped');
+
+        $this->isStoppingDaemons = false;
     }
 
     public function stop(): void
