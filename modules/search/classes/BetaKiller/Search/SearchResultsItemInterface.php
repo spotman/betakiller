@@ -5,7 +5,7 @@ namespace BetaKiller\Search;
 interface SearchResultsItemInterface
 {
     /**
-     * @return array
+     * @return mixed
      */
-    public function getSearchResultsItemData(): array;
+    public function getSearchResultsItemData();
 }

@@ -375,6 +375,8 @@ final class UrlHelper
 
         $redirectElement = $element;
 
+        $counter = 0;
+
         // Process chained dummies to prevent multiple redirects in browser
         do {
             $redirectTarget = $redirectElement->getRedirectTarget();
@@ -388,7 +390,14 @@ final class UrlHelper
             if (!$redirectElement) {
                 $redirectElement = $this->tree->getDefault();
             }
-        } while ($redirectElement instanceof DummyModelInterface);
+            $counter++;
+        } while ($redirectElement instanceof DummyModelInterface && $counter < 20);
+
+        if ($counter > 10) {
+            throw new UrlElementException('Possible circular reference for ":name" UrlElement', [
+                ':name' => $element->getRedirectTarget(),
+            ]);
+        }
 
         if ($redirectElement instanceof DummyModelInterface) {
             $redirectElement = $this->getDummyParentTarget($redirectElement);

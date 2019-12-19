@@ -65,16 +65,16 @@ class AclHelper
     }
 
     /**
-     * @param \BetaKiller\Model\UserInterface               $user
-     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param string|null                                   $action
+     * @param \BetaKiller\Model\UserInterface           $user
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
+     * @param string|null                               $action
      *
      * @return bool
      * @throws \Spotman\Acl\Exception
      */
     public function isEntityActionAllowed(
         UserInterface $user,
-        DispatchableEntityInterface $entity,
+        AbstractEntityInterface $entity,
         ?string $action = null
     ): bool {
         $resource = $this->getEntityAclResource($entity);
@@ -352,7 +352,7 @@ class AclHelper
         }
 
         foreach ($rules as $value) {
-            list($resourceIdentity, $permissionIdentity) = explode('.', $value, 2);
+            [$resourceIdentity, $permissionIdentity] = explode('.', $value, 2);
 
             $resource = $this->getResource($resourceIdentity);
 

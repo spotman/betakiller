@@ -129,7 +129,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
             ->filterArticles($orm)
             ->orderByCreatedAt($orm);
 
-        return $orm->getSearchResults($page, $itemsPerPage);
+        return $this->findAllResults($orm, $page, $itemsPerPage);
     }
 
     /**

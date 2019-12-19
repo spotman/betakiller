@@ -11,6 +11,13 @@ namespace BetaKiller\Search;
 
 interface SearchResultsInterface extends \IteratorAggregate, \JsonSerializable
 {
+    /**
+     * @param string|null $url
+     *
+     * @return \BetaKiller\Search\SearchResultsInterface
+     */
+    public static function emptyResult(string $url = null): SearchResultsInterface;
+
     public function addItem(SearchResultsItemInterface $item): void;
 
     /**

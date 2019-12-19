@@ -9,6 +9,8 @@
 namespace ORM;
 
 use BetaKiller\Model\ExtendedOrmInterface;
+use BetaKiller\Search\SearchResults;
+use BetaKiller\Search\SearchResultsInterface;
 
 class PaginateHelper
 {
@@ -41,8 +43,9 @@ class PaginateHelper
      * PaginateHelper factory.
      *
      * @param ExtendedOrmInterface $model
-     * @param int $currentPage
-     * @param int $itemsPerPage
+     * @param int                  $currentPage
+     * @param int                  $itemsPerPage
+     *
      * @return PaginateHelper
      */
     public static function create(ExtendedOrmInterface $model, int $currentPage, int $itemsPerPage): PaginateHelper
@@ -54,8 +57,8 @@ class PaginateHelper
      * PaginateHelper constructor.
      *
      * @param ExtendedOrmInterface $model
-     * @param int $currentPage
-     * @param int $itemsPerPage
+     * @param int                  $currentPage
+     * @param int                  $itemsPerPage
      */
     protected function __construct(ExtendedOrmInterface $model, int $currentPage, int $itemsPerPage)
     {
@@ -110,5 +113,16 @@ class PaginateHelper
     public function hasPreviousPage(): bool
     {
         return (($this->currentPage - 1) >= 0);
+    }
+
+    public function getSearchResults(): SearchResultsInterface
+    {
+        // Wrap results in a DTO
+        return new SearchResults(
+            $this->getResults(),
+            $this->getTotalItems(),
+            $this->getTotalPages(),
+            $this->hasNextPage()
+        );
     }
 }

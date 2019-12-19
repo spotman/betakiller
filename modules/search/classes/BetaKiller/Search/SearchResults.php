@@ -57,14 +57,14 @@ class SearchResults implements SearchResultsInterface
         }
     }
 
-    public static function factory(
-        array $items,
-        int $totalItems,
-        int $totalPages,
-        bool $hasNextPage,
-        string $url = null
-    ): SearchResultsInterface {
-        return new self($items, $totalItems, $totalPages, $hasNextPage, $url);
+    /**
+     * @param string|null $url
+     *
+     * @return \BetaKiller\Search\SearchResultsInterface
+     */
+    public static function emptyResult(string $url = null): SearchResultsInterface
+    {
+        return new self([], 0, 0, false, $url);
     }
 
     /**
@@ -138,11 +138,11 @@ class SearchResults implements SearchResultsInterface
     public function jsonSerialize()
     {
         return [
-            'items'       => $this->getItemsData(),
-            'totalItems'  => $this->getTotalCount(),
-            'totalPages'  => $this->getTotalPages(),
-            'hasNextPage' => $this->hasNextPage(),
-            'url'         => $this->getURL(),
+            'items_found'   => $this->getItemsData(),
+            'total_items'   => $this->getTotalCount(),
+            'total_pages'   => $this->getTotalPages(),
+            'has_next_page' => $this->hasNextPage(),
+            'url'           => $this->getURL(),
         ];
     }
 

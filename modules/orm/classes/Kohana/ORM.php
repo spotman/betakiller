@@ -1657,10 +1657,14 @@ class Kohana_ORM extends Model implements Serializable {
 
 		$this->_build(Database::SELECT);
 
-		$records = $this->_db_builder->from(array($this->_table_name, $this->_object_name))
-			->select(array(DB::expr('COUNT(*)'), 'records_found'))
-			->execute($this->_db)
-			->get('records_found');
+		$query = $this->_db_builder->from(array($this->_table_name, $this->_object_name))
+            ->select(array(DB::expr('COUNT(*)'), 'records_found'));
+
+        $result = $query->execute($this->_db);
+
+        if ($result->count() > 1) {
+            throw new LogicException('ORM::count_all() query result must return 1 row only (no group_by)');
+        }
 
 		// Add back in selected columns
 		$this->_db_pending += $selects;
@@ -1668,7 +1672,7 @@ class Kohana_ORM extends Model implements Serializable {
 		$this->reset();
 
 		// Return the total number of records in a table
-		return $records;
+		return $result->get('records_found');
 	}
 
 	/**

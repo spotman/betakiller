@@ -243,10 +243,20 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
      * @return \BetaKiller\Search\SearchResultsInterface
      * @throws \BetaKiller\Exception
      */
-    protected function findAllResults(ExtendedOrmInterface $orm, int $currentPage, int $itemsPerPage): SearchResultsInterface
-    {
+    protected function findAllResults(
+        ExtendedOrmInterface $orm,
+        int $currentPage,
+        int $itemsPerPage
+    ): SearchResultsInterface {
         try {
-            return $orm->getSearchResults($currentPage, $itemsPerPage);
+            // Wrap in a pager
+            $pager = PaginateHelper::create(
+                $orm,
+                $currentPage,
+                $itemsPerPage
+            );
+
+            return $pager->getSearchResults();
         } catch (\Kohana_Exception $e) {
             throw RepositoryException::wrap($e);
         }

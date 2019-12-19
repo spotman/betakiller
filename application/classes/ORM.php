@@ -4,7 +4,6 @@ use BetaKiller\DI\Container;
 use BetaKiller\Factory\OrmFactory;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\ExtendedOrmInterface;
-use BetaKiller\Search\SearchResultsInterface;
 use BetaKiller\Url\Parameter\UrlParameterException;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
 use BetaKiller\Utils;
@@ -12,6 +11,8 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
 {
+    public const REL_DELIMITER = ':';
+
     /**
      * @var OrmFactory
      */
@@ -106,7 +107,11 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
             }
 
             throw new \RuntimeException(
-                sprintf('Related alias "%s" is not loaded in entity "%s"', $alias, self::detectModelName($this))
+                sprintf('Related alias "%s" is not loaded in entity "%s" with ID "%s"',
+                    $alias,
+                    self::detectModelName($this),
+                    $this->pk()
+                )
             );
         }
 
@@ -362,40 +367,6 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     public function hasID(): bool
     {
         return (bool)$this->pk();
-    }
-
-    /**
-     * @param int $page
-     * @param int $itemsPerPage
-     *
-     * @return \BetaKiller\Search\SearchResultsInterface
-     */
-    public function getSearchResults(int $page, int $itemsPerPage): SearchResultsInterface
-    {
-        // Wrap in a pager
-        $pager = \ORM\PaginateHelper::create(
-            $this,
-            $page,
-            $itemsPerPage
-        );
-
-        // Wrap results in a DTO
-        $results = \BetaKiller\Search\SearchResults::factory(
-            $pager->getResults(),
-            $pager->getTotalItems(),
-            $pager->getTotalPages(),
-            $pager->hasNextPage()
-        );
-
-        return $results;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSearchResultsItemData(): array
-    {
-        return $this->as_array();
     }
 
     protected function setOnce(string $key, $value): void

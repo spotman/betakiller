@@ -56,6 +56,6 @@ abstract class AbstractProvider
      */
     protected function getEmptyResults(): SearchResultsInterface
     {
-        return SearchResults::factory([], 0, 0, false);
+        return SearchResults::emptyResult();
     }
 }
