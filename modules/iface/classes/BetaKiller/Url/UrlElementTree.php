@@ -128,6 +128,25 @@ class UrlElementTree implements UrlElementTreeInterface
                 ':codename' => $model->getCodename(),
             ]);
         }
+
+        if ($model instanceof DummyModelInterface) {
+            $redirectTarget = $model->getRedirectTarget();
+            $forwardTarget  = $model->getForwardTarget();
+
+            if ($redirectTarget && !$this->has($redirectTarget)) {
+                throw new UrlElementException('Redirect target ":target" is missing in UrlElement ":codename"', [
+                    ':target'   => $redirectTarget,
+                    ':codename' => $model->getCodename(),
+                ]);
+            }
+
+            if ($forwardTarget && !$this->has($forwardTarget)) {
+                throw new UrlElementException('Forward target ":target" is missing in UrlElement ":codename"', [
+                    ':target'   => $redirectTarget,
+                    ':codename' => $model->getCodename(),
+                ]);
+            }
+        }
     }
 
     private function validateZone(UrlElementInterface $model): void
