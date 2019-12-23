@@ -170,6 +170,12 @@ class ErrorPageMiddleware implements MiddlewareInterface
                 ? $this->ifaceView->render($iface, $request)
                 : $this->renderFallbackMessage($exception, $request);
 
+            // Temporary switch from 401 to 200 HTTP code coz of Chrome bug rising while using nginx basic auth
+            // @see https://support.google.com/chrome/thread/14126937?hl=en
+            if ($httpCode === 401) {
+                $httpCode = 200;
+            }
+
             return new HtmlResponse($body, $httpCode);
         } catch (\Throwable $e) {
             $this->logException($this->logger, $e);
