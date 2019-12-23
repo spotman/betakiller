@@ -39,7 +39,9 @@ final class FallbackErrorMiddleware implements MiddlewareInterface
                 return ResponseHelper::text('', 500);
             }
 
-            return ResponseHelper::html(\Debug::htmlStacktrace($e));
+            \Debug::injectStackTraceCsp($request);
+
+            return ResponseHelper::html(\Debug::htmlStacktrace($e), 500);
         }
     }
 }
