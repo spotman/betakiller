@@ -74,4 +74,9 @@ class TextHelper
     {
         return substr($haystack, -strlen($needle)) === $needle;
     }
+
+    public static function contains(string $haystack, string $needle): bool
+    {
+        return \strpos($haystack, $needle) !== false;
+    }
 }

@@ -5,6 +5,7 @@ namespace BetaKiller\Task\Cache;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Helper\TextHelper;
 use BetaKiller\Service\HttpClientService;
 use BetaKiller\Task\TaskException;
 use BetaKiller\Url\AvailableUrlsCollector;
@@ -308,7 +309,8 @@ class Warmup extends \BetaKiller\Task\AbstractTask
             $url      = (string)$this->appConfig->getBaseUri()->withPath($url);
             $response = $this->makeHttpRequest($url);
 
-            if ($response->getStatusCode() !== 401) {
+//            if ($response->getStatusCode() !== 401) {
+            if (!TextHelper::contains($response->getBody()->getContents(), 'Authorization required')) {
                 throw new TaskException('Auth must be required in :url', [
                     ':url' => $url,
                 ]);
