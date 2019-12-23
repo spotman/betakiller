@@ -3,27 +3,10 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-interface UserStatusInterface extends HasI18nKeyNameInterface
+use BetaKiller\Workflow\WorkflowStateInterface;
+
+interface UserStateInterface extends WorkflowStateInterface
 {
-    /**
-     * @param string $value
-     *
-     * @return \BetaKiller\Model\UserStatusInterface
-     */
-    public function setCodename(string $value): UserStatusInterface;
-
-    /**
-     * @return string
-     */
-    public function getCodename(): string;
-
-    /**
-     * @param string $value
-     *
-     * @return bool
-     */
-    public function isStatus(string $value): bool;
-
     /**
      * @return bool
      */

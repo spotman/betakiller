@@ -7,7 +7,6 @@ use Aidantwoods\SecureHeaders\SecureHeaders;
 use BetaKiller\Dev\DebugBarCookiesDataCollector;
 use BetaKiller\Dev\DebugBarHttpDriver;
 use BetaKiller\Dev\DebugBarSessionDataCollector;
-use BetaKiller\Dev\DebugBarTwigDataCollector;
 use BetaKiller\Dev\DebugBarUserDataCollector;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\CookieHelper;
@@ -116,7 +115,7 @@ class DebugMiddleware implements MiddlewareInterface
         if (!$debugEnabled && ServerRequestHelper::hasUser($request)) {
             $user = ServerRequestHelper::getUser($request);
 
-            if ($this->userService->isDeveloper($user)) {
+            if ($user->isDeveloper()) {
                 $debugEnabled = true;
             }
         }
@@ -153,10 +152,10 @@ class DebugMiddleware implements MiddlewareInterface
             ->addCollector(new DebugBarCookiesDataCollector($this->cookieHelper, $request))
             ->addCollector(new MemoryCollector());
 
-        if (ServerRequestHelper::isHtmlPreferred($request)) {
-            // Temp disable coz of error
+// Temp disable coz of error
+//        if (ServerRequestHelper::isHtmlPreferred($request)) {
 //            $debugBar->addCollector(new DebugBarTwigDataCollector($debugBar, $this->twigEnv));
-        }
+//        }
 
         // Temporary disable storage for testing purposes
         // Storage for processing data for AJAX calls and redirects

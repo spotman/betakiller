@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Workflow;
 
+use BetaKiller\Exception\DomainException;
 use ORM;
 
 abstract class AbstractWorkflowStateOrm extends ORM implements WorkflowStateInterface
@@ -70,5 +71,22 @@ abstract class AbstractWorkflowStateOrm extends ORM implements WorkflowStateInte
     public function isFinish(): bool
     {
         return (bool)$this->get(self::COL_IS_FINISH);
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return bool
+     * @throws \BetaKiller\Exception\DomainException
+     */
+    protected function isWorkflowStateCodename(string $value): bool
+    {
+        if (!$this->getCodename()) {
+            throw new DomainException('Workflow state ":name" codename is empty', [
+                ':name' => $this::getModelName(),
+            ]);
+        }
+
+        return $this->getCodename() === $value;
     }
 }

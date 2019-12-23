@@ -16,7 +16,6 @@ use BetaKiller\Repository\HitLinkRepository;
 use BetaKiller\Repository\HitPageRepository;
 use BetaKiller\Repository\HitRepository;
 use BetaKiller\Service\HitService;
-use BetaKiller\Service\UserService;
 use DateTimeImmutable;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
@@ -62,11 +61,6 @@ class HitStatMiddleware implements MiddlewareInterface
     private $logger;
 
     /**
-     * @var \BetaKiller\Service\UserService
-     */
-    private $userService;
-
-    /**
      * @var \Psr\Http\Message\UriFactoryInterface
      */
     private $uriFactory;
@@ -79,7 +73,6 @@ class HitStatMiddleware implements MiddlewareInterface
      * @param \BetaKiller\Repository\HitRepository     $hitRepo
      * @param \BetaKiller\Repository\HitPageRepository $pageRepo
      * @param \BetaKiller\Repository\HitLinkRepository $linkRepo
-     * @param \BetaKiller\Service\UserService          $userService
      * @param \Psr\Http\Message\UriFactoryInterface    $uriFactory
      * @param \Psr\Log\LoggerInterface                 $logger
      */
@@ -89,18 +82,16 @@ class HitStatMiddleware implements MiddlewareInterface
         HitRepository $hitRepo,
         HitPageRepository $pageRepo,
         HitLinkRepository $linkRepo,
-        UserService $userService,
         UriFactoryInterface $uriFactory,
         LoggerInterface $logger
     ) {
-        $this->appEnv      = $appEnv;
-        $this->service     = $service;
-        $this->hitRepo     = $hitRepo;
-        $this->pageRepo    = $pageRepo;
-        $this->linkRepo    = $linkRepo;
-        $this->logger      = $logger;
-        $this->userService = $userService;
-        $this->uriFactory  = $uriFactory;
+        $this->appEnv     = $appEnv;
+        $this->service    = $service;
+        $this->hitRepo    = $hitRepo;
+        $this->pageRepo   = $pageRepo;
+        $this->linkRepo   = $linkRepo;
+        $this->logger     = $logger;
+        $this->uriFactory = $uriFactory;
     }
 
     /**
@@ -262,7 +253,7 @@ class HitStatMiddleware implements MiddlewareInterface
             $user = ServerRequestHelper::getUser($request);
 
             // Ignore hits of admin users
-            if ($this->userService->isAdmin($user)) {
+            if ($user->isAdmin()) {
                 return null;
             }
 

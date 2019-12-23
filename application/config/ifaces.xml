@@ -33,7 +33,7 @@
     </iface>
 
     <!-- Registration claim -->
-    <action uri="claim-registration" name="Auth_ClaimRegistration" zone="public">
+    <action uri="claim-registration" name="Auth_ClaimRegistration" zone="public" query="h=NotificationLog.hash">
         <iface uri="claim-thanks" name="Auth_RegistrationClaimThanks" label="iface.auth.claim-thanks.label"/>
     </action>
 
@@ -46,9 +46,8 @@
         </iface>
     </dummy>
 
-    <iface uri="auth" name="Auth_Admin_AuthRoot" parent="Admin_Index" menu="admin" zone="developer"
-        label="Auth Admin">
-        <action uri="restart-session" name="Auth_Admin_SessionRestart" />
+    <iface uri="auth" name="Auth_Admin_AuthRoot" parent="Admin_Index" menu="admin" zone="developer" label="Auth Admin">
+        <action uri="restart-session" name="Auth_Admin_SessionRestart"/>
     </iface>
 </root>
 

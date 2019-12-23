@@ -11,11 +11,6 @@ use DateTimeImmutable;
 final class MaintenanceModeService
 {
     /**
-     * @var \BetaKiller\Service\UserService
-     */
-    private $userService;
-
-    /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
@@ -23,22 +18,16 @@ final class MaintenanceModeService
     /**
      * MaintenanceModeService constructor.
      *
-     * @param \BetaKiller\Service\UserService    $userService
      * @param \BetaKiller\Helper\AppEnvInterface $appEnv
      */
-    public function __construct(UserService $userService, AppEnvInterface $appEnv)
+    public function __construct(AppEnvInterface $appEnv)
     {
-        $this->userService = $userService;
-        $this->appEnv      = $appEnv;
+        $this->appEnv = $appEnv;
     }
 
     public function isDisplayedFor(UserInterface $user): bool
     {
-        if ($this->userService->isDeveloper($user)) {
-            return false;
-        }
-
-        return true;
+        return !$user->isDeveloper();
     }
 
     public function isEnabled(): bool
@@ -154,7 +143,7 @@ final class MaintenanceModeService
         $name = implode('.', [
             $this->appEnv->getAppCodename(),
             $this->appEnv->getModeName(),
-            'maintenance'
+            'maintenance',
         ]);
 
         // Store file in a /tmp with prefix from project name and env

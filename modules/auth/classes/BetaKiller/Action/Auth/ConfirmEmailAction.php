@@ -7,30 +7,30 @@ use BetaKiller\Auth\UserUrlDetectorInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\AuthService;
 use BetaKiller\Service\TokenService;
-use BetaKiller\Service\UserVerificationService;
+use BetaKiller\Workflow\UserWorkflow;
 
 class ConfirmEmailAction extends AbstractTokenVerificationAction
 {
     /**
-     * @var \BetaKiller\Service\UserVerificationService
+     * @var \BetaKiller\Workflow\UserWorkflow
      */
-    private $emailService;
+    private $userWorkflow;
 
     /**
-     * @param \BetaKiller\Service\TokenService            $tokenService
-     * @param \BetaKiller\Service\AuthService             $auth
-     * @param \BetaKiller\Auth\UserUrlDetectorInterface   $urlDetector
-     * @param \BetaKiller\Service\UserVerificationService $emailService
+     * @param \BetaKiller\Service\TokenService          $tokenService
+     * @param \BetaKiller\Service\AuthService           $auth
+     * @param \BetaKiller\Auth\UserUrlDetectorInterface $urlDetector
+     * @param \BetaKiller\Workflow\UserWorkflow         $userWorkflow
      */
     public function __construct(
         TokenService $tokenService,
         AuthService $auth,
         UserUrlDetectorInterface $urlDetector,
-        UserVerificationService $emailService
+        UserWorkflow $userWorkflow
     ) {
         parent::__construct($tokenService, $auth, $urlDetector);
 
-        $this->emailService = $emailService;
+        $this->userWorkflow = $userWorkflow;
     }
 
     /**
@@ -40,6 +40,6 @@ class ConfirmEmailAction extends AbstractTokenVerificationAction
      */
     protected function processValid(UserInterface $user): void
     {
-        $this->emailService->confirmUser($user);
+        $this->userWorkflow->confirmEmail($user);
     }
 }

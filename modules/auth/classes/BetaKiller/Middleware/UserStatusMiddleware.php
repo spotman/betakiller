@@ -7,7 +7,6 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Auth\BlockedIFace;
 use BetaKiller\IFace\Auth\SuspendedIFace;
-use BetaKiller\Model\UserStatus;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -52,13 +51,13 @@ class UserStatusMiddleware implements MiddlewareInterface
             return null;
         }
 
-        $status = ServerRequestHelper::getUser($request)->getStatus();
+        $user = ServerRequestHelper::getUser($request);
 
-        switch ($status->getCodename()) {
-            case UserStatus::STATUS_BLOCKED:
+        switch (true) {
+            case $user->isBlocked():
                 return BlockedIFace::codename();
 
-            case UserStatus::STATUS_SUSPENDED:
+            case $user->isSuspended():
                 return SuspendedIFace::codename();
 
             default:

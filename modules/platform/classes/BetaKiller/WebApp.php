@@ -18,6 +18,7 @@ use BetaKiller\Middleware\ContentNegotiationMiddleware;
 use BetaKiller\Middleware\DebugMiddleware;
 use BetaKiller\Middleware\ErrorPageMiddleware;
 use BetaKiller\Middleware\ExpectedExceptionMiddleware;
+use BetaKiller\Middleware\FallbackErrorMiddleware;
 use BetaKiller\Middleware\I18nMiddleware;
 use BetaKiller\Middleware\MaintenanceModeMiddleware;
 use BetaKiller\Middleware\ProfilerMiddleware;
@@ -45,6 +46,7 @@ use Zend\Expressive\Router\Middleware\ImplicitHeadMiddleware;
 use Zend\Expressive\Router\Middleware\ImplicitOptionsMiddleware;
 use Zend\Expressive\Router\Middleware\MethodNotAllowedMiddleware;
 use Zend\Expressive\Router\Middleware\RouteMiddleware;
+use Zend\Stratigility\Middleware\ErrorHandler;
 
 class WebApp
 {
@@ -76,11 +78,8 @@ class WebApp
 
     private function addPipeline(): void
     {
-        // The error handler should be the first (most outer) middleware to catch
-        // all Exceptions.
-//        $this->app->pipe(ErrorHandler::class);
-//        $this->app->pipe(ServerUrlMiddleware::class);
-        // TODO Insert here fallback Exception handler with plain text 500 response
+        // The error handler should be the first (most outer) middleware to catch all Exceptions.
+        $this->app->pipe(FallbackErrorMiddleware::class);
 
         // Pipe more middleware here that you want to execute on every request:
         // - bootstrapping

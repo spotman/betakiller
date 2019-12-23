@@ -4,33 +4,22 @@ declare(strict_types=1);
 namespace BetaKiller\Action\Auth;
 
 use BetaKiller\Action\AbstractAction;
-use BetaKiller\Action\GetRequestActionInterface;
 use BetaKiller\Exception\BadRequestHttpException;
-use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Auth\RegistrationClaimThanksIFace;
-use BetaKiller\Model\UserStatus;
+use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
-use BetaKiller\Repository\NotificationLogRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
-use BetaKiller\Repository\UserStatusRepositoryInterface;
 use BetaKiller\Url\ZoneInterface;
+use BetaKiller\Workflow\UserWorkflow;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Spotman\Defence\DefinitionBuilderInterface;
 
-class ClaimRegistrationAction extends AbstractAction implements GetRequestActionInterface
+class ClaimRegistrationAction extends AbstractAction
 {
     public const NOTIFICATION = 'support/claim-registration';
-
-    private const ARG_HASH = 'h';
-
-    /**
-     * @var \BetaKiller\Repository\NotificationLogRepositoryInterface
-     */
-    private $logRepo;
 
     /**
      * @var \BetaKiller\Helper\NotificationHelper
@@ -48,36 +37,28 @@ class ClaimRegistrationAction extends AbstractAction implements GetRequestAction
     private $userRepo;
 
     /**
-     * @var \BetaKiller\Repository\UserStatusRepositoryInterface
+     * @var \BetaKiller\Workflow\UserWorkflow
      */
-    private $statusRepo;
+    private $userWorkflow;
 
     /**
      * ClaimRegistrationAction constructor.
      *
-     * @param \BetaKiller\Repository\NotificationLogRepositoryInterface $logRepo
      * @param \BetaKiller\Helper\NotificationHelper                     $notification
      * @param \BetaKiller\Repository\LanguageRepositoryInterface        $langRepo
-     * @param \BetaKiller\Repository\UserStatusRepositoryInterface      $statusRepo
      * @param \BetaKiller\Repository\UserRepositoryInterface            $userRepo
+     * @param \BetaKiller\Workflow\UserWorkflow                         $userWorkflow
      */
     public function __construct(
-        NotificationLogRepositoryInterface $logRepo,
         NotificationHelper $notification,
         LanguageRepositoryInterface $langRepo,
-        UserStatusRepositoryInterface $statusRepo,
-        UserRepositoryInterface $userRepo
+        UserRepositoryInterface $userRepo,
+        UserWorkflow $userWorkflow
     ) {
-        $this->logRepo    = $logRepo;
-        $this->facade     = $notification;
-        $this->langRepo   = $langRepo;
-        $this->userRepo   = $userRepo;
-        $this->statusRepo = $statusRepo;
-    }
-
-    public function defineGetArguments(DefinitionBuilderInterface $builder): void
-    {
-        $builder->string(self::ARG_HASH);
+        $this->facade       = $notification;
+        $this->langRepo     = $langRepo;
+        $this->userRepo     = $userRepo;
+        $this->userWorkflow = $userWorkflow;
     }
 
     /**
@@ -89,11 +70,7 @@ class ClaimRegistrationAction extends AbstractAction implements GetRequestAction
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        $get = ActionRequestHelper::getArguments($request);
-
-        $hash = $get->getString(self::ARG_HASH);
-
-        $log = $this->logRepo->getByHash($hash);
+        $log = ServerRequestHelper::getEntity($request, NotificationLogInterface::class);
 
         $userId = $log->getTargetUserId();
 
@@ -104,10 +81,10 @@ class ClaimRegistrationAction extends AbstractAction implements GetRequestAction
 
         $user = $this->userRepo->getById($userId);
 
-        if (!$user->getStatus()->isClaimed()) {
-            // Mark user as "claimed" to prevent future communication
-            $status = $this->statusRepo->getByCodename(UserStatus::STATUS_CLAIMED);
-            $user->setStatus($status);
+        // Prevent errors on multiple calls from different emails
+        if (!$user->isRegistrationClaimed()) {
+            $this->userWorkflow->notRegisteredClaim($user);
+
             $this->userRepo->save($user);
 
             $this->facade->groupMessage(self::NOTIFICATION, [

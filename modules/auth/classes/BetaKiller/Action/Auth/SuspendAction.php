@@ -7,19 +7,13 @@ use BetaKiller\Action\AbstractAction;
 use BetaKiller\Auth\UserUrlDetectorInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Model\UserStatus;
 use BetaKiller\Repository\UserRepositoryInterface;
-use BetaKiller\Repository\UserStatusRepositoryInterface;
+use BetaKiller\Workflow\UserWorkflow;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class SuspendAction extends AbstractAction
 {
-    /**
-     * @var \BetaKiller\Repository\UserStatusRepositoryInterface
-     */
-    private $statusRepo;
-
     /**
      * @var \BetaKiller\Auth\UserUrlDetectorInterface
      */
@@ -31,20 +25,25 @@ class SuspendAction extends AbstractAction
     private $userRepo;
 
     /**
+     * @var \BetaKiller\Workflow\UserWorkflow
+     */
+    private $userWorkflow;
+
+    /**
      * SuspendApiMethod constructor.
      *
-     * @param \BetaKiller\Repository\UserStatusRepositoryInterface $statusRepo
-     * @param \BetaKiller\Repository\UserRepositoryInterface       $userRepo
-     * @param \BetaKiller\Auth\UserUrlDetectorInterface            $urlDetector
+     * @param \BetaKiller\Workflow\UserWorkflow              $userWorkflow
+     * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
+     * @param \BetaKiller\Auth\UserUrlDetectorInterface      $urlDetector
      */
     public function __construct(
-        UserStatusRepositoryInterface $statusRepo,
+        UserWorkflow $userWorkflow,
         UserRepositoryInterface $userRepo,
         UserUrlDetectorInterface $urlDetector
     ) {
-        $this->statusRepo  = $statusRepo;
-        $this->urlDetector = $urlDetector;
-        $this->userRepo    = $userRepo;
+        $this->userWorkflow = $userWorkflow;
+        $this->urlDetector  = $urlDetector;
+        $this->userRepo     = $userRepo;
     }
 
     /**
@@ -60,12 +59,10 @@ class SuspendAction extends AbstractAction
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // No requests for other users here, only for caller
-        $user      = ServerRequestHelper::getUser($request);
+        $user = ServerRequestHelper::getUser($request);
 
-        // Update status
-        $status = $this->statusRepo->getByCodename(UserStatus::STATUS_SUSPENDED);
+        $this->userWorkflow->suspend($user);
 
-        $user->setStatus($status);
         $this->userRepo->save($user);
 
         // Redirect to proper page

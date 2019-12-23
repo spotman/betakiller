@@ -1,12 +1,28 @@
 <?php
 namespace BetaKiller\Notification\Transport;
 
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Notification\MessageInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 
 final class EmailTransport extends AbstractTransport
 {
     public const CODENAME = 'email';
+
+    /**
+     * @var \BetaKiller\Helper\AppEnvInterface
+     */
+    private $appEnv;
+
+    /**
+     * EmailTransport constructor.
+     *
+     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     */
+    public function __construct(AppEnvInterface $appEnv)
+    {
+        $this->appEnv = $appEnv;
+    }
 
     public function getName(): string
     {
@@ -67,6 +83,11 @@ final class EmailTransport extends AbstractTransport
 
         if (!$subj) {
             throw new \InvalidArgumentException('Missing email subject');
+        }
+
+        // Redirect all emails while in debug mode
+        if ($this->appEnv->isDebugEnabled()) {
+            $to = $this->appEnv->getDebugEmail();
         }
 
         // Fake delay to prevent blackout of SMTP relay

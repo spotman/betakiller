@@ -9,30 +9,30 @@ use BetaKiller\IFace\Auth\PasswordChangeIFace;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\AuthService;
 use BetaKiller\Service\TokenService;
-use BetaKiller\Service\UserVerificationService;
+use BetaKiller\Workflow\UserWorkflow;
 
 class VerifyAccessRecoveryTokenAction extends AbstractTokenVerificationAction
 {
     /**
-     * @var \BetaKiller\Service\UserVerificationService
+     * @var \BetaKiller\Workflow\UserWorkflow
      */
-    private $verification;
+    private $userWorkflow;
 
     /**
-     * @param \BetaKiller\Service\TokenService            $tokenService
-     * @param \BetaKiller\Service\AuthService             $auth
-     * @param \BetaKiller\Auth\UserUrlDetectorInterface   $urlDetector
-     * @param \BetaKiller\Service\UserVerificationService $verification
+     * @param \BetaKiller\Service\TokenService          $tokenService
+     * @param \BetaKiller\Service\AuthService           $auth
+     * @param \BetaKiller\Auth\UserUrlDetectorInterface $urlDetector
+     * @param \BetaKiller\Workflow\UserWorkflow         $userWorkflow
      */
     public function __construct(
         TokenService $tokenService,
         AuthService $auth,
         UserUrlDetectorInterface $urlDetector,
-        UserVerificationService $verification
+        UserWorkflow $userWorkflow
     ) {
         parent::__construct($tokenService, $auth, $urlDetector);
 
-        $this->verification = $verification;
+        $this->userWorkflow = $userWorkflow;
     }
 
     /**
@@ -42,8 +42,10 @@ class VerifyAccessRecoveryTokenAction extends AbstractTokenVerificationAction
      */
     protected function processValid(UserInterface $user): void
     {
-        // Confirm user email if not verified
-        $this->verification->confirmUser($user);
+        // Confirm user email if not verified (no errors on duplicate token requests)
+        if (!$user->isEmailConfirmed()) {
+            $this->userWorkflow->confirmEmail($user);
+        }
     }
 
     /**

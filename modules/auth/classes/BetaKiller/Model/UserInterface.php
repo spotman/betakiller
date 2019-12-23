@@ -5,25 +5,21 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
+use BetaKiller\Workflow\HasWorkflowStateInterface;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Spotman\Acl\AclUserInterface;
 
-interface UserInterface extends DispatchableEntityInterface, OrmInterface, MessageTargetInterface, AclUserInterface
+/**
+ * Interface UserInterface
+ *
+ * @package BetaKiller\Model
+ * @method UserStateInterface getWorkflowState()
+ */
+interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWorkflowStateInterface,
+    MessageTargetInterface, AclUserInterface
 {
     public function completeLogin(): void;
-
-    /**
-     * @param \BetaKiller\Model\UserStatusInterface $userStatusModel
-     *
-     * @return \BetaKiller\Model\UserInterface
-     */
-    public function setStatus(UserStatusInterface $userStatusModel): UserInterface;
-
-    /**
-     * @return \BetaKiller\Model\UserStatusInterface
-     */
-    public function getStatus(): UserStatusInterface;
 
     /**
      * @return bool
@@ -39,6 +35,11 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, Messa
      * @return bool
      */
     public function isSuspended(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isRegistrationClaimed(): bool;
 
     /**
      * @param \DateTimeInterface $value [optional]
@@ -87,6 +88,16 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, Messa
      * @return bool
      */
     public function isGuest(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isAdmin(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isDeveloper(): bool;
 
     /**
      * @param RoleInterface $role
@@ -238,8 +249,8 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, Messa
     /**
      * Forces authorization if user is not logged in
      *
-     * @throws \BetaKiller\Auth\AuthorizationRequiredException
      * @return void
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
      */
     public function forceAuthorization(): void;
 

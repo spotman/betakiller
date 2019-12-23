@@ -3,7 +3,9 @@ namespace BetaKiller\Repository;
 
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\RoleInterface;
+use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Model\UserState;
 
 /**
  * Class UserRepository
@@ -14,8 +16,16 @@ use BetaKiller\Model\UserInterface;
  * @method UserInterface[] getAll()
  * @method void save(UserInterface $entity)
  */
-class UserRepository extends AbstractOrmBasedRepository implements UserRepositoryInterface
+class UserRepository extends AbstractHasWorkflowStateRepository implements UserRepositoryInterface
 {
+    /**
+     * @inheritDoc
+     */
+    public function getUrlKeyName(): string
+    {
+        return User::COL_ID;
+    }
+
     /**
      * Search for user by username or e-mail
      *
@@ -48,6 +58,16 @@ class UserRepository extends AbstractOrmBasedRepository implements UserRepositor
         return $this->findAll($orm);
     }
 
+    protected function getStateRelationKey(): string
+    {
+        return User::getWorkflowStateRelationKey();
+    }
+
+    protected function getStateCodenameColumnName(): string
+    {
+        return UserState::COL_CODENAME;
+    }
+
     private function filterRole(ExtendedOrmInterface $orm, RoleInterface $role): self
     {
         // TODO Deal with roles inheritance (current implementation returns only users with explicit role)
@@ -60,7 +80,7 @@ class UserRepository extends AbstractOrmBasedRepository implements UserRepositor
     /**
      * Allows a model use both email and username as unique identifiers for login
      *
-     * @param   string  unique value
+     * @param string  unique value
      *
      * @return  string  field name
      */

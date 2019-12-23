@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
 
+use BetaKiller\Action\Auth\ConfirmEmailAction;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Service\AccessRecoveryService;
 use BetaKiller\Service\AuthService;
-use BetaKiller\Service\UserVerificationService;
+use BetaKiller\Workflow\UserWorkflow;
 
 define('AUTH_USER_GROUP', 'auth-user');
 
@@ -43,8 +44,9 @@ return [
             'group' => AUTH_USER_GROUP,
         ],
 
-        UserVerificationService::NOTIFICATION_NAME => [
+        UserWorkflow::NOTIFICATION_EMAIL_VERIFICATION => [
             'group' => AUTH_USER_GROUP,
+            'action' => ConfirmEmailAction::codename(),
         ],
 
         AuthService::REQUEST_PASSWORD_CHANGE => [

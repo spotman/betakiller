@@ -7,20 +7,13 @@ use BetaKiller\Action\AbstractAction;
 use BetaKiller\Auth\UserUrlDetectorInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Model\UserStatus;
 use BetaKiller\Repository\UserRepositoryInterface;
-use BetaKiller\Repository\UserStatusRepositoryInterface;
-use BetaKiller\Service\UserVerificationService;
+use BetaKiller\Workflow\UserWorkflow;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ActivateSuspendedAction extends AbstractAction
+final class ActivateSuspendedAction extends AbstractAction
 {
-    /**
-     * @var \BetaKiller\Repository\UserStatusRepositoryInterface
-     */
-    private $statusRepo;
-
     /**
      * @var \BetaKiller\Repository\UserRepositoryInterface
      */
@@ -32,28 +25,25 @@ class ActivateSuspendedAction extends AbstractAction
     private $urlDetector;
 
     /**
-     * @var \BetaKiller\Service\UserVerificationService
+     * @var \BetaKiller\Workflow\UserWorkflow
      */
-    private $verification;
+    private $userWorkflow;
 
     /**
      * ActivateSuspendedAction constructor.
      *
-     * @param \BetaKiller\Repository\UserStatusRepositoryInterface $statusRepo
-     * @param \BetaKiller\Repository\UserRepositoryInterface       $userRepo
-     * @param \BetaKiller\Auth\UserUrlDetectorInterface            $urlDetector
-     * @param \BetaKiller\Service\UserVerificationService          $verification
+     * @param \BetaKiller\Workflow\UserWorkflow              $userWorkflow
+     * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
+     * @param \BetaKiller\Auth\UserUrlDetectorInterface      $urlDetector
      */
     public function __construct(
-        UserStatusRepositoryInterface $statusRepo,
+        UserWorkflow $userWorkflow,
         UserRepositoryInterface $userRepo,
-        UserUrlDetectorInterface $urlDetector,
-        UserVerificationService $verification
+        UserUrlDetectorInterface $urlDetector
     ) {
-        $this->statusRepo   = $statusRepo;
         $this->userRepo     = $userRepo;
         $this->urlDetector  = $urlDetector;
-        $this->verification = $verification;
+        $this->userWorkflow = $userWorkflow;
     }
 
     /**
@@ -69,15 +59,9 @@ class ActivateSuspendedAction extends AbstractAction
     {
         $user = ServerRequestHelper::getUser($request);
 
-        // Update status to "created" to prevent status workflow hacks (created => suspended => confirmed)
-        $status = $this->statusRepo->getByCodename(UserStatus::STATUS_CREATED);
-
-        $user->setStatus($status);
+        $this->userWorkflow->activateSuspended($user);
 
         $this->userRepo->save($user);
-
-        // Send verification link
-        $this->verification->sendEmail($user);
 
         // Redirect to actual page
         $url = $this->urlDetector->detect($user);

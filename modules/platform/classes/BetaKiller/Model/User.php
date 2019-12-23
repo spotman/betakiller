@@ -5,11 +5,21 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Auth\AuthorizationRequiredException;
 use BetaKiller\Exception\DomainException;
+use BetaKiller\Workflow\HasWorkflowStateModelOrmTrait;
 use DateTimeImmutable;
 
+/**
+ * Class User
+ *
+ * @package BetaKiller\Model
+ * @method UserStateInterface getWorkflowState()
+ */
 class User extends \ORM implements UserInterface
 {
+    use HasWorkflowStateModelOrmTrait;
+
     public const TABLE_NAME          = 'users';
+    public const COL_ID              = 'id';
     public const COL_STATUS_ID       = 'status_id';
     public const COL_CREATED_AT      = 'created_at';
     public const COL_USERNAME        = 'username';
@@ -26,7 +36,6 @@ class User extends \ORM implements UserInterface
     public const COL_CREATED_FROM_IP = 'created_from_ip';
 
     public const  REL_LANGUAGE = 'language';
-    private const REL_STATUS   = 'status';
 
     protected $allUserRolesNames = [];
 
@@ -36,10 +45,6 @@ class User extends \ORM implements UserInterface
         $this->_reload_on_wakeup = true;
 
         $this->belongs_to([
-            self::REL_STATUS   => [
-                'model'       => UserStatus::getModelName(),
-                'foreign_key' => self::COL_STATUS_ID,
-            ],
             self::REL_LANGUAGE => [
                 'model'       => Language::getModelName(),
                 'foreign_key' => self::COL_LANGUAGE_ID,
@@ -58,10 +63,27 @@ class User extends \ORM implements UserInterface
             ],
         ]);
 
+        $this->configureWorkflowStateRelation();
+
         $this->load_with([
-            self::REL_STATUS,
             self::REL_LANGUAGE,
         ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getWorkflowStateModelName(): string
+    {
+        return UserState::getModelName();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getWorkflowStateForeignKey(): string
+    {
+        return self::COL_STATUS_ID;
     }
 
     /**
@@ -138,29 +160,11 @@ class User extends \ORM implements UserInterface
 //    }
 
     /**
-     * @param \BetaKiller\Model\UserStatusInterface $userStatusModel
-     *
-     * @return \BetaKiller\Model\UserInterface
-     */
-    public function setStatus(UserStatusInterface $userStatusModel): UserInterface
-    {
-        return $this->set('status', $userStatusModel);
-    }
-
-    /**
-     * @return \BetaKiller\Model\UserStatusInterface
-     */
-    public function getStatus(): UserStatusInterface
-    {
-        return $this->getRelatedEntity('status');
-    }
-
-    /**
      * @return bool
      */
     public function isEmailConfirmed(): bool
     {
-        return $this->isStatusCodename(UserStatus::STATUS_CONFIRMED);
+        return $this->getWorkflowState()->isConfirmed();
     }
 
     /**
@@ -168,7 +172,7 @@ class User extends \ORM implements UserInterface
      */
     public function isBlocked(): bool
     {
-        return $this->isStatusCodename(UserStatus::STATUS_SUSPENDED);
+        return $this->getWorkflowState()->isBlocked();
     }
 
     /**
@@ -176,7 +180,15 @@ class User extends \ORM implements UserInterface
      */
     public function isSuspended(): bool
     {
-        return $this->isStatusCodename(UserStatus::STATUS_BLOCKED);
+        return $this->getWorkflowState()->isSuspended();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRegistrationClaimed(): bool
+    {
+        return $this->getWorkflowState()->isClaimed();
     }
 
     /**
@@ -267,6 +279,23 @@ class User extends \ORM implements UserInterface
     public function isGuest(): bool
     {
         return ($this instanceof GuestUserInterface);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        // This role is not assigned directly but through inheritance
+        return $this->hasRoleName(RoleInterface::ADMIN_PANEL);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDeveloper(): bool
+    {
+        return $this->hasRoleName(RoleInterface::DEVELOPER);
     }
 
     /**
@@ -399,7 +428,7 @@ class User extends \ORM implements UserInterface
      */
     public function isActive(): bool
     {
-        return ($this->loaded() && !$this->getStatus()->isBlocked());
+        return ($this->loaded() && !$this->getWorkflowState()->isBlocked());
     }
 
     /**
@@ -600,10 +629,5 @@ class User extends \ORM implements UserInterface
         $this->set(self::COL_CREATED_FROM_IP, $ip);
 
         return $this;
-    }
-
-    private function isStatusCodename(string $codename): bool
-    {
-        return $this->getStatus()->getCodename() === $codename;
     }
 }

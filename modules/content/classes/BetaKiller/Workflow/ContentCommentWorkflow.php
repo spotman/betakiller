@@ -5,7 +5,6 @@ use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Service\UserService;
 
 class ContentCommentWorkflow
 {
@@ -29,11 +28,6 @@ class ContentCommentWorkflow
     private $urlHelper;
 
     /**
-     * @var \BetaKiller\Service\UserService
-     */
-    private $userService;
-
-    /**
      * @var \BetaKiller\Workflow\StatusWorkflowInterface
      */
     private $status;
@@ -43,18 +37,15 @@ class ContentCommentWorkflow
      *
      * @param \BetaKiller\Helper\NotificationHelper        $notificationHelper
      * @param \BetaKiller\Helper\UrlHelper                 $urlHelper
-     * @param \BetaKiller\Service\UserService              $service
      * @param \BetaKiller\Workflow\StatusWorkflowInterface $statusWorkflow
      */
     public function __construct(
         NotificationHelper $notificationHelper,
         UrlHelper $urlHelper,
-        UserService $service,
         StatusWorkflowInterface $statusWorkflow
     ) {
         $this->notification = $notificationHelper;
         $this->urlHelper    = $urlHelper;
-        $this->userService  = $service;
         $this->status       = $statusWorkflow;
     }
 
@@ -97,7 +88,7 @@ class ContentCommentWorkflow
         $authorUser = $comment->getAuthorUser();
 
         // Skip notification for moderators
-        if ($authorUser && $this->userService->isAdmin($authorUser)) {
+        if ($authorUser && $authorUser->isAdmin()) {
             return;
         }
 

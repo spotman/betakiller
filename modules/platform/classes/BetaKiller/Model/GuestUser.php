@@ -8,21 +8,10 @@ use BetaKiller\Exception\NotImplementedHttpException;
 class GuestUser extends User implements GuestUserInterface
 {
     /**
-     * @param \BetaKiller\Model\UserStatusInterface $userStatusModel
-     *
-     * @return \BetaKiller\Model\UserInterface
+     * @return \BetaKiller\Model\UserStateInterface
      * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
-    public function setStatus(UserStatusInterface $userStatusModel): UserInterface
-    {
-        throw new NotImplementedHttpException();
-    }
-
-    /**
-     * @return \BetaKiller\Model\UserStatusInterface
-     * @throws \BetaKiller\Exception\NotImplementedHttpException
-     */
-    public function getStatus(): UserStatusInterface
+    public function getStatus(): UserStateInterface
     {
         throw new NotImplementedHttpException();
     }

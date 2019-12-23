@@ -6,6 +6,12 @@ namespace BetaKiller\Repository;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\UserInterface;
 
+/**
+ * Interface UserRepositoryInterface
+ *
+ * @package BetaKiller\Repository
+ * @method UserInterface getById(string $id)
+ */
 interface UserRepositoryInterface extends RepositoryInterface
 {
     /**

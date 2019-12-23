@@ -7,7 +7,6 @@ use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\I18n\I18nFacade;
-use BetaKiller\Service\UserService;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;
 use BetaKiller\Widget\WidgetFacade;
@@ -15,11 +14,11 @@ use HTML;
 use Meta;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Twig_Extension;
-use Twig_Filter;
-use Twig_Function;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
-class TwigExtension extends Twig_Extension
+final class TwigExtension extends AbstractExtension
 {
     use LoggerHelperTrait;
 
@@ -39,11 +38,6 @@ class TwigExtension extends Twig_Extension
     private $logger;
 
     /**
-     * @var \BetaKiller\Service\UserService
-     */
-    private $userService;
-
-    /**
      * @var string[][]
      */
     private $manifestCache = [];
@@ -58,20 +52,17 @@ class TwigExtension extends Twig_Extension
      *
      * @param \BetaKiller\Helper\AppEnvInterface     $appEnv
      * @param \BetaKiller\Widget\WidgetFacade        $widgetFacade
-     * @param \BetaKiller\Service\UserService        $userService
      * @param \BetaKiller\IdentityConverterInterface $identityConverter
      * @param \Psr\Log\LoggerInterface               $logger
      */
     public function __construct(
         AppEnvInterface $appEnv,
         WidgetFacade $widgetFacade,
-        UserService $userService,
         IdentityConverterInterface $identityConverter,
         LoggerInterface $logger
     ) {
         $this->appEnv            = $appEnv;
         $this->widgetFacade      = $widgetFacade;
-        $this->userService       = $userService;
         $this->logger            = $logger;
         $this->identityConverter = $identityConverter;
     }
@@ -80,145 +71,145 @@ class TwigExtension extends Twig_Extension
     {
         return [
 
-            new Twig_Function(
+            new TwigFunction(
                 'js',
                 [$this, 'js'],
                 ['needs_context' => true, 'is_safe' => ['html']]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'css',
                 [$this, 'css'],
                 ['needs_context' => true, 'is_safe' => ['html']]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'static',
                 [$this, 'getLinkToStaticFile'],
                 ['needs_context' => true, 'is_safe' => ['html']]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'static_content',
                 [$this, 'getStaticFileContent'],
                 ['needs_context' => true, 'is_safe' => ['html']]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'image',
                 [$this, 'image'],
                 ['needs_context' => true, 'is_safe' => ['html']]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'csp',
                 [$this, 'csp'],
                 ['needs_context' => true]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'js_nonce',
                 [$this, 'getJsNonce'],
                 ['needs_context' => true]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'css_nonce',
                 [$this, 'getCssNonce'],
                 ['needs_context' => true]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'kohanaProfiler',
                 [$this, 'showKohanaProfiler'],
                 ['is_safe' => ['html']]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'entry',
                 [$this, 'webpackEntry'],
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'static_dist',
                 [$this, 'webpackManifestRecord'],
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'lang',
                 [$this, 'getCurrentLang'],
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'widget',
                 [$this, 'widget'],
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'in_public_zone',
                 [$this, 'inPublicZone'],
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'in_production',
                 [$this, 'inProduction']
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'in_staging',
                 [$this, 'inStaging']
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'in_dev',
                 [$this, 'inDev']
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'is_debug',
                 [$this, 'isDebug']
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'is_admin',
                 [$this, 'isAdmin'],
                 ['needs_context' => true]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'env_mode',
                 [$this, 'envMode']
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'user_id',
                 [$this, 'userId'],
                 ['needs_context' => true]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'json_encode',
                 'json_encode',
                 ['is_safe' => ['html']]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'log_error',
                 [$this, 'logError']
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'meta',
                 [$this, 'meta'],
                 ['needs_context' => true]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'link',
                 [$this, 'linkTag'],
                 ['needs_context' => true]
@@ -227,25 +218,25 @@ class TwigExtension extends Twig_Extension
             /**
              * Add element to <title> tag (will be combined automatically upon template render)
              */
-            new Twig_Function(
+            new TwigFunction(
                 'title',
                 [$this, 'metaTitle'],
                 ['needs_context' => true,]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'description',
                 [$this, 'metaDescription'],
                 ['needs_context' => true,]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'meta_image',
                 [$this, 'metaImage'],
                 ['needs_context' => true,]
             ),
 
-            new Twig_Function(
+            new TwigFunction(
                 'meta_share_title',
                 [$this, 'metaShareTitle'],
                 ['needs_context' => true,]
@@ -261,7 +252,7 @@ class TwigExtension extends Twig_Extension
             /**
              * Converts boolean value to JavaScript string representation
              */
-            new Twig_Filter('bool', function ($value) {
+            new TwigFilter('bool', function ($value) {
                 return $value ? 'true' : 'false';
             }),
 
@@ -271,7 +262,7 @@ class TwigExtension extends Twig_Extension
              *
              * @example ":count lots"|plural({ ":count": lotsCount })
              */
-            new Twig_Filter('plural', function (array $context, string $key, array $values = null, $form = null) {
+            new TwigFilter('plural', function (array $context, string $key, array $values = null, $form = null) {
                 if (!\is_array($values)) {
                     $values = [
                         ':count' => (int)$values,
@@ -288,7 +279,7 @@ class TwigExtension extends Twig_Extension
              *
              * @example ":count lots"|i18n({ ":count": lotsCount })
              */
-            new Twig_Filter('i18n', function (array $context, string $text, array $values = null) {
+            new TwigFilter('i18n', function (array $context, string $text, array $values = null) {
                 if ($values) {
                     $values = I18nFacade::addPlaceholderPrefixToKeys($values);
                 }
@@ -378,7 +369,8 @@ class TwigExtension extends Twig_Extension
 
         $user = ServerRequestHelper::getUser($request);
 
-        return $this->userService->isAdmin($user);
+
+        return $user->isAdmin();
     }
 
     /**

@@ -12,6 +12,7 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RoleRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
+use BetaKiller\Workflow\UserWorkflow;
 
 class UserService
 {
@@ -43,6 +44,11 @@ class UserService
     private $entityFactory;
 
     /**
+     * @var \BetaKiller\Workflow\UserWorkflow
+     */
+    private $workflow;
+
+    /**
      * UserService constructor.
      *
      * @param \BetaKiller\Factory\EntityFactoryInterface     $entityFactory
@@ -50,19 +56,22 @@ class UserService
      * @param \BetaKiller\Repository\RoleRepositoryInterface $roleRepo
      * @param \BetaKiller\Factory\GuestUserFactory           $guestFactory
      * @param \BetaKiller\Config\AppConfigInterface          $appConfig
+     * @param \BetaKiller\Workflow\UserWorkflow              $workflow
      */
     public function __construct(
         EntityFactoryInterface $entityFactory,
         UserRepositoryInterface $userRepo,
         RoleRepositoryInterface $roleRepo,
         GuestUserFactory $guestFactory,
-        AppConfigInterface $appConfig
+        AppConfigInterface $appConfig,
+        UserWorkflow $workflow
     ) {
         $this->entityFactory  = $entityFactory;
         $this->userRepository = $userRepo;
         $this->roleRepository = $roleRepo;
         $this->appConfig      = $appConfig;
         $this->guestFactory   = $guestFactory;
+        $this->workflow       = $workflow;
     }
 
     /**
@@ -72,7 +81,6 @@ class UserService
      * @param string|null $username
      *
      * @return \BetaKiller\Model\UserInterface
-     * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function createUser(
@@ -99,6 +107,8 @@ class UserService
 
         // Enable email notifications by default
         $user->enableEmailNotification();
+
+        $this->workflow->justCreated($user);
 
         // Create new model via save so ID will be populated for adding roles
         $this->userRepository->save($user);
@@ -154,28 +164,6 @@ class UserService
         $role = $this->roleRepository->getDeveloperRole();
 
         return $this->userRepository->getUsersWithRole($role);
-    }
-
-    /**
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @return bool
-     * @throws \BetaKiller\Repository\RepositoryException
-     */
-    public function isDeveloper(UserInterface $user): bool
-    {
-        return $user->hasRole($this->roleRepository->getDeveloperRole());
-    }
-
-    /**
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @return bool
-     */
-    public function isAdmin(UserInterface $user): bool
-    {
-        // This role is not assigned directly but through inheritance
-        return $user->hasRoleName(RoleInterface::ADMIN_PANEL);
     }
 
     /**

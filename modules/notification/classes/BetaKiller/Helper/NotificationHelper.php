@@ -2,15 +2,12 @@
 namespace BetaKiller\Helper;
 
 use BetaKiller\I18n\I18nFacade;
-use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\NotificationGroupUserConfigInterface;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Notification\MessageInterface;
-use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\MessageTargetEmail;
 use BetaKiller\Notification\MessageTargetInterface;
-use BetaKiller\Repository\UserRepositoryInterface;
+use BetaKiller\Notification\NotificationFacade;
 
 class NotificationHelper
 {
@@ -20,38 +17,22 @@ class NotificationHelper
     private $notification;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
-     */
-    private $appEnv;
-
-    /**
      * @var \BetaKiller\I18n\I18nFacade
      */
     private $i18n;
 
     /**
-     * @var \BetaKiller\Repository\UserRepositoryInterface
-     */
-    private $userRepo;
-
-    /**
      * NotificationHelper constructor.
      *
-     * @param \BetaKiller\Notification\NotificationFacade    $facade
-     * @param \BetaKiller\Helper\AppEnvInterface             $appEnv
-     * @param \BetaKiller\I18n\I18nFacade                    $i18n
-     * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
+     * @param \BetaKiller\Notification\NotificationFacade $facade
+     * @param \BetaKiller\I18n\I18nFacade                 $i18n
      */
     public function __construct(
         NotificationFacade $facade,
-        AppEnvInterface $appEnv,
-        I18nFacade $i18n,
-        UserRepositoryInterface $userRepo
+        I18nFacade $i18n
     ) {
         $this->notification = $facade;
-        $this->appEnv       = $appEnv;
         $this->i18n         = $i18n;
-        $this->userRepo     = $userRepo;
     }
 
     public function getMessageGroup(string $messageCodename): NotificationGroupInterface
@@ -99,7 +80,7 @@ class NotificationHelper
         $message = $this->notification->createMessage($name, $target, $templateData, $attachments);
 
         // Send only if target user allowed this message group
-        $this->enqueue($message);
+        $this->notification->enqueue($message);
     }
 
     /**
@@ -123,39 +104,5 @@ class NotificationHelper
         UserInterface $user
     ): NotificationGroupUserConfigInterface {
         return $this->notification->getGroupUserConfig($group, $user);
-    }
-
-    /**
-     * @param \BetaKiller\Notification\MessageInterface $message
-     *
-     * @return void
-     * @throws \BetaKiller\Notification\NotificationException
-     */
-    private function enqueue(MessageInterface $message): void
-    {
-        $this->rewriteTargetForDebug($message);
-
-        $this->notification->enqueue($message);
-    }
-
-    /**
-     * @param \BetaKiller\Notification\MessageInterface $message
-     *
-     * @return void
-     */
-    private function rewriteTargetForDebug(MessageInterface $message): void
-    {
-        if (!$this->appEnv->isDebugEnabled()) {
-            return;
-        }
-
-        $email  = $this->appEnv->getDebugEmail();
-        $target = $this->userRepo->searchBy($email);
-
-        if (!$target) {
-            $target = $this->emailTarget($email, 'Debug email target', LanguageInterface::ISO_EN);
-        }
-
-        $message->setTarget($target);
     }
 }
