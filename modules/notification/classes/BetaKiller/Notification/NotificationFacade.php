@@ -188,11 +188,10 @@ final class NotificationFacade
      * Enqueue message for future processing
      *
      * @param \BetaKiller\Notification\MessageInterface $message
-     * @param bool|null                                 $force
      *
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function enqueue(MessageInterface $message, bool $force = null): void
+    public function enqueue(MessageInterface $message): void
     {
         $target = $message->getTarget();
 
@@ -204,22 +203,6 @@ final class NotificationFacade
         $body = $this->serializer->serialize($message);
 
         $queueMessage = $this->queueContext->createMessage($body);
-
-        // Apply user settings
-        if (!$force && $target instanceof UserInterface) {
-            // Get linked group
-            $group = $this->getMessageGroup($message);
-
-            if ($group->isFrequencyControlEnabled()) {
-                // Get user config
-                $config = $this->getGroupUserConfig($group, $target);
-
-                // Prevent immediate sending if scheduled option is selected
-                if ($config->hasFrequencyDefined() && $config->getFrequency()->isImmediately()) {
-                    return;
-                }
-            }
-        }
 
         // Enqueue
         $this->queueProducer->send($this->queue, $queueMessage);
@@ -239,7 +222,14 @@ final class NotificationFacade
         $counter  = 0;
         $attempts = 0;
 
+        $isImmediate = $this->isImmediateSendRequired($message, $target);
+
         foreach ($this->getTransports() as $transport) {
+            // Skip immediate delivery if transport follows the schedule config
+            if (!$isImmediate && $transport->isScheduleApplied()) {
+                continue;
+            }
+
             if (!$transport->canHandle($message)) {
                 continue;
             }
@@ -523,7 +513,6 @@ final class NotificationFacade
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      * @throws \BetaKiller\Notification\NotificationException
-     * @throws \BetaKiller\Repository\RepositoryException
      */
     private function getMessageGroup(MessageInterface $message): NotificationGroupInterface
     {
@@ -543,5 +532,27 @@ final class NotificationFacade
             $target->getEmail(),
             $transport->getName(),
         ]));
+    }
+
+    private function isImmediateSendRequired(MessageInterface $message, MessageTargetInterface $target): bool
+    {
+        // Apply user settings
+        if ($target instanceof UserInterface) {
+            // Get linked group
+            $group = $this->getMessageGroup($message);
+
+            if ($group->isFrequencyControlEnabled()) {
+                // Get user config
+                $config = $this->getGroupUserConfig($group, $target);
+
+                // Prevent immediate sending if scheduled option is selected
+                if ($config->hasFrequencyDefined()) {
+                    return $config->getFrequency()->isImmediately();
+                }
+            }
+        }
+
+        // No config means send immediately
+        return true;
     }
 }

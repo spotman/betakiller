@@ -43,4 +43,11 @@ interface TransportInterface
      * @return bool
      */
     public function isSubjectRequired(): bool;
+
+    /**
+     * Returns true if transport supports scheduled messages
+     *
+     * @return bool
+     */
+    public function isScheduleApplied(): bool;
 }

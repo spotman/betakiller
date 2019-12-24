@@ -29,6 +29,16 @@ final class EmailTransport extends AbstractTransport
         return self::CODENAME;
     }
 
+    /**
+     * Returns true if transport must follow schedule option selected by User
+     *
+     * @return bool
+     */
+    public function isScheduleApplied(): bool
+    {
+        return true;
+    }
+
     public function isEnabledFor(MessageTargetInterface $user): bool
     {
         return $user->isEmailNotificationAllowed();
