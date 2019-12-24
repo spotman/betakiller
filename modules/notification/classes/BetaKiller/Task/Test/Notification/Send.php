@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Test\Notification;
 
-use BetaKiller\Error\PhpExceptionStorageHandler;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
@@ -31,9 +30,9 @@ class Send extends AbstractTask
     /**
      * Send constructor.
      *
-     * @param \BetaKiller\Helper\NotificationHelper $notification
+     * @param \BetaKiller\Helper\NotificationHelper          $notification
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Psr\Log\LoggerInterface                       $logger
      */
     public function __construct(
         NotificationHelper $notification,
@@ -66,7 +65,7 @@ class Send extends AbstractTask
 
         $target = $userName
             ? $this->userRepo->searchBy($userName)
-            : PhpExceptionStorageHandler::getNotificationTarget($this->notification);
+            : $this->notification->debugEmailTarget();
 
         $this->notification->directMessage(self::NOTIFICATION_TEST, $target, []);
 

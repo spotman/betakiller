@@ -5,10 +5,8 @@ use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Log\Logger;
-use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\PhpException;
 use BetaKiller\Model\PhpExceptionModelInterface;
-use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Repository\PhpExceptionRepositoryInterface;
 use Debug;
 use Email;
@@ -251,7 +249,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      *
      * @return bool
      */
-    public function isNotificationNeededFor(PhpExceptionModelInterface $model): bool
+    private function isNotificationNeededFor(PhpExceptionModelInterface $model): bool
     {
         // Skip ignored exceptions
         if ($model->isIgnored()) {
@@ -268,15 +266,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
         // Throttle by time
         return !$lastNotifiedAtTimestamp || $timeDiffInSeconds > static::REPEAT_DELAY;
-    }
-
-    public static function getNotificationTarget(NotificationHelper $helper): MessageTargetInterface
-    {
-        return $helper->emailTarget(
-            getenv('DEBUG_EMAIL_ADDRESS'),
-            'Bug Hunters',
-            LanguageInterface::ISO_EN // Only English template is available for now
-        );
     }
 
     private function notifyDevelopersAboutFailure(Throwable $subsystemException, Throwable $originalException): void
@@ -297,7 +286,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      */
     private function sendNotification(Throwable $subsystemException, Throwable $originalException): void
     {
-        $target = self::getNotificationTarget($this->notification);
+        $target = $this->notification->debugEmailTarget('Bug Hunters');
 
         $this->notification->directMessage(self::NOTIFICATION_SUBSYSTEM_FAILURE, $target, [
             'url'       => getenv('APP_URL'),

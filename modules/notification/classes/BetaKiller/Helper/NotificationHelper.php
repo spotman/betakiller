@@ -2,6 +2,7 @@
 namespace BetaKiller\Helper;
 
 use BetaKiller\I18n\I18nFacade;
+use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\NotificationGroupUserConfigInterface;
 use BetaKiller\Model\UserInterface;
@@ -97,6 +98,20 @@ class NotificationHelper
         $lang = $lang ?? $this->i18n->getPrimaryLanguage()->getIsoCode();
 
         return new MessageTargetEmail($email, $name, $lang);
+    }
+
+    /**
+     * @param string|null $name
+     *
+     * @return \BetaKiller\Notification\MessageTargetInterface
+     */
+    public function debugEmailTarget(string $name = null): MessageTargetInterface
+    {
+        return $this->emailTarget(
+            getenv('DEBUG_EMAIL_ADDRESS'),
+            $name ?? 'Email debugger',
+            LanguageInterface::ISO_EN // Only English template is available for now
+        );
     }
 
     public function getGroupUserConfig(

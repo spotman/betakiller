@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Error;
 
-use BetaKiller\Error\PhpExceptionStorageHandler;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\PhpExceptionModelInterface;
-use BetaKiller\Repository\PhpExceptionRepository;
+use BetaKiller\Repository\PhpExceptionRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Url\ZoneInterface;
 use DateTimeImmutable;
@@ -18,7 +17,7 @@ class Notify extends AbstractTask
     public const NOTIFICATION_PHP_EXCEPTION = 'developer/error/php-exception';
 
     /**
-     * @var \BetaKiller\Repository\PhpExceptionRepository
+     * @var \BetaKiller\Repository\PhpExceptionRepositoryInterface
      */
     private $repository;
 
@@ -46,7 +45,7 @@ class Notify extends AbstractTask
      * @param \Psr\Log\LoggerInterface                      $logger
      */
     public function __construct(
-        PhpExceptionRepository $repository,
+        PhpExceptionRepositoryInterface $repository,
         NotificationHelper $notificationHelper,
         UrlHelperFactory $urlHelperFactory,
         LoggerInterface $logger
@@ -96,7 +95,7 @@ class Notify extends AbstractTask
      */
     private function notifyAboutException(PhpExceptionModelInterface $model): void
     {
-        $target = PhpExceptionStorageHandler::getNotificationTarget($this->notification);
+        $target = $this->notification->debugEmailTarget('Bug Hunters');
 
         // Notify developers
         $this->notification->directMessage(self::NOTIFICATION_PHP_EXCEPTION, $target, [
