@@ -8,4 +8,6 @@ return [
     'user.status.approved'  => 'Approved by moderator',
     'user.status.verified'  => 'KYC verified',
     'user.status.blocked'   => 'Blocked',
+
+    'iface.auth.claim-thanks.title' => 'Thanks for your report!'
 ];

@@ -25,9 +25,6 @@ return [
                     UserResource::ACTION_UPDATE => [
                         RoleInterface::LOGIN,
                     ],
-                    UserResource::ACTION_LIST   => [
-                        Worknector::ROLE_USER_MANAGEMENT,
-                    ],
                 ],
 
                 WorkflowConfig::TRANSITIONS => [
@@ -46,9 +43,6 @@ return [
                     ],
                     UserResource::ACTION_UPDATE => [
                         RoleInterface::LOGIN,
-                    ],
-                    UserResource::ACTION_LIST   => [
-                        Worknector::ROLE_USER_MANAGEMENT,
                     ],
                 ],
 
@@ -69,9 +63,6 @@ return [
                     UserResource::ACTION_UPDATE => [
                         RoleInterface::LOGIN,
                     ],
-                    UserResource::ACTION_LIST   => [
-                        Worknector::ROLE_USER_MANAGEMENT,
-                    ],
                 ],
 
                 WorkflowConfig::TRANSITIONS => [
@@ -90,9 +81,6 @@ return [
                     ],
                     UserResource::ACTION_UPDATE => [
                         // No one can update
-                    ],
-                    UserResource::ACTION_LIST   => [
-                        Worknector::ROLE_USER_MANAGEMENT,
                     ],
                 ],
 
@@ -113,9 +101,6 @@ return [
                     UserResource::ACTION_UPDATE => [
                         // No one can update
                     ],
-                    UserResource::ACTION_LIST   => [
-                        Worknector::ROLE_USER_MANAGEMENT,
-                    ],
                 ],
 
                 // No transitions for blocked Users
@@ -131,9 +116,6 @@ return [
                     ],
                     UserResource::ACTION_UPDATE => [
                         // No one can update
-                    ],
-                    UserResource::ACTION_LIST   => [
-                        Worknector::ROLE_USER_MANAGEMENT,
                     ],
                 ],
 

@@ -75,7 +75,7 @@ abstract class AbstractStatusRelatedResourceRulesCollector extends AbstractResou
             foreach ($this->config->getStateActions($modelName, $stateName) as $action) {
                 // Check workflow has not defined unusual actions
                 if (!in_array($action, $definedActions, true)) {
-                    throw new WorkflowStateException('Action ":model.:action" is not defined for state ":state"', [
+                    throw new WorkflowStateException('Action ":model.:action" is not suitable for state ":state"', [
                         ':state'  => $stateName,
                         ':action' => $action,
                         ':model'  => $modelName,

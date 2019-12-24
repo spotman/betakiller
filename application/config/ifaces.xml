@@ -34,7 +34,8 @@
 
     <!-- Registration claim -->
     <action uri="claim-registration" name="Auth_ClaimRegistration" zone="public" query="h=NotificationLog.hash">
-        <iface uri="claim-thanks" name="Auth_RegistrationClaimThanks" label="iface.auth.claim-thanks.label"/>
+        <iface uri="claim-thanks" name="Auth_RegistrationClaimThanks"
+               title="iface.auth.claim-thanks.title" label="Claim thanks"/>
     </action>
 
     <dummy uri="auth" name="Auth_Dummy" zone="public" hideInSiteMap="true" label="Auth">
