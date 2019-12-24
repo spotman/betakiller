@@ -19,4 +19,9 @@ interface NotificationFrequencyRepositoryInterface extends RepositoryInterface
      * @return \BetaKiller\Model\NotificationFrequencyInterface
      */
     public function getByCodename(string $codename): NotificationFrequencyInterface;
+
+    /**
+     * @return NotificationFrequencyInterface[]
+     */
+    public function getScheduledFrequencies(): array;
 }

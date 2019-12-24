@@ -12,11 +12,10 @@ use BetaKiller\Model\NotificationGroupUserConfigInterface;
 use BetaKiller\Model\NotificationLog;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\NotificationFrequencyRepositoryInterface;
-use BetaKiller\Repository\NotificationGroupRepository;
+use BetaKiller\Repository\NotificationGroupRepositoryInterface;
 use BetaKiller\Repository\NotificationGroupUserConfigRepositoryInterface;
 use BetaKiller\Repository\NotificationLogRepositoryInterface;
 use DateTimeImmutable;
-use Enqueue\Redis\RedisMessage;
 use Interop\Queue\Context;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -38,7 +37,7 @@ final class NotificationFacade
     private $config;
 
     /**
-     * @var \BetaKiller\Repository\NotificationGroupRepository
+     * @var \BetaKiller\Repository\NotificationGroupRepositoryInterface
      */
     private $groupRepo;
 
@@ -109,7 +108,7 @@ final class NotificationFacade
      * @param \BetaKiller\Notification\MessageFactory                               $messageFactory
      * @param \BetaKiller\Notification\MessageRendererInterface                     $renderer
      * @param \BetaKiller\Config\NotificationConfigInterface                        $config
-     * @param \BetaKiller\Repository\NotificationGroupRepository                    $groupRepo
+     * @param \BetaKiller\Repository\NotificationGroupRepositoryInterface           $groupRepo
      * @param \BetaKiller\Repository\NotificationLogRepositoryInterface             $logRepo
      * @param \BetaKiller\Repository\NotificationGroupUserConfigRepositoryInterface $userConfigRepo
      * @param \BetaKiller\Repository\NotificationFrequencyRepositoryInterface       $freqRepo
@@ -123,7 +122,7 @@ final class NotificationFacade
         MessageFactory $messageFactory,
         MessageRendererInterface $renderer,
         NotificationConfigInterface $config,
-        NotificationGroupRepository $groupRepo,
+        NotificationGroupRepositoryInterface $groupRepo,
         NotificationLogRepositoryInterface $logRepo,
         NotificationGroupUserConfigRepositoryInterface $userConfigRepo,
         NotificationFrequencyRepositoryInterface $freqRepo,
@@ -189,10 +188,11 @@ final class NotificationFacade
      * Enqueue message for future processing
      *
      * @param \BetaKiller\Notification\MessageInterface $message
+     * @param bool|null                                 $force
      *
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function enqueue(MessageInterface $message): void
+    public function enqueue(MessageInterface $message, bool $force = null): void
     {
         $target = $message->getTarget();
 
@@ -205,14 +205,8 @@ final class NotificationFacade
 
         $queueMessage = $this->queueContext->createMessage($body);
 
-        if (!$queueMessage instanceof RedisMessage) {
-            throw new NotificationException('Wrong queue message type ":class"', [
-                ':class' => get_class($queueMessage),
-            ]);
-        }
-
         // Apply user settings
-        if ($target instanceof UserInterface) {
+        if (!$force && $target instanceof UserInterface) {
             // Get linked group
             $group = $this->getMessageGroup($message);
 
@@ -220,13 +214,9 @@ final class NotificationFacade
                 // Get user config
                 $config = $this->getGroupUserConfig($group, $target);
 
-                // Set delivery time
-                if ($config->hasFrequencyDefined()) {
-                    $schedule = $config->getFrequency()->calculateSchedule();
-
-                    $delay = $schedule->getTimestamp() - time();
-
-                    $queueMessage->setDeliveryDelay($delay * 1000);
+                // Prevent immediate sending if scheduled option is selected
+                if ($config->hasFrequencyDefined() && $config->getFrequency()->isImmediately()) {
+                    return;
                 }
             }
         }
@@ -340,6 +330,16 @@ final class NotificationFacade
     /**
      * @param \BetaKiller\Model\NotificationGroupInterface $group
      *
+     * @return string[]
+     */
+    public function getGroupMessagesCodenames(NotificationGroupInterface $group): array
+    {
+        return $this->config->getGroupMessages($group->getCodename());
+    }
+
+    /**
+     * @param \BetaKiller\Model\NotificationGroupInterface $group
+     *
      * @return \BetaKiller\Notification\MessageTargetInterface[]
      * @throws \BetaKiller\Exception
      * @throws \BetaKiller\Factory\FactoryException
@@ -355,6 +355,17 @@ final class NotificationFacade
         }
 
         return $users;
+    }
+
+    /**
+     * @param \BetaKiller\Model\NotificationGroupInterface     $group
+     * @param \BetaKiller\Model\NotificationFrequencyInterface $freq
+     *
+     * @return \BetaKiller\Notification\MessageTargetInterface[]
+     */
+    public function findGroupFreqTargets(NotificationGroupInterface $group, NotificationFrequencyInterface $freq): array
+    {
+        return $this->groupRepo->findGroupUsers($group, $freq);
     }
 
     public function disableMessageForUser(string $messageCodename, UserInterface $user): void
@@ -424,6 +435,22 @@ final class NotificationFacade
         return $this->freqRepo->getByCodename($codename);
     }
 
+    /**
+     * @return NotificationFrequencyInterface[]
+     */
+    public function getScheduledFrequencies(): array
+    {
+        return $this->freqRepo->getScheduledFrequencies();
+    }
+
+    /**
+     * @return NotificationGroupInterface[]
+     */
+    public function getScheduledGroups(): array
+    {
+        return $this->groupRepo->getScheduledGroups();
+    }
+
     private function saveGroupUserConfig(NotificationGroupUserConfigInterface $config): void
     {
         $this->userConfigRepo->save($config);
@@ -433,7 +460,6 @@ final class NotificationFacade
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return NotificationGroupInterface[]
-     * @throws \BetaKiller\Factory\FactoryException
      */
     public function getUserGroups(UserInterface $user): array
     {

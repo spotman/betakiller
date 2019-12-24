@@ -23,4 +23,14 @@ interface NotificationFrequencyInterface extends AbstractEntityInterface, HasI18
      * @return \DateTimeInterface
      */
     public function calculateSchedule(): DateTimeInterface;
+
+    /**
+     * @return bool
+     */
+    public function isDue(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isImmediately(): bool;
 }

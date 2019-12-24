@@ -4,11 +4,14 @@ declare(strict_types=1);
 namespace BetaKiller\Repository;
 
 use BetaKiller\Model\ExtendedOrmInterface;
+use BetaKiller\Model\NotificationFrequencyInterface;
 use BetaKiller\Model\NotificationGroup;
 use BetaKiller\Model\NotificationGroupInterface;
+use BetaKiller\Model\NotificationGroupUserConfig;
 use BetaKiller\Model\UserInterface;
 
-class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
+class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository implements
+    NotificationGroupRepositoryInterface
 {
     /**
      * @return string
@@ -75,6 +78,20 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
     }
 
     /**
+     * @return NotificationGroupInterface[]
+     */
+    public function getScheduledGroups(): array
+    {
+        $orm = $this->getOrmInstance();
+
+        return $this
+            ->filterGroupIsEnabled($orm, true)
+            ->filterScheduled($orm)
+            ->orderByPlace($orm)
+            ->findAll($orm);
+    }
+
+    /**
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @param bool|null                       $includeSystem
@@ -100,12 +117,16 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
     /**
      * @param \BetaKiller\Model\NotificationGroupInterface $groupModel
      *
+     * @param \BetaKiller\Model\NotificationFrequencyInterface|null $freq
+     *
      * @return \BetaKiller\Model\UserInterface[]
      * @throws \BetaKiller\Exception
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function findGroupUsers(NotificationGroupInterface $groupModel): array
-    {
+    public function findGroupUsers(
+        NotificationGroupInterface $groupModel,
+        NotificationFrequencyInterface $freq = null
+    ): array {
         /*
         SELECT `user`.*
         FROM `users` AS `user`
@@ -125,6 +146,27 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
          */
 
         $orm = $this->getOrmInstance()->get('users');
+
+        if ($freq) {
+            // Filter users with selected freq for group
+            $orm
+                ->join(NotificationGroupUserConfig::TABLE_NAME)
+                ->on(
+                    NotificationGroupUserConfig::TABLE_NAME.'.'.NotificationGroupUserConfig::COL_GROUP_ID,
+                    '=',
+                    $orm->object_primary_key()
+                )
+                ->where(
+                    NotificationGroupUserConfig::TABLE_NAME.'.'.NotificationGroupUserConfig::COL_USER_ID,
+                    '=',
+                    'users.id'
+                )
+                ->where(
+                    NotificationGroupUserConfig::TABLE_NAME.'.'.NotificationGroupUserConfig::COL_FREQ_ID,
+                    '=',
+                    $freq->getID()
+                );
+        }
 
         return $orm
             ->join_related('roles', 'roles')
@@ -173,7 +215,7 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
      */
     private function filterByCodename(ExtendedOrmInterface $orm, string $codename): self
     {
-        $orm->where($orm->object_column('codename'), '=', $codename);
+        $orm->where($orm->object_column(NotificationGroup::COL_CODENAME), '=', $codename);
 
         return $this;
     }
@@ -201,6 +243,17 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
             $orm->object_column(NotificationGroup::COL_IS_SYSTEM),
             '=',
             $value
+        );
+
+        return $this;
+    }
+
+    private function filterScheduled(ExtendedOrmInterface $orm): self
+    {
+        $orm->where(
+            $orm->object_column(NotificationGroup::COL_IS_FREQ_CONTROLLED),
+            '=',
+            true
         );
 
         return $this;

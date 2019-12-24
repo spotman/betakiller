@@ -24,9 +24,21 @@ class NotificationFrequencyRepository extends AbstractOrmBasedRepository impleme
             ->getOne($orm);
     }
 
-    private function filterCodename(OrmInterface $orm, string $codename): self
+    /**
+     * @return NotificationFrequencyInterface[]
+     */
+    public function getScheduledFrequencies(): array
     {
-        $orm->where($orm->object_column(NotificationFrequency::COL_CODENAME), '=', $codename);
+        $orm = $this->getOrmInstance();
+
+        return $this
+            ->filterCodename($orm, NotificationFrequency::FREQ_IMMEDIATELY, true)
+            ->findAll($orm);
+    }
+
+    private function filterCodename(OrmInterface $orm, string $codename, bool $not = null): self
+    {
+        $orm->where($orm->object_column(NotificationFrequency::COL_CODENAME), $not ? '<>' : '=', $codename);
 
         return $this;
     }
