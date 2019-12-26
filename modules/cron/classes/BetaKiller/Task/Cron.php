@@ -24,10 +24,6 @@ use Symfony\Component\Yaml\Yaml;
 
 class Cron extends AbstractTask
 {
-    public const EXPR_HELPERS = [
-        'hourly',
-    ];
-
     private const TAG_FINGERPRINT = 'fingerprint';
     private const TAG_LOG_ID      = 'log-id';
 
@@ -87,7 +83,7 @@ class Cron extends AbstractTask
         $this->logger = $logger;
 
         parent::__construct();
-        $this->repo = $repo;
+        $this->repo            = $repo;
         $this->maintenanceMode = $maintenanceMode;
     }
 
@@ -130,13 +126,22 @@ class Cron extends AbstractTask
             throw new TaskException('Missing crontab.yml');
         }
 
-        foreach ($records as $name => $data) {
+        foreach ($records as $data) {
+            $name       = $data['name'] ?? null;
             $expr       = $data['at'] ?? null;
             $params     = $data['params'] ?? null;
             $taskStages = $data['stages'] ?? null;
 
+            if (!$name) {
+                throw new TaskException('Missing "name" key value in task :data', [
+                    ':data' => \json_encode($data),
+                ]);
+            }
+
             if (!$expr) {
-                throw new TaskException('Missing "at" key value in [:name] task', [':name' => $name]);
+                throw new TaskException('Missing "at" key value in [:name] task', [
+                    ':name' => $name,
+                ]);
             }
 
             if (!$taskStages) {
