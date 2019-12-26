@@ -81,7 +81,7 @@ class NotificationHelper
         $message = $this->notification->createMessage($name, $target, $templateData, $attachments);
 
         // Send only if target user allowed this message group
-        $this->notification->enqueue($message);
+        $this->notification->enqueueImmediate($message);
     }
 
     /**

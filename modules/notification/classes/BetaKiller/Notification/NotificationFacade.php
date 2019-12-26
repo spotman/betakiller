@@ -185,27 +185,35 @@ final class NotificationFacade
     }
 
     /**
-     * Enqueue message for future processing
+     * Enqueue immediate message for future processing (highest priority)
      *
      * @param \BetaKiller\Notification\MessageInterface $message
      *
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function enqueue(MessageInterface $message): void
+    public function enqueueImmediate(MessageInterface $message): void
     {
-        $target = $message->getTarget();
-
-        // Send only if targets were specified or message group was allowed
-        if (!$this->isMessageEnabledForUser($message, $target)) {
-            return;
+        if ($this->isMessageScheduled($message)) {
+            throw new NotificationException('Message ":name" is scheduled and must be sent via dedicated processor');
         }
 
-        $body = $this->serializer->serialize($message);
+        $this->enqueue($message);
+    }
 
-        $queueMessage = $this->queueContext->createMessage($body);
+    /**
+     * Enqueue scheduled message for future processing (lowest priority)
+     *
+     * @param \BetaKiller\Notification\MessageInterface $message
+     *
+     * @throws \BetaKiller\Notification\NotificationException
+     */
+    public function enqueueScheduled(MessageInterface $message): void
+    {
+        if (!$this->isMessageScheduled($message)) {
+            throw new NotificationException('Message ":name" is not scheduled and must be send directly');
+        }
 
-        // Enqueue
-        $this->queueProducer->send($this->queue, $queueMessage);
+        $this->enqueue($message);
     }
 
     /**
@@ -222,14 +230,7 @@ final class NotificationFacade
         $counter  = 0;
         $attempts = 0;
 
-        $isImmediate = $this->isImmediateSendRequired($message, $target);
-
         foreach ($this->getTransports() as $transport) {
-            // Skip immediate delivery if transport follows the schedule config
-            if (!$isImmediate && $transport->isScheduleApplied()) {
-                continue;
-            }
-
             if (!$transport->canHandle($message)) {
                 continue;
             }
@@ -332,7 +333,6 @@ final class NotificationFacade
      *
      * @return \BetaKiller\Notification\MessageTargetInterface[]
      * @throws \BetaKiller\Exception
-     * @throws \BetaKiller\Factory\FactoryException
      */
     public function getGroupTargets(NotificationGroupInterface $group): array
     {
@@ -423,14 +423,6 @@ final class NotificationFacade
     public function getFrequencyByCodename(string $codename): NotificationFrequencyInterface
     {
         return $this->freqRepo->getByCodename($codename);
-    }
-
-    /**
-     * @return NotificationFrequencyInterface[]
-     */
-    public function getScheduledFrequencies(): array
-    {
-        return $this->freqRepo->getScheduledFrequencies();
     }
 
     /**
@@ -534,25 +526,32 @@ final class NotificationFacade
         ]));
     }
 
-    private function isImmediateSendRequired(MessageInterface $message, MessageTargetInterface $target): bool
+    /**
+     * Enqueue message for future processing
+     *
+     * @param \BetaKiller\Notification\MessageInterface $message
+     *
+     * @throws \BetaKiller\Notification\NotificationException
+     */
+    private function enqueue(MessageInterface $message): void
     {
-        // Apply user settings
-        if ($target instanceof UserInterface) {
-            // Get linked group
-            $group = $this->getMessageGroup($message);
+        $target = $message->getTarget();
 
-            if ($group->isFrequencyControlEnabled()) {
-                // Get user config
-                $config = $this->getGroupUserConfig($group, $target);
-
-                // Prevent immediate sending if scheduled option is selected
-                if ($config->hasFrequencyDefined()) {
-                    return $config->getFrequency()->isImmediately();
-                }
-            }
+        // Send only if targets were specified or message group was allowed
+        if (!$this->isMessageEnabledForUser($message, $target)) {
+            return;
         }
 
-        // No config means send immediately
-        return true;
+        $body = $this->serializer->serialize($message);
+
+        $queueMessage = $this->queueContext->createMessage($body);
+
+        // Enqueue
+        $this->queueProducer->send($this->queue, $queueMessage);
+    }
+
+    private function isMessageScheduled(MessageInterface $message): bool
+    {
+        return $this->getMessageGroup($message)->isFrequencyControlEnabled();
     }
 }

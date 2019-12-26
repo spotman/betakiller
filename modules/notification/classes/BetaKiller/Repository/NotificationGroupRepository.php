@@ -115,8 +115,7 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
     }
 
     /**
-     * @param \BetaKiller\Model\NotificationGroupInterface $groupModel
-     *
+     * @param \BetaKiller\Model\NotificationGroupInterface          $groupModel
      * @param \BetaKiller\Model\NotificationFrequencyInterface|null $freq
      *
      * @return \BetaKiller\Model\UserInterface[]
@@ -150,22 +149,34 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
         if ($freq) {
             // Filter users with selected freq for group
             $orm
-                ->join(NotificationGroupUserConfig::TABLE_NAME)
+                ->join(NotificationGroupUserConfig::TABLE_NAME, 'left')
                 ->on(
                     NotificationGroupUserConfig::TABLE_NAME.'.'.NotificationGroupUserConfig::COL_GROUP_ID,
                     '=',
                     $orm->object_primary_key()
                 )
-                ->where(
+                ->on(
                     NotificationGroupUserConfig::TABLE_NAME.'.'.NotificationGroupUserConfig::COL_USER_ID,
                     '=',
-                    'users.id'
+                    'user.id'
                 )
-                ->where(
+                ->and_where_open()
+                ->or_where(
                     NotificationGroupUserConfig::TABLE_NAME.'.'.NotificationGroupUserConfig::COL_FREQ_ID,
                     '=',
                     $freq->getID()
                 );
+
+            // No config means "immediately"
+            if ($freq->isImmediately()) {
+                $orm->or_where(
+                    NotificationGroupUserConfig::TABLE_NAME.'.'.NotificationGroupUserConfig::COL_FREQ_ID,
+                    'IS',
+                    null
+                );
+            }
+
+            $orm->and_where_close();
         }
 
         return $orm

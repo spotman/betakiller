@@ -56,7 +56,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     protected function createTableIfNotExists()
     {
         DB::query(Database::SELECT, 'CREATE TABLE IF NOT EXISTS `notification_log` (
-    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    id INTEGER PRIMARY KEY NOT NULL,
     hash VARCHAR(128) NOT NULL,
     name VARCHAR(64) NOT NULL,
     user_id INTEGER NULL DEFAULT NULL,

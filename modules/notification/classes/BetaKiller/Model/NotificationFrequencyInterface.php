@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-use DateTimeInterface;
-
 interface NotificationFrequencyInterface extends AbstractEntityInterface, HasI18nKeyNameInterface
 {
     /**
@@ -20,17 +18,22 @@ interface NotificationFrequencyInterface extends AbstractEntityInterface, HasI18
     public function setCodename(string $value): NotificationFrequencyInterface;
 
     /**
-     * @return \DateTimeInterface
-     */
-    public function calculateSchedule(): DateTimeInterface;
-
-    /**
-     * @return bool
-     */
-    public function isDue(): bool;
-
-    /**
      * @return bool
      */
     public function isImmediately(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isThreeTimesAWeek(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isTwiceAWeek(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isOnceAWeek(): bool;
 }

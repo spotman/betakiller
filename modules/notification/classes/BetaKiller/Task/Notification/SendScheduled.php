@@ -3,14 +3,19 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Notification;
 
-use BetaKiller\Model\NotificationFrequencyInterface;
+use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\NotificationFacade;
+use BetaKiller\Notification\ScheduleProcessor\ScheduleProcessorInterface;
+use BetaKiller\Notification\ScheduleProcessorFactory;
 use BetaKiller\Task\AbstractTask;
+use BetaKiller\Task\TaskException;
 use Psr\Log\LoggerInterface;
 
 final class SendScheduled extends AbstractTask
 {
+    use LoggerHelperTrait;
+
     /**
      * @var \BetaKiller\Notification\NotificationFacade
      */
@@ -22,17 +27,27 @@ final class SendScheduled extends AbstractTask
     private $logger;
 
     /**
+     * @var \BetaKiller\Notification\ScheduleProcessorFactory
+     */
+    private $processorFactory;
+
+    /**
      * SendScheduled constructor.
      *
-     * @param \BetaKiller\Notification\NotificationFacade $notification
-     * @param \Psr\Log\LoggerInterface                    $logger
+     * @param \BetaKiller\Notification\NotificationFacade       $notification
+     * @param \BetaKiller\Notification\ScheduleProcessorFactory $processorFactory
+     * @param \Psr\Log\LoggerInterface                          $logger
      */
-    public function __construct(NotificationFacade $notification, LoggerInterface $logger)
-    {
+    public function __construct(
+        NotificationFacade $notification,
+        ScheduleProcessorFactory $processorFactory,
+        LoggerInterface $logger
+    ) {
         parent::__construct();
 
-        $this->notification = $notification;
-        $this->logger       = $logger;
+        $this->notification     = $notification;
+        $this->processorFactory = $processorFactory;
+        $this->logger           = $logger;
     }
 
     /**
@@ -40,22 +55,40 @@ final class SendScheduled extends AbstractTask
      */
     public function defineOptions(): array
     {
-        return [];
+        return [
+            'freq' => null,
+        ];
     }
 
     public function run(): void
     {
-        $freq = $this->detectDueFrequency();
+        $freqCodename = (string)$this->getOption('freq', true);
 
-        if (!$freq) {
-            return;
-        }
+        $freq = $this->notification->getFrequencyByCodename($freqCodename);
+
+        $this->logger->debug('Processing notification for ":freq" schedule', [
+            ':freq' => $freq->getCodename(),
+        ]);
 
         // For every scheduled group
         foreach ($this->notification->getScheduledGroups() as $group) {
             $this->logger->debug('Processing scheduled notification group ":name"', [
                 ':name' => $group->getCodename(),
             ]);
+
+            $messages = $this->notification->getGroupMessagesCodenames($group);
+
+            if (count($messages) > 1) {
+                $this->logException($this->logger, new TaskException(
+                    'Multiple messages in scheduled group ":name" are not allowed', [
+                    ':name' => $group->getCodename(),
+                ]));
+                continue;
+            }
+
+            $messageCodename = array_pop($messages);
+
+            $processor = $this->processorFactory->create($messageCodename);
 
             // Get all users with selected schedule option for group
             $targets = $this->notification->findGroupFreqTargets($group, $freq);
@@ -67,38 +100,33 @@ final class SendScheduled extends AbstractTask
 
             $this->logger->debug(':count targets found for scheduled notification group ":name"', [
                 ':count' => count($targets),
-                ':name' => $group->getCodename(),
+                ':name'  => $group->getCodename(),
             ]);
 
-            // Proceed "targets <=> messages" matrix
-            foreach ($this->notification->getGroupMessagesCodenames($group) as $message) {
-                foreach ($targets as $target) {
-                    $this->processMessage($message, $target);
-                }
+            // Proceed message for each target
+            foreach ($targets as $target) {
+                $this->processMessage($processor, $messageCodename, $target);
             }
         }
     }
 
-    private function detectDueFrequency(): ?NotificationFrequencyInterface
-    {
-        // Get all schedule options
-        foreach ($this->notification->getScheduledFrequencies() as $freq) {
-            // Check schedule option is due (check its crontab)
-            if (!$freq->isDue()) { // TODO Inverse
-                return $freq;
-            }
+    private function processMessage(
+        ScheduleProcessorInterface $processor,
+        string $messageCodename,
+        MessageTargetInterface $target
+    ): void {
+        $message = $this->notification->createMessage($messageCodename, $target, []);
+
+        // Message does not need to be sent
+        if (!$processor->makeMessage($message, $target)) {
+            return;
         }
-
-        return null;
-    }
-
-    private function processMessage(string $codename, MessageTargetInterface $target): void
-    {
-        // Check user-group spec and send notification
 
         $this->logger->info('Sending notification message ":name" to target ":who"', [
-            ':name' => $codename,
+            ':name' => $messageCodename,
             ':who'  => $target->getEmail(),
         ]);
+
+        $this->notification->enqueueScheduled($message);
     }
 }
