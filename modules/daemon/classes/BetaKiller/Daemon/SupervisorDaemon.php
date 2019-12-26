@@ -254,7 +254,7 @@ class SupervisorDaemon implements DaemonInterface
         $process->on('exit', function ($exitCode, $termSignal) use ($name, $lock) {
             $this->logger->debug('Daemon ":name" exited with :code code and :signal signal', [
                 ':name'   => $name,
-                ':code'   => $termSignal ?? 'unknown',
+                ':code'   => $exitCode ?? 'unknown',
                 ':signal' => $termSignal ?? 'unknown',
             ]);
 
