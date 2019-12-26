@@ -229,8 +229,10 @@ class Kohana_Core
         }
 
         if (!is_writable(Kohana::$cache_dir)) {
-            throw new Kohana_Exception('Directory :dir must be writable',
-                [':dir' => Debug::path(Kohana::$cache_dir)]);
+            throw new Kohana_Exception('Directory :dir must be writable by user ":who"', [
+                ':dir' => Debug::path(Kohana::$cache_dir),
+                ':who' => posix_getpwuid(posix_geteuid())['name']
+            ]);
         }
 
         if (isset($settings['cache_life'])) {
