@@ -6,7 +6,6 @@ use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\Model\GuestUserInterface;
-use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RoleRepositoryInterface;
@@ -123,7 +122,6 @@ class UserService
     /**
      * @return \BetaKiller\Model\UserInterface
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Exception\ValidationException
      */
     public function createCliUser(): UserInterface
     {
