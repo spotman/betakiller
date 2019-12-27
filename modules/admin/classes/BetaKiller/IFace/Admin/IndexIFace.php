@@ -3,7 +3,7 @@ namespace BetaKiller\IFace\Admin;
 
 use Psr\Http\Message\ServerRequestInterface;
 
-class IndexIFace extends AbstractAdminIFace
+final class IndexIFace extends AbstractAdminIFace
 {
     /**
      * Returns data for View
