@@ -188,14 +188,10 @@ class SupervisorDaemon implements DaemonInterface
             return;
         }
 
-        $this->isStoppingDaemons = true;
-
         // Trying to restart failed daemons
         foreach ($this->filterStatus(self::STATUS_STOPPED) as $name) {
             $this->startDaemon($name, true);
         }
-
-        $this->isStoppingDaemons = false;
     }
 
     private function stopAll(): void
@@ -350,18 +346,24 @@ class SupervisorDaemon implements DaemonInterface
         $process->terminate(\SIGTERM);
 
         // Sync wait for process stop ()
-        if ($lock->waitForRelease($stopTimeout)) {
-            $this->setStatus($name, self::STATUS_STOPPED);
-
-            $this->logger->notice('Daemon ":name" stopped', [
-                ':name' => $name,
-            ]);
-        } else {
+        if (!$lock->waitForRelease($stopTimeout)) {
             $this->logger->warning('Daemon ":name" had not been stopped in :timeout seconds, force exit', [
                 ':name'    => $name,
                 ':timeout' => $stopTimeout,
             ]);
+
+            // Kill daemon
+            $process->terminate(\SIGKILL);
+
+            // Release the lock (cleanup)
+            $lock->release();
         }
+
+        $this->setStatus($name, self::STATUS_STOPPED);
+
+        $this->logger->notice('Daemon ":name" stopped', [
+            ':name' => $name,
+        ]);
     }
 
     private function getDefinedDaemons(): array
