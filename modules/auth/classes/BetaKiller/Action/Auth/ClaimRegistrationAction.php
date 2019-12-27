@@ -44,10 +44,10 @@ class ClaimRegistrationAction extends AbstractAction
     /**
      * ClaimRegistrationAction constructor.
      *
-     * @param \BetaKiller\Helper\NotificationHelper                     $notification
-     * @param \BetaKiller\Repository\LanguageRepositoryInterface        $langRepo
-     * @param \BetaKiller\Repository\UserRepositoryInterface            $userRepo
-     * @param \BetaKiller\Workflow\UserWorkflow                         $userWorkflow
+     * @param \BetaKiller\Helper\NotificationHelper              $notification
+     * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
+     * @param \BetaKiller\Repository\UserRepositoryInterface     $userRepo
+     * @param \BetaKiller\Workflow\UserWorkflow                  $userWorkflow
      */
     public function __construct(
         NotificationHelper $notification,
@@ -84,8 +84,6 @@ class ClaimRegistrationAction extends AbstractAction
         // Prevent errors on multiple calls from different emails
         if (!$user->isRegistrationClaimed()) {
             $this->userWorkflow->notRegisteredClaim($user);
-
-            $this->userRepo->save($user);
 
             $this->facade->groupMessage(self::NOTIFICATION, [
                 'email'             => $log->getTargetString(),

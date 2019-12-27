@@ -87,6 +87,8 @@ final class UserWorkflow
     public function confirmEmail(UserInterface $user): void
     {
         $this->state->doTransition($user, self::TRANSITION_EMAIL_CONFIRMED, $user);
+
+        $this->userRepo->save($user);
     }
 
     public function changeEmail(UserInterface $user, string $email): void
@@ -104,17 +106,23 @@ final class UserWorkflow
 
     public function block(UserInterface $user): void
     {
+        $this->state->doTransition($user, self::TRANSITION_BLOCK, $user);
 
+        $this->userRepo->save($user);
     }
 
     public function suspend(UserInterface $user): void
     {
         $this->state->doTransition($user, self::TRANSITION_SUSPEND, $user);
+
+        $this->userRepo->save($user);
     }
 
     public function activateSuspended(UserInterface $user): void
     {
         $this->state->doTransition($user, self::TRANSITION_ACTIVATE_SUSPENDED, $user);
+
+        $this->userRepo->save($user);
 
         // Send verification link
         $this->sendConfirmationEmail($user);
@@ -124,6 +132,8 @@ final class UserWorkflow
     {
         // Mark user as "claimed" to prevent future communication
         $this->state->doTransition($user, self::TRANSITION_REG_CLAIM, $user);
+
+        $this->userRepo->save($user);
     }
 
     /**

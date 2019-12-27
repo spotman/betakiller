@@ -7,18 +7,12 @@ use BetaKiller\Action\AbstractAction;
 use BetaKiller\Auth\UserUrlDetectorInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Workflow\UserWorkflow;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class ActivateSuspendedAction extends AbstractAction
 {
-    /**
-     * @var \BetaKiller\Repository\UserRepositoryInterface
-     */
-    private $userRepo;
-
     /**
      * @var \BetaKiller\Auth\UserUrlDetectorInterface
      */
@@ -32,16 +26,13 @@ final class ActivateSuspendedAction extends AbstractAction
     /**
      * ActivateSuspendedAction constructor.
      *
-     * @param \BetaKiller\Workflow\UserWorkflow              $userWorkflow
-     * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
-     * @param \BetaKiller\Auth\UserUrlDetectorInterface      $urlDetector
+     * @param \BetaKiller\Workflow\UserWorkflow         $userWorkflow
+     * @param \BetaKiller\Auth\UserUrlDetectorInterface $urlDetector
      */
     public function __construct(
         UserWorkflow $userWorkflow,
-        UserRepositoryInterface $userRepo,
         UserUrlDetectorInterface $urlDetector
     ) {
-        $this->userRepo     = $userRepo;
         $this->urlDetector  = $urlDetector;
         $this->userWorkflow = $userWorkflow;
     }
@@ -60,8 +51,6 @@ final class ActivateSuspendedAction extends AbstractAction
         $user = ServerRequestHelper::getUser($request);
 
         $this->userWorkflow->activateSuspended($user);
-
-        $this->userRepo->save($user);
 
         // Redirect to actual page
         $url = $this->urlDetector->detect($user);
