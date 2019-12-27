@@ -17,8 +17,9 @@ class SupervisorDaemon implements DaemonInterface
 {
     public const CODENAME = 'Supervisor';
 
-    public const RETRY_LIMIT   = 3;
-    public const RELOAD_SIGNAL = \SIGUSR1;
+    public const RETRY_LIMIT    = 3;
+    public const RELOAD_SIGNAL  = \SIGUSR1;
+    public const RESTART_SIGNAL = \SIGUSR2;
 
     private const STATUS_STARTING = 'starting';
     private const STATUS_RUNNING  = 'running';
@@ -106,8 +107,14 @@ class SupervisorDaemon implements DaemonInterface
 
         // Reload signal => hot restart
         $loop->addSignal(self::RELOAD_SIGNAL, function () {
-            $this->logger->debug('Reloading supervisor');
+            $this->logger->debug('Reloading stopped daemons');
             $this->restartStopped();
+        });
+
+        // Restart signal => hot restart
+        $loop->addSignal(self::RESTART_SIGNAL, function () {
+            $this->logger->debug('Restarting all daemons');
+            $this->stopAll();
         });
 
         $this->addSupervisorTimer();
