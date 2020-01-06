@@ -284,7 +284,7 @@ class User extends \ORM implements UserInterface
     /**
      * @return bool
      */
-    public function isAdmin(): bool
+    public function hasAdminRole(): bool
     {
         // This role is not assigned directly but through inheritance
         return $this->hasRoleName(RoleInterface::ADMIN_PANEL);
@@ -293,7 +293,7 @@ class User extends \ORM implements UserInterface
     /**
      * @return bool
      */
-    public function isDeveloper(): bool
+    public function hasDeveloperRole(): bool
     {
         return $this->hasRoleName(RoleInterface::DEVELOPER);
     }

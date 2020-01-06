@@ -88,7 +88,7 @@ class ContentCommentWorkflow
         $authorUser = $comment->getAuthorUser();
 
         // Skip notification for moderators
-        if ($authorUser && $authorUser->isAdmin()) {
+        if ($authorUser && $authorUser->hasAdminRole()) {
             return;
         }
 

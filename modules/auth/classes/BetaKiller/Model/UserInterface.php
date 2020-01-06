@@ -92,12 +92,12 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     /**
      * @return bool
      */
-    public function isAdmin(): bool;
+    public function hasAdminRole(): bool;
 
     /**
      * @return bool
      */
-    public function isDeveloper(): bool;
+    public function hasDeveloperRole(): bool;
 
     /**
      * @param RoleInterface $role

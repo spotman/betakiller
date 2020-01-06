@@ -253,7 +253,7 @@ class HitStatMiddleware implements MiddlewareInterface
             $user = ServerRequestHelper::getUser($request);
 
             // Ignore hits of admin users
-            if ($user->isAdmin()) {
+            if ($user->hasAdminRole()) {
                 return null;
             }
 

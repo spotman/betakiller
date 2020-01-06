@@ -27,7 +27,7 @@ final class MaintenanceModeService
 
     public function isDisplayedFor(UserInterface $user): bool
     {
-        return !$user->isDeveloper();
+        return !$user->hasDeveloperRole();
     }
 
     public function isEnabled(): bool

@@ -115,7 +115,7 @@ class DebugMiddleware implements MiddlewareInterface
         if (!$debugEnabled && ServerRequestHelper::hasUser($request)) {
             $user = ServerRequestHelper::getUser($request);
 
-            if ($user->isDeveloper()) {
+            if ($user->hasDeveloperRole()) {
                 $debugEnabled = true;
             }
         }
