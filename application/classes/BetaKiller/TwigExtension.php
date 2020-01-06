@@ -70,125 +70,325 @@ final class TwigExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-
+            /**
+             * Helper for adding JS files
+             */
             new TwigFunction(
                 'js',
-                [$this, 'js'],
+                function (array $context, string $location, string $condition = null) {
+                    $this->getStaticAssets($context)->addJs($location, $condition);
+                },
                 ['needs_context' => true, 'is_safe' => ['html']]
             ),
 
+            /**
+             * Helper for adding CSS files
+             */
             new TwigFunction(
                 'css',
-                [$this, 'css'],
+                function (array $context, string $location, string $condition = null): void {
+                    $this->getStaticAssets($context)->addCss($location, $condition);
+                },
                 ['needs_context' => true, 'is_safe' => ['html']]
             ),
 
+            /**
+             * Helper for getting link for custom static file
+             */
             new TwigFunction(
                 'static',
-                [$this, 'getLinkToStaticFile'],
+                function (array $context, string $path): string {
+                    return $this->getStaticAssets($context)->getFullUrl($path);
+                },
                 ['needs_context' => true, 'is_safe' => ['html']]
             ),
 
             new TwigFunction(
                 'static_content',
-                [$this, 'getStaticFileContent'],
+                function (array $context, string $path): string {
+                    $fullPath = $this->getStaticAssets($context)->findFile($path);
+
+                    if (!$fullPath) {
+                        throw new Exception('Missing static asset ":path"', [
+                            ':path' => $fullPath,
+                        ]);
+                    }
+
+                    return \file_get_contents($fullPath);
+                },
                 ['needs_context' => true, 'is_safe' => ['html']]
             ),
 
+            /**
+             * Helper for creating <img> tag
+             */
             new TwigFunction(
                 'image',
-                [$this, 'image'],
+                function (array $context, array $attributes, ?array $data = null, ?bool $forceSize = null): string {
+                    if ($data) {
+                        $attributes = array_merge($attributes, $data);
+                    }
+
+                    if (!$forceSize) {
+                        unset($attributes['width'], $attributes['height']);
+                    }
+
+                    $src = $this->getStaticAssets($context)->getFullUrl($attributes['src']);
+
+                    return HTML::image($src, array_filter($attributes));
+                },
                 ['needs_context' => true, 'is_safe' => ['html']]
             ),
 
             new TwigFunction(
                 'csp',
-                [$this, 'csp'],
+                function (array $context, string $name, string $value, bool $reportOnly = null): void {
+                    $request = $this->getRequest($context);
+                    $csp     = ServerRequestHelper::getCsp($request);
+
+                    if ($reportOnly) {
+                        $csp->csp($name, $value, true);
+                    } else {
+                        $csp->csp($name, $value);
+                    }
+                },
                 ['needs_context' => true]
             ),
 
             new TwigFunction(
                 'js_nonce',
-                [$this, 'getJsNonce'],
+                function (array $context): string {
+                    $request = $this->getRequest($context);
+
+                    return ServerRequestHelper::getCsp($request)->cspNonce('script');
+                },
                 ['needs_context' => true]
             ),
 
             new TwigFunction(
                 'css_nonce',
-                [$this, 'getCssNonce'],
+                function (array $context): string {
+                    $request = $this->getRequest($context);
+
+                    return ServerRequestHelper::getCsp($request)->cspNonce('style');
+                },
                 ['needs_context' => true]
             ),
 
             new TwigFunction(
                 'kohanaProfiler',
-                [$this, 'showKohanaProfiler'],
+                static function (): string {
+                    return \View::factory('profiler/stats')->render();
+                },
                 ['is_safe' => ['html']]
             ),
 
             new TwigFunction(
                 'entry',
-                [$this, 'webpackEntry'],
+                function (array $context, string $entryPoint, string $distDir = null): void {
+                    if (!$distDir) {
+                        $distDir = $context['dist_dir'] ?? null;
+                    }
+
+                    if (!$distDir) {
+                        throw new Exception('Pass dist dir as a second argument or set "dist_dir" variable in layout before using entry() function');
+                    }
+
+                    $assets = $this->getStaticAssets($context);
+
+                    $fileName = $distDir.\DIRECTORY_SEPARATOR.'entrypoints.json';
+                    $fullPath = $assets->findFile($fileName);
+
+                    if (!$fullPath) {
+                        throw new Exception('Missing file ":path", check webpack build and "dist_dir" variable', [
+                            ':path' => $fileName,
+                        ]);
+                    }
+
+                    $fileContent = \file_get_contents($fullPath);
+
+                    if (!$fileContent) {
+                        throw new Exception('Empty file ":path", check webpack build and "dist_dir" variable', [
+                            ':path' => $fullPath,
+                        ]);
+                    }
+
+                    $fileData = \json_decode($fileContent, true);
+
+                    $config = $fileData['entrypoints'][$entryPoint] ?? null;
+
+                    if (!$config) {
+                        throw new Exception('Missing entry ":name" in file ":path"', [
+                            ':path' => $fullPath,
+                            ':name' => $entryPoint,
+                        ]);
+                    }
+
+                    $baseUrl = $assets->getBaseUrl();
+
+                    if (isset($config['js'])) {
+                        foreach ($config['js'] as $jsFileName) {
+                            $assets->addJs((string)$baseUrl->withPath($jsFileName));
+                        }
+                    }
+
+                    if (isset($config['css'])) {
+                        foreach ($config['css'] as $cssFileName) {
+                            $assets->addCss((string)$baseUrl->withPath($cssFileName));
+                        }
+                    }
+                },
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),
 
             new TwigFunction(
                 'static_dist',
-                [$this, 'webpackManifestRecord'],
+                function (array $context, string $name, string $distDir = null): string {
+                    if (!$distDir) {
+                        $distDir = $context['dist_dir'] ?? null;
+                    }
+
+                    if (!$distDir) {
+                        throw new Exception('Pass dist dir as a second argument or set "dist_dir" variable in layout before using entry() function');
+                    }
+
+                    $assets = $this->getStaticAssets($context);
+
+                    $fileData         = $this->manifestCache[$distDir] ?? null;
+                    $manifestFileName = $distDir.\DIRECTORY_SEPARATOR.'manifest.json';
+                    $manifestFullPath = $assets->findFile($manifestFileName);
+
+                    if (!$fileData) {
+
+                        if (!$manifestFullPath) {
+                            throw new Exception('Missing file ":path", check webpack build and "dist_dir" variable', [
+                                ':path' => $manifestFileName,
+                            ]);
+                        }
+
+                        $fileContent = \file_get_contents($manifestFullPath);
+
+                        if (!$fileContent) {
+                            throw new Exception('Empty file ":path", check webpack build and "dist_dir" variable', [
+                                ':path' => $manifestFullPath,
+                            ]);
+                        }
+
+                        $this->manifestCache[$distDir] = $fileData = \json_decode($fileContent, true);
+                    }
+
+                    $key = $distDir.'/'.$name;
+
+                    $recordPath = $fileData[$key] ?? null;
+
+                    if (!$recordPath) {
+                        throw new Exception('Missing record ":name" in file ":path"', [
+                            ':path' => $manifestFullPath,
+                            ':name' => $key,
+                        ]);
+                    }
+
+                    return (string)$assets->getBaseUrl()->withPath($recordPath);
+                },
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),
 
             new TwigFunction(
                 'lang',
-                [$this, 'getCurrentLang'],
+                function (array $context): string {
+                    return $this->getI18n($context)->getLang()->getIsoCode();
+                },
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),
 
             new TwigFunction(
                 'widget',
-                [$this, 'widget'],
+                function (array $context, string $name, array $data = null): string {
+                    if ($data) {
+                        $context = array_merge($context, $data);
+                    }
+
+                    $request = $this->getRequest($context);
+
+                    $widget = $this->widgetFacade->create($name);
+
+                    return $this->widgetFacade->render($widget, $request, $context);
+                },
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),
 
             new TwigFunction(
                 'in_public_zone',
-                [$this, 'inPublicZone'],
+                static function (array $context): bool {
+                    $zoneName = $context[IFaceView::IFACE_KEY][IFaceView::IFACE_ZONE_KEY];
+
+                    return $zoneName === ZoneInterface::PUBLIC;
+                },
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),
 
             new TwigFunction(
                 'in_production',
-                [$this, 'inProduction']
+                function (): bool {
+                    return $this->appEnv->inProductionMode();
+                }
             ),
 
             new TwigFunction(
                 'in_staging',
-                [$this, 'inStaging']
+                function (): bool {
+                    return $this->appEnv->inStagingMode();
+                }
             ),
 
             new TwigFunction(
                 'in_dev',
-                [$this, 'inDev']
+                function (): bool {
+                    return $this->appEnv->inDevelopmentMode();
+                }
             ),
 
             new TwigFunction(
                 'is_debug',
-                [$this, 'isDebug']
+                function (): bool {
+                    return $this->appEnv->isDebugEnabled();
+                }
             ),
 
             new TwigFunction(
                 'is_admin',
-                [$this, 'isAdmin'],
+                function (array $context): bool {
+                    $request = $this->getRequest($context);
+
+                    if (ServerRequestHelper::isGuest($request)) {
+                        return false;
+                    }
+
+                    return ServerRequestHelper::getUser($request)->hasAdminRole();
+                },
                 ['needs_context' => true]
             ),
 
             new TwigFunction(
                 'env_mode',
-                [$this, 'envMode']
+                function (): string {
+                    return $this->appEnv->getModeName();
+                }
             ),
 
             new TwigFunction(
                 'user_id',
-                [$this, 'userId'],
+                function (array $context): string {
+                    $request = $this->getRequest($context);
+
+                    if (ServerRequestHelper::isGuest($request)) {
+                        return 'Guest';
+                    }
+
+                    $user = ServerRequestHelper::getUser($request);
+
+                    return $this->identityConverter->encode($user);
+                },
                 ['needs_context' => true]
             ),
 
@@ -200,18 +400,34 @@ final class TwigExtension extends AbstractExtension
 
             new TwigFunction(
                 'log_error',
-                [$this, 'logError']
+                function (string $message, array $params = null): void {
+                    $params = $params ?? [];
+
+                    $params = Exception::addPlaceholderPrefixToKeys($params);
+
+                    $this->logException($this->logger, new Exception($message, $params));
+                }
             ),
 
+            /**
+             * Helper for adding HTML meta-headers in output
+             */
             new TwigFunction(
                 'meta',
-                [$this, 'meta'],
+                function (array $context, string $name, string $value): void {
+                    $this->getMeta($context)->set($name, $value);
+                },
                 ['needs_context' => true]
             ),
 
+
             new TwigFunction(
                 'link',
-                [$this, 'linkTag'],
+                function (array $context, string $rel, string $href, array $attributes = null): ?string {
+                    $this->getMeta($context)->addLink($rel, $href, $attributes);
+
+                    return null;
+                },
                 ['needs_context' => true]
             ),
 
@@ -220,25 +436,36 @@ final class TwigExtension extends AbstractExtension
              */
             new TwigFunction(
                 'title',
-                [$this, 'metaTitle'],
+                function (array $context, string $value): void {
+                    $this->getMeta($context)->setTitle($value, Meta::TITLE_APPEND);
+                },
                 ['needs_context' => true,]
             ),
 
             new TwigFunction(
                 'description',
-                [$this, 'metaDescription'],
+                function (array $context, string $value): void {
+                    $this->getMeta($context)->setDescription($value);
+                },
                 ['needs_context' => true,]
             ),
 
             new TwigFunction(
                 'meta_image',
-                [$this, 'metaImage'],
+                function (array $context, string $url): void {
+                    $this->getMeta($context)->setImage($url);
+                },
                 ['needs_context' => true,]
             ),
 
             new TwigFunction(
                 'meta_share_title',
-                [$this, 'metaShareTitle'],
+                function (array $context, string $title): void {
+                    $meta = $this->getMeta($context);
+
+                    $meta->set('og:title', $title);
+                    $meta->set('twitter:title', $title);
+                },
                 ['needs_context' => true,]
             ),
 
@@ -252,7 +479,7 @@ final class TwigExtension extends AbstractExtension
             /**
              * Converts boolean value to JavaScript string representation
              */
-            new TwigFilter('bool', function ($value) {
+            new TwigFilter('bool', static function ($value) {
                 return $value ? 'true' : 'false';
             }),
 
@@ -290,392 +517,6 @@ final class TwigExtension extends AbstractExtension
         ];
     }
 
-    public function metaTitle(array $context, string $value): void
-    {
-        $this->getMeta($context)->setTitle($value, Meta::TITLE_APPEND);
-    }
-
-    public function metaDescription(array $context, string $value): void
-    {
-        $this->getMeta($context)->setDescription($value);
-    }
-
-    public function metaImage(array $context, string $url): void
-    {
-        $this->getMeta($context)->setImage($url);
-    }
-
-    public function metaShareTitle(array $context, string $title): void
-    {
-        $meta = $this->getMeta($context);
-
-        $meta->set('og:title', $title);
-        $meta->set('twitter:title', $title);
-    }
-
-    /**
-     * @return bool
-     */
-    public function inProduction(): bool
-    {
-        return $this->appEnv->inProductionMode();
-    }
-
-    /**
-     * @return bool
-     */
-    public function inStaging(): bool
-    {
-        return $this->appEnv->inStagingMode();
-    }
-
-    /**
-     * @return bool
-     */
-    public function inDev(): bool
-    {
-        return $this->appEnv->inDevelopmentMode();
-    }
-
-    /**
-     * @return string
-     */
-    public function envMode(): string
-    {
-        return $this->appEnv->getModeName();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isDebug(): bool
-    {
-        return $this->appEnv->isDebugEnabled();
-    }
-
-    /**
-     * @param array $context
-     *
-     * @return bool
-     * @throws \BetaKiller\Repository\RepositoryException
-     */
-    public function isAdmin(array $context): bool
-    {
-        $request = $this->getRequest($context);
-
-        if (ServerRequestHelper::isGuest($request)) {
-            return false;
-        }
-
-        $user = ServerRequestHelper::getUser($request);
-
-
-        return $user->isAdmin();
-    }
-
-    /**
-     * @param array $context
-     *
-     * @return string
-     */
-    public function userId(array $context): string
-    {
-        $request = $this->getRequest($context);
-
-        if (ServerRequestHelper::isGuest($request)) {
-            return 'Guest';
-        }
-
-        $user = ServerRequestHelper::getUser($request);
-
-        return $this->identityConverter->encode($user);
-    }
-
-    /**
-     * Helper for adding JS files
-     *
-     * @param array       $context
-     * @param string      $location
-     * @param string|null $condition
-     */
-    public function js(array $context, string $location, string $condition = null): void
-    {
-        $this->getStaticAssets($context)->addJs($location, $condition);
-    }
-
-    /**
-     * Helper for adding CSS files
-     *
-     * @param array       $context
-     * @param string      $location
-     * @param string|null $condition
-     */
-    public function css(array $context, string $location, string $condition = null): void
-    {
-        $this->getStaticAssets($context)->addCss($location, $condition);
-    }
-
-    /**
-     * Helper for creating <img> tag
-     *
-     * @param array      $context
-     * @param array      $attributes
-     * @param array|null $data
-     * @param bool|null  $forceSize
-     *
-     * @return string
-     */
-    public function image(array $context, array $attributes, ?array $data = null, ?bool $forceSize = null): string
-    {
-        if ($data) {
-            $attributes = array_merge($attributes, $data);
-        }
-
-        if (!$forceSize) {
-            unset($attributes['width'], $attributes['height']);
-        }
-
-        $src = $this->getLinkToStaticFile($context, $attributes['src']);
-
-        return HTML::image($src, array_filter($attributes));
-    }
-
-    /**
-     * Helper for getting link for custom static file
-     *
-     * @param array  $context
-     * @param string $path
-     *
-     * @return string
-     */
-    public function getLinkToStaticFile(array $context, string $path): string
-    {
-        return $this->getStaticAssets($context)->getFullUrl($path);
-    }
-
-    /**
-     * @param array  $context
-     * @param string $path
-     *
-     * @return string
-     * @throws \BetaKiller\Exception
-     */
-    public function getStaticFileContent(array $context, string $path): string
-    {
-        $fullPath = $this->getStaticAssets($context)->findFile($path);
-
-        if (!$fullPath) {
-            throw new Exception('Missing static asset ":path"', [
-                ':path' => $fullPath,
-            ]);
-        }
-
-        return \file_get_contents($fullPath);
-    }
-
-    /**
-     * Helper for adding HTML meta-headers in output
-     *
-     * @param array  $context
-     * @param string $name
-     * @param string $value
-     *
-     * @return void
-     */
-    public function meta(array $context, string $name, string $value): void
-    {
-        $this->getMeta($context)->set($name, $value);
-    }
-
-    public function linkTag(array $context, string $rel, string $href, array $attributes = null): ?string
-    {
-        $this->getMeta($context)->addLink($rel, $href, $attributes);
-
-        return null;
-    }
-
-    public function logError(string $message, array $params = null): void
-    {
-        $params = $params ?? [];
-
-        $params = Exception::addPlaceholderPrefixToKeys($params);
-
-        $this->logException($this->logger, new Exception($message, $params));
-    }
-
-    /**
-     * @return string
-     * @throws \View_Exception
-     */
-    public function showKohanaProfiler(): string
-    {
-        return \View::factory('profiler/stats')->render();
-    }
-
-    public function csp(array $context, string $name, string $value, bool $reportOnly = null): void
-    {
-        $request = $this->getRequest($context);
-        $csp     = ServerRequestHelper::getCsp($request);
-
-        if ($reportOnly) {
-            $csp->csp($name, $value, true);
-        } else {
-            $csp->csp($name, $value);
-        }
-    }
-
-    public function getJsNonce(array $context): string
-    {
-        $request = $this->getRequest($context);
-
-        return ServerRequestHelper::getCsp($request)->cspNonce('script');
-    }
-
-    public function getCssNonce(array $context): string
-    {
-        $request = $this->getRequest($context);
-
-        return ServerRequestHelper::getCsp($request)->cspNonce('style');
-    }
-
-    public function webpackEntry(array $context, string $entryPoint, string $distDir = null): void
-    {
-        if (!$distDir) {
-            $distDir = $context['dist_dir'] ?? null;
-        }
-
-        if (!$distDir) {
-            throw new Exception('Pass dist dir as a second argument or set "dist_dir" variable in layout before using entry() function');
-        }
-
-        $assets = $this->getStaticAssets($context);
-
-        $fileName = $distDir.\DIRECTORY_SEPARATOR.'entrypoints.json';
-        $fullPath = $assets->findFile($fileName);
-
-        if (!$fullPath) {
-            throw new Exception('Missing file ":path", check webpack build and "dist_dir" variable', [
-                ':path' => $fileName,
-            ]);
-        }
-
-        $fileContent = \file_get_contents($fullPath);
-
-        if (!$fileContent) {
-            throw new Exception('Empty file ":path", check webpack build and "dist_dir" variable', [
-                ':path' => $fullPath,
-            ]);
-        }
-
-        $fileData = \json_decode($fileContent, true);
-
-        $config = $fileData['entrypoints'][$entryPoint] ?? null;
-
-        if (!$config) {
-            throw new Exception('Missing entry ":name" in file ":path"', [
-                ':path' => $fullPath,
-                ':name' => $entryPoint,
-            ]);
-        }
-
-        $baseUrl = $assets->getBaseUrl();
-
-        if (isset($config['js'])) {
-            foreach ($config['js'] as $jsFileName) {
-                $assets->addJs((string)$baseUrl->withPath($jsFileName));
-            }
-        }
-
-        if (isset($config['css'])) {
-            foreach ($config['css'] as $cssFileName) {
-                $assets->addCss((string)$baseUrl->withPath($cssFileName));
-            }
-        }
-    }
-
-    public function webpackManifestRecord(array $context, string $name, string $distDir = null): string
-    {
-        if (!$distDir) {
-            $distDir = $context['dist_dir'] ?? null;
-        }
-
-        if (!$distDir) {
-            throw new Exception('Pass dist dir as a second argument or set "dist_dir" variable in layout before using entry() function');
-        }
-
-        $assets = $this->getStaticAssets($context);
-
-        $fileData         = $this->manifestCache[$distDir] ?? null;
-        $manifestFileName = $distDir.\DIRECTORY_SEPARATOR.'manifest.json';
-        $manifestFullPath = $assets->findFile($manifestFileName);
-
-        if (!$fileData) {
-
-            if (!$manifestFullPath) {
-                throw new Exception('Missing file ":path", check webpack build and "dist_dir" variable', [
-                    ':path' => $manifestFileName,
-                ]);
-            }
-
-            $fileContent = \file_get_contents($manifestFullPath);
-
-            if (!$fileContent) {
-                throw new Exception('Empty file ":path", check webpack build and "dist_dir" variable', [
-                    ':path' => $manifestFullPath,
-                ]);
-            }
-
-            $this->manifestCache[$distDir] = $fileData = \json_decode($fileContent, true);
-        }
-
-        $key = $distDir.'/'.$name;
-
-        $recordPath = $fileData[$key] ?? null;
-
-        if (!$recordPath) {
-            throw new Exception('Missing record ":name" in file ":path"', [
-                ':path' => $manifestFullPath,
-                ':name' => $key,
-            ]);
-        }
-
-        return (string)$assets->getBaseUrl()->withPath($recordPath);
-    }
-
-    public function getCurrentLang(array $context): string
-    {
-        return $this->getI18n($context)->getLang()->getIsoCode();
-    }
-
-    /**
-     * @param array      $context
-     * @param string     $name
-     * @param array|null $data
-     *
-     * @return string
-     * @throws \BetaKiller\Auth\AccessDeniedException
-     * @throws \BetaKiller\Factory\FactoryException
-     */
-    public function widget(array $context, string $name, array $data = null): string
-    {
-        if ($data) {
-            $context = array_merge($context, $data);
-        }
-
-        $request = $this->getRequest($context);
-
-        $widget = $this->widgetFacade->create($name);
-
-        return $this->widgetFacade->render($widget, $request, $context);
-    }
-
-    public function inPublicZone(array $context): bool
-    {
-        $zoneName = $context[IFaceView::IFACE_KEY][IFaceView::IFACE_ZONE_KEY];
-
-        return $zoneName === ZoneInterface::PUBLIC;
-    }
-
     private function getRequest(array $context): ServerRequestInterface
     {
         return $context[IFaceView::REQUEST_KEY];
@@ -691,7 +532,7 @@ final class TwigExtension extends AbstractExtension
         return $context[IFaceView::ASSETS_KEY];
     }
 
-    private function getMeta(array $context): \Meta
+    private function getMeta(array $context): Meta
     {
         return $context[IFaceView::META_KEY];
     }
