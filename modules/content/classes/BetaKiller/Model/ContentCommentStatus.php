@@ -13,60 +13,15 @@ class ContentCommentStatus extends AbstractWorkflowStateOrm
     protected function configure(): void
     {
         $this->_table_name = 'content_comment_statuses';
-
-        parent::configure();
     }
 
     /**
+     * Returns name of I18n key to proceed
+     *
      * @return string
      */
-    protected function getStatusAclModelName(): string
-    {
-        return 'ContentCommentStatusAcl';
-    }
-
-    /**
-     * @return string
-     */
-    protected function getStatusAclModelForeignKey(): string
-    {
-        return 'status_id';
-    }
-
-    public function getLabelI18nKey(): string
+    public function getI18nKeyName(): string
     {
         return 'comment.status.'.$this->getCodename();
-    }
-
-    /**
-     * @return string
-     */
-    protected function getRelatedModelKey(): string
-    {
-        return 'status';
-    }
-
-    /**
-     * @return string
-     */
-    protected function getRelatedModelName(): string
-    {
-        return 'ContentComment';
-    }
-
-    /**
-     * @return string
-     */
-    protected function getTransitionModelName(): string
-    {
-        return 'ContentCommentStatusTransition';
-    }
-
-    /**
-     * @return string
-     */
-    protected function getRelatedModelFk(): string
-    {
-        return 'status_id';
     }
 }

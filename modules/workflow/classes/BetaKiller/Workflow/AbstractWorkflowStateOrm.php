@@ -11,14 +11,6 @@ abstract class AbstractWorkflowStateOrm extends ORM implements WorkflowStateInte
     public const COL_IS_FINISH = 'is_finish';
 
     /**
-     * Custom configuration (set table name, configure relations, load_with(), etc)
-     */
-    protected function configure(): void
-    {
-        // Nothing to do here
-    }
-
-    /**
      * @return string
      */
     public function getCodename(): string

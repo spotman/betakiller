@@ -15,55 +15,15 @@ class ContentPostStatus extends AbstractWorkflowStateOrm
     protected function configure(): void
     {
         $this->_table_name = 'content_post_statuses';
-
-        parent::configure();
     }
 
     /**
+     * Returns name of I18n key to proceed
+     *
      * @return string
      */
-    protected function getRelatedModelKey(): string
+    public function getI18nKeyName(): string
     {
-        return 'status';
-    }
-
-    /**
-     * @return string
-     */
-    protected function getRelatedModelName(): string
-    {
-        return 'ContentPost';
-    }
-
-    /**
-     * @return string
-     */
-    protected function getTransitionModelName(): string
-    {
-        return 'ContentPostStatusTransition';
-    }
-
-    /**
-     * @return string
-     */
-    protected function getRelatedModelFk(): string
-    {
-        return 'post_id';
-    }
-
-    /**
-     * @return string
-     */
-    protected function getStatusAclModelName(): string
-    {
-        return 'ContentPostStatusAcl';
-    }
-
-    /**
-     * @return string
-     */
-    protected function getStatusAclModelForeignKey(): string
-    {
-        return 'status_id';
+        return 'content-post-state.'.$this->getCodename();
     }
 }
