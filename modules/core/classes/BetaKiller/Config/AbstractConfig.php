@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Config;
 
-
 use BetaKiller\Exception;
 
 abstract class AbstractConfig

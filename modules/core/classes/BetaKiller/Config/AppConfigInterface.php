@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Config;
 
-
 use Psr\Http\Message\UriInterface;
 
 interface AppConfigInterface
