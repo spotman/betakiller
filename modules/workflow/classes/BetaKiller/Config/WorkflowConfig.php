@@ -5,7 +5,7 @@ namespace BetaKiller\Config;
 
 use BetaKiller\Workflow\WorkflowStateException;
 
-class WorkflowConfig extends AbstractConfig implements WorkflowConfigInterface
+final class WorkflowConfig extends AbstractConfig implements WorkflowConfigInterface
 {
     public const STATES       = 'states';
     public const STATUS_MODEL = 'model';
