@@ -39,11 +39,13 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     }
 
     /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
+     * @param \Spotman\Defence\DefinitionBuilderInterface $builder
+     *
+     * @return void
      */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    public function defineArguments(DefinitionBuilderInterface $builder): void
     {
-        return $this->definition()
+        $builder
             ->identity()
             ->string(self::ARG_TARGET_URL)->optional();
     }

@@ -7,11 +7,13 @@ use Spotman\Defence\DefinitionBuilderInterface;
 class DeleteApiMethod extends AbstractEntityDeleteApiMethod
 {
     /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
+     * @param \Spotman\Defence\DefinitionBuilderInterface $builder
+     *
+     * @return void
      */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    public function defineArguments(DefinitionBuilderInterface $builder): void
     {
-        return $this->definition()
+        $builder
             ->identity();
     }
 

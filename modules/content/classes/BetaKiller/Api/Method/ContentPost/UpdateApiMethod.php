@@ -17,11 +17,13 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     private const ARG_CONTENT = 'content';
 
     /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
+     * @param \Spotman\Defence\DefinitionBuilderInterface $builder
+     *
+     * @return void
      */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    public function defineArguments(DefinitionBuilderInterface $builder): void
     {
-        return $this->definition()
+        $builder
             ->composite(self::ARG_DATA)
             ->string(self::ARG_LABEL)->optional()
             ->string(self::ARG_URI)->optional()

@@ -35,11 +35,13 @@ class DataApiMethod extends AbstractApiMethod
     ];
 
     /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
+     * @param \Spotman\Defence\DefinitionBuilderInterface $builder
+     *
+     * @return void
      */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    public function defineArguments(DefinitionBuilderInterface $builder): void
     {
-        return $this->definition()
+        $builder
             ->string(self::ARG_CASE)
             ->whitelist(self::AVAILABLE_CASES);
     }

@@ -67,11 +67,13 @@ class ReadApiMethod extends AbstractApiMethod
     }
 
     /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
+     * @param \Spotman\Defence\DefinitionBuilderInterface $builder
+     *
+     * @return void
      */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    public function defineArguments(DefinitionBuilderInterface $builder): void
     {
-        return $this->definition()
+        $builder
             ->string(self::ARG_MENU)
             ->string(self::ARG_URL)
             ->int(self::ARG_LEVEL)->optional()->default(1)->positive()

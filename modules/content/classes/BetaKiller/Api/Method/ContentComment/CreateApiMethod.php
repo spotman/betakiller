@@ -14,11 +14,13 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
     private const ARG_MESSAGE     = 'message';
 
     /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
+     * @param \Spotman\Defence\DefinitionBuilderInterface $builder
+     *
+     * @return void
      */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    public function defineArguments(DefinitionBuilderInterface $builder): void
     {
-        return $this->definition()
+        $builder
             ->composite(self::ARG_DATA)
             ->string(self::ARG_AUTHOR_NAME)
             ->string(self::ARG_MESSAGE);

@@ -12,11 +12,13 @@ class ThrowHttpExceptionApiMethod extends AbstractPhpExceptionApiMethod
     private const ARG_CODE = 'code';
 
     /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
+     * @param \Spotman\Defence\DefinitionBuilderInterface $builder
+     *
+     * @return void
      */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    public function defineArguments(DefinitionBuilderInterface $builder): void
     {
-        return $this->definition()
+        $builder
             ->int(self::ARG_CODE);
     }
 

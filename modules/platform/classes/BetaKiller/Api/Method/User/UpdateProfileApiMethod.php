@@ -13,11 +13,13 @@ class UpdateProfileApiMethod extends AbstractEntityBasedApiMethod
     private const ARG_DATA = 'data';
 
     /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
+     * @param \Spotman\Defence\DefinitionBuilderInterface $builder
+     *
+     * @return void
      */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    public function defineArguments(DefinitionBuilderInterface $builder): void
     {
-        return $this->definition()
+        $builder
             ->composite(self::ARG_DATA);
     }
 
