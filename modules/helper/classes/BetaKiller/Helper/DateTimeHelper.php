@@ -91,4 +91,17 @@ final class DateTimeHelper
     {
         return self::formatAtom($time);
     }
+
+    /**
+     * Compare dates only (ignore time)
+     *
+     * @param \DateTimeImmutable $left
+     * @param \DateTimeImmutable $right
+     *
+     * @return bool
+     */
+    public static function isSameDate(DateTimeImmutable $left, DateTimeImmutable $right): bool
+    {
+        return $left->setTime(0, 0, 0, 0) == $right->setTime(0, 0, 0, 0);
+    }
 }
