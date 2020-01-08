@@ -1,9 +1,10 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
+use BetaKiller\Content\Content;
 use BetaKiller\Model\RoleInterface;
 
-class ContentCommentResource extends AbstractHasWorkflowStateAclResource
+final class ContentCommentResource extends AbstractHasWorkflowStateAclResource
 {
     /**
      * Provides array of roles` names which are allowed to create entities
@@ -37,7 +38,7 @@ class ContentCommentResource extends AbstractHasWorkflowStateAclResource
     protected function getSearchPermissionRoles(): array
     {
         return [
-            RoleInterface::MODERATOR,
+            Content::ROLE_CONTENT_MODERATOR,
         ];
     }
 }

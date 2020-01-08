@@ -17,12 +17,6 @@ interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, Multi
     public const DEVELOPER = 'developer';
 
     /**
-     * Simplified role for moderators
-     * @deprecated Use more specific roles instead
-     */
-    public const MODERATOR = 'moderator';
-
-    /**
      * Role with access to admin panel
      */
     public const ADMIN_PANEL = 'admin-panel';

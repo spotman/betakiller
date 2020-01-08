@@ -16,19 +16,14 @@ return [
         ],
     ],
 
-    RoleInterface::MODERATOR => [
-        RoleConfig::OPTION_DESC => 'Role for moderators',
-    ],
-
     RoleInterface::ADMIN_PANEL => [
         RoleConfig::OPTION_DESC => 'Grants access to the admin panel',
     ],
 
     RoleInterface::DEVELOPER => [
-        RoleConfig::OPTION_DESC     => 'Role for developers',
+        RoleConfig::OPTION_DESC     => 'Developer',
         RoleConfig::OPTION_INHERITS => [
             RoleInterface::ADMIN_PANEL, // Developer has access to admin panel
-            RoleInterface::MODERATOR,
             RoleInterface::LOGIN,       // Developers are always allowed to login
         ],
     ],

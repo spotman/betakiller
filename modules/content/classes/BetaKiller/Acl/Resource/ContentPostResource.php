@@ -4,7 +4,7 @@ namespace BetaKiller\Acl\Resource;
 use BetaKiller\Content\Content;
 use BetaKiller\Model\RoleInterface;
 
-class ContentPostResource extends AbstractHasWorkflowStateAclResource
+final class ContentPostResource extends AbstractHasWorkflowStateAclResource
 {
     /**
      * Provides array of roles` names which are allowed to create entities
@@ -14,9 +14,8 @@ class ContentPostResource extends AbstractHasWorkflowStateAclResource
     protected function getCreatePermissionRoles(): array
     {
         return [
-            RoleInterface::MODERATOR,
-            RoleInterface::DEVELOPER,
-            Content::WRITER_ROLE_NAME,
+            Content::ROLE_CONTENT_MODERATOR,
+            Content::ROLE_WRITER,
         ];
     }
 

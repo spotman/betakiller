@@ -90,8 +90,8 @@ class Roles extends AbstractTask
                 ]);
             }
 
-            // Add description if not exists
-            if (!$model->getDescription()) {
+            // Update description
+            if ($model->getDescription() !== $description) {
                 $model->setDescription($description);
                 $this->logger->info('Role ":role" description updated', [
                     ':role' => $name,

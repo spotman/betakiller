@@ -2,11 +2,10 @@
 namespace BetaKiller\Acl\Resource;
 
 use BetaKiller\Content\Content;
-use BetaKiller\Model\RoleInterface;
 
-class ShortcodeResource extends AbstractEntityRelatedAclResource
+final class ShortcodeResource extends AbstractEntityRelatedAclResource
 {
-    public const ACTION_VERIFY = 'verify';
+    public const ACTION_VERIFY                    = 'verify';
     public const ACTION_GET_ATTRIBUTES_DEFINITION = 'getAttributesDefinition';
 
     /**
@@ -20,48 +19,40 @@ class ShortcodeResource extends AbstractEntityRelatedAclResource
     {
         return [
             self::ACTION_VERIFY => [
-                Content::WRITER_ROLE_NAME,
-                RoleInterface::MODERATOR,
-                RoleInterface::DEVELOPER,
+                Content::ROLE_WRITER,
+                Content::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_GET_ATTRIBUTES_DEFINITION => [
-                Content::WRITER_ROLE_NAME,
-                RoleInterface::MODERATOR,
-                RoleInterface::DEVELOPER,
+                Content::ROLE_WRITER,
+                Content::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_CREATE => [
-                RoleInterface::MODERATOR,
-                RoleInterface::DEVELOPER,
+                Content::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_READ => [
-                Content::WRITER_ROLE_NAME,
-                RoleInterface::MODERATOR,
-                RoleInterface::DEVELOPER,
+                Content::ROLE_WRITER,
+                Content::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_UPDATE => [
-                RoleInterface::MODERATOR,
-                RoleInterface::DEVELOPER,
+                Content::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_DELETE => [
-                RoleInterface::MODERATOR,
-                RoleInterface::DEVELOPER,
+                Content::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_LIST => [
-                Content::WRITER_ROLE_NAME,
-                RoleInterface::MODERATOR,
-                RoleInterface::DEVELOPER,
+                Content::ROLE_WRITER,
+                Content::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_SEARCH => [
-                Content::WRITER_ROLE_NAME,
-                RoleInterface::MODERATOR,
-                RoleInterface::DEVELOPER,
+                Content::ROLE_WRITER,
+                Content::ROLE_CONTENT_MODERATOR,
             ],
         ];
     }

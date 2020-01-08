@@ -3,10 +3,15 @@ declare(strict_types=1);
 
 namespace BetaKiller\Content;
 
-class Content
+final class Content
 {
     /**
      * Role for writers
      */
-    public const WRITER_ROLE_NAME    = 'writer';
+    public const ROLE_WRITER = 'writer';
+
+    /**
+     * Simplified role for moderators
+     */
+    public const ROLE_CONTENT_MODERATOR = 'content-moderator';
 }

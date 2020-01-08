@@ -1,9 +1,10 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
+use BetaKiller\Content\Content;
 use BetaKiller\Model\RoleInterface;
 
-class ContentCommentStatusResource extends AbstractEntityRelatedAclResource
+final class ContentCommentStatusResource extends AbstractEntityRelatedAclResource
 {
     /**
      * Returns default permissions bundled with current resource
@@ -20,7 +21,7 @@ class ContentCommentStatusResource extends AbstractEntityRelatedAclResource
             ],
 
             self::ACTION_READ => [
-                RoleInterface::MODERATOR,
+                Content::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_UPDATE => [

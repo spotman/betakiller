@@ -4,7 +4,7 @@ namespace BetaKiller\Acl\Resource;
 use BetaKiller\Content\Content;
 use BetaKiller\Model\RoleInterface;
 
-class ContentPostRevisionResource extends AbstractEntityRelatedAclResource
+final class ContentPostRevisionResource extends AbstractEntityRelatedAclResource
 {
     /**
      * Returns default permissions bundled with current resource
@@ -17,14 +17,12 @@ class ContentPostRevisionResource extends AbstractEntityRelatedAclResource
     {
         return [
             self::ACTION_CREATE => [
-                RoleInterface::MODERATOR,
-                RoleInterface::DEVELOPER,
-                Content::WRITER_ROLE_NAME,
+                Content::ROLE_CONTENT_MODERATOR,
+                Content::ROLE_WRITER,
             ],
-            self::ACTION_READ => [
-                RoleInterface::MODERATOR,
-                RoleInterface::DEVELOPER,
-                Content::WRITER_ROLE_NAME,
+            self::ACTION_READ   => [
+                Content::ROLE_CONTENT_MODERATOR,
+                Content::ROLE_WRITER,
             ],
             self::ACTION_UPDATE => [
                 RoleInterface::DEVELOPER,
@@ -32,15 +30,13 @@ class ContentPostRevisionResource extends AbstractEntityRelatedAclResource
             self::ACTION_DELETE => [
                 RoleInterface::DEVELOPER,
             ],
-            self::ACTION_LIST => [
-                RoleInterface::MODERATOR,
-                RoleInterface::DEVELOPER,
-                Content::WRITER_ROLE_NAME,
+            self::ACTION_LIST   => [
+                Content::ROLE_CONTENT_MODERATOR,
+                Content::ROLE_WRITER,
             ],
             self::ACTION_SEARCH => [
-                RoleInterface::MODERATOR,
-                RoleInterface::DEVELOPER,
-                Content::WRITER_ROLE_NAME,
+                Content::ROLE_CONTENT_MODERATOR,
+                Content::ROLE_WRITER,
             ],
         ];
     }

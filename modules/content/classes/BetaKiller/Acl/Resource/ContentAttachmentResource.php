@@ -1,4 +1,6 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-class ContentAttachmentResource extends DefaultContentElementResource {}
+final class ContentAttachmentResource extends DefaultContentElementResource
+{
+}
