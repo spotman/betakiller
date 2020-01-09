@@ -142,7 +142,7 @@ class UrlElementTree implements UrlElementTreeInterface
 
             if ($forwardTarget && !$this->has($forwardTarget)) {
                 throw new UrlElementException('Forward target ":target" is missing in UrlElement ":codename"', [
-                    ':target'   => $redirectTarget,
+                    ':target'   => $forwardTarget,
                     ':codename' => $model->getCodename(),
                 ]);
             }
