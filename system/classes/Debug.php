@@ -105,6 +105,11 @@ class Debug extends Kohana_Debug
 
     public static function injectStackTraceCsp(ServerRequestInterface $request): void
     {
+        // CSP may be not loaded yet
+        if (!ServerRequestHelper::hasCsp($request)) {
+            return;
+        }
+
         $csp = ServerRequestHelper::getCsp($request);
 
         $csp->csp('script', self::CSP_SCRIPT);

@@ -259,6 +259,11 @@ class ServerRequestHelper
         return $request->getAttribute(DebugBar::class);
     }
 
+    public static function hasCsp(ServerRequestInterface $request): bool
+    {
+        return (bool)$request->getAttribute(SecureHeaders::class);
+    }
+
     public static function getCsp(ServerRequestInterface $request): SecureHeaders
     {
         return $request->getAttribute(SecureHeaders::class);
