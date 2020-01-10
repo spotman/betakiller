@@ -2,7 +2,7 @@
 namespace BetaKiller\Acl\Resource;
 
 use BetaKiller\Model\AbstractEntityInterface;
-use Spotman\Acl\Exception;
+use Spotman\Acl\AclException;
 
 abstract class AbstractEntityRelatedAclResource extends AbstractCrudlsPermissionsResource implements
     EntityRelatedAclResourceInterface
@@ -26,12 +26,12 @@ abstract class AbstractEntityRelatedAclResource extends AbstractCrudlsPermission
 
     /**
      * @return \BetaKiller\Model\AbstractEntityInterface
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
     protected function getEntity(): AbstractEntityInterface
     {
         if (!$this->entity) {
-            throw new Exception('Entity model is missing, set it via setEntity() method');
+            throw new AclException('Entity model is missing, set it via setEntity() method');
         }
 
         return $this->entity;

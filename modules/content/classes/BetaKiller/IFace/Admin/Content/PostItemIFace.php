@@ -82,7 +82,7 @@ class PostItemIFace extends AbstractContentAdminIFace
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Kohana_Exception
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
     public function getData(ServerRequestInterface $request): array
     {

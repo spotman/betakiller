@@ -19,7 +19,7 @@ use BetaKiller\Url\Zone\ZoneAccessSpecFactory;
 use BetaKiller\Url\Zone\ZoneAccessSpecInterface;
 use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclUserInterface;
-use Spotman\Acl\Exception;
+use Spotman\Acl\AclException;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
 
 class AclHelper
@@ -70,7 +70,7 @@ class AclHelper
      * @param string|null                               $action
      *
      * @return bool
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
     public function isEntityActionAllowed(
         UserInterface $user,
@@ -92,7 +92,7 @@ class AclHelper
      * @param \BetaKiller\Model\AbstractEntityInterface $entity
      *
      * @return \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
     public function getEntityAclResource(AbstractEntityInterface $entity): EntityRelatedAclResourceInterface
     {
@@ -108,14 +108,14 @@ class AclHelper
      * @param string $name
      *
      * @return \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
     private function getAclResourceForEntityName(string $name): EntityRelatedAclResourceInterface
     {
         $resource = $this->acl->getResource($name);
 
         if (!($resource instanceof EntityRelatedAclResourceInterface)) {
-            throw new Exception('Entity resource [:name] must implement :must', [
+            throw new AclException('Entity resource [:name] must implement :must', [
                 ':name' => $name,
                 ':must' => EntityRelatedAclResourceInterface::class,
             ]);
@@ -132,7 +132,7 @@ class AclHelper
      * @return bool
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\UrlElementException
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
     public function isUrlElementAllowed(
         AclUserInterface $user,
@@ -232,7 +232,7 @@ class AclHelper
         // Fetch entity from UrlContainer if required
         if ($resource->isEntityRequiredForAction($actionName)) {
             if (!$params) {
-                throw new Exception('UrlContainer is required for action ":action"', [
+                throw new AclException('UrlContainer is required for action ":action"', [
                     ':action' => $actionName,
                 ]);
             }
@@ -240,7 +240,7 @@ class AclHelper
             $entityInstance = $params->getEntity($entityName);
 
             if (!$entityInstance) {
-                throw new Exception('Entity instance ":entity" is absent for action ":action" in ":el"', [
+                throw new AclException('Entity instance ":entity" is absent for action ":action" in ":el"', [
                     ':entity' => $entityName,
                     ':action' => $actionName,
                     ':el'     => $urlElement->getCodename(),
@@ -277,14 +277,14 @@ class AclHelper
      * @param string $identity
      *
      * @return \Spotman\Acl\Resource\ResolvingResourceInterface
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
     public function getResource(string $identity): ResolvingResourceInterface
     {
         $resource = $this->acl->getResource($identity);
 
         if (!($resource instanceof ResolvingResourceInterface)) {
-            throw new Exception('Resource :name must implement :must', [
+            throw new AclException('Resource :name must implement :must', [
                 ':name' => $resource->getResourceId(),
                 ':must' => ResolvingResourceInterface::class,
             ]);
@@ -342,7 +342,7 @@ class AclHelper
      * @param \Spotman\Acl\AclUserInterface $user
      *
      * @return bool
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
     private function checkCustomAclRules(array $rules, AclUserInterface $user): bool
     {

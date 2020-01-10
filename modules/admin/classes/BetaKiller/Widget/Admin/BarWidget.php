@@ -67,7 +67,7 @@ class BarWidget extends AbstractAdminWidget
      * @return array
      * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
     public function getData(ServerRequestInterface $request, array $context): array
     {
@@ -141,7 +141,7 @@ class BarWidget extends AbstractAdminWidget
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
     protected function getCreateButtonItems(
         UserInterface $user,
@@ -171,7 +171,7 @@ class BarWidget extends AbstractAdminWidget
      * @return array|null
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\UrlElementException
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
 //    private function getCommentsData(): ?array
 //    {
