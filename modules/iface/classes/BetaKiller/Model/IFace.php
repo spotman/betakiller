@@ -135,4 +135,17 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
         // at this moment there is no need to store IFace data in database.
         return null;
     }
+
+    /**
+     * Returns sorted array of URL values for dynamic urls or numeric index for static urls
+     * Returns null if no order is defined
+     *
+     * @return array
+     */
+    public function getMenuOrder(): array
+    {
+        // realization temporarily is absent.
+        // at this moment there is no need to store IFace data in database.
+        return null;
+    }
 }

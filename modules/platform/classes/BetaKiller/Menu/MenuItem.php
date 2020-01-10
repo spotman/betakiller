@@ -5,7 +5,7 @@ namespace BetaKiller\Menu;
 
 use JsonSerializable;
 
-class MenuItem implements JsonSerializable
+final class MenuItem implements JsonSerializable
 {
     /**
      * @var string
@@ -38,6 +38,11 @@ class MenuItem implements JsonSerializable
     private $codename;
 
     /**
+     * @var int|null
+     */
+    private $order;
+
+    /**
      * MenuItem constructor.
      *
      * @param string   $url
@@ -45,14 +50,22 @@ class MenuItem implements JsonSerializable
      * @param bool     $active
      * @param string   $codename
      * @param int|null $counter
+     * @param int|null $order
      */
-    public function __construct(string $url, string $label, bool $active, string $codename, ?int $counter = null)
-    {
+    public function __construct(
+        string $url,
+        string $label,
+        bool $active,
+        string $codename,
+        ?int $counter = null,
+        ?int $order = null
+    ) {
         $this->url      = $url;
         $this->label    = $label;
         $this->active   = $active;
         $this->codename = $codename;
         $this->counter  = $counter;
+        $this->order    = $order;
     }
 
     /**
@@ -96,6 +109,14 @@ class MenuItem implements JsonSerializable
     }
 
     /**
+     * @return int|null
+     */
+    public function getOrder(): ?int
+    {
+        return $this->order;
+    }
+
+    /**
      * @param MenuItem[] $children
      */
     public function addChildren(array $children): void
@@ -126,6 +147,7 @@ class MenuItem implements JsonSerializable
             'label'    => $this->getLabel(),
             'active'   => $this->isActive(),
             'counter'  => $this->getCounter(),
+            'order'    => $this->getOrder(),
             'name'     => $this->getCodename(),
             'children' => array_map(static function (MenuItem $item) {
                 return $item->jsonSerialize();

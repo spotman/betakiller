@@ -140,7 +140,7 @@ class AvailableUrlsCollector
                     ]);
                     continue;
                 }
-            } catch (\Spotman\Acl\Exception $e) {
+            } catch (\Spotman\Acl\AclException $e) {
                 throw UrlElementException::wrap($e);
             }
 

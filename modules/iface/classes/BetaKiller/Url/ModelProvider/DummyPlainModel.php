@@ -4,20 +4,17 @@ namespace BetaKiller\Url\ModelProvider;
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Model\DummyModelTrait;
 use BetaKiller\Url\DummyModelInterface;
+use BetaKiller\Url\UrlElementForMenuPlainModelTrait;
 
 class DummyPlainModel extends AbstractPlainEntityLinkedUrlElement implements DummyModelInterface
 {
     use DummyModelTrait;
+    use UrlElementForMenuPlainModelTrait;
 
     /**
      * @var string
      */
     private $label;
-
-    /**
-     * @var string|null
-     */
-    private $menu;
 
     /**
      * @var string|null
@@ -63,16 +60,6 @@ class DummyPlainModel extends AbstractPlainEntityLinkedUrlElement implements Dum
     }
 
     /**
-     * Returns menu codename to which URL is assigned
-     *
-     * @return null|string
-     */
-    public function getMenuName(): ?string
-    {
-        return $this->menu;
-    }
-
-    /**
      * Returns UrlElement codename (if defined)
      *
      * @return string|null
@@ -106,9 +93,7 @@ class DummyPlainModel extends AbstractPlainEntityLinkedUrlElement implements Dum
     {
         $this->label = $data[self::OPTION_LABEL] ?? null;
 
-        if (isset($data[self::OPTION_MENU])) {
-            $this->menu = mb_strtolower($data[self::OPTION_MENU]);
-        }
+        $this->menuFromArray($data);
 
         if (isset($data[self::OPTION_LAYOUT])) {
             $this->layoutCodename = (string)$data[self::OPTION_LAYOUT];
@@ -132,9 +117,8 @@ class DummyPlainModel extends AbstractPlainEntityLinkedUrlElement implements Dum
      */
     public function asArray(): array
     {
-        return array_merge(parent::asArray(), [
+        return array_merge(parent::asArray(), $this->menuToArray(), [
             self::OPTION_LABEL    => $this->getLabel(),
-            self::OPTION_MENU     => $this->getMenuName(),
             self::OPTION_REDIRECT => $this->getRedirectTarget(),
             self::OPTION_FORWARD  => $this->getForwardTarget(),
             self::OPTION_LAYOUT   => $this->getLayoutCodename(),

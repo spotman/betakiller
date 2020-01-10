@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace BetaKiller\Service;
 
+use BetaKiller\Exception\DomainException;
 use BetaKiller\Factory\UrlElementInstanceFactory;
 use BetaKiller\Helper\AclHelper;
+use BetaKiller\Helper\TextHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Menu\MenuItem;
@@ -16,11 +18,13 @@ use BetaKiller\Url\ElementFilter\MenuCodenameUrlElementFilter;
 use BetaKiller\Url\ElementFilter\UrlElementFilterInterface;
 use BetaKiller\Url\HasMenuCounterInterface;
 use BetaKiller\Url\UrlElementException;
+use BetaKiller\Url\UrlElementForMenuInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlElementTreeRecursiveIterator;
 use Generator;
 use RecursiveIterator;
+use Spotman\Acl\AclException;
 
 class MenuService
 {
@@ -177,6 +181,9 @@ class MenuService
     ): array {
         $items = [];
 
+        // Start from 1 for simplicity
+        $layerItemsCounter = 1;
+
         // Iterate over every url element
         foreach ($iterator as $urlElement) {
             //$params = $params ?: $this->urlHelper->createUrlContainer();
@@ -226,6 +233,8 @@ class MenuService
                 // Element is in menu, processing
                 $instance = $this->elementFactory->createFromUrlElement($urlElement);
 
+                $availableUrlCounter = 0;
+
                 // Iterate over every generated URL to make full tree
                 foreach ($this->getAvailableIFaceUrls($urlElement, $params) as $availableUrl) {
                     // Store parameter for childs processing (if exists)
@@ -241,18 +250,26 @@ class MenuService
                         continue;
                     }
 
+                    $url = $availableUrl->getUrl();
+
                     // Calculate menu counter if needed
                     $counter = $instance instanceof HasMenuCounterInterface
                         ? $instance->getMenuCounter($params, $this->user)
                         : null;
 
+                    // Calculate order
+                    $itemOrder = $urlElement instanceof UrlElementForMenuInterface
+                        ? $this->getMenuItemOrder($urlElement, $url)
+                        : $availableUrlCounter;
+
                     // Use current URL if item is in menu
                     $item = new MenuItem(
-                        $availableUrl->getUrl(),
+                        $url,
                         $this->elementHelper->getLabel($urlElement, $params, $this->user->getLanguage()),
                         $this->urlHelper->inStack($urlElement, $params),
                         $urlElement->getCodename(),
-                        $counter
+                        $counter,
+                        $itemOrder + $layerItemsCounter
                     );
 
                     $items[] = $item;
@@ -261,7 +278,11 @@ class MenuService
                     if ($iterator->hasChildren()) {
                         $item->addChildren($this->processLayer($iterator->getChildren(), $params));
                     }
+
+                    $availableUrlCounter++;
                 }
+
+                $layerItemsCounter++;
             } elseif ($useChildren) {
                 // Just push children up
                 foreach ($this->processLayer($iterator->getChildren(), $params) as $item) {
@@ -274,6 +295,11 @@ class MenuService
                 $this->currentLevel--;
             }
         }
+
+        // Sort items by order
+        usort($items, static function (MenuItem $a, MenuItem $b) {
+            return $a->getOrder() <=> $b->getOrder();
+        });
 
         return $items;
     }
@@ -301,8 +327,35 @@ class MenuService
         try {
             // Security check
             return $this->aclHelper->isUrlElementAllowed($this->user, $element, $params);
-        } catch (\Spotman\Acl\Exception $e) {
+        } catch (AclException $e) {
             throw UrlElementException::wrap($e);
         }
+    }
+
+    private function getMenuItemOrder(UrlElementForMenuInterface $urlElement, string $url): ?int
+    {
+        // Dynamic UrlElement => order contains list of possible URL values (comma-separated)
+        $orderedValues = $urlElement->getMenuOrder();
+
+        // No order => nothing to do
+        if (!$orderedValues) {
+            return null;
+        }
+
+        if (!$urlElement->hasDynamicUrl()) {
+            throw new DomainException('Only dynamic URLs may define custom menu order but ":name" used it', [
+                ':name' => $urlElement->getCodename(),
+            ]);
+        }
+
+        foreach ($orderedValues as $index => $value) {
+            if (TextHelper::endsWith($url, $value)) {
+                return $index;
+            }
+        }
+
+        throw new UrlElementException('Can not detect menu order for URL ":url"', [
+            ':url' => $url,
+        ]);
     }
 }

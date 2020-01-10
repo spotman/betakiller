@@ -4,9 +4,12 @@ namespace BetaKiller\Url\ModelProvider;
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementForMenuPlainModelTrait;
 
 class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFaceModelInterface
 {
+    use UrlElementForMenuPlainModelTrait;
+
     public const OPTION_TITLE = 'title';
 
     /**
@@ -28,11 +31,6 @@ class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFa
      * @var bool
      */
     private $hideInSiteMap = false;
-
-    /**
-     * @var string|null
-     */
-    private $menu;
 
     /**
      * @return string
@@ -116,11 +114,10 @@ class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFa
      */
     public function asArray(): array
     {
-        return array_merge(parent::asArray(), [
+        return array_merge(parent::asArray(), $this->menuToArray(), [
             self::OPTION_LABEL  => $this->getLabel(),
             self::OPTION_TITLE  => $this->getTitle(),
             self::OPTION_LAYOUT => $this->getLayoutCodename(),
-            self::OPTION_MENU   => $this->getMenuName(),
         ]);
     }
 
@@ -147,9 +144,7 @@ class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFa
             $this->layoutCodename = (string)$data[self::OPTION_LAYOUT];
         }
 
-        if (isset($data[self::OPTION_MENU])) {
-            $this->menu = mb_strtolower($data[self::OPTION_MENU]);
-        }
+        $this->menuFromArray($data);
 
         parent::fromArray($data);
     }
@@ -160,15 +155,5 @@ class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFa
     public function isHiddenInSiteMap(): bool
     {
         return $this->hideInSiteMap;
-    }
-
-    /**
-     * Returns menu codename to which URL is assigned
-     *
-     * @return null|string
-     */
-    public function getMenuName(): ?string
-    {
-        return $this->menu;
     }
 }

@@ -74,7 +74,7 @@ class UrlProcessor
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\UrlElementException
-     * @throws \Spotman\Acl\Exception
+     * @throws \Spotman\Acl\AclException
      */
     private function checkUrlElementAccess(
         UrlElementInterface $urlElement,
