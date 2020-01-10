@@ -55,12 +55,12 @@ abstract class AbstractHasWorkflowStateRepository extends AbstractOrmBasedDispat
         return $this;
     }
 
-    protected function filterStatesCodenames(OrmInterface $orm, array $codenames): self
+    protected function filterStatesCodenames(OrmInterface $orm, array $codenames, bool $not = null): self
     {
         $rel = $this->getStateRelationKey();
         $col = $this->getStateCodenameColumnName();
 
-        $orm->where($rel.'.'.$col, 'IN', $codenames);
+        $orm->where($rel.'.'.$col, $not ? 'NOT IN' : 'IN', $codenames);
 
         return $this;
     }
