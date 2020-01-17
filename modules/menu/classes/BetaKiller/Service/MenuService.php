@@ -343,8 +343,9 @@ class MenuService
         }
 
         if (!$urlElement->hasDynamicUrl()) {
-            throw new DomainException('Only dynamic URLs may define custom menu order but ":name" used it', [
+            throw new DomainException('Only dynamic URLs may define custom menu order but ":name" used ":values"', [
                 ':name' => $urlElement->getCodename(),
+                ':values' => \implode(', ', $orderedValues),
             ]);
         }
 

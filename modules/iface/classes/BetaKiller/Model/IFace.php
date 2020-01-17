@@ -146,6 +146,6 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
     {
         // realization temporarily is absent.
         // at this moment there is no need to store IFace data in database.
-        return null;
+        return [];
     }
 }

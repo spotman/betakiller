@@ -43,7 +43,9 @@ trait UrlElementForMenuPlainModelTrait
         }
 
         if (isset($data[self::OPTION_MENU_ORDER])) {
-            $this->menuOrder = array_map('trim', explode(',', $data[self::OPTION_MENU_ORDER]));
+            $orderedValues = explode(',', $data[self::OPTION_MENU_ORDER]);
+
+            $this->menuOrder = array_filter(array_map('trim', $orderedValues));
         }
     }
 
