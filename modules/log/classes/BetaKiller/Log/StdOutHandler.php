@@ -4,10 +4,10 @@ namespace BetaKiller\Log;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 
-class CliHandler extends StreamHandler
+class StdOutHandler extends StreamHandler
 {
     /**
-     * CliHandler constructor.
+     * StdOutHandler constructor.
      *
      * @param int  $level
      * @param bool $ansi
