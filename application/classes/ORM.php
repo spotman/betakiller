@@ -373,7 +373,11 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     {
         if ($this->hasKeyValue($key)) {
             throw new LogicException(
-                sprintf('Can not reassign key "%s" in "%s" model', $key, static::getModelName())
+                sprintf('Can not reassign key "%s" in "%s" model with ID "%s"',
+                    $key,
+                    static::getModelName(),
+                    $this->pk()
+                )
             );
         }
 
