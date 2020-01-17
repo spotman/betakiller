@@ -2,10 +2,11 @@
 namespace BetaKiller\Log;
 
 use Joli\JoliNotif\Notification;
+use Joli\JoliNotif\Notifier;
 use Joli\JoliNotif\NotifierFactory;
 use Monolog\Handler\AbstractHandler;
 
-class DesktopNotificationHandler extends AbstractHandler
+final class DesktopNotificationHandler extends AbstractHandler
 {
     /**
      * @var \Joli\JoliNotif\Notifier
@@ -14,15 +15,14 @@ class DesktopNotificationHandler extends AbstractHandler
 
     public function __construct()
     {
-        /** @var \Joli\JoliNotif\Notifier $notifier */
-        $this->notifier = NotifierFactory::create();
+        $this->notifier = NotifierFactory::createOrThrowException();
 
         parent::__construct();
     }
 
     public static function isSupported(): bool
     {
-        return \interface_exists(\Joli\JoliNotif\Notifier::class);
+        return \interface_exists(Notifier::class);
     }
 
     /**
@@ -35,7 +35,7 @@ class DesktopNotificationHandler extends AbstractHandler
      * Unless the bubbling is interrupted (by returning true), the Logger class will keep on
      * calling further handlers in the stack with a given log record.
      *
-     * @param  array $record The record to handle
+     * @param array $record The record to handle
      *
      * @return bool true means that this handler handled the record, and that bubbling is not permitted.
      *                        false means the record was either not processed or that this handler allows bubbling.
@@ -55,7 +55,7 @@ class DesktopNotificationHandler extends AbstractHandler
                 ->setTitle($exception->getMessage())
                 ->setBody($exception->getTraceAsString());
 
-            $this->notifier->send($notification);
+            return $this->notifier->send($notification);
         }
 
         return false;
