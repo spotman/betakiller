@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Error;
 
-use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Log\Logger;
@@ -48,11 +47,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     private $enabled = true;
 
     /**
-     * @var \BetaKiller\Factory\EntityFactoryInterface
-     */
-    private $entityFactory;
-
-    /**
      * @var \BetaKiller\Repository\PhpExceptionRepository
      */
     private $repository;
@@ -70,18 +64,13 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     /**
      * PhpExceptionStorageHandler constructor.
      *
-     * @param \BetaKiller\Factory\EntityFactoryInterface             $entityFactory
-     * @param \BetaKiller\Repository\PhpExceptionRepositoryInterface $repository
-     * @param \BetaKiller\Helper\NotificationHelper                  $notificationHelper
+     * @param \BetaKiller\Repository\PhpExceptionRepositoryInterface $repo
+     * @param \BetaKiller\Helper\NotificationHelper                  $notification
      */
-    public function __construct(
-        EntityFactoryInterface $entityFactory,
-        PhpExceptionRepositoryInterface $repository,
-        NotificationHelper $notificationHelper
-    ) {
-        $this->entityFactory = $entityFactory;
-        $this->repository    = $repository;
-        $this->notification  = $notificationHelper;
+    public function __construct(PhpExceptionRepositoryInterface $repo, NotificationHelper $notification)
+    {
+        $this->repository   = $repo;
+        $this->notification = $notification;
 
         parent::__construct(self::MIN_LEVEL);
     }
@@ -189,8 +178,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             // Mark exception as repeated
             $model->markAsRepeated($user);
         } else {
-            /** @var PhpExceptionModelInterface $model */
-            $model = $this->entityFactory->create(PhpException::getModelName());
+            $model = new PhpException();
             $model
                 ->setHash($hash)
                 ->setMessage($message)

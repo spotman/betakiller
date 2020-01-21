@@ -6,7 +6,7 @@ use DateTimeImmutable;
 use DB;
 use ORM;
 
-class PhpException extends \ORM implements PhpExceptionModelInterface
+class PhpException extends ORM implements PhpExceptionModelInterface
 {
     public const COLUMN_HASH         = 'hash';
     public const COLUMN_STATUS       = 'status';
