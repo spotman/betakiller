@@ -17,9 +17,9 @@ use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlPrototypeService;
 use BetaKiller\Url\Zone\ZoneAccessSpecFactory;
 use BetaKiller\Url\Zone\ZoneAccessSpecInterface;
+use Spotman\Acl\AclException;
 use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclUserInterface;
-use Spotman\Acl\AclException;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
 
 class AclHelper
@@ -67,18 +67,19 @@ class AclHelper
     /**
      * @param \BetaKiller\Model\UserInterface           $user
      * @param \BetaKiller\Model\AbstractEntityInterface $entity
-     * @param string|null                               $action
+     * @param string                                    $action
      *
      * @return bool
      * @throws \Spotman\Acl\AclException
      */
-    public function isEntityActionAllowed(
+    public function isEntityPermissionAllowed(
         UserInterface $user,
         AbstractEntityInterface $entity,
-        ?string $action = null
+        string $action
     ): bool {
         $resource = $this->getEntityAclResource($entity);
-        $action   = $action ?? CrudlsActionsInterface::ACTION_READ;
+
+        $resource->setEntity($entity);
 
         return $this->isPermissionAllowed($user, $resource, $action);
     }
@@ -266,10 +267,9 @@ class AclHelper
      */
     private function isEntityAllowedInZone(DispatchableEntityInterface $entity, UrlElementInterface $urlElement): bool
     {
-        $spec   = $this->getZoneAccessSpec($urlElement);
-        $result = $spec->isEntityAllowed($entity);
+        $result = $this->getZoneAccessSpec($urlElement)->isEntityAllowed($entity);
 
-        // Entity is allowed if no spec defined
+        // Entity is allowed if entity spec is not defined
         return $result ?? true;
     }
 
@@ -301,7 +301,7 @@ class AclHelper
      *
      * @return bool
      */
-    public function isPermissionAllowed(
+    private function isPermissionAllowed(
         AclUserInterface $user,
         ResolvingResourceInterface $resource,
         string $permission

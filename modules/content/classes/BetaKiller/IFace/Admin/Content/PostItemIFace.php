@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
-use BetaKiller\CrudlsActionsInterface;
+use BetaKiller\Acl\Resource\ContentPostResource;
 use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\AssetsHelper;
@@ -105,8 +105,8 @@ class PostItemIFace extends AbstractContentAdminIFace
 
         $status = $post->getWorkflowState();
 
-        $updateAllowed = $this->aclHelper->isEntityActionAllowed($this->user, $post,
-            CrudlsActionsInterface::ACTION_UPDATE);
+        $updateAllowed = $this->aclHelper->isEntityPermissionAllowed($this->user, $post,
+            ContentPostResource::ACTION_UPDATE);
 
         return [
             'post' => [

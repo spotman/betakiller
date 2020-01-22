@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Workflow;
 
-use BetaKiller\Acl\Resource\HasWorkflowStateAclResourceInterface;
 use BetaKiller\Config\WorkflowConfigInterface;
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Factory\RepositoryFactory;
@@ -80,16 +79,7 @@ final class StatusWorkflow implements StatusWorkflowInterface
         string $codename,
         UserInterface $user
     ): bool {
-        $resource = $this->acl->getEntityAclResource($model);
-
-        if (!$resource instanceof HasWorkflowStateAclResourceInterface) {
-            throw new WorkflowStateException('Acl resource ":id" must implement :class', [
-                ':id'    => $resource->getResourceId(),
-                ':class' => HasWorkflowStateAclResourceInterface::class,
-            ]);
-        }
-
-        return $this->acl->isPermissionAllowed($user, $resource, $codename);
+        return $this->acl->isEntityPermissionAllowed($user, $model, $codename);
     }
 
     public function setStartState(HasWorkflowStateInterface $model): void
