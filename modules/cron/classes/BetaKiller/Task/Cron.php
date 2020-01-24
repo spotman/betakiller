@@ -318,11 +318,12 @@ class Cron extends AbstractTask
             $till = (new \DateTimeImmutable)->add(new \DateInterval('PT15M'));
             $task->postpone($till);
 
-            $this->logDebug('Task [:name] is failed and postponed till :time', [
+            $this->logger->warning('Task [:name] is failed and postponed till :time', [
                 ':name' => $task->getName(),
                 ':time' => $till->format('H:i:s d.m.Y'),
             ]);
 
+            // TODO Real enqueue and postpone (use ESB command queue)
             $log = $this->getLogFromRunEvent($event);
             $log->markAsFailed();
             $this->repo->save($log);
