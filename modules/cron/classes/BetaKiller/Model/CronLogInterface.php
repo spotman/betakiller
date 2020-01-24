@@ -20,6 +20,18 @@ interface CronLogInterface extends AbstractEntityInterface
     public function getName(): string;
 
     /**
+     * @param array $value
+     *
+     * @return \BetaKiller\Model\CronLogInterface
+     */
+    public function setParams(array $value): CronLogInterface;
+
+    /**
+     * @return array
+     */
+    public function getParams(): array;
+
+    /**
      * @param string $value
      *
      * @return \BetaKiller\Model\CronLogInterface

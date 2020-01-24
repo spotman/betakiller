@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task;
 
+use BetaKiller\Cron\ConfigItem;
 use BetaKiller\Cron\CronException;
 use BetaKiller\Cron\Task;
 use BetaKiller\Cron\TaskQueue;
@@ -11,7 +12,6 @@ use BetaKiller\Model\CronLog;
 use BetaKiller\Model\CronLogInterface;
 use BetaKiller\Repository\CronLogRepositoryInterface;
 use BetaKiller\Service\MaintenanceModeService;
-use Cron\CronExpression;
 use Graze\ParallelProcess\Display\Table;
 use Graze\ParallelProcess\Event\RunEvent;
 use Graze\ParallelProcess\PriorityPool;
@@ -102,6 +102,9 @@ class Cron extends AbstractTask
         $this->isHuman      = $this->getOption('human') !== false;
         $this->currentStage = $this->env->getModeName();
 
+        // Enqueue all tasks which was missed in past (power outage, script error, etc)
+        $this->enqueueMissedTasks();
+
         // Get all due tasks and enqueue them (long-running task would not affect next tasks due check)
         $this->enqueueDueTasks();
 
@@ -110,10 +113,10 @@ class Cron extends AbstractTask
     }
 
     /**
+     * @return \Generator|ConfigItem[]
      * @throws \BetaKiller\Task\TaskException
-     * @throws \Symfony\Component\Yaml\Exception\ParseException
      */
-    private function enqueueDueTasks(): void
+    private function getConfigTasksGenerator(): \Generator
     {
         $sitePath = $this->env->getAppRootPath();
 
@@ -127,22 +130,9 @@ class Cron extends AbstractTask
         }
 
         foreach ($records as $data) {
-            $name       = $data['name'] ?? null;
-            $expr       = $data['at'] ?? null;
-            $params     = $data['params'] ?? null;
-            $taskStages = $data['stages'] ?? null;
+            $item = ConfigItem::fromArray($data);
 
-            if (!$name) {
-                throw new TaskException('Missing "name" key value in task :data', [
-                    ':data' => \json_encode($data),
-                ]);
-            }
-
-            if (!$expr) {
-                throw new TaskException('Missing "at" key value in [:name] task', [
-                    ':name' => $name,
-                ]);
-            }
+            $taskStages = $item->getStages();
 
             if (!$taskStages) {
                 // No stage means any stage
@@ -156,35 +146,72 @@ class Cron extends AbstractTask
             // Ensure that target stage is reached
             if (!\in_array($this->currentStage, $taskStages, true)) {
                 $this->logDebug('Skip task [:name] for stages ":stage"', [
-                    ':name'  => $name,
+                    ':name'  => $item->getName(),
                     ':stage' => implode('", "', $taskStages),
                 ]);
 
                 continue;
             }
 
-            $cron = CronExpression::factory($expr);
-
-            if (!$cron->isDue()) {
-                $this->logDebug('Task [:task] is not due, skipping', [':task' => $name]);
-                continue;
-            }
-
-            $this->logDebug('Task [:task] is due', [':task' => $name]);
-
-            $task = new Task($name, $params);
-
-            // Skip task if already queued
-            if ($this->queue->isQueued($task)) {
-                $this->logger->warning('Task [:task] is already queued, skipping', [':task' => $name]);
-                continue;
-            }
-
-            // Enqueue task
-            $this->queue->enqueue($task);
-
-            $this->logDebug('Task [:task] was queued', [':task' => $name]);
+            yield $item;
         }
+    }
+
+    private function enqueueMissedTasks(): void
+    {
+        foreach ($this->getConfigTasksGenerator() as $item) {
+            $name   = $item->getName();
+            $params = $item->getParams();
+            $cron   = $item->getExpression();
+
+            $previousRun = \DateTimeImmutable::createFromMutable($cron->getPreviousRunDate());
+
+            $this->logDebug('Checking task [:task] is missed after :date', [
+                ':task' => $name,
+                ':date' => $previousRun->format(\DateTimeImmutable::ATOM),
+            ]);
+
+            if (!$this->repo->hasTaskRecordAfter($name, $params, $previousRun)) {
+                $this->logDebug('Task [:task] is missing previous run', [':task' => $name]);
+
+                $this->enqueueTask($name, $params);
+            }
+        }
+    }
+
+    /**
+     * @throws \BetaKiller\Task\TaskException
+     * @throws \Symfony\Component\Yaml\Exception\ParseException
+     */
+    private function enqueueDueTasks(): void
+    {
+        foreach ($this->getConfigTasksGenerator() as $item) {
+            $name = $item->getName();
+            $cron = $item->getExpression();
+
+            if ($cron->isDue()) {
+                $this->logDebug('Task [:task] is due', [':task' => $name]);
+
+                $this->enqueueTask($name, $item->getParams());
+            }
+        }
+    }
+
+    private function enqueueTask(string $name, array $params): void
+    {
+        $task = new Task($name, $params);
+
+        // Skip task if already queued
+        if ($this->queue->isQueued($task)) {
+            $this->logger->warning('Task [:task] is already queued, skipping', [':task' => $name]);
+
+            return;
+        }
+
+        // Enqueue task
+        $this->queue->enqueue($task);
+
+        $this->logDebug('Task [:task] was queued', [':task' => $name]);
     }
 
     /**
@@ -229,13 +256,17 @@ class Cron extends AbstractTask
     {
         $this->logDebug('Task [:name] is ready to start', [':name' => $task->getName()]);
 
-        $cmd     = self::getTaskCmd($this->env, $task->getName(), $task->getParams());
+        $name   = $task->getName();
+        $params = $task->getParams();
+
+        $cmd     = self::getTaskCmd($this->env, $name, $params);
         $docRoot = $this->env->getDocRootPath();
 
         $log = new CronLog();
 
         $log
-            ->setName($task->getName())
+            ->setName($name)
+            ->setParams($params)
             ->setCmd($cmd)
             ->markAsQueued();
 
