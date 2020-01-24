@@ -35,7 +35,7 @@ class WysiwygPreviewAction extends AbstractAction
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $params = ServerRequestHelper::getUrlContainer($request);
-        $entity = $params->getEntity(ShortcodeEntityInterface::URL_CONTAINER_KEY);
+        $entity = $params->getEntity(ShortcodeEntityInterface::MODEL_NAME);
 
         $shortcode = $this->shortcodeFacade->createFromEntity($entity);
 

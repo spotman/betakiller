@@ -326,32 +326,12 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
             /** @var OrmInterface $model */
             $model = $this->get($column);
 
-            if ($model->loaded() && $model->get_id()) {
+            if ($model->loaded() && $model->pk()) {
                 $entities[] = $model;
             }
         }
 
         return $entities;
-    }
-
-    /**
-     * Returns true if this entity has linked one with provided key
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function hasLinkedEntity(string $key): bool
-    {
-        foreach ($this->_belongs_to as $column => $config) {
-            $modelName = $config['model'] ?? null;
-
-            if ($modelName && $modelName === $key) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

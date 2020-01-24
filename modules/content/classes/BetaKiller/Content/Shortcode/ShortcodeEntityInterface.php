@@ -5,8 +5,8 @@ use BetaKiller\Model\ConfigBasedDispatchableEntityInterface;
 
 interface ShortcodeEntityInterface extends ConfigBasedDispatchableEntityInterface
 {
-    public const URL_CONTAINER_KEY = 'Shortcode';
-    public const URL_KEY           = 'tag_name';
+    public const MODEL_NAME = 'Shortcode';
+    public const URL_KEY    = 'tag_name';
 
     public const TYPE_STATIC          = 'static';
     public const TYPE_DYNAMIC         = 'dynamic';

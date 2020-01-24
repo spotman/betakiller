@@ -17,6 +17,16 @@ abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispa
     private $configOptions;
 
     /**
+     * Returns key which will be used for storing model in UrlContainer registry.
+     *
+     * @return string
+     */
+    final public static function getUrlContainerKey(): string
+    {
+        return static::getModelName();
+    }
+
+    /**
      * AbstractConfigBasedDispatchableEntity constructor.
      *
      * @param string     $codename
@@ -57,19 +67,6 @@ abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispa
     {
         // No entities by default
         return [];
-    }
-
-    /**
-     * Returns true if this entity has linked one with provided key
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function hasLinkedEntity(string $key): bool
-    {
-        // No linked entities by default
-        return false;
     }
 
     /**

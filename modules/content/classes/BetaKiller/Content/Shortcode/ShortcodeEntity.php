@@ -3,24 +3,14 @@ namespace BetaKiller\Content\Shortcode;
 
 use BetaKiller\Model\AbstractConfigBasedDispatchableEntity;
 
-class ShortcodeEntity extends AbstractConfigBasedDispatchableEntity implements ShortcodeEntityInterface
+final class ShortcodeEntity extends AbstractConfigBasedDispatchableEntity implements ShortcodeEntityInterface
 {
-    /**
-     * Returns key which will be used for storing model in UrlContainer registry.
-     *
-     * @return string
-     */
-    public static function getUrlContainerKey(): string
-    {
-        return ShortcodeEntityInterface::URL_CONTAINER_KEY;
-    }
-
     /**
      * @return string
      */
     public static function getModelName(): string
     {
-        return self::URL_CONTAINER_KEY;
+        return self::MODEL_NAME;
     }
 
     /**

@@ -5,7 +5,7 @@ namespace BetaKiller\Model;
 
 interface WebHookModelInterface extends ConfigBasedDispatchableEntityInterface
 {
-    public const URL_CONTAINER_KEY = 'WebHook';
+    public const MODEL_NAME = 'WebHook';
 
     /**
      * Returns target service name (website domain or company name)

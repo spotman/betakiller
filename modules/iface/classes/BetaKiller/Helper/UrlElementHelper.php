@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\IFaceModelInterface;
@@ -25,25 +24,17 @@ class UrlElementHelper
     private $stringPatternHelper;
 
     /**
-     * @var \BetaKiller\I18n\I18nFacade
-     */
-    private $i18n;
-
-    /**
      * UrlElementHelper constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface $tree
-     * @param \BetaKiller\I18n\I18nFacade             $i18n
      * @param \BetaKiller\Helper\StringPatternHelper  $stringPatternHelper
      */
     public function __construct(
         UrlElementTreeInterface $tree,
-        I18nFacade $i18n,
         StringPatternHelper $stringPatternHelper
     ) {
         $this->tree                = $tree;
         $this->stringPatternHelper = $stringPatternHelper;
-        $this->i18n                = $i18n;
     }
 
     /**
@@ -125,11 +116,7 @@ class UrlElementHelper
             ]);
         }
 
-        if (I18nFacade::isI18nKey($label)) {
-            $label = $this->i18n->translateKeyName($lang, $label);
-        }
-
-        return $this->stringPatternHelper->processPattern($label, $params);
+        return $this->stringPatternHelper->process($label, $params, $lang);
     }
 
     /**
@@ -159,11 +146,7 @@ class UrlElementHelper
             ]);
         }
 
-        if (I18nFacade::isI18nKey($title)) {
-            $title = $this->i18n->translateKeyName($lang, $title);
-        }
-
-        return $this->stringPatternHelper->processPattern($title, $params, SeoMetaInterface::TITLE_LIMIT);
+        return $this->stringPatternHelper->process($title, $params, $lang, SeoMetaInterface::TITLE_LIMIT);
     }
 
     /**
@@ -187,11 +170,7 @@ class UrlElementHelper
             return '';
         }
 
-        if (I18nFacade::isI18nKey($description)) {
-            $description = $this->i18n->translateKeyName($lang, $description);
-        }
-
-        return $this->stringPatternHelper->processPattern($description, $params, SeoMetaInterface::DESCRIPTION_LIMIT);
+        return $this->stringPatternHelper->process($description, $params, $lang, SeoMetaInterface::DESCRIPTION_LIMIT);
     }
 
     /**

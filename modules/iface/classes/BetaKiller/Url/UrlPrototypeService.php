@@ -257,7 +257,13 @@ class UrlPrototypeService
         $instance = $parameters->getParameter($name);
 
         if (!$instance) {
-            throw new UrlPrototypeException('Can not find ":name" parameter', [':name' => $name]);
+            throw new UrlPrototypeException('Can not find ":name" parameter for prototype ":proto", having ":params"', [
+                ':name'   => $name,
+                ':proto'  => $prototype->asString(),
+                ':params' => implode('", "', array_map(static function (UrlParameterInterface $param) {
+                    return $param::getUrlContainerKey();
+                }, $parameters->getAllParameters())),
+            ]);
         }
 
         return $instance;

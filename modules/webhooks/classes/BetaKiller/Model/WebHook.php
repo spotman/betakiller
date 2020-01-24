@@ -38,20 +38,10 @@ class WebHook extends AbstractConfigBasedDispatchableEntity implements WebHookMo
     }
 
     /**
-     * Returns key which will be used for storing model in UrlContainer registry.
-     *
-     * @return string
-     */
-    public static function getUrlContainerKey(): string
-    {
-        return WebHookModelInterface::URL_CONTAINER_KEY;
-    }
-
-    /**
      * @return string
      */
     public static function getModelName(): string
     {
-        return WebHookModelInterface::URL_CONTAINER_KEY;
+        return WebHookModelInterface::MODEL_NAME;
     }
 }

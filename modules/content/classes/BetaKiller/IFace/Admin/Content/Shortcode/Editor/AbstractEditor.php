@@ -47,7 +47,7 @@ abstract class AbstractEditor extends AbstractContentAdminIFace
      */
     protected function getShortcodeEditor(): ShortcodeEditorInterface
     {
-        $this->shortcodeEntity = $this->urlContainer->getEntity(ShortcodeEntityInterface::URL_CONTAINER_KEY);
+        $this->shortcodeEntity = $this->urlContainer->getEntity(ShortcodeEntityInterface::MODEL_NAME);
 
         return $this->editorFactory->createFromEntity($this->shortcodeEntity);
     }
