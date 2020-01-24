@@ -203,7 +203,7 @@ class Cron extends AbstractTask
 
         // Skip task if already queued
         if ($this->queue->isQueued($task)) {
-            $this->logger->warning('Task [:task] is already queued, skipping', [':task' => $name]);
+            $this->logger->info('Task [:task] is already queued, skipping', [':task' => $name]);
 
             return;
         }
