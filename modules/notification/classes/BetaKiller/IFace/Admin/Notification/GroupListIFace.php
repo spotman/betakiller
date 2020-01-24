@@ -9,9 +9,8 @@ use BetaKiller\Helper\UrlHelper;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Notification\MessageRendererInterface;
-use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Repository\LanguageRepositoryInterface;
-use BetaKiller\Repository\NotificationGroupRepository;
+use BetaKiller\Repository\NotificationGroupRepositoryInterface;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use function http_build_query;
@@ -34,11 +33,6 @@ class GroupListIFace extends AbstractAdminIFace
     private $messageRenderer;
 
     /**
-     * @var \BetaKiller\Notification\NotificationFacade
-     */
-    private $facade;
-
-    /**
      * @var \BetaKiller\Repository\LanguageRepositoryInterface
      */
     private $langRepo;
@@ -46,23 +40,20 @@ class GroupListIFace extends AbstractAdminIFace
     /**
      * GroupListIFace constructor.
      *
-     * @param \BetaKiller\Repository\NotificationGroupRepository $groupRepo
-     * @param \BetaKiller\Config\NotificationConfigInterface     $config
-     * @param \BetaKiller\Notification\NotificationFacade        $facade
-     * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
-     * @param \BetaKiller\Notification\MessageRendererInterface  $messageRenderer
+     * @param \BetaKiller\Repository\NotificationGroupRepositoryInterface $groupRepo
+     * @param \BetaKiller\Config\NotificationConfigInterface              $config
+     * @param \BetaKiller\Repository\LanguageRepositoryInterface          $langRepo
+     * @param \BetaKiller\Notification\MessageRendererInterface           $messageRenderer
      */
     public function __construct(
-        NotificationGroupRepository $groupRepo,
+        NotificationGroupRepositoryInterface $groupRepo,
         NotificationConfigInterface $config,
-        NotificationFacade $facade,
         LanguageRepositoryInterface $langRepo,
         MessageRendererInterface $messageRenderer
     ) {
         $this->groupRepo       = $groupRepo;
         $this->config          = $config;
         $this->messageRenderer = $messageRenderer;
-        $this->facade          = $facade;
         $this->langRepo        = $langRepo;
     }
 
@@ -130,14 +121,12 @@ class GroupListIFace extends AbstractAdminIFace
     private function checkMessageTemplates(string $messageCodename): array
     {
         $languages  = $this->langRepo->getAppLanguages(true);
-        $transports = $this->facade->getTransports();
+        $transports = $this->config->getTransports();
 
         $data = [];
 
         // Iterate transports first
-        foreach ($transports as $transport) {
-            $transportName = $transport->getName();
-
+        foreach ($transports as $transportName) {
             if ($this->messageRenderer->hasGeneralTemplate($messageCodename, $transportName)) {
                 $data[$transportName] = true;
             } else {

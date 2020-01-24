@@ -8,6 +8,7 @@ use BetaKiller\Model\NotificationGroupUserConfigInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\MessageTargetEmail;
 use BetaKiller\Notification\MessageTargetInterface;
+use BetaKiller\Notification\NotificationException;
 use BetaKiller\Notification\NotificationFacade;
 
 class NotificationHelper
@@ -49,15 +50,21 @@ class NotificationHelper
      *
      * @param string[]|null $attachments
      *
-     * @throws \BetaKiller\Exception
-     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Notification\NotificationException
      */
     public function groupMessage(string $name, array $templateData, array $attachments = null): void
     {
         $group = $this->getMessageGroup($name);
 
-        foreach ($this->notification->getGroupTargets($group) as $target) {
+        $targets = $this->notification->getGroupTargets($group);
+
+        if (!$targets) {
+            throw new NotificationException('Missing targets for group ":name"', [
+                ':name' => $group->getCodename(),
+            ]);
+        }
+
+        foreach ($targets as $target) {
             $this->directMessage($name, $target, $templateData, $attachments);
         }
     }

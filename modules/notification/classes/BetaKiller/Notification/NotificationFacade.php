@@ -451,7 +451,7 @@ final class NotificationFacade
     /**
      * @return \BetaKiller\Notification\TransportInterface[]
      */
-    public function getTransports(): array
+    private function getTransports(): array
     {
         if (!$this->transports) {
             $this->transports = $this->createTransports();
