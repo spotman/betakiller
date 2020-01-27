@@ -138,12 +138,16 @@ class MenuService
         // Iterate over all tree (filtering will be done later)
         $iterator = new UrlElementTreeRecursiveIterator($this->tree);
 
+        // was null (new container on every branch)
         $rootParams = $urlHelper->createUrlContainer();
 
         $rootParams->import($urlHelper->getUrlContainer());
 
+        // Start from 1 for simplicity
+        $totalCounter = 1;
+
         // Generate menu items
-        return $this->processLayer($iterator, $rootParams); // was null (new container on every branch)
+        return $this->processLayer($iterator, $rootParams, $totalCounter);
     }
 
     /**
@@ -168,7 +172,11 @@ class MenuService
      * @param \RecursiveIterator|UrlElementInterface[]        $iterator
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
+     * @param int|null                                        $totalCounter
+     *
      * @return MenuItem[]
+     * @throws \BetaKiller\Exception
+     * @throws \BetaKiller\Exception\DomainException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\I18n\I18nException
      * @throws \BetaKiller\Url\UrlElementException
@@ -177,12 +185,10 @@ class MenuService
      */
     private function processLayer(
         RecursiveIterator $iterator,
-        UrlContainerInterface $params
+        UrlContainerInterface $params,
+        int &$totalCounter
     ): array {
         $items = [];
-
-        // Start from 1 for simplicity
-        $layerItemsCounter = 1;
 
         // Iterate over every url element
         foreach ($iterator as $urlElement) {
@@ -233,6 +239,7 @@ class MenuService
                 // Element is in menu, processing
                 $instance = $this->elementFactory->createFromUrlElement($urlElement);
 
+                $orderedItemsBaseCounter = $totalCounter;
                 $availableUrlCounter = 0;
 
                 // Iterate over every generated URL to make full tree
@@ -269,23 +276,23 @@ class MenuService
                         $this->urlHelper->inStack($urlElement, $params),
                         $urlElement->getCodename(),
                         $counter,
-                        $itemOrder + $layerItemsCounter
+                        $itemOrder + $orderedItemsBaseCounter
                     );
 
                     $items[] = $item;
 
                     // Recursion for children
                     if ($iterator->hasChildren()) {
-                        $item->addChildren($this->processLayer($iterator->getChildren(), $params));
+                        $item->addChildren($this->processLayer($iterator->getChildren(), $params ,$totalCounter));
                     }
 
                     $availableUrlCounter++;
                 }
 
-                $layerItemsCounter++;
+                $totalCounter++;
             } elseif ($useChildren) {
-                // Just push children up
-                foreach ($this->processLayer($iterator->getChildren(), $params) as $item) {
+                // Just push children up, keep ordering
+                foreach ($this->processLayer($iterator->getChildren(), $params, $totalCounter) as $item) {
                     $items[] = $item;
                 }
             }
@@ -344,7 +351,7 @@ class MenuService
 
         if (!$urlElement->hasDynamicUrl()) {
             throw new DomainException('Only dynamic URLs may define custom menu order but ":name" used ":values"', [
-                ':name' => $urlElement->getCodename(),
+                ':name'   => $urlElement->getCodename(),
                 ':values' => \implode(', ', $orderedValues),
             ]);
         }
