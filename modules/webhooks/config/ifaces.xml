@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <!-- Public action -->
-    <dummy uri="webhooks" name="App_WebHook_RootDummy" hideInSiteMap="true" zone="public" label="Webhooks">
+    <dummy uri="webhooks" name="App\WebHook\RootDummy" hideInSiteMap="true" zone="public" label="Webhooks">
         <action name="WebHookExecute" uri="{WebHook.codename}" zone="public"/>
     </dummy>
 
     <!-- Admin panel -->
-    <iface uri="webhooks" name="Admin_WebHooks_ListItems" parent="Admin_Index" zone="developer" label="WebHooks"
+    <iface uri="webhooks" name="Admin\WebHooks\ListItems" parent="Admin\Index" zone="developer" label="WebHooks"
            menu="admin">
-        <iface uri="{WebHook.codename}" name="Admin_WebHooks_InfoItem" label="{WebHook.codename}"/>
+        <iface uri="{WebHook.codename}" name="Admin\WebHooks\InfoItem" label="{WebHook.codename}"/>
     </iface>
 </root>

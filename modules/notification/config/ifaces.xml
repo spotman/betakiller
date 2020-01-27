@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
-    <iface uri="notifications" name="Admin_Notification_Index" parent="Admin_Index" zone="admin" label="Notification"
+    <iface uri="notifications" name="Admin\Notification\Index" parent="Admin\Index" zone="admin" label="Notification"
            menu="admin" entity="NotificationGroup" entityAction="list">
 
-        <iface uri="groups" name="Admin_Notification_GroupList" label="Groups" menu="admin" entity="NotificationGroup"
+        <iface uri="groups" name="Admin\Notification\GroupList" label="Groups" menu="admin" entity="NotificationGroup"
                entityAction="list">
-            <iface uri="{NotificationGroup.codename}" name="Admin_Notification_GroupItem"
+            <iface uri="{NotificationGroup.codename}" name="Admin\Notification\GroupItem"
                    label="{NotificationGroup.codename}" entity="NotificationGroup" entityAction="read"/>
         </iface>
 
-        <iface uri="logs" name="Admin_Notification_LogIndex" label="Logs" menu="admin"
+        <iface uri="logs" name="Admin\Notification\LogIndex" label="Logs" menu="admin"
                entity="NotificationLog" entityAction="list">
-            <iface uri="{Page}" name="Admin_Notification_LogPage" label="Page {Page}"/>
-            <dummy uri="item" name="Admin_Notification_ItemDummy" label="Item">
-                <iface uri="{NotificationLog.id}" name="Admin_Notification_LogItem" label="Message"
+            <iface uri="{Page}" name="Admin\Notification\LogPage" label="Page {Page}"/>
+            <dummy uri="item" name="Admin\Notification\ItemDummy" label="Item">
+                <iface uri="{NotificationLog.id}" name="Admin\Notification\LogItem" label="Message"
                        entity="NotificationLog" entityAction="read"/>
             </dummy>
         </iface>

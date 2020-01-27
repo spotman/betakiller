@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
-    <iface uri="admin" name="Admin_Index" label="Admin" hideInSiteMap="true" zone="admin" layout="admin">
-        <iface uri="tests" name="Admin_Test_Index" zone="developer" menu="admin" label="Tests"/>
+    <iface uri="admin" name="Admin\Index" label="Admin" hideInSiteMap="true" zone="admin" layout="admin">
+        <iface uri="tests" name="Admin\Test\Index" zone="developer" menu="admin" label="Tests"/>
     </iface>
 </root>

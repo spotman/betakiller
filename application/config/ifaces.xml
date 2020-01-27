@@ -1,54 +1,54 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <!-- Auth common ifaces -->
-    <iface uri="login" name="Auth_Login" label="Sign in" layout="auth" hideInSiteMap="true" zone="public">
-        <action uri="regular" name="Auth_RegularLogin"/>
+    <iface uri="login" name="Auth\Login" label="Sign in" layout="auth" hideInSiteMap="true" zone="public">
+        <action uri="regular" name="Auth\RegularLogin"/>
     </iface>
 
-    <action uri="logout" name="Auth_Logout" zone="public"/>
-    <!--<action uri="change-account" name="Auth_ReLogin" layout="auth" hideInSiteMap="true" zone="personal" />-->
+    <action uri="logout" name="Auth\Logout" zone="public"/>
+    <!--<action uri="change-account" name="Auth\ReLogin" layout="auth" hideInSiteMap="true" zone="personal" />-->
 
-    <dummy uri="change-password" name="Auth_ChangePasswordDummy" zone="public" label="Change password">
-        <action uri="{Token.value}" name="Auth_VerifyPasswordChangeToken"/>
-        <iface uri="form" name="Auth_PasswordChange" zone="personal"
+    <dummy uri="change-password" name="Auth\ChangePasswordDummy" zone="public" label="Change password">
+        <action uri="{Token.value}" name="Auth\VerifyPasswordChangeToken"/>
+        <iface uri="form" name="Auth\PasswordChange" zone="personal"
                label="iface.auth.password-change.label" title="iface.auth.password-change.title">
-            <action uri="update" name="Auth_ChangePassword"/>
+            <action uri="update" name="Auth\ChangePassword"/>
         </iface>
         <!-- TODO 404 page here for missing token -->
     </dummy>
 
     <!--Verification-->
-    <dummy uri="verification" name="Auth_VerificationDummy" zone="public" label="Verification">
-        <action uri="{Token.value}" name="Auth_ConfirmEmail"/>
-        <iface uri="missing" name="Auth_EmailConfirmationTokenError404"
+    <dummy uri="verification" name="Auth\VerificationDummy" zone="public" label="Verification">
+        <action uri="{Token.value}" name="Auth\ConfirmEmail"/>
+        <iface uri="missing" name="Auth\EmailConfirmationTokenError404"
                label="iface.auth.token-error.label" title="iface.auth.token-error.label"/>
     </dummy>
 
     <!-- Access Recovery -->
-    <iface uri="access-recovery" name="Auth_AccessRecoveryRequest" label="Access recovery" layout="public"
+    <iface uri="access-recovery" name="Auth\AccessRecoveryRequest" label="Access recovery" layout="public"
            hideInSiteMap="true" zone="public">
-        <action uri="{Token.value}" name="Auth_VerifyAccessRecoveryToken"/>
-        <action uri="request" name="Auth_SendRecoveryEmail"/>
-        <iface uri="missing" name="Auth_AccessRecoveryTokenError404" label="iface.auth.token-error.label"/>
+        <action uri="{Token.value}" name="Auth\VerifyAccessRecoveryToken"/>
+        <action uri="request" name="Auth\SendRecoveryEmail"/>
+        <iface uri="missing" name="Auth\AccessRecoveryTokenError404" label="iface.auth.token-error.label"/>
     </iface>
 
     <!-- Registration claim -->
-    <action uri="claim-registration" name="Auth_ClaimRegistration" zone="public" query="h=NotificationLog.hash">
-        <iface uri="claim-thanks" name="Auth_RegistrationClaimThanks"
+    <action uri="claim-registration" name="Auth\ClaimRegistration" zone="public" query="h=NotificationLog.hash">
+        <iface uri="claim-thanks" name="Auth\RegistrationClaimThanks"
                title="iface.auth.claim-thanks.title" label="Claim thanks"/>
     </action>
 
-    <dummy uri="auth" name="Auth_Dummy" zone="public" hideInSiteMap="true" label="Auth">
-        <action uri="suspend" name="Auth_Suspend" zone="personal"/>
+    <dummy uri="auth" name="Auth\Dummy" zone="public" hideInSiteMap="true" label="Auth">
+        <action uri="suspend" name="Auth\Suspend" zone="personal"/>
 
-        <iface uri="blocked" name="Auth_Blocked" label="Blocked" zone="personal" layout="auth"/>
-        <iface uri="suspended" name="Auth_Suspended" label="Suspended" zone="personal" layout="auth">
-            <action uri="activate" name="Auth_ActivateSuspended" zone="personal"/>
+        <iface uri="blocked" name="Auth\Blocked" label="Blocked" zone="personal" layout="auth"/>
+        <iface uri="suspended" name="Auth\Suspended" label="Suspended" zone="personal" layout="auth">
+            <action uri="activate" name="Auth\ActivateSuspended" zone="personal"/>
         </iface>
     </dummy>
 
-    <iface uri="auth" name="Auth_Admin_AuthRoot" parent="Admin_Index" menu="admin" zone="developer" label="Auth Admin">
-        <action uri="restart-session" name="Auth_Admin_SessionRestart"/>
+    <iface uri="auth" name="Auth\Admin\AuthRoot" parent="Admin\Index" menu="admin" zone="developer" label="Auth Admin">
+        <action uri="restart-session" name="Auth\Admin\SessionRestart"/>
     </iface>
 </root>
 

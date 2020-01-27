@@ -224,22 +224,26 @@ final class NamespaceBasedFactory
      */
     private function detectClassName(string $codename): string
     {
+        $separator = '\\';
+
+        // Replace legacy naming underscore with namespace separator
+        $codename = \str_replace('_', $separator, $codename);
+
         $className = $this->getClassNameFromCache($codename);
 
         if ($className) {
             return $className;
         }
 
-        // Explode legacy naming by underscore
-        $codenameArray = explode('_', $codename);
+        // Explode naming by namespace separator
+        $codenameArray = explode($separator, $codename);
 
         // Add class namespaces if needed
         if ($this->classNamespaces) {
             $codenameArray = array_merge($this->classNamespaces, $codenameArray);
         }
 
-        $separator = '\\';
-        $baseName  = implode($separator, $codenameArray).$this->classSuffix;
+        $baseName = implode($separator, $codenameArray).$this->classSuffix;
 
         if ($this->useInterface) {
             $baseName .= 'Interface';
@@ -381,6 +385,6 @@ final class NamespaceBasedFactory
 
     private function getInstanceCacheKey(string $codename): string
     {
-        return implode('-', $this->classNamespaces).'.'.$codename;
+        return implode('-', $this->classNamespaces).'.'.\str_replace('\\', '_', $codename);
     }
 }

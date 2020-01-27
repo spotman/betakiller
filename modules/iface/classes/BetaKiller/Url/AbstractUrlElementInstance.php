@@ -10,7 +10,7 @@ abstract class AbstractUrlElementInstance implements UrlElementInstanceInterface
     {
         $codename = explode('\\', static::class);
         array_splice($codename, 0, -1 * \count($codename) + 2);
-        $codename = implode('_', $codename);
+        $codename = implode('\\', $codename);
 
         $suffix   = static::getSuffix();
         $codename = preg_replace('/(.+?)'.$suffix.'$/', '$1', $codename);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <!--Test Wamp Rpc -->
-    <iface uri="wamp" name="Admin_Test_WampRpcManager" menu="admin" label="WampRpcManager" parent="Admin_Test_Index">
-        <iface uri="test" name="Admin_Test_WampRpcRunner" label="WampRpcRunner"/>
+    <iface uri="wamp" name="Admin\Test\WampRpcManager" menu="admin" label="WampRpcManager" parent="Admin\Test\Index">
+        <iface uri="test" name="Admin\Test\WampRpcRunner" label="WampRpcRunner"/>
     </iface>
 </root>

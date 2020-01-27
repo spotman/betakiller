@@ -10,31 +10,31 @@
     </iface>
 
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в UrlElementTree::admin() -->
-    <dummy uri="errors" name="Admin_Error_IndexDummy" parent="Admin_Index" label="Errors" menu="admin"
-           entity="PhpException" entityAction="search" redirect="Admin_Error_UnresolvedPhpExceptionIndex">
-        <iface uri="{PhpException.hash}" name="Admin_Error_PhpExceptionItem"
+    <dummy uri="errors" name="Admin\Error\IndexDummy" parent="Admin\Index" label="Errors" menu="admin"
+           entity="PhpException" entityAction="search" redirect="Admin\Error\UnresolvedPhpExceptionIndex">
+        <iface uri="{PhpException.hash}" name="Admin\Error\PhpExceptionItem"
                label="Message" title="{PhpException.message}"
                entity="PhpException" entityAction="read">
-            <!--<iface uri="stacktrace" name="Admin_Error_PhpExceptionStackTrace" label="Stacktrace" layout="raw"/>-->
+            <!--<iface uri="stacktrace" name="Admin\Error\PhpExceptionStackTrace" label="Stacktrace" layout="raw"/>-->
         </iface>
 
-        <iface uri="unresolved" name="Admin_Error_UnresolvedPhpExceptionIndex" menu="admin"
+        <iface uri="unresolved" name="Admin\Error\UnresolvedPhpExceptionIndex" menu="admin"
                title="Unresolved PhpExceptions | Admin" label="Unresolved"
                entity="PhpException" entityAction="list"/>
 
-        <iface uri="resolved" name="Admin_Error_ResolvedPhpExceptionIndex" menu="admin"
+        <iface uri="resolved" name="Admin\Error\ResolvedPhpExceptionIndex" menu="admin"
                title="Resolved PhpExceptions | Admin" label="Resolved"
                entity="PhpException" entityAction="list"/>
 
-        <iface uri="ignored" name="Admin_Error_IgnoredPhpExceptionIndex" menu="admin"
+        <iface uri="ignored" name="Admin\Error\IgnoredPhpExceptionIndex" menu="admin"
                title="Ignored PhpExceptions | Admin" label="Ignored"
                entity="PhpException" entityAction="list"/>
     </dummy>
 
-    <iface uri="php-exceptions" name="Admin_Test_PhpExceptionIndex" parent="Admin_Test_Index" label="Php Exception"
+    <iface uri="php-exceptions" name="Admin\Test\PhpExceptionIndex" parent="Admin\Test\Index" label="Php Exception"
            entity="PhpException" entityAction="test" menu="admin" zone="developer">
-        <iface uri="500" name="Admin_Test_PhpExceptionHttp500" label="HTTP 500 test"/>
-        <iface uri="logger" name="Admin_Test_PhpExceptionLogger" label="Logger test"/>
+        <iface uri="500" name="Admin\Test\PhpExceptionHttp500" label="HTTP 500 test"/>
+        <iface uri="logger" name="Admin\Test\PhpExceptionLogger" label="Logger test"/>
     </iface>
 
 </root>
