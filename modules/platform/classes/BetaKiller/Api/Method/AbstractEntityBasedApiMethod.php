@@ -45,7 +45,7 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
 
         $id = $this->decodeIdentity($entityName, $arguments->getID());
 
-        return $this->getRepository()->findById($id);
+        return $this->getRepository()->getById($id);
     }
 
     /**
