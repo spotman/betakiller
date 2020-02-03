@@ -67,6 +67,16 @@ class Arguments implements ArgumentsInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function mustHave(string $key): void
+    {
+        if (!$this->has($key)) {
+            throw new \LogicException(sprintf('Missing required key "%s"', $key));
+        }
+    }
+
+    /**
      * @param string $key
      *
      * @return int

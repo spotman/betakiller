@@ -40,6 +40,13 @@ interface ArgumentsInterface
     /**
      * @param string $key
      *
+     * @throws \LogicException
+     */
+    public function mustHave(string $key): void;
+
+    /**
+     * @param string $key
+     *
      * @return int
      */
     public function getInt(string $key): int;
