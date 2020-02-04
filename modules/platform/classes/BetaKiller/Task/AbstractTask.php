@@ -8,8 +8,6 @@ use Minion_Task;
 abstract class AbstractTask extends Minion_Task
 {
     public const CLI_USER_NAME = 'minion';
-    public const COLOR_RED     = 'red';
-    public const COLOR_GREEN   = 'green';
 
     public function __construct()
     {
