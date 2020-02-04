@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\AuthService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -42,6 +41,6 @@ class UserMiddleware implements MiddlewareInterface
         $session = ServerRequestHelper::getSession($request);
         $user    = $this->auth->getSessionUser($session);
 
-        return $handler->handle($request->withAttribute(UserInterface::class, $user));
+        return $handler->handle(ServerRequestHelper::setUser($request, $user));
     }
 }

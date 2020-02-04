@@ -208,6 +208,11 @@ class ServerRequestHelper
         return $request->getAttribute(UrlHelper::class);
     }
 
+    public static function setUser(ServerRequestInterface $request, UserInterface $user): ServerRequestInterface
+    {
+        return $request->withAttribute(UserInterface::class, $user);
+    }
+
     public static function getUser(ServerRequestInterface $request): UserInterface
     {
         return $request->getAttribute(UserInterface::class);
