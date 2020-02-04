@@ -87,8 +87,8 @@ final class EmailTransport extends AbstractTransport
 
         // Redirect all emails while in debug mode
         if ($this->appEnv->isDebugEnabled()) {
+            $subj .= ' [DEBUG] '.$to;
             $to   = $this->appEnv->getDebugEmail();
-            $subj .= ' [DEBUG]';
         }
 
         // Fake delay to prevent blackout of SMTP relay
