@@ -6,10 +6,12 @@ namespace BetaKiller\Action\Auth;
 use BetaKiller\Action\AbstractAction;
 use BetaKiller\Action\PostRequestActionInterface;
 use BetaKiller\Auth\IncorrectCredentialsException;
+use BetaKiller\Event\WebLoginEvent;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Service\AuthService;
 use Psr\Http\Message\ResponseInterface;
@@ -38,15 +40,22 @@ class RegularLoginAction extends AbstractAction implements PostRequestActionInte
     private $userRepo;
 
     /**
+     * @var \BetaKiller\MessageBus\EventBusInterface
+     */
+    private $eventBus;
+
+    /**
      * RegularLoginAction constructor.
      *
      * @param \BetaKiller\Service\AuthService                $auth
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
+     * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
-    public function __construct(AuthService $auth, UserRepositoryInterface $userRepo)
+    public function __construct(AuthService $auth, UserRepositoryInterface $userRepo, EventBusInterface $eventBus)
     {
         $this->auth     = $auth;
         $this->userRepo = $userRepo;
+        $this->eventBus = $eventBus;
     }
 
     /**
@@ -103,6 +112,9 @@ class RegularLoginAction extends AbstractAction implements PostRequestActionInte
 
         $session = ServerRequestHelper::getSession($request);
         $this->auth->login($session, $user);
+
+        // Notify other subsystems
+        $this->eventBus->emit(new WebLoginEvent($user, ServerRequestHelper::getUrlContainer($request)));
 
         return ServerRequestHelper::isJsonPreferred($request)
             ? ResponseHelper::successJson()
