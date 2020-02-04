@@ -15,7 +15,7 @@ class StringPatternHelper
     public const PLACEHOLDER_PRIORITY_PCRE = '/\[([\d]{1,2})\[([^\]]+)\]\]/';
 
     // {~...~} tags
-    public const PLACEHOLDER_I18N_PCRE = '/\{\~([A-Za-z]+)\~\}/';
+    public const PLACEHOLDER_ENTITY_I18N_PCRE = '/\{\~([A-Za-z]+)\~\}/';
 
     /**
      * @var \BetaKiller\Url\UrlPrototypeService
@@ -58,11 +58,11 @@ class StringPatternHelper
         ?int $limit = null
     ): string {
         if (I18nFacade::isI18nKey($source)) {
-            return $this->i18n->translateKeyName($lang, $source);
+            $source = $this->i18n->translateKeyName($lang, $source);
         }
 
         // Replace i18n keys
-        $source = $this->replaceI18nKeys($source, $params, $lang);
+        $source = $this->replaceEntityI18nKeys($source, $params, $lang);
 
         // Replace url parameters
         $source = $this->prototypeHelper->replaceUrlParametersParts($source, $params);
@@ -115,10 +115,13 @@ class StringPatternHelper
         return $output;
     }
 
-    private function replaceI18nKeys(string $source, UrlContainerInterface $parameters, LanguageInterface $lang): string
-    {
+    private function replaceEntityI18nKeys(
+        string $source,
+        UrlContainerInterface $parameters,
+        LanguageInterface $lang
+    ): string {
         return preg_replace_callback(
-            self::PLACEHOLDER_I18N_PCRE,
+            self::PLACEHOLDER_ENTITY_I18N_PCRE,
             function ($matches) use ($parameters, $lang) {
                 $key = $matches[1];
 
