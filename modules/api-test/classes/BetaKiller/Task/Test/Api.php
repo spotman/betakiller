@@ -72,7 +72,7 @@ class Api extends AbstractTask
 
         $arguments = $this->getCallArguments();
 
-        list($resourceName, $methodName) = explode('.', $targetString, 2);
+        [$resourceName, $methodName] = explode('.', $targetString, 2);
 
         $this->logger->debug('Calling ":resource->:method" with arguments ":args"', [
             ':resource' => $resourceName,
@@ -80,12 +80,20 @@ class Api extends AbstractTask
             ':args'     => json_encode($arguments),
         ]);
 
+        $start = \microtime(true);
+
         $response = $this->api
             ->getResource($resourceName)
             ->call($methodName, $arguments, $this->user);
 
+        $end = \microtime(true);
+
         $this->logger->info('Last modified at :date', [
             ':date' => $response->getLastModified()->format(DateTimeImmutable::COOKIE),
+        ]);
+
+        $this->logger->info('Executed in :time ms', [
+            ':time' => \round(($end - $start) * 1000),
         ]);
 
         echo json_encode($response->getData(), JSON_PRETTY_PRINT).PHP_EOL;
