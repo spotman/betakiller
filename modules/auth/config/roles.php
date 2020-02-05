@@ -5,15 +5,13 @@ use BetaKiller\Auth\RoleConfig;
 use BetaKiller\Model\RoleInterface;
 
 return [
+    // Separate role for guests (do not inherit in other roles)
     RoleInterface::GUEST => [
         RoleConfig::OPTION_DESC => 'All guests and unauthorized users',
     ],
 
     RoleInterface::LOGIN => [
-        RoleConfig::OPTION_DESC     => 'Grants access to login',
-        RoleConfig::OPTION_INHERITS => [
-            RoleInterface::GUEST,
-        ],
+        RoleConfig::OPTION_DESC => 'Grants access to login',
     ],
 
     RoleInterface::ADMIN_PANEL => [

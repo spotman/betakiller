@@ -28,6 +28,7 @@ interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, Multi
 
     /**
      * Role for unauthenticated users (guests)
+     * Do not inherit in any other role (cause permission leakage through roles chain "a" -> "guest" <- "b")
      */
     public const GUEST = 'guest';
 

@@ -5,6 +5,7 @@ namespace BetaKiller\Task\Import;
 
 use BetaKiller\Auth\RoleConfig;
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Exception\DomainException;
 use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Model\Role;
 use BetaKiller\Model\RoleInterface;
@@ -106,6 +107,14 @@ class Roles extends AbstractTask
             $model = $this->roleRepo->findByName($name);
 
             $inherits = $options[RoleConfig::OPTION_INHERITS] ?? [];
+
+            // Prevent guest role to be inherited by any other role
+            if (\in_array(RoleInterface::GUEST, $inherits, true)) {
+                throw new DomainException('Role ":name" must not inherit ":guest" role', [
+                    ':name'  => $name,
+                    ':guest' => RoleInterface::GUEST,
+                ]);
+            }
 
             /** @var RoleInterface $parentRole */
             foreach ($model->getParents() as $parentRole) {
