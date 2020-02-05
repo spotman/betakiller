@@ -23,6 +23,7 @@ use BetaKiller\Model\ContentPostInterface;
 use BetaKiller\Model\ContentYoutubeRecord;
 use BetaKiller\Model\Entity;
 use BetaKiller\Model\Quote;
+use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\WordpressAttachmentInterface;
 use BetaKiller\Repository\WordpressAttachmentRepositoryInterface;
 use BetaKiller\Service\UserService;
@@ -1697,7 +1698,12 @@ class Wordpress extends AbstractTask
             $userModel = $this->userRepository->searchBy($wpEmail) ?: $this->userRepository->searchBy($wpLogin);
 
             if (!$userModel) {
-                $userModel = $this->userService->createUser($wpEmail, UserService::DEFAULT_IP, $wpLogin);
+                $userModel = $this->userService->createUser(
+                    RoleInterface::LOGIN,
+                    $wpEmail,
+                    UserService::DEFAULT_IP,
+                    $wpLogin
+                );
                 $this->logger->info('User :login successfully imported', [':login' => $userModel->getEmail()]);
             } else {
                 $this->logger->info('User :login already exists', [':login' => $userModel->getEmail()]);

@@ -3,9 +3,11 @@ namespace BetaKiller\Service;
 
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Exception\DomainException;
 use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\Model\GuestUserInterface;
+use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RoleRepositoryInterface;
@@ -74,6 +76,7 @@ class UserService
     }
 
     /**
+     * @param string      $primaryRoleName
      * @param string      $email
      * @param string      $createdFromIp
      *
@@ -83,14 +86,20 @@ class UserService
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function createUser(
+        string $primaryRoleName,
         string $email,
         string $createdFromIp,
         string $username = null
     ): UserInterface {
-        $basicRoles = [
-            $this->roleRepository->getGuestRole(),
-            $this->roleRepository->getLoginRole(),
-        ];
+        $loginRole   = $this->roleRepository->getLoginRole();
+        $primaryRole = $this->roleRepository->getByName($primaryRoleName);
+
+        if (!$primaryRole->hasParent($loginRole)) {
+            throw new DomainException('Role ":name" must inherit ":login" role', [
+                ':name'  => $primaryRole->getName(),
+                ':login' => $loginRole->getName(),
+            ]);
+        }
 
         /** @var UserInterface $user */
         $user = $this->entityFactory->create(User::getModelName());
@@ -112,9 +121,7 @@ class UserService
         // Create new model via save so ID will be populated for adding roles
         $this->userRepository->save($user);
 
-        foreach ($basicRoles as $role) {
-            $user->addRole($role);
-        }
+        $user->addRole($primaryRole);
 
         return $user;
     }
@@ -125,28 +132,20 @@ class UserService
      */
     public function createCliUser(): UserInterface
     {
-        $cliUserName = AbstractTask::CLI_USER_NAME;
-
-        $host  = $this->appConfig->getBaseUri()->getHost();
-        $email = $cliUserName.'@'.$host;
-
-        $user = $this->userRepository->searchBy($cliUserName);
+        $userName = AbstractTask::CLI_USER_NAME;
+        $user     = $this->userRepository->searchBy($userName);
 
         if (!$user) {
-            $user = $this->createUser($email, '8.8.8.8', $cliUserName)
+            $host  = $this->appConfig->getBaseUri()->getHost();
+            $email = $userName.'@'.$host;
+
+            $user = $this->createUser(RoleInterface::CLI, $email, self::DEFAULT_IP, $userName)
                 ->setFirstName('Minion')
                 ->setLastName('Server');
         }
 
         // No notification for cron user
         $user->disableEmailNotification();
-
-        // Allow everything (admin may remove some roles later if needed)
-        foreach ($this->roleRepository->getAll() as $role) {
-            if (!$user->hasRole($role)) {
-                $user->addRole($role);
-            }
-        }
 
         $this->userRepository->save($user);
 

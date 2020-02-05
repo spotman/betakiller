@@ -11,18 +11,28 @@ return [
     ],
 
     RoleInterface::LOGIN => [
-        RoleConfig::OPTION_DESC => 'Grants access to login',
+        RoleConfig::OPTION_DESC => 'Any user allowed to sign-in',
     ],
 
     RoleInterface::ADMIN_PANEL => [
-        RoleConfig::OPTION_DESC => 'Grants access to the admin panel',
+        RoleConfig::OPTION_DESC     => 'Grants access to the admin panel',
+        RoleConfig::OPTION_INHERITS => [
+            RoleInterface::LOGIN,       // Admins are allowed to login
+        ],
     ],
 
     RoleInterface::DEVELOPER => [
         RoleConfig::OPTION_DESC     => 'Developer',
         RoleConfig::OPTION_INHERITS => [
             RoleInterface::ADMIN_PANEL, // Developer has access to admin panel
-            RoleInterface::LOGIN,       // Developers are always allowed to login
+        ],
+    ],
+
+    RoleInterface::CLI => [
+        RoleConfig::OPTION_DESC     => 'Console task runner',
+        RoleConfig::OPTION_INHERITS => [
+            // Allow everything for simplicity
+            RoleInterface::DEVELOPER,
         ],
     ],
 ];

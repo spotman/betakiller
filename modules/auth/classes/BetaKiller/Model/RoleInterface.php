@@ -12,6 +12,11 @@ interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, Multi
     // Extended methods
 
     /**
+     * Role for CLI scripts
+     */
+    public const CLI = 'cli';
+
+    /**
      * Role for access to developer tools
      */
     public const DEVELOPER = 'developer';
