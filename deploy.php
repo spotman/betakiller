@@ -429,7 +429,10 @@ task('import:zones', static function () {
 
 task('import:i18n', static function () {
     runMinionTask('import:i18n');
-})->desc('Import localization data');
+})->desc('Import localization data')->onStage(
+    \DEPLOYER_STAGING_STAGE,
+    \DEPLOYER_PRODUCTION_STAGE
+);
 
 task('import:notification', static function () {
     runMinionTask('notification:importGroups');
@@ -522,7 +525,7 @@ task('update', [
     'migrate',
 ])->desc('Update local workspace')->onHosts('dev')->onStage(\DEPLOYER_DEV_STAGE);
 
-task('load:errors', static function() {
+task('load:errors', static function () {
     download('{{release_path}}/{{core_path}}/application/logs/errors.sqlite', __DIR__.'/application/logs/');
 })->desc('Load errors database from remote host');
 
