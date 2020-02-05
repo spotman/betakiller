@@ -20,6 +20,11 @@ class UrlElementTree implements UrlElementTreeInterface
     private $items = [];
 
     /**
+     * @var \BetaKiller\Url\UrlElementInterface[]
+     */
+    private $childs = [];
+
+    /**
      * @param \BetaKiller\Url\UrlElementInterface $model
      * @param bool|null                           $warnIfExists
      *
@@ -34,6 +39,14 @@ class UrlElementTree implements UrlElementTreeInterface
         }
 
         $this->items[$codename] = $model;
+
+        $parentCodename = $model->getParentCodename();
+
+        // Create empty array if not exists
+        $this->childs[$parentCodename] = $this->childs[$parentCodename] ?? [];
+
+        // Keep ref to parent codename to optimize search
+        $this->childs[$parentCodename][] = $model;
     }
 
     /**
@@ -216,17 +229,7 @@ class UrlElementTree implements UrlElementTreeInterface
     {
         $parentCodename = $parentModel ? $parentModel->getCodename() : null;
 
-        $models = [];
-
-        foreach ($this->items as $model) {
-            if ($model->getParentCodename() !== $parentCodename) {
-                continue;
-            }
-
-            $models[] = $model;
-        }
-
-        return $models;
+        return $this->childs[$parentCodename] ?? [];
     }
 
     /**
