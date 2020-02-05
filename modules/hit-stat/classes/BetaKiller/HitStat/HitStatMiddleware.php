@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\HitStat;
 
-use BetaKiller\Dev\Profiler;
+use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\ResponseHelper;
@@ -116,7 +116,7 @@ class HitStatMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        $p = Profiler::begin($request, 'Hit stat processing');
+        $p = RequestProfiler::begin($request, 'Hit stat processing');
 
         try {
             $hit = $this->registerHit($request);
@@ -143,7 +143,7 @@ class HitStatMiddleware implements MiddlewareInterface
             $this->logException($this->logger, $e);
         }
 
-        Profiler::end($p);
+        RequestProfiler::end($p);
 
         // Forward call in case of exception
         return $handler->handle($request);
@@ -172,33 +172,33 @@ class HitStatMiddleware implements MiddlewareInterface
             $sourceUri = !$e;
         }
 
-        $p1 = Profiler::begin($request, 'Detect source page');
+        $p1 = RequestProfiler::begin($request, 'Detect source page');
 
         // Find source page
         $sourcePage = $sourceUri ? $this->service->getPageByFullUrl($sourceUri) : null;
 
-        Profiler::end($p1);
+        RequestProfiler::end($p1);
 
         // Skip ignored pages and domains
         if ($sourcePage && $sourcePage->isIgnored()) {
             return null;
         }
 
-        $p2 = Profiler::begin($request, 'Detect target page');
+        $p2 = RequestProfiler::begin($request, 'Detect target page');
 
         $now = new DateTimeImmutable;
 
         // Search for target URL and create if not exists
         $targetPage = $this->service->getPageByFullUrl($targetUri);
 
-        Profiler::end($p2);
+        RequestProfiler::end($p2);
 
         // Skip ignored pages and domains
         if ($targetPage->isIgnored()) {
             return null;
         }
 
-        $p3 = Profiler::begin($request, 'Process target page');
+        $p3 = RequestProfiler::begin($request, 'Process target page');
 
         // Increment hit counter for target URL
         $targetPage
@@ -207,11 +207,11 @@ class HitStatMiddleware implements MiddlewareInterface
 
         $this->pageRepo->save($targetPage);
 
-        Profiler::end($p3);
+        RequestProfiler::end($p3);
 
         // Process source page if exists
         if ($sourcePage) {
-            $p4 = Profiler::begin($request, 'Process source page');
+            $p4 = RequestProfiler::begin($request, 'Process source page');
 
             $sourcePage->setLastSeenAt($now);
 
@@ -225,10 +225,10 @@ class HitStatMiddleware implements MiddlewareInterface
             // Register link
             $this->processLink($sourcePage, $targetPage);
 
-            Profiler::end($p4);
+            RequestProfiler::end($p4);
         }
 
-        $p5 = Profiler::begin($request, 'Create hit');
+        $p5 = RequestProfiler::begin($request, 'Create hit');
 
         // Detect marker
         $marker = $this->service->getMarkerFromRequest($request);
@@ -262,7 +262,7 @@ class HitStatMiddleware implements MiddlewareInterface
 
         $this->hitRepo->save($hit);
 
-        Profiler::end($p5);
+        RequestProfiler::end($p5);
 
         return $hit;
     }

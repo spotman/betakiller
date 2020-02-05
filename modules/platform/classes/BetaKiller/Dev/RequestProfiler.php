@@ -7,7 +7,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use DebugBar\DebugBar;
 use Psr\Http\Message\ServerRequestInterface;
 
-class Profiler
+class RequestProfiler
 {
     private const TIME_DATA = 'time';
 
@@ -23,7 +23,7 @@ class Profiler
         }
 
         if (!$debugBar->hasCollector(self::TIME_DATA)) {
-            throw new \LogicException('Profiler requires DebugBar TimeDataCollector');
+            throw new \LogicException('RequestProfiler requires DebugBar TimeDataCollector');
         }
 
         $this->collector = $debugBar->getCollector(self::TIME_DATA);

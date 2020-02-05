@@ -2,7 +2,7 @@
 namespace BetaKiller\View;
 
 use BetaKiller\Assets\StaticAssetsFactory;
-use BetaKiller\Dev\Profiler;
+use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\IFace\IFaceInterface;
@@ -81,7 +81,7 @@ class IFaceView
      */
     public function render(IFaceInterface $iface, ServerRequestInterface $request): string
     {
-        $dataPack = Profiler::begin($request, $iface->getCodename().' IFace data');
+        $dataPack = RequestProfiler::begin($request, $iface->getCodename().' IFace data');
 
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
         $params    = ServerRequestHelper::getUrlContainer($request);
@@ -99,8 +99,8 @@ class IFaceView
             $ifaceView->set($key, $value);
         }
 
-        Profiler::end($dataPack);
-        $renderPack = Profiler::begin($request, $iface->getCodename().' IFace render');
+        RequestProfiler::end($dataPack);
+        $renderPack = RequestProfiler::begin($request, $iface->getCodename().' IFace render');
 
         // Send current request to widgets
         $ifaceView->set(self::REQUEST_KEY, $request);
@@ -133,7 +133,7 @@ class IFaceView
 
         $result = $this->layoutView->render($ifaceView, $renderHelper);
 
-        Profiler::end($renderPack);
+        RequestProfiler::end($renderPack);
 
         return $result;
     }

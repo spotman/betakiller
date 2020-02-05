@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Dev\Profiler;
+use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Event\MissingUrlEvent;
 use BetaKiller\Event\UrlDispatchedEvent;
 use BetaKiller\Exception\NotFoundHttpException;
@@ -72,7 +72,7 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $pid = Profiler::begin($request, 'UrlElement dispatch');
+        $pid = RequestProfiler::begin($request, 'UrlElement dispatch');
 
         $stack  = ServerRequestHelper::getUrlElementStack($request);
         $params = ServerRequestHelper::getUrlContainer($request);
@@ -89,7 +89,7 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
             $i18n->setLang($lang);
         }
 
-        Profiler::end($pid);
+        RequestProfiler::end($pid);
 
         // Forward call
         return $handler->handle($request);

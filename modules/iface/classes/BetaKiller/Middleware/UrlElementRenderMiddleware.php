@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Dev\Profiler;
+use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Factory\UrlElementInstanceFactory;
@@ -63,7 +63,7 @@ class UrlElementRenderMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $pid = Profiler::begin($request, 'UrlElement processing');
+        $pid = RequestProfiler::begin($request, 'UrlElement processing');
 
         $stack = ServerRequestHelper::getUrlElementStack($request);
 
@@ -104,7 +104,7 @@ class UrlElementRenderMiddleware implements MiddlewareInterface
             $instance->afterProcessing($request);
         }
 
-        Profiler::end($pid);
+        RequestProfiler::end($pid);
 
         return $response;
     }

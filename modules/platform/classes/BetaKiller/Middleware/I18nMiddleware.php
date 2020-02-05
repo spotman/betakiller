@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Dev\Profiler;
+use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -51,7 +51,7 @@ class I18nMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $pid = Profiler::begin($request, 'Language detection');
+        $pid = RequestProfiler::begin($request, 'Language detection');
 
         $langIsoCode = $this->detectLangIsoCode($request);
 
@@ -62,7 +62,7 @@ class I18nMiddleware implements MiddlewareInterface
         $i18n = new I18nHelper($this->facade);
         $i18n->setLang($lang);
 
-        Profiler::end($pid);
+        RequestProfiler::end($pid);
 
         $response = $handler->handle($request->withAttribute(I18nHelper::class, $i18n));
 

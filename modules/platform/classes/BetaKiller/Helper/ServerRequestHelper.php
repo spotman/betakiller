@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Helper;
 
 use Aidantwoods\SecureHeaders\SecureHeaders;
-use BetaKiller\Dev\Profiler;
+use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Model\UserInterface;
@@ -254,9 +254,9 @@ class ServerRequestHelper
         return $request->getAttribute(I18nHelper::class);
     }
 
-    public static function getProfiler(ServerRequestInterface $request): Profiler
+    public static function getProfiler(ServerRequestInterface $request): RequestProfiler
     {
-        return $request->getAttribute(Profiler::class);
+        return $request->getAttribute(RequestProfiler::class);
     }
 
     public static function getDebugBar(ServerRequestInterface $request): ?DebugBar

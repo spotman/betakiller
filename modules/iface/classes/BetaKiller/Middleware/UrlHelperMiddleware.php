@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Dev\Profiler;
+use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Url\Container\ResolvingUrlContainer;
@@ -42,7 +42,7 @@ class UrlHelperMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $pack = Profiler::begin($request, 'UrlHelper middleware');
+        $pack = RequestProfiler::begin($request, 'UrlHelper middleware');
 
         $params = ResolvingUrlContainer::create();
         $stack  = new UrlElementStack($params);
@@ -56,7 +56,7 @@ class UrlHelperMiddleware implements MiddlewareInterface
             ->withAttribute(UrlContainerInterface::class, $params)
             ->withAttribute(UrlHelper::class, $urlHelper);
 
-        Profiler::end($pack);
+        RequestProfiler::end($pack);
 
         return $handler->handle($request);
     }

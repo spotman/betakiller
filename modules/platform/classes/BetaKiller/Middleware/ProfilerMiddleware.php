@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Dev\Profiler;
+use BetaKiller\Dev\RequestProfiler;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -23,8 +23,8 @@ class ProfilerMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         // Fresh instance for every request
-        $profiler = new Profiler;
+        $profiler = new RequestProfiler;
 
-        return $handler->handle($request->withAttribute(Profiler::class, $profiler));
+        return $handler->handle($request->withAttribute(RequestProfiler::class, $profiler));
     }
 }
