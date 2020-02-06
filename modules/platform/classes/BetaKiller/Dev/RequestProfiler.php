@@ -77,6 +77,6 @@ class RequestProfiler
 
     private function generateId(): string
     {
-        return \base64_encode(\microtime());
+        return \bin2hex(\microtime());
     }
 }
