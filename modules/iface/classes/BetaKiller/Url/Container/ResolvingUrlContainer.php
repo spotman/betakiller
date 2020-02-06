@@ -55,6 +55,15 @@ class ResolvingUrlContainer extends UrlContainer
 
         // Check highest level first
         foreach ($params as $param) {
+            $with = $param::getUrlContainerKey();
+
+            // Prevent endless loop on circular dependencies
+            if (\in_array($with, $checked, true)) {
+                continue;
+            }
+
+            $checked[] = $with;
+
             if ($this->isKey($param, $key)) {
                 return $param;
             }
@@ -62,15 +71,6 @@ class ResolvingUrlContainer extends UrlContainer
 
         // Go deeper
         foreach ($params as $param) {
-            $with = $param::getUrlContainerKey();
-
-            // Prevent endless loop on circular dependencies
-            if (\in_array($with, $checked, true)) {
-                break;
-            }
-
-            $checked[] = $with;
-
             if ($param instanceof DispatchableEntityInterface) {
                 $linkedParam = $this->findParameterByKeyRecursive($param->getLinkedEntities(), $key, $checked);
 
