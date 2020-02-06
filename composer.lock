@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d2f734deb9129048278f798a05a24048",
+    "content-hash": "3c1e7f11967ddddb688265db3ab31c3a",
     "packages": [
         {
             "name": "aidantwoods/secureheaders",
@@ -5784,6 +5784,56 @@
             "time": "2019-08-20T14:44:19+00:00"
         },
         {
+            "name": "symfony/stopwatch",
+            "version": "v5.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/stopwatch.git",
+                "reference": "5d9add8034135b9a5f7b101d1e42c797e7f053e4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/stopwatch/zipball/5d9add8034135b9a5f7b101d1e42c797e7f053e4",
+                "reference": "5d9add8034135b9a5f7b101d1e42c797e7f053e4",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2.5",
+                "symfony/service-contracts": "^1.0|^2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Stopwatch\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Stopwatch Component",
+            "homepage": "https://symfony.com",
+            "time": "2020-01-04T14:08:26+00:00"
+        },
+        {
             "name": "symfony/var-dumper",
             "version": "v4.3.4",
             "source": {
@@ -6588,6 +6638,7 @@
                 "code",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-code",
             "time": "2019-08-31T14:14:34+00:00"
         },
         {
@@ -6654,6 +6705,7 @@
                 "psr",
                 "psr-7"
             ],
+            "abandoned": "laminas/laminas-diactoros",
             "time": "2019-07-10T16:13:25+00:00"
         },
         {
@@ -6699,6 +6751,7 @@
                 "escaper",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-escaper",
             "time": "2019-09-05T20:03:20+00:00"
         },
         {
@@ -6753,6 +6806,7 @@
                 "events",
                 "zf2"
             ],
+            "abandoned": "laminas/laminas-eventmanager",
             "time": "2018-04-25T15:33:34+00:00"
         },
         {
@@ -6845,6 +6899,7 @@
                 "zend-expressive",
                 "zf"
             ],
+            "abandoned": "mezzio/mezzio",
             "time": "2018-11-08T15:30:09+00:00"
         },
         {
@@ -6912,6 +6967,7 @@
                 "zend-expressive",
                 "zf"
             ],
+            "abandoned": "mezzio/mezzio-fastroute",
             "time": "2019-06-20T13:58:31+00:00"
         },
         {
@@ -6971,6 +7027,7 @@
                 "zend-expressive",
                 "zf"
             ],
+            "abandoned": "mezzio/mezzio-flash",
             "time": "2019-06-24T22:24:18+00:00"
         },
         {
@@ -7031,6 +7088,7 @@
                 "zend-expressive",
                 "zf"
             ],
+            "abandoned": "mezzio/mezzio-helpers",
             "time": "2019-03-12T20:43:27+00:00"
         },
         {
@@ -7094,6 +7152,7 @@
                 "zend-expressive",
                 "zf"
             ],
+            "abandoned": "mezzio/mezzio-router",
             "time": "2018-06-05T15:28:00+00:00"
         },
         {
@@ -7156,6 +7215,7 @@
                 "zend-expressive",
                 "zf"
             ],
+            "abandoned": "mezzio/mezzio-session",
             "time": "2019-03-05T20:57:32+00:00"
         },
         {
@@ -7209,6 +7269,7 @@
                 "zend-expressive",
                 "zf"
             ],
+            "abandoned": "mezzio/mezzio-template",
             "time": "2019-06-20T14:05:59+00:00"
         },
         {
@@ -7264,6 +7325,7 @@
                 "psr-7",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-httphandlerrunner",
             "time": "2019-02-19T18:20:34+00:00"
         },
         {
@@ -7313,6 +7375,7 @@
                 "acl",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-permissions-acl",
             "time": "2019-06-25T08:09:22+00:00"
         },
         {
@@ -7359,6 +7422,7 @@
                 "stdlib",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-stdlib",
             "time": "2018-08-28T21:34:05+00:00"
         },
         {
@@ -7425,6 +7489,7 @@
                 "psr-7",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-stratigility",
             "time": "2019-06-12T15:22:39+00:00"
         }
     ],

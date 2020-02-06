@@ -259,7 +259,12 @@ class ServerRequestHelper
         return $request->getAttribute(RequestProfiler::class);
     }
 
-    public static function getDebugBar(ServerRequestInterface $request): ?DebugBar
+    public static function hasDebugBar(ServerRequestInterface $request): bool
+    {
+        return (bool)$request->getAttribute(DebugBar::class);
+    }
+
+    public static function getDebugBar(ServerRequestInterface $request): DebugBar
     {
         return $request->getAttribute(DebugBar::class);
     }

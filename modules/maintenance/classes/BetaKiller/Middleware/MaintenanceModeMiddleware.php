@@ -56,11 +56,11 @@ class MaintenanceModeMiddleware implements MiddlewareInterface
 
         $user = ServerRequestHelper::getUser($request);
 
-        $debugBar = ServerRequestHelper::getDebugBar($request);
-
-        if ($debugBar) {
+        if (ServerRequestHelper::hasDebugBar($request)) {
             $model = $this->service->getModel();
-            $debugBar->addCollector(new MaintenanceModeDebugBarDataCollector($model));
+
+            ServerRequestHelper::getDebugBar($request)
+                ->addCollector(new MaintenanceModeDebugBarDataCollector($model));
         }
 
         if (!$this->service->isEnabled() || !$this->service->isDisplayedFor($user)) {

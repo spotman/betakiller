@@ -8,13 +8,13 @@ use BetaKiller\Dev\DebugBarCookiesDataCollector;
 use BetaKiller\Dev\DebugBarHttpDriver;
 use BetaKiller\Dev\DebugBarSessionDataCollector;
 use BetaKiller\Dev\DebugBarUserDataCollector;
+use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Log\FilterExceptionsHandler;
 use BetaKiller\Log\LoggerInterface;
-use BetaKiller\Service\UserService;
 use DebugBar\DataCollector\MemoryCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DebugBar;
@@ -29,7 +29,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Twig\Environment;
 
 class DebugMiddleware implements MiddlewareInterface
 {
@@ -59,22 +58,15 @@ class DebugMiddleware implements MiddlewareInterface
     private $cookieHelper;
 
     /**
-     * @var \BetaKiller\Service\UserService
-     */
-    private $userService;
-
-    /**
      * @var \Twig\Environment
      */
-    private $twigEnv;
+//    private $twigEnv;
 
     /**
      * DebugMiddleware constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
      * @param \BetaKiller\Helper\CookieHelper            $cookieHelper
-     * @param \BetaKiller\Service\UserService            $userService
-     * @param \Twig\Environment                          $twigEnv
      * @param \Psr\Http\Message\ResponseFactoryInterface $responseFactory
      * @param \Psr\Http\Message\StreamFactoryInterface   $streamFactory
      * @param \BetaKiller\Log\LoggerInterface            $logger
@@ -82,19 +74,17 @@ class DebugMiddleware implements MiddlewareInterface
     public function __construct(
         AppEnvInterface $appEnv,
         CookieHelper $cookieHelper,
-        UserService $userService,
-        Environment $twigEnv,
+//        Environment $twigEnv,
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface $streamFactory,
         LoggerInterface $logger
     ) {
         $this->responseFactory = $responseFactory;
         $this->cookieHelper    = $cookieHelper;
-        $this->userService     = $userService;
         $this->streamFactory   = $streamFactory;
         $this->appEnv          = $appEnv;
-        $this->twigEnv         = $twigEnv;
-        $this->logger          = $logger;
+//        $this->twigEnv         = $twigEnv;
+        $this->logger = $logger;
     }
 
     /**
@@ -124,6 +114,8 @@ class DebugMiddleware implements MiddlewareInterface
             // Forward call
             return $handler->handle($request);
         }
+
+        $ps = RequestProfiler::begin($request, 'Debug middleware (start up)');
 
         // Enable debugging via PhpConsole
         if ($this->appEnv->inDevelopmentMode() && $this->isPhpConsoleActive()) {
@@ -161,9 +153,6 @@ class DebugMiddleware implements MiddlewareInterface
         // Storage for processing data for AJAX calls and redirects
         // $debugBar->setStorage(new FileStorage($this->appEnv->getTempPath()));
 
-        // Initialize profiler with DebugBar instance and enable it
-        ServerRequestHelper::getProfiler($request)->enable($debugBar);
-
         // Prepare renderer
         $renderer = $debugBar->getJavascriptRenderer('/phpDebugBar');
         $renderer->setEnableJqueryNoConflict(false); // No jQuery
@@ -176,10 +165,17 @@ class DebugMiddleware implements MiddlewareInterface
             'a.phpdebugbar-restore-btn { text-align: center }'.
             'a.phpdebugbar-restore-btn:before { content: "{}"; font-size: 16px; color: #333; font-weight: bold }',
         ], [], []);
+
         $middleware = new PhpDebugBarMiddleware($renderer, $this->responseFactory, $this->streamFactory);
 
+        // Inject DebugBar instance
+        $request = $request->withAttribute(DebugBar::class, $debugBar);
+
+        // Stop profiler before call forward
+        RequestProfiler::end($ps);
+
         // Forward call
-        $response = $middleware->process($request->withAttribute(DebugBar::class, $debugBar), $handler);
+        $response = $middleware->process($request, $this->getFakeHandler($handler));
 
         // DebugBar generates inline tags and images so configuring CSP
         $csp = ServerRequestHelper::getCsp($request);
@@ -242,5 +238,36 @@ class DebugMiddleware implements MiddlewareInterface
 //        $phpConsoleHandler->pushProcessor(new ContextCleanupProcessor);
 
         $this->logger->pushHandler(new FilterExceptionsHandler($phpConsoleHandler));
+    }
+
+    private function getFakeHandler(RequestHandlerInterface $handler): RequestHandlerInterface
+    {
+        return new class($handler) implements RequestHandlerInterface {
+            /**
+             * @var \Psr\Http\Server\RequestHandlerInterface
+             */
+            private $handler;
+
+            public function __construct(RequestHandlerInterface $handler)
+            {
+                $this->handler = $handler;
+            }
+
+            /**
+             * @inheritDoc
+             */
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                $response = $this->handler->handle($request);
+
+                $profiler = ServerRequestHelper::getProfiler($request);
+                $debugBar = ServerRequestHelper::getDebugBar($request);
+
+                // Push measures to DebugBar
+                $profiler->transferMeasuresToDebugBar($debugBar);
+
+                return $response;
+            }
+        };
     }
 }

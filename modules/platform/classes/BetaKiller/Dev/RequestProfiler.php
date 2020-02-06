@@ -6,77 +6,83 @@ namespace BetaKiller\Dev;
 use BetaKiller\Helper\ServerRequestHelper;
 use DebugBar\DebugBar;
 use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Stopwatch\StopwatchEvent;
 
-class RequestProfiler
+final class RequestProfiler
 {
-    private const TIME_DATA = 'time';
+    private const DEBUGBAR_TIME_COLLECTOR = 'time';
 
     /**
-     * @var \DebugBar\DataCollector\TimeDataCollector
+     * @var \Symfony\Component\Stopwatch\Stopwatch
      */
-    private $collector;
+    private $stopwatch;
 
-    public function enable(DebugBar $debugBar): void
+    /**
+     * @var float
+     */
+    private $createdAt;
+
+    /**
+     * RequestProfiler constructor.
+     */
+    public function __construct()
     {
-        if ($this->collector) {
-            throw new \LogicException('DebugBar is enabled already');
-        }
+        $this->createdAt = \microtime(true);
+        $this->stopwatch = new Stopwatch(true);
+    }
 
-        if (!$debugBar->hasCollector(self::TIME_DATA)) {
+    public function transferMeasuresToDebugBar(DebugBar $debugBar): void
+    {
+        if (!$debugBar->hasCollector(self::DEBUGBAR_TIME_COLLECTOR)) {
             throw new \LogicException('RequestProfiler requires DebugBar TimeDataCollector');
         }
 
-        $this->collector = $debugBar->getCollector(self::TIME_DATA);
+        /** @var \DebugBar\DataCollector\TimeDataCollector $collector */
+        $collector = $debugBar->getCollector(self::DEBUGBAR_TIME_COLLECTOR);
 
-        $this->startupMeasure();
+        $collector->addMeasure('Startup', $collector->getRequestStartTime(), $this->createdAt);
+
+        // Iterate sections
+        foreach ($this->stopwatch->getSections() as $section) {
+            // iterate section events
+            foreach ($section->getEvents() as $name => $event) {
+                $start = $event->getOrigin();
+                $end   = $event->getOrigin() + $event->getDuration();
+
+                // Push measure to DebugBar
+                $collector->addMeasure(
+                    $name,
+                    $start / 1000,
+                    $end / 1000
+                );
+            }
+        }
     }
 
-    public function start(string $label): string
+    public function start(string $label): StopwatchEvent
     {
-        // Skip profiling when DebugBar was not initialized
-        if (!$this->collector) {
-            return '';
-        }
-
-        $id = $this->generateId();
-        $this->collector->startMeasure($id, $label);
-
-        return $id;
+        return $this->stopwatch->start($label);
     }
 
-    public function stop(string $id, array $params = null): void
+    public function stop(StopwatchEvent $event): void
     {
-        // Skip profiling when DebugBar was not initialized
-        if ($this->collector && $id) {
-            $this->collector->stopMeasure($id, $params ?? []);
-        }
+        $event->stop();
     }
 
     public static function begin(ServerRequestInterface $request, string $label): array
     {
-        $id = ServerRequestHelper::getProfiler($request)->start($label);
+        $event = ServerRequestHelper::getProfiler($request)->start($label);
 
-        return [$request, $id];
+        return [$request, $event];
     }
 
     public static function end(array $pack): void
     {
         /** @var ServerRequestInterface $request */
-        [$request, $id] = $pack;
+        /** @var StopwatchEvent $event */
+        [$request, $event] = $pack;
 
-        ServerRequestHelper::getProfiler($request)->stop($id);
-    }
-
-    private function startupMeasure(): void
-    {
-        $start = $this->collector->getRequestStartTime();
-        $end = microtime(true);
-
-        $this->collector->addMeasure('Startup', $start, $end);
-    }
-
-    private function generateId(): string
-    {
-        return \bin2hex(\microtime());
+        ServerRequestHelper::getProfiler($request)->stop($event);
     }
 }
