@@ -21,7 +21,7 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
     protected $logger;
 
     /**
-     * @var \BetaKiller\MessageBus\MessageHandlerInterface[][]
+     * @var callable[][]
      */
     private $bindings = [];
 
@@ -35,11 +35,6 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
         $this->container = $container;
         $this->logger    = $logger;
     }
-
-    /**
-     * @return string
-     */
-    abstract protected function getHandlerInterface(): string;
 
     /**
      * @return int
@@ -107,12 +102,9 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
             throw MessageBusException::wrap($e);
         }
 
-        $handlerInterface = $this->getHandlerInterface();
-
-        if (!($instance instanceof $handlerInterface)) {
-            throw new MessageBusException('Handler :class must implement :must for using in :bus', [
+        if (!is_callable($instance)) {
+            throw new MessageBusException('Handler :class must be callable for using in :bus', [
                 ':class' => \get_class($instance),
-                ':must'  => $handlerInterface,
                 ':bus'   => \get_class($this),
             ]);
         }

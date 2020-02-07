@@ -44,11 +44,6 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
         }
     }
 
-    protected function getHandlerInterface(): string
-    {
-        return EventHandlerInterface::class;
-    }
-
     protected function getMessageHandlersLimit(): int
     {
         // No limit
@@ -70,13 +65,13 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
 
     /**
      * @param \BetaKiller\MessageBus\EventMessageInterface $message
-     * @param \BetaKiller\MessageBus\EventHandlerInterface $handler
+     * @param callable                                     $handler
      */
-    private function process(EventMessageInterface $message, EventHandlerInterface $handler): void
+    private function process(EventMessageInterface $message, callable $handler): void
     {
         // Wrap every message bus processing with try-catch block and log exceptions
         try {
-            $handler->handleEvent($message);
+            $handler($message);
         } catch (\Throwable $e) {
             $this->logException($this->logger, $e);
         }

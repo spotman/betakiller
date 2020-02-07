@@ -53,11 +53,6 @@ class CommandBus extends AbstractMessageBus implements CommandBusInterface
         $this->getProducer()->send($this->queue, $queueMessage);
     }
 
-    protected function getHandlerInterface(): string
-    {
-        return CommandHandlerInterface::class;
-    }
-
     protected function getMessageHandlersLimit(): int
     {
         // One command => one handler

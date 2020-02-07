@@ -1,12 +1,12 @@
 <?php
 namespace BetaKiller\HitStat;
 
+use BetaKiller\Event\MissingUrlEvent;
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\MessageBus\EventHandlerInterface;
 use BetaKiller\Repository\HitPageRepository;
 use BetaKiller\Service\HitService;
 
-class HitStatMissingUrlEventHandler implements EventHandlerInterface
+class HitStatMissingUrlEventHandler
 {
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
@@ -40,13 +40,7 @@ class HitStatMissingUrlEventHandler implements EventHandlerInterface
         $this->service  = $service;
     }
 
-    /**
-     * @param \BetaKiller\Event\MissingUrlEvent $message
-     *
-     * @throws \BetaKiller\Exception\ValidationException
-     * @throws \BetaKiller\Repository\RepositoryException
-     */
-    public function handleEvent($message): void
+    public function __invoke(MissingUrlEvent $message): void
     {
         // Skip calls like "cache warmup" from CLI mode
         if ($this->appEnv->isInternalWebServer()) {

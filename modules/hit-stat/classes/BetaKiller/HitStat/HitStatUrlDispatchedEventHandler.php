@@ -1,15 +1,15 @@
 <?php
 namespace BetaKiller\HitStat;
 
-use BetaKiller\MessageBus\EventHandlerInterface;
+use BetaKiller\Event\UrlDispatchedEvent;
 use BetaKiller\Model\HitMarkerInterface;
 
-class HitStatUrlDispatchedEventHandler implements EventHandlerInterface
+class HitStatUrlDispatchedEventHandler
 {
     /**
      * @param \BetaKiller\Event\UrlDispatchedEvent $message
      */
-    public function handleEvent($message): void
+    public function __invoke(UrlDispatchedEvent $message): void
     {
         $params = $message->getUrlContainer();
 
