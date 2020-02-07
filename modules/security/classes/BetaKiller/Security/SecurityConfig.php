@@ -7,10 +7,16 @@ use BetaKiller\Config\AbstractConfig;
 
 class SecurityConfig extends AbstractConfig implements SecurityConfigInterface
 {
-    private const PATH_CSP_ENABLED    = ['csp', 'enabled'];
-    private const PATH_CSP_SAFE_MODE  = ['csp', 'safe_mode'];
-    private const PATH_CSP_ERRORS     = ['csp', 'errors'];
-    private const PATH_CSP_RULES      = ['csp', 'rules'];
+    private const PATH_CSP_ENABLED   = ['csp', 'enabled'];
+    private const PATH_CSP_SAFE_MODE = ['csp', 'safe_mode'];
+    private const PATH_CSP_ERRORS    = ['csp', 'errors'];
+    private const PATH_CSP_RULES     = ['csp', 'rules'];
+
+    private const PATH_HSTS_ENABLED    = ['hsts', 'enabled'];
+    private const PATH_HSTS_MAX_AGE    = ['hsts', 'max_age'];
+    private const PATH_HSTS_SUBDOMAINS = ['hsts', 'subdomains'];
+    private const PATH_HSTS_PRELOAD    = ['hsts', 'preload'];
+
     private const PATH_HEADERS_ADD    = ['headers', 'add'];
     private const PATH_HEADERS_REMOVE = ['headers', 'remove'];
 
@@ -65,5 +71,37 @@ class SecurityConfig extends AbstractConfig implements SecurityConfigInterface
     public function getHeadersToRemove(): array
     {
         return (array)$this->get(self::PATH_HEADERS_REMOVE, true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isHstsEnabled(): bool
+    {
+        return (bool)$this->get(self::PATH_HSTS_ENABLED);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getHstsMaxAge(): int
+    {
+        return (int)$this->get(self::PATH_HSTS_MAX_AGE);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHstsForSubdomains(): bool
+    {
+        return (bool)$this->get(self::PATH_HSTS_SUBDOMAINS);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHstsPreload(): bool
+    {
+        return (bool)$this->get(self::PATH_HSTS_PRELOAD);
     }
 }

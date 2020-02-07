@@ -18,6 +18,26 @@ interface SecurityConfigInterface
     /**
      * @return bool
      */
+    public function isHstsEnabled(): bool;
+
+    /**
+     * @return int
+     */
+    public function getHstsMaxAge(): int;
+
+    /**
+     * @return bool
+     */
+    public function isHstsForSubdomains(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isHstsPreload(): bool;
+
+    /**
+     * @return bool
+     */
     public function isErrorLogEnabled(): bool;
 
     /**

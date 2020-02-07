@@ -31,7 +31,7 @@ class SecureHeadersMiddleware implements MiddlewareInterface
      */
     public function __construct(AppConfigInterface $appConfig, SecurityConfigInterface $securityConfig)
     {
-        $this->appConfig = $appConfig;
+        $this->appConfig      = $appConfig;
         $this->securityConfig = $securityConfig;
     }
 
@@ -63,15 +63,21 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->csp('report', $reportUri);
         $headers->csp('report', $reportUri, true);
 
-        // Basic STS headers with safe mode enabled to prevent long-lasting effects of incorrect configuration
-        $headers->hsts();
-
-        // Enable/disable errors logging
-        $headers->errorReporting($this->securityConfig->isErrorLogEnabled());
-
         if ($this->securityConfig->isCspSafeModeEnabled()) {
             $headers->safeMode(true);
         }
+
+        if ($this->securityConfig->isHstsEnabled()) {
+            // Basic STS headers with safe mode enabled to prevent long-lasting effects of incorrect configuration
+            $headers->hsts(
+                $this->securityConfig->getHstsMaxAge(),
+                $this->securityConfig->isHstsForSubdomains(),
+                $this->securityConfig->isHstsPreload()
+            );
+        }
+
+        // Enable/disable errors logging
+        $headers->errorReporting($this->securityConfig->isErrorLogEnabled());
 
         $headers->csp('default', $baseUrl);
         $headers->csp('image', $baseUrl);
