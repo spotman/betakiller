@@ -53,12 +53,15 @@ class ResolvingUrlContainer extends UrlContainer
             ]);
         }
 
+        $skipped = 0;
+
         // Check highest level first
         foreach ($params as $param) {
             $with = $param::getUrlContainerKey();
 
             // Prevent endless loop on circular dependencies
             if (\in_array($with, $checked, true)) {
+                $skipped++;
                 continue;
             }
 
@@ -67,6 +70,11 @@ class ResolvingUrlContainer extends UrlContainer
             if ($this->isKey($param, $key)) {
                 return $param;
             }
+        }
+
+        // Prevent deep search if all params were skipped
+        if (count($params) === $skipped) {
+            return null;
         }
 
         // Go deeper
