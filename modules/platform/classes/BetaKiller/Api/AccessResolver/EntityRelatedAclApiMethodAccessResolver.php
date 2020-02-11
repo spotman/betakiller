@@ -1,11 +1,14 @@
 <?php
 namespace BetaKiller\Api\AccessResolver;
 
+use BetaKiller\Acl\EntityAclSpecFactory;
 use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\Api\Method\EntityBasedApiMethodInterface;
 use BetaKiller\Model\UserInterface;
+use Spotman\Acl\AclInterface;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
 use Spotman\Api\AccessResolver\AclApiMethodAccessResolver;
+use Spotman\Api\ApiAccessViolationException;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodInterface;
 use Spotman\Defence\ArgumentsInterface;
@@ -13,6 +16,24 @@ use Spotman\Defence\ArgumentsInterface;
 class EntityRelatedAclApiMethodAccessResolver extends AclApiMethodAccessResolver
 {
     public const CODENAME = 'EntityRelatedAcl';
+
+    /**
+     * @var \BetaKiller\Acl\EntityAclSpecFactory
+     */
+    private $aclSpecFactory;
+
+    /**
+     * AclApiMethodAccessResolver constructor.
+     *
+     * @param \Spotman\Acl\AclInterface            $acl
+     * @param \BetaKiller\Acl\EntityAclSpecFactory $aclSpecFactory
+     */
+    public function __construct(AclInterface $acl, EntityAclSpecFactory $aclSpecFactory)
+    {
+        parent::__construct($acl);
+
+        $this->aclSpecFactory = $aclSpecFactory;
+    }
 
     protected function prepareResource(
         ResolvingResourceInterface $resource,
@@ -41,6 +62,17 @@ class EntityRelatedAclApiMethodAccessResolver extends AclApiMethodAccessResolver
 
         if ($resource->isEntityRequiredForAction($method->getName())) {
             $entity = $method->getEntity($arguments);
+
+            $spec = $this->aclSpecFactory->createFor($entity);
+
+            // Check entity is allowed to user via EntityAclSpec
+            if (!$spec->isAllowedTo($entity, $user)) {
+                throw new ApiAccessViolationException('Entity ":entity" with ID ":id" is not allowed to ":who"', [
+                    ':entity' => $entity::getModelName(),
+                    ':id'     => $entity->getID(),
+                    ':who'    => $user->getID(),
+                ]);
+            }
 
             // Store model for processing status and transition permissions
             $resource->setEntity($entity);
