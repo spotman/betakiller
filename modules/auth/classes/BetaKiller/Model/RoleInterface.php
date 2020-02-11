@@ -38,6 +38,11 @@ interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, Multi
     public const GUEST = 'guest';
 
     /**
+     * Role for managing users
+     */
+    public const ROLE_USER_MANAGEMENT = 'user-management';
+
+    /**
      * @return string
      */
     public function getName(): string;

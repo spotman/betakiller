@@ -1,13 +1,12 @@
 <?php
 declare(strict_types=1);
 
+use BetaKiller\Acl\Resource\UserResource;
 use BetaKiller\Config\WorkflowConfig;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\User;
 use BetaKiller\Model\UserState;
 use BetaKiller\Workflow\UserWorkflow;
-use Worknector\Acl\Resource\UserResource;
-use Worknector\Worknector;
 
 return [
     User::getModelName() => [
@@ -20,7 +19,7 @@ return [
                 WorkflowConfig::ACTIONS => [
                     UserResource::ACTION_READ   => [
                         RoleInterface::LOGIN,
-                        Worknector::ROLE_USER_MANAGEMENT,
+                        RoleInterface::ROLE_USER_MANAGEMENT,
                     ],
                     UserResource::ACTION_UPDATE => [
                         RoleInterface::LOGIN,
@@ -39,7 +38,7 @@ return [
                 WorkflowConfig::ACTIONS => [
                     UserResource::ACTION_READ   => [
                         RoleInterface::LOGIN,
-                        Worknector::ROLE_USER_MANAGEMENT,
+                        RoleInterface::ROLE_USER_MANAGEMENT,
                     ],
                     UserResource::ACTION_UPDATE => [
                         RoleInterface::LOGIN,
@@ -58,7 +57,7 @@ return [
                 WorkflowConfig::ACTIONS => [
                     UserResource::ACTION_READ   => [
                         RoleInterface::LOGIN,
-                        Worknector::ROLE_USER_MANAGEMENT,
+                        RoleInterface::ROLE_USER_MANAGEMENT,
                     ],
                     UserResource::ACTION_UPDATE => [
                         RoleInterface::LOGIN,
@@ -77,7 +76,7 @@ return [
                 WorkflowConfig::ACTIONS => [
                     UserResource::ACTION_READ   => [
                         RoleInterface::LOGIN,
-                        Worknector::ROLE_USER_MANAGEMENT,
+                        RoleInterface::ROLE_USER_MANAGEMENT,
                     ],
                     UserResource::ACTION_UPDATE => [
                         // No one can update
@@ -96,7 +95,7 @@ return [
                 WorkflowConfig::ACTIONS     => [
                     UserResource::ACTION_READ   => [
 //                        RoleInterface::LOGIN,
-                        Worknector::ROLE_USER_MANAGEMENT,
+                        RoleInterface::ROLE_USER_MANAGEMENT,
                     ],
                     UserResource::ACTION_UPDATE => [
                         // No one can update
@@ -112,7 +111,7 @@ return [
 
                 WorkflowConfig::ACTIONS     => [
                     UserResource::ACTION_READ   => [
-                        Worknector::ROLE_USER_MANAGEMENT,
+                        RoleInterface::ROLE_USER_MANAGEMENT,
                     ],
                     UserResource::ACTION_UPDATE => [
                         // No one can update
@@ -146,7 +145,7 @@ return [
             ],
 
             UserWorkflow::TRANSITION_BLOCK => [
-                Worknector::ROLE_USER_MANAGEMENT,
+                RoleInterface::ROLE_USER_MANAGEMENT,
             ],
         ],
     ],
