@@ -12,6 +12,7 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
 {
     public const REL_DELIMITER = ':';
+    public const COL_DELIMITER = '.';
 
     /**
      * @var OrmFactory
