@@ -1533,11 +1533,17 @@ class Kohana_ORM extends Model implements Serializable {
 	 */
 	public function count_relations($alias, $far_keys = NULL)
 	{
+	    $pk = $this->pk();
+
+	    if (!$pk) {
+            throw new DomainException('Missing primary key value for '.$this->table_name());
+        }
+
 		if ($far_keys === NULL)
 		{
 			return (int) DB::select(array(DB::expr('COUNT(*)'), 'records_found'))
 				->from($this->_has_many[$alias]['through'])
-				->where($this->_has_many[$alias]['foreign_key'], '=', $this->pk())
+				->where($this->_has_many[$alias]['foreign_key'], '=', $pk)
 				->execute($this->_db)->get('records_found');
 		}
 
