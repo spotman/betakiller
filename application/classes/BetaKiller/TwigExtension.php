@@ -422,11 +422,9 @@ final class TwigExtension extends AbstractExtension
 
 
             new TwigFunction(
-                'link',
-                function (array $context, string $rel, string $href, array $attributes = null): ?string {
+                'meta_link',
+                function (array $context, string $rel, string $href, array $attributes = null): void {
                     $this->getMeta($context)->addLink($rel, $href, $attributes);
-
-                    return null;
                 },
                 ['needs_context' => true]
             ),
@@ -435,7 +433,7 @@ final class TwigExtension extends AbstractExtension
              * Add element to <title> tag (will be combined automatically upon template render)
              */
             new TwigFunction(
-                'title',
+                'meta_title',
                 function (array $context, string $value): void {
                     $this->getMeta($context)->setTitle($value, Meta::TITLE_APPEND);
                 },
@@ -443,9 +441,17 @@ final class TwigExtension extends AbstractExtension
             ),
 
             new TwigFunction(
-                'description',
+                'meta_description',
                 function (array $context, string $value): void {
                     $this->getMeta($context)->setDescription($value);
+                },
+                ['needs_context' => true,]
+            ),
+
+            new TwigFunction(
+                'meta_share_description',
+                function (array $context, string $value): void {
+                    $this->getMeta($context)->setSocialDescription($value);
                 },
                 ['needs_context' => true,]
             ),
@@ -474,6 +480,23 @@ final class TwigExtension extends AbstractExtension
                 ['needs_context' => true,]
             ),
 
+            new TwigFunction(
+                'get_meta_share_title',
+                function (array $context) {
+                    // Act as a getter
+                    return $this->getMeta($context)->getSocialTitle();
+                },
+                ['needs_context' => true,]
+            ),
+
+            new TwigFunction(
+                'get_meta_share_description',
+                function (array $context) {
+                    // Act as a getter
+                    return $this->getMeta($context)->getSocialDescription();
+                },
+                ['needs_context' => true,]
+            ),
         ];
     }
 
