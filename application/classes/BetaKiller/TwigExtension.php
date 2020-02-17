@@ -451,7 +451,7 @@ final class TwigExtension extends AbstractExtension
             ),
 
             new TwigFunction(
-                'meta_image',
+                'meta_share_image',
                 function (array $context, string $url, bool $overwrite = null): void {
                     $meta = $this->getMeta($context);
 
