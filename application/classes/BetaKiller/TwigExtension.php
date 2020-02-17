@@ -452,19 +452,24 @@ final class TwigExtension extends AbstractExtension
 
             new TwigFunction(
                 'meta_image',
-                function (array $context, string $url): void {
-                    $this->getMeta($context)->setImage($url);
+                function (array $context, string $url, bool $overwrite = null): void {
+                    $meta = $this->getMeta($context);
+
+                    if ($overwrite || !$meta->hasSocialImage()) {
+                        $meta->setSocialImage($url);
+                    }
                 },
                 ['needs_context' => true,]
             ),
 
             new TwigFunction(
                 'meta_share_title',
-                function (array $context, string $title): void {
+                function (array $context, string $title, bool $overwrite = null): void {
                     $meta = $this->getMeta($context);
 
-                    $meta->set('og:title', $title);
-                    $meta->set('twitter:title', $title);
+                    if ($overwrite || !$meta->hasSocialTitle()) {
+                        $meta->setSocialTitle($title);
+                    }
                 },
                 ['needs_context' => true,]
             ),
