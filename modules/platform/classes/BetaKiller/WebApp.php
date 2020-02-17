@@ -186,7 +186,7 @@ class WebApp
 
         // Assets
         $extRegexp  = '[a-z]{2,}'; // (jpg|jpeg|gif|png)
-        $sizeRegexp = '[0-9]{0,3}'.AssetsModelImageInterface::SIZE_DELIMITER.'[0-9]{0,3}';
+        $sizeRegexp = '[0-9]{0,4}'.AssetsModelImageInterface::SIZE_DELIMITER.'[0-9]{0,4}';
 
         $itemPlace = '{item:.+}';
         $sizePlace = '-{size:'.$sizeRegexp.'}';
