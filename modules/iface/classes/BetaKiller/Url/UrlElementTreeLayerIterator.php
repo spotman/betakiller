@@ -8,25 +8,25 @@ class UrlElementTreeLayerIterator extends \FilterIterator
     /**
      * IFace URL element filters
      *
-     * @var \BetaKiller\Url\ElementFilter\UrlElementFilterInterface
+     * @var \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null
      */
-    private $filters;
+    private $filter;
 
     /**
      * UrlElementTreeLayerIterator constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface                      $tree
      * @param \BetaKiller\Url\UrlElementInterface                          $parent
-     * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filters [optional]
+     * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filter [optional]
      *
      * @throws \BetaKiller\Url\UrlElementException
      */
     public function __construct(
         UrlElementTreeInterface $tree,
         ?UrlElementInterface $parent = null,
-        ?UrlElementFilterInterface $filters = null
+        ?UrlElementFilterInterface $filter = null
     ) {
-        $this->filters = $filters;
+        $this->filter = $filter;
 
         $layer = $parent
             ? $tree->getChildren($parent)
@@ -51,10 +51,10 @@ class UrlElementTreeLayerIterator extends \FilterIterator
      */
     public function accept(): bool
     {
-        if ($this->filters) {
+        if ($this->filter) {
             $urlElement = $this->current();
 
-            return $this->filters->isAvailable($urlElement);
+            return $this->filter->isAvailable($urlElement);
         }
 
         return true;

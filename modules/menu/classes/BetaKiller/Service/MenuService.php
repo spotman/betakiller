@@ -240,7 +240,7 @@ class MenuService
                 $instance = $this->elementFactory->createFromUrlElement($urlElement);
 
                 $orderedItemsBaseCounter = $totalCounter;
-                $availableUrlCounter = 0;
+                $availableUrlCounter     = 0;
 
                 // Iterate over every generated URL to make full tree
                 foreach ($this->getAvailableIFaceUrls($urlElement, $params) as $availableUrl) {
@@ -283,7 +283,7 @@ class MenuService
 
                     // Recursion for children
                     if ($iterator->hasChildren()) {
-                        $item->addChildren($this->processLayer($iterator->getChildren(), $params ,$totalCounter));
+                        $item->addChildren($this->processLayer($iterator->getChildren(), $params, $totalCounter));
                     }
 
                     $availableUrlCounter++;

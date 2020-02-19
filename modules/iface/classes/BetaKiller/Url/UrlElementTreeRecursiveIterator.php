@@ -17,26 +17,26 @@ class UrlElementTreeRecursiveIterator extends UrlElementTreeLayerIterator implem
      *
      * @var \BetaKiller\Url\ElementFilter\UrlElementFilterInterface
      */
-    private $filters;
+    private $filter;
 
     /**
      * UrlElementTreeRecursiveIterator constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface                      $tree
-     * @param \BetaKiller\Url\UrlElementInterface|null                     $parent  [optional]
-     * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filters [optional]
+     * @param \BetaKiller\Url\UrlElementInterface|null                     $parent [optional]
+     * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filter [optional]
      *
      * @throws \BetaKiller\Url\UrlElementException
      */
     public function __construct(
         UrlElementTreeInterface $tree,
         ?UrlElementInterface $parent = null,
-        ?UrlElementFilterInterface $filters = null
+        ?UrlElementFilterInterface $filter = null
     ) {
-        parent::__construct($tree, $parent, $filters);
+        parent::__construct($tree, $parent, $filter);
 
         $this->tree    = $tree;
-        $this->filters = $filters;
+        $this->filter = $filter;
     }
 
     /**
@@ -63,6 +63,6 @@ class UrlElementTreeRecursiveIterator extends UrlElementTreeLayerIterator implem
     {
         $current = $this->current();
 
-        return new self($this->tree, $current, $this->filters);
+        return new self($this->tree, $current, $this->filter);
     }
 }

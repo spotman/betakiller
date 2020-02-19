@@ -7,7 +7,6 @@ use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Factory\FactoryException;
 use BetaKiller\Model\DispatchableEntityInterface;
-use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -260,12 +259,6 @@ class UrlHelper
         ?UrlContainerInterface $params = null,
         ?bool $removeCycling = null
     ): string {
-        if (!\in_array($action, CrudlsActionsInterface::ACTIONS_WITHOUT_ENTITY, true)) {
-            throw new UrlBehaviourException('Action ":action" requires entity instance for URL generation', [
-                ':action' => $action,
-            ]);
-        }
-
         // Search for URL element with provided entity, action and zone
         $urlElement = $this->tree->getByEntityActionAndZone($entityName, $action, $zone);
 
