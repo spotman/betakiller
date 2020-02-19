@@ -70,14 +70,10 @@ class WidgetFacade
      */
     public function render(WidgetInterface $widget, ServerRequestInterface $request, array $context): string
     {
-        $pack = RequestProfiler::begin($request, $widget->getName().' widget render');
-
         $user = ServerRequestHelper::getUser($request);
 
         if (!$this->isAllowed($widget, $user)) {
             if ($widget->isEmptyResponseAllowed()) {
-                RequestProfiler::end($pack);
-
                 // Return empty string if widget allows empty response and it`s not allowed by ACL
                 return '';
             }
@@ -88,8 +84,12 @@ class WidgetFacade
         $result = '';
 
         try {
+            $dp = RequestProfiler::begin($request, $widget->getName().' widget: data');
+
             // Collecting data
             $data = $widget->getData($request, $context);
+
+            RequestProfiler::end($dp);
 
             // Creating View instance
             $view = $this->createView($widget);
@@ -109,12 +109,13 @@ class WidgetFacade
                 'name' => $widget->getName(),
             ]);
 
+            $rp = RequestProfiler::begin($request, $widget->getName().' widget: render');
+
             $result = $view->render();
+            RequestProfiler::end($rp);
         } catch (\Throwable $e) {
             $this->logException($this->logger, $e);
         }
-
-        RequestProfiler::end($pack);
 
         return $result;
     }
