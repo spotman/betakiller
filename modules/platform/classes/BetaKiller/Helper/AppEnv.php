@@ -50,8 +50,8 @@ class AppEnv implements AppEnvInterface
         $this->isCoreRunning = $isCoreRunning;
 
         $this->initDotEnv();
-        $this->detectDebugMode();
         $this->detectAppMode();
+        $this->detectDebugMode();
         $this->detectCliEnv(); // Cli options can override app configuration
     }
 
@@ -74,7 +74,7 @@ class AppEnv implements AppEnvInterface
 
     private function detectDebugMode(): void
     {
-        if (\getenv('APP_DEBUG')) {
+        if (!$this->inProductionMode() && \getenv('APP_DEBUG')) {
             $this->enableDebug();
         }
     }
