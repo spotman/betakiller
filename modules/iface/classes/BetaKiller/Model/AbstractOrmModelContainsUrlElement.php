@@ -145,6 +145,23 @@ abstract class AbstractOrmModelContainsUrlElement extends \ORM implements Entity
         return $this->getUrlElement()->getEntityActionName();
     }
 
+
+    /**
+     * @inheritDoc
+     */
+    public function hasEnvironmentRestrictions(): bool
+    {
+        return $this->getUrlElement()->hasEnvironmentRestrictions();
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getAllowedEnvironments(): array
+    {
+        return $this->getUrlElement()->getAllowedEnvironments();
+    }
+
     /**
      * Specify data which should be serialized to JSON
      *

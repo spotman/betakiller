@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Url\ModelProvider;
 
 use BetaKiller\Exception\NotImplementedHttpException;
+use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementInterface;
 
 abstract class AbstractPlainUrlElementModel implements UrlElementInterface
@@ -17,6 +18,7 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     public const OPTION_IS_DEFAULT         = 'isDefault';
     public const OPTION_ZONE               = 'zone';
     public const OPTION_ACL_RULES          = 'aclRules';
+    public const OPTION_ENV                = 'env';
 
     public const OPTION_EXTENDS = 'extends';
 
@@ -64,6 +66,11 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
      * @var string[]
      */
     private $aclRules = [];
+
+    /**
+     * @var string[]
+     */
+    private $environments = [];
 
     /**
      * @param array $data
@@ -171,6 +178,31 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     }
 
     /**
+     *
+     * @return string[]
+     */
+    public function getAdditionalAclRules(): array
+    {
+        return $this->aclRules;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasEnvironmentRestrictions(): bool
+    {
+        return count($this->environments) > 0;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getAllowedEnvironments(): array
+    {
+        return $this->environments;
+    }
+
+    /**
      * Returns array representation of the model data
      *
      * @return array
@@ -187,6 +219,7 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
             self::OPTION_ACL_RULES          => $this->exportAclRules(),
             self::OPTION_IS_DEFAULT         => $this->isDefault(),
             self::OPTION_ZONE               => $this->getZoneName(),
+            self::OPTION_ENV                => $this->exportEnvironments(),
         ];
     }
 
@@ -220,15 +253,10 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
         if (isset($data[self::OPTION_ACL_RULES])) {
             $this->importAclRules((string)$data[self::OPTION_ACL_RULES]);
         }
-    }
 
-    /**
-     *
-     * @return string[]
-     */
-    public function getAdditionalAclRules(): array
-    {
-        return $this->aclRules;
+        if (isset($data[self::OPTION_ENV])) {
+            $this->importEnvironments((string)$data[self::OPTION_ENV]);
+        }
     }
 
     /**
@@ -294,5 +322,16 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     protected function exportAclRules(): string
     {
         return implode(',', $this->aclRules);
+    }
+
+    protected function importEnvironments(string $envString): void
+    {
+        $values             = explode(',', $envString);
+        $this->environments = array_filter(array_map('trim', $values));
+    }
+
+    protected function exportEnvironments(): string
+    {
+        return implode(',', $this->environments);
     }
 }

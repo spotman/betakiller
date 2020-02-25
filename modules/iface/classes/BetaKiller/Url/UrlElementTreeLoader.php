@@ -170,6 +170,12 @@ class UrlElementTreeLoader
 
         foreach ($sources as $provider) {
             foreach ($provider->getAll() as $urlElement) {
+                // Skip adding Url Elements which are not allowed in the current env
+                if ($urlElement->hasEnvironmentRestrictions() &&
+                    !\in_array($this->appEnv->getModeName(), $urlElement->getAllowedEnvironments(), true)) {
+                    continue;
+                }
+
                 $this->tree->add($urlElement, true); // No overwriting allowed
             }
         }

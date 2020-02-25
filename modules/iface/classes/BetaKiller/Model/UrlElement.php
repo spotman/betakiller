@@ -311,4 +311,20 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements Entity
     {
         return $this->get('type');
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasEnvironmentRestrictions(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getAllowedEnvironments(): array
+    {
+        throw new NotImplementedHttpException();
+    }
 }

@@ -80,4 +80,14 @@ interface UrlElementInterface extends \JsonSerializable
      * @return string[]
      */
     public function getAdditionalAclRules(): array;
+
+    /**
+     * @return bool
+     */
+    public function hasEnvironmentRestrictions(): bool;
+
+    /**
+     * @return string[]
+     */
+    public function getAllowedEnvironments(): array;
 }
