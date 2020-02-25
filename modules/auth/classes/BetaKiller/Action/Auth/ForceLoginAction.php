@@ -10,7 +10,6 @@ use BetaKiller\Event\WebLoginEvent;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\MessageBus\EventBusInterface;
-use BetaKiller\Model\User;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Service\AuthService;
 use BetaKiller\Url\Parameter\UserNameUrlParameter;
@@ -53,10 +52,14 @@ final class ForceLoginAction extends AbstractAction
      * @param \BetaKiller\Auth\UserUrlDetectorInterface      $urlDetector
      * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
-    public function __construct(AuthService $auth, UserRepositoryInterface $userRepo, UserUrlDetectorInterface $urlDetector, EventBusInterface $eventBus)
-    {
+    public function __construct(
+        AuthService $auth,
+        UserRepositoryInterface $userRepo,
+        UserUrlDetectorInterface $urlDetector,
+        EventBusInterface $eventBus
+    ) {
         $this->auth        = $auth;
-        $this->userRepo = $userRepo;
+        $this->userRepo    = $userRepo;
         $this->eventBus    = $eventBus;
         $this->urlDetector = $urlDetector;
     }
