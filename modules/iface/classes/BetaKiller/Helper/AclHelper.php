@@ -149,15 +149,17 @@ class AclHelper
 
         // Check DataSource item access
         if ($urlElement->hasDynamicUrl()) {
-            $entityName = $this->prototypeService
-                ->createPrototypeFromUrlElement($urlElement)
-                ->getDataSourceName();
+            $prototype = $this->prototypeService->createPrototypeFromUrlElement($urlElement);
 
-            // Default is READ, everything else can be defined in "aclRules" section of UrlElement config
-            $actionName = CrudlsActionsInterface::ACTION_READ;
+            if (!$prototype->isRawParameter()) {
+                $entityName = $prototype->getDataSourceName();
 
-            if (!$this->checkUrlElementEntityPermissions($urlElement, $params, $entityName, $actionName, $user)) {
-                return false;
+                // Default is READ, everything else can be defined in "aclRules" section of UrlElement config
+                $actionName = CrudlsActionsInterface::ACTION_READ;
+
+                if (!$this->checkUrlElementEntityPermissions($urlElement, $params, $entityName, $actionName, $user)) {
+                    return false;
+                }
             }
         }
 

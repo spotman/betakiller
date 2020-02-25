@@ -3,6 +3,7 @@
     <!-- Auth common ifaces -->
     <iface uri="login" name="Auth\Login" label="Sign in" layout="auth" hideInSiteMap="true" zone="public">
         <action uri="regular" name="Auth\RegularLogin"/>
+        <action uri="{UserName}" name="Auth\ForceLogin" env="development,testing,staging"/>
     </iface>
 
     <action uri="logout" name="Auth\Logout" zone="public"/>

@@ -99,23 +99,23 @@ class UrlPrototypeService
         string $uriValue,
         UrlContainerInterface $params
     ): ?UrlParameterInterface {
-        // Search for model item
-        if ($prototype->hasModelKey()) {
-            $dataSource = $this->getDataSourceInstance($prototype);
-
-            $this->validatePrototypeModelKey($prototype, $dataSource);
-
-            if ($prototype->hasIdKey()) {
-                $id = $this->converter->decode($prototype->getDataSourceName(), $uriValue);
-
-                return $dataSource->findById($id);
-            }
-
-            return $dataSource->findItemByUrlKeyValue($uriValue, $params);
+        if ($prototype->isRawParameter()) {
+            // Plain parameter - use factory instead
+            return $this->getRawParameterInstance($prototype, $uriValue);
         }
 
-        // Plain parameter - use factory instead
-        return $this->getRawParameterInstance($prototype, $uriValue);
+        // Search for model item
+        $dataSource = $this->getDataSourceInstance($prototype);
+
+        $this->validatePrototypeModelKey($prototype, $dataSource);
+
+        if ($prototype->hasIdKey()) {
+            $id = $this->converter->decode($prototype->getDataSourceName(), $uriValue);
+
+            return $dataSource->findById($id);
+        }
+
+        return $dataSource->findItemByUrlKeyValue($uriValue, $params);
     }
 
     /**
@@ -346,7 +346,7 @@ class UrlPrototypeService
             ]);
         }
 
-        if (!$prototype->hasModelKey()) {
+        if ($prototype->isRawParameter()) {
             // No processing for RawUrlParameter
             return [];
         }

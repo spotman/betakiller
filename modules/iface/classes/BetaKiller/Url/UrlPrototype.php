@@ -95,6 +95,14 @@ final class UrlPrototype
     /**
      * @return bool
      */
+    public function isRawParameter(): bool
+    {
+        return !$this->hasModelKey();
+    }
+
+    /**
+     * @return bool
+     */
     public function hasModelKey(): bool
     {
         return !empty($this->modelKey);
