@@ -17,6 +17,7 @@ abstract class AbstractPublicWidget extends AbstractWidget
         return [
             // Guests and any logged in users may use public widgets
             RoleInterface::GUEST,
+            RoleInterface::LOGIN,
         ];
     }
 
