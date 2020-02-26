@@ -53,9 +53,10 @@ class DebugBarUserDataCollector extends DataCollector implements Renderable
     private function getData(UserInterface $user): array
     {
         return [
-            'id'    => $user->getID(),
-            'email' => $user->getEmail(),
-            'roles' => implode('", "', $this->getAssignedRoles()),
+            'id'       => $user->getID(),
+            'username' => $user->getUsername(),
+            'email'    => $user->getEmail(),
+            'roles'    => implode('", "', $this->getAssignedRoles()),
         ];
     }
 
