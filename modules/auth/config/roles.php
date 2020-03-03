@@ -21,7 +21,7 @@ return [
         ],
     ],
 
-    RoleInterface::ROLE_USER_MANAGEMENT => [
+    RoleInterface::USER_MANAGEMENT => [
         RoleConfig::OPTION_DESC     => 'Grants access to user management',
         RoleConfig::OPTION_INHERITS => [
             // User management is done via admin panel

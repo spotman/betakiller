@@ -522,6 +522,14 @@ class User extends \ORM implements UserInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function hasPhoneDefined(): bool
+    {
+        return (string)$this->get(self::COL_PHONE) !== '';
+    }
+
+    /**
      * Возвращает основной номер телефона
      *
      * @return string

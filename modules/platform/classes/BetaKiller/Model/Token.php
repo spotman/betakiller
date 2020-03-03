@@ -5,26 +5,28 @@ namespace BetaKiller\Model;
 
 class Token extends \ORM implements TokenInterface
 {
-    public const TABLE_NAME             = 'tokens';
-    public const TABLE_FIELD_USER_ID    = 'user_id';
-    public const TABLE_FIELD_VALUE      = 'value';
-    public const TABLE_FIELD_ENDING_AT  = 'ending_at';
-    public const TABLE_FIELD_CREATED_AT = 'created_at';
-    public const TABLE_FIELD_USED_AT    = 'used_at';
+    public const TABLE_NAME     = 'tokens';
+    public const COL_USER_ID    = 'user_id';
+    public const COL_VALUE      = 'value';
+    public const COL_ENDING_AT  = 'ending_at';
+    public const COL_CREATED_AT = 'created_at';
+    public const COL_USED_AT    = 'used_at';
+
+    private const REL_USER = 'user';
 
     protected function configure(): void
     {
         $this->_table_name = static::TABLE_NAME;
 
         $this->belongs_to([
-            'user' => [
-                'model'       => 'User',
-                'foreign_key' => self::TABLE_FIELD_USER_ID,
+            self::REL_USER => [
+                'model'       => User::getModelName(),
+                'foreign_key' => self::COL_USER_ID,
             ],
         ]);
 
         $this->load_with([
-            'user',
+            self::REL_USER,
         ]);
     }
 
@@ -34,29 +36,29 @@ class Token extends \ORM implements TokenInterface
     public function rules(): array
     {
         return [
-            self::TABLE_FIELD_VALUE => [
+            self::COL_VALUE => [
                 ['not_empty'],
                 ['max_length', [':value', 64]],
             ],
 
-            self::TABLE_FIELD_CREATED_AT => [
+            self::COL_CREATED_AT => [
                 ['not_empty'],
             ],
 
-            self::TABLE_FIELD_ENDING_AT => [
+            self::COL_ENDING_AT => [
                 ['not_empty'],
             ],
         ];
     }
 
     /**
-     * @param \BetaKiller\Model\UserInterface $userModel
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \BetaKiller\Model\TokenInterface
      */
-    public function setUser(UserInterface $userModel): TokenInterface
+    public function setUser(UserInterface $user): TokenInterface
     {
-        $this->set(self::TABLE_FIELD_USER_ID, $userModel);
+        $this->set(self::REL_USER, $user);
 
         return $this;
     }
@@ -66,7 +68,7 @@ class Token extends \ORM implements TokenInterface
      */
     public function getUser(): UserInterface
     {
-        return $this->getRelatedEntity('user');
+        return $this->getRelatedEntity(self::REL_USER);
     }
 
     /**
@@ -76,7 +78,7 @@ class Token extends \ORM implements TokenInterface
      */
     public function setValue(string $value): TokenInterface
     {
-        $this->set(self::TABLE_FIELD_VALUE, $value);
+        $this->set(self::COL_VALUE, $value);
 
         return $this;
     }
@@ -86,7 +88,7 @@ class Token extends \ORM implements TokenInterface
      */
     public function getValue(): string
     {
-        return $this->get(self::TABLE_FIELD_VALUE);
+        return $this->get(self::COL_VALUE);
     }
 
     /**
@@ -96,7 +98,7 @@ class Token extends \ORM implements TokenInterface
      */
     public function setEndingAt(\DateTimeImmutable $value): TokenInterface
     {
-        $this->set_datetime_column_value(self::TABLE_FIELD_ENDING_AT, $value);
+        $this->set_datetime_column_value(self::COL_ENDING_AT, $value);
 
         return $this;
     }
@@ -106,7 +108,7 @@ class Token extends \ORM implements TokenInterface
      */
     public function getEndingAt(): \DateTimeImmutable
     {
-        return $this->get_datetime_column_value(self::TABLE_FIELD_ENDING_AT);
+        return $this->get_datetime_column_value(self::COL_ENDING_AT);
     }
 
     /**
@@ -116,7 +118,7 @@ class Token extends \ORM implements TokenInterface
      */
     public function setCreatedAt(\DateTimeImmutable $value): TokenInterface
     {
-        $this->set_datetime_column_value(self::TABLE_FIELD_CREATED_AT, $value);
+        $this->set_datetime_column_value(self::COL_CREATED_AT, $value);
 
         return $this;
     }
@@ -126,7 +128,7 @@ class Token extends \ORM implements TokenInterface
      */
     public function getCreatedAt(): \DateTimeImmutable
     {
-        return $this->get_datetime_column_value(self::TABLE_FIELD_CREATED_AT);
+        return $this->get_datetime_column_value(self::COL_CREATED_AT);
     }
 
     /**
@@ -136,7 +138,7 @@ class Token extends \ORM implements TokenInterface
      */
     public function setUsedAt(\DateTimeImmutable $value): TokenInterface
     {
-        $this->set_datetime_column_value(self::TABLE_FIELD_USED_AT, $value);
+        $this->set_datetime_column_value(self::COL_USED_AT, $value);
 
         return $this;
     }
@@ -146,7 +148,7 @@ class Token extends \ORM implements TokenInterface
      */
     public function getUsedAt(): ?\DateTimeImmutable
     {
-        return $this->get_datetime_column_value(self::TABLE_FIELD_USED_AT);
+        return $this->get_datetime_column_value(self::COL_USED_AT);
     }
 
     /**

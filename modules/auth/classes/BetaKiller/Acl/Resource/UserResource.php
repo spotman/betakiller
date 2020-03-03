@@ -20,7 +20,7 @@ final class UserResource extends AbstractHasWorkflowStateAclResource
     protected function getListPermissionRoles(): array
     {
         return [
-            RoleInterface::ROLE_USER_MANAGEMENT,
+            RoleInterface::USER_MANAGEMENT,
         ];
     }
 
@@ -30,7 +30,7 @@ final class UserResource extends AbstractHasWorkflowStateAclResource
     protected function getSearchPermissionRoles(): array
     {
         return [
-            RoleInterface::ROLE_USER_MANAGEMENT,
+            RoleInterface::USER_MANAGEMENT,
         ];
     }
 }

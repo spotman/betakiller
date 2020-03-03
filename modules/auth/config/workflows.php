@@ -19,7 +19,7 @@ return [
                 WorkflowConfig::ACTIONS => [
                     UserResource::ACTION_READ   => [
                         RoleInterface::LOGIN,
-                        RoleInterface::ROLE_USER_MANAGEMENT,
+                        RoleInterface::USER_MANAGEMENT,
                     ],
                     UserResource::ACTION_UPDATE => [
                         RoleInterface::LOGIN,
@@ -38,7 +38,7 @@ return [
                 WorkflowConfig::ACTIONS => [
                     UserResource::ACTION_READ   => [
                         RoleInterface::LOGIN,
-                        RoleInterface::ROLE_USER_MANAGEMENT,
+                        RoleInterface::USER_MANAGEMENT,
                     ],
                     UserResource::ACTION_UPDATE => [
                         RoleInterface::LOGIN,
@@ -57,7 +57,7 @@ return [
                 WorkflowConfig::ACTIONS => [
                     UserResource::ACTION_READ   => [
                         RoleInterface::LOGIN,
-                        RoleInterface::ROLE_USER_MANAGEMENT,
+                        RoleInterface::USER_MANAGEMENT,
                     ],
                     UserResource::ACTION_UPDATE => [
                         RoleInterface::LOGIN,
@@ -76,7 +76,7 @@ return [
                 WorkflowConfig::ACTIONS => [
                     UserResource::ACTION_READ   => [
                         RoleInterface::LOGIN,
-                        RoleInterface::ROLE_USER_MANAGEMENT,
+                        RoleInterface::USER_MANAGEMENT,
                     ],
                     UserResource::ACTION_UPDATE => [
                         // No one can update
@@ -95,7 +95,7 @@ return [
                 WorkflowConfig::ACTIONS     => [
                     UserResource::ACTION_READ   => [
 //                        RoleInterface::LOGIN,
-                        RoleInterface::ROLE_USER_MANAGEMENT,
+                        RoleInterface::USER_MANAGEMENT,
                     ],
                     UserResource::ACTION_UPDATE => [
                         // No one can update
@@ -111,7 +111,7 @@ return [
 
                 WorkflowConfig::ACTIONS     => [
                     UserResource::ACTION_READ   => [
-                        RoleInterface::ROLE_USER_MANAGEMENT,
+                        RoleInterface::USER_MANAGEMENT,
                     ],
                     UserResource::ACTION_UPDATE => [
                         // No one can update
@@ -145,7 +145,7 @@ return [
             ],
 
             UserWorkflow::TRANSITION_BLOCK => [
-                RoleInterface::ROLE_USER_MANAGEMENT,
+                RoleInterface::USER_MANAGEMENT,
             ],
         ],
     ],

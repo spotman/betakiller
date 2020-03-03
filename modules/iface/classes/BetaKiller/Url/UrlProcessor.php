@@ -6,6 +6,7 @@ namespace BetaKiller\Url;
 use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\Factory\UrlElementInstanceFactory;
 use BetaKiller\Helper\AclHelper;
+use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 
@@ -85,9 +86,20 @@ class UrlProcessor
         $this->aclHelper->forceAuthorizationIfNeeded($urlElement, $user);
 
         if (!$this->aclHelper->isUrlElementAllowed($user, $urlElement, $urlParameters)) {
-            throw new AccessDeniedException('UrlElement :name is not allowed to User ":who"', [
-                ':name' => $urlElement->getCodename(),
-                ':who'  => $user->isGuest() ? 'Guest' : $user->getID(),
+            $params = [];
+
+            foreach ($urlParameters->getAllParameters() as $item) {
+                $id = $item instanceof AbstractEntityInterface
+                    ? $item->getID()
+                    : null;
+
+                $params[] = sprintf('%s (%s)', $item::getUrlContainerKey(), $id);
+            }
+
+            throw new AccessDeniedException('UrlElement ":name" is not allowed to User ":who" with :params', [
+                ':name'   => $urlElement->getCodename(),
+                ':who'    => $user->isGuest() ? 'Guest' : $user->getID(),
+                ':params' => implode(', ', $params),
             ]);
         }
     }

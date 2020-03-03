@@ -40,7 +40,7 @@ interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, Multi
     /**
      * Role for managing users
      */
-    public const ROLE_USER_MANAGEMENT = 'user-management';
+    public const USER_MANAGEMENT = 'user-management';
 
     /**
      * @return string

@@ -18,7 +18,7 @@ class TokenRepository extends AbstractOrmBasedDispatchableRepository implements 
      */
     public function getUrlKeyName(): string
     {
-        return Token::TABLE_FIELD_VALUE;
+        return Token::COL_VALUE;
     }
 
     /**
@@ -73,7 +73,7 @@ class TokenRepository extends AbstractOrmBasedDispatchableRepository implements 
      */
     private function filterValue(OrmInterface $orm, string $value): self
     {
-        $column = $orm->object_column(Token::TABLE_FIELD_VALUE);
+        $column = $orm->object_column(Token::COL_VALUE);
         $orm->where($column, '=', $value);
 
         return $this;
@@ -88,7 +88,7 @@ class TokenRepository extends AbstractOrmBasedDispatchableRepository implements 
      */
     private function filterActive(OrmInterface $orm, bool $active): self
     {
-        $column = $orm->object_column(Token::TABLE_FIELD_ENDING_AT);
+        $column = $orm->object_column(Token::COL_ENDING_AT);
         $now    = new \DateTimeImmutable();
 
         $orm->filter_datetime_column_value($column, $now, $active ? '>' : '<=');
@@ -98,7 +98,7 @@ class TokenRepository extends AbstractOrmBasedDispatchableRepository implements 
 
     private function filterNotUsed(OrmInterface $orm): self
     {
-        $column = $orm->object_column(Token::TABLE_FIELD_USED_AT);
+        $column = $orm->object_column(Token::COL_USED_AT);
 
         $orm->where($column, 'IS', null);
 

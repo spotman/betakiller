@@ -87,8 +87,9 @@ class AccessRecoveryService
         $claimElement = $this->urlHelper->getUrlElementByCodename(ClaimRegistrationAction::codename());
 
         $this->notification->directMessage(self::NOTIFICATION_NAME, $user, [
+            // User Language will be fetched from Token
             'recovery_url' => $this->urlHelper->makeUrl($actionElement, $actionParams, false),
-            'claim_url'    => $this->urlHelper->makeUrl($claimElement, null, false),
+            'claim_url'    => $this->urlHelper->makeUrl($claimElement, $actionParams, false),
         ]);
 
         $this->eventBus->emit(new AccessRecoveryRequestedEvent($user, $urlParams));

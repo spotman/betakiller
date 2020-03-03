@@ -225,6 +225,11 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     /**
      * @return bool
      */
+    public function hasPhoneDefined(): bool;
+
+    /**
+     * @return bool
+     */
     public function isEmailNotificationAllowed(): bool;
 
     /**

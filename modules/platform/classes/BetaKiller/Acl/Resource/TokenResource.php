@@ -5,7 +5,7 @@ namespace BetaKiller\Acl\Resource;
 
 use BetaKiller\Model\RoleInterface;
 
-final class TokenResource extends AbstractCrudlsPermissionsResource
+final class TokenResource extends AbstractEntityRelatedAclResource
 {
     /**
      * @inheritDoc
