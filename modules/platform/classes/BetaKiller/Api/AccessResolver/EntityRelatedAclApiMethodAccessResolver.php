@@ -67,7 +67,7 @@ class EntityRelatedAclApiMethodAccessResolver extends AclApiMethodAccessResolver
 
             // Check entity is allowed to user via EntityAclSpec
             if (!$spec->isAllowedTo($entity, $user)) {
-                throw new ApiAccessViolationException('Entity ":entity" with ID ":id" is not allowed to ":who"', [
+                throw new ApiAccessViolationException('Entity ":entity" with ID ":id" is not allowed to User ":who"', [
                     ':entity' => $entity::getModelName(),
                     ':id'     => $entity->getID(),
                     ':who'    => $user->getID(),
