@@ -7,8 +7,8 @@ class HitLink extends \ORM
      * Prepares the model database connection, determines the table name,
      * and loads column information.
      *
-     * @throws \Exception
      * @return void
+     * @throws \Exception
      */
     protected function configure(): void
     {
@@ -28,14 +28,14 @@ class HitLink extends \ORM
         $this->load_with(['source', 'target']);
     }
 
-    public function setSource(?HitPage $source): HitLink
+    public function setSource(?HitPageInterface $source): HitLink
     {
         $this->set('source', $source);
 
         return $this;
     }
 
-    public function setTarget(HitPage $target): HitLink
+    public function setTarget(HitPageInterface $target): HitLink
     {
         $this->set('target', $target);
 
@@ -68,12 +68,12 @@ class HitLink extends \ORM
         return $this;
     }
 
-    public function getSource(): HitPage
+    public function getSource(): HitPageInterface
     {
         return $this->get('source');
     }
 
-    public function getTarget(): HitPage
+    public function getTarget(): HitPageInterface
     {
         return $this->get('target');
     }

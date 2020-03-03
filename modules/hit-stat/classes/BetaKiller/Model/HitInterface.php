@@ -2,6 +2,7 @@
 namespace BetaKiller\Model;
 
 use Psr\Http\Message\UriInterface;
+use Ramsey\Uuid\UuidInterface;
 
 interface HitInterface extends AbstractEntityInterface
 {
@@ -13,18 +14,28 @@ interface HitInterface extends AbstractEntityInterface
     public function bindToUser(UserInterface $user): HitInterface;
 
     /**
-     * @param \BetaKiller\Model\HitPage|null $value
-     *
-     * @return \BetaKiller\Model\HitInterface
+     * @param \Ramsey\Uuid\UuidInterface $uuid
      */
-    public function setSourcePage(HitPage $value): HitInterface;
+    public function setUuid(UuidInterface $uuid): void;
 
     /**
-     * @param \BetaKiller\Model\HitPage $value
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    public function getUuid(): UuidInterface;
+
+    /**
+     * @param \BetaKiller\Model\HitPageInterface $value
      *
      * @return \BetaKiller\Model\HitInterface
      */
-    public function setTargetPage(HitPage $value): HitInterface;
+    public function setSourcePage(HitPageInterface $value): HitInterface;
+
+    /**
+     * @param \BetaKiller\Model\HitPageInterface $value
+     *
+     * @return \BetaKiller\Model\HitInterface
+     */
+    public function setTargetPage(\BetaKiller\Model\HitPageInterface $value): HitInterface;
 
     /**
      * @param string $ip
@@ -55,12 +66,12 @@ interface HitInterface extends AbstractEntityInterface
     /**
      * @return \BetaKiller\Model\HitPage
      */
-    public function getSourcePage(): HitPage;
+    public function getSourcePage(): HitPageInterface;
 
     /**
      * @return \BetaKiller\Model\HitPage
      */
-    public function getTargetPage(): HitPage;
+    public function getTargetPage(): HitPageInterface;
 
     /**
      * @return \BetaKiller\Model\HitMarkerInterface

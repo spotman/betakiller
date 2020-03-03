@@ -35,6 +35,7 @@ class HitStatMissingUrlEventHandler
         HitPageRepository $pageRepo,
         HitService $service
     ) {
+
         $this->appEnv   = $appEnv;
         $this->pageRepo = $pageRepo;
         $this->service  = $service;
@@ -42,37 +43,35 @@ class HitStatMissingUrlEventHandler
 
     public function __invoke(MissingUrlEvent $message): void
     {
-        // Skip calls like "cache warmup" from CLI mode
+        // Skip processing during cache warmup
         if ($this->appEnv->isInternalWebServer()) {
             return;
         }
 
-        $request = $message->getRequest();
+        $targetUri = $message->getMissedUri();
 
-        if (HitStatRequestHelper::hasHit($request)) {
-            // Get target page from Request
-            $target = HitStatRequestHelper::getHit($request)->getTargetPage();
+        // Get target page from Request
+        $target = $this->service->getPageByFullUrl($targetUri, true);
 
-            if ($target->isMissing()) {
-                // Nothing to do
-                return;
-            }
-
-            // Mark target page as missing
-            $target->markAsMissing();
-
-            $redirectToUrl = $message->getRedirectToUrl();
-
-            // Set redirect target if provided
-            if ($redirectToUrl) {
-                $redirect = $this->service->getPageRedirectByUrl($redirectToUrl);
-
-                // Set target in missed url
-                $target->setRedirect($redirect);
-            }
-
-            // Save target page
-            $this->pageRepo->save($target);
+        if ($target->isMissing()) {
+            // Nothing to do
+            return;
         }
+
+        // Mark target page as missing
+        $target->markAsMissing();
+
+        $redirectToUrl = $message->getRedirectToUrl();
+
+        // Set redirect target if provided
+        if ($redirectToUrl) {
+            $redirect = $this->service->getPageRedirectByUrl($redirectToUrl);
+
+            // Set target in missed url
+            $target->setRedirect($redirect);
+        }
+
+        // Save target page
+        $this->pageRepo->save($target);
     }
 }

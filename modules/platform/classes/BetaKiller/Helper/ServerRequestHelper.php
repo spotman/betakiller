@@ -12,6 +12,7 @@ use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
 use DebugBar\DebugBar;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 use Zend\Expressive\Flash\FlashMessageMiddleware;
 use Zend\Expressive\Flash\FlashMessagesInterface;
 use Zend\Expressive\Router\RouteResult;

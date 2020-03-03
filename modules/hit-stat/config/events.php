@@ -1,12 +1,17 @@
 <?php
 declare(strict_types=1);
 
+use BetaKiller\Event\MissingUrlEvent;
+use BetaKiller\Event\UrlDispatchedEvent;
+use BetaKiller\HitStat\HitStatMissingUrlEventHandler;
+use BetaKiller\HitStat\HitStatUrlDispatchedEventHandler;
+
 return [
-    \BetaKiller\Event\UrlDispatchedEvent::class => [
-        \BetaKiller\HitStat\HitStatUrlDispatchedEventHandler::class,
+    UrlDispatchedEvent::class => [
+        HitStatUrlDispatchedEventHandler::class,
     ],
 
-    \BetaKiller\Event\MissingUrlEvent::class => [
-        \BetaKiller\HitStat\HitStatMissingUrlEventHandler::class
+    MissingUrlEvent::class => [
+        HitStatMissingUrlEventHandler::class
     ]
 ];

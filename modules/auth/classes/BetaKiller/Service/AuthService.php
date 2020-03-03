@@ -119,12 +119,12 @@ class AuthService
 
     public function getSessionUser(SessionInterface $session): UserInterface
     {
-        // Extract user from session
-        $userID = SessionHelper::getUserID($session);
-
-        if (!$userID) {
+        if (!SessionHelper::hasUserID($session)) {
             return $this->guestUserFactory->create();
         }
+
+        // Extract user from session
+        $userID = SessionHelper::getUserID($session);
 
         return $this->userRepo->getById($userID);
     }

@@ -60,6 +60,11 @@ class SessionHelper
         $session->set(self::AUTH_USER_ID, $user->getID());
     }
 
+    public static function hasUserID(SessionInterface $session): bool
+    {
+        return $session->has(self::AUTH_USER_ID);
+    }
+
     /**
      * Null means guest user
      *

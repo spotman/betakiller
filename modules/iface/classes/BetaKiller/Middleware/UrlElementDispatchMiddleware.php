@@ -109,12 +109,16 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
             $parentModel = $e->getParentUrlElement();
 
             $urlHelper = ServerRequestHelper::getUrlHelper($request);
+            $ip        = ServerRequestHelper::getIpAddress($request);
+            $referrer  = ServerRequestHelper::getHttpReferrer($request);
 
             $redirectToUrl = $parentModel && $e->getRedirectToParent()
                 ? $urlHelper->makeUrl($parentModel, $params, false)
                 : null;
 
-            $this->eventBus->emit(new MissingUrlEvent($request, $parentModel, $redirectToUrl));
+            $this->eventBus->emit(
+                new MissingUrlEvent($request->getUri(), $parentModel, $redirectToUrl, $ip, $referrer)
+            );
 
             if ($redirectToUrl) {
                 // Missing but see other

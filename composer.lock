@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3c1e7f11967ddddb688265db3ab31c3a",
+    "content-hash": "8be0195c2ae977050c46260d9e78759d",
     "packages": [
         {
             "name": "aidantwoods/secureheaders",
@@ -3376,6 +3376,53 @@
                 "psr-7"
             ],
             "time": "2019-07-01T17:17:08+00:00"
+        },
+        {
+            "name": "php-middleware/request-id",
+            "version": "4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-middleware/request-id.git",
+                "reference": "f466aed7162e9952468250f25525feb73b79a09b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-middleware/request-id/zipball/f466aed7162e9952468250f25525feb73b79a09b",
+                "reference": "f466aed7162e9952468250f25525feb73b79a09b",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1",
+                "psr/http-message": "^1.0",
+                "psr/http-server-handler": "^1.0",
+                "psr/http-server-middleware": "^1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.5.13",
+                "ramsey/uuid": "^3.0",
+                "zendframework/zend-diactoros": "^2.0"
+            },
+            "suggest": {
+                "ramsey/uuid": "To use Ramsey\\Uuid 3.0 generator"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PhpMiddleware\\RequestId\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Request Id middleware with PSR-7",
+            "keywords": [
+                "middleware",
+                "psr",
+                "psr-7",
+                "request-id"
+            ],
+            "time": "2019-06-19T19:06:45+00:00"
         },
         {
             "name": "phpoption/phpoption",

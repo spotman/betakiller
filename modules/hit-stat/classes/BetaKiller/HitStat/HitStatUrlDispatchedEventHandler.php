@@ -14,10 +14,8 @@ class HitStatUrlDispatchedEventHandler
         $params = $message->getUrlContainer();
 
         // Fetch UTM tags if exists so IFace would not warn about unused parameters
-        $params->getQueryPart(HitMarkerInterface::UTM_QUERY_SOURCE);
-        $params->getQueryPart(HitMarkerInterface::UTM_QUERY_MEDIUM);
-        $params->getQueryPart(HitMarkerInterface::UTM_QUERY_CAMPAIGN);
-        $params->getQueryPart(HitMarkerInterface::UTM_QUERY_CONTENT);
-        $params->getQueryPart(HitMarkerInterface::UTM_QUERY_TERM);
+        foreach (HitMarkerInterface::UTM_QUERY_KEYS as $key) {
+            $params->getQueryPart($key);
+        }
     }
 }

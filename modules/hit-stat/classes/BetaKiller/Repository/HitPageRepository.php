@@ -1,23 +1,22 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Factory\OrmFactory;
 use BetaKiller\Model\HitDomain;
 use BetaKiller\Model\HitPage;
+use BetaKiller\Model\HitPageInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 /**
  * Class HitPageRepository
  *
  * @package BetaKiller\Repository
- * @method HitPage findById(int $id)
- * @method HitPage[] getAll()
- * @method void save(HitPage $entity)
+ * @method HitPageInterface findById(int $id)
+ * @method HitPageInterface[] getAll()
+ * @method void save(HitPageInterface $entity)
  */
-class HitPageRepository extends AbstractOrmBasedRepository
+final class HitPageRepository extends AbstractOrmBasedRepository
 {
-    public function findByUri(HitDomain $domain, string $uri): ?HitPage
+    public function findByUri(HitDomain $domain, string $uri): ?HitPageInterface
     {
         $orm = $this->getOrmInstance();
 

@@ -2,11 +2,14 @@
 namespace BetaKiller\Model;
 
 use Psr\Http\Message\UriInterface;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 class Hit extends \ORM implements HitInterface
 {
     public const COL_IS_PROCESSED = 'is_processed';
     public const COL_CREATED_AT   = 'created_at';
+    public const COL_UUID         = 'uuid';
 
     private const COL_SOURCE_ID  = 'source_id';
     private const COL_TARGET_ID  = 'target_id';
@@ -32,22 +35,22 @@ class Hit extends \ORM implements HitInterface
 
         $this->belongs_to([
             self::RELATION_SOURCE => [
-                'model'       => 'HitPage',
+                'model'       => HitPage::getModelName(),
                 'foreign_key' => self::COL_SOURCE_ID,
             ],
 
             self::RELATION_TARGET => [
-                'model'       => 'HitPage',
+                'model'       => HitPage::getModelName(),
                 'foreign_key' => self::COL_TARGET_ID,
             ],
 
             self::RELATION_MARKER => [
-                'model'       => 'HitMarker',
+                'model'       => HitMarker::getModelName(),
                 'foreign_key' => self::COL_MARKER_ID,
             ],
 
             self::RELATION_USER => [
-                'model'       => 'User',
+                'model'       => User::getModelName(),
                 'foreign_key' => self::COL_USER_ID,
             ],
         ]);
@@ -57,6 +60,24 @@ class Hit extends \ORM implements HitInterface
             self::RELATION_TARGET,
             self::RELATION_MARKER,
         ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setUuid(UuidInterface $uuid): void
+    {
+        $this->set(self::COL_UUID, $uuid->toString());
+    }
+
+    /**
+     * @return UuidInterface
+     */
+    public function getUuid(): UuidInterface
+    {
+        $value = (string)$this->get(self::COL_UUID);
+
+        return Uuid::fromString($value);
     }
 
     /**
@@ -72,11 +93,11 @@ class Hit extends \ORM implements HitInterface
     }
 
     /**
-     * @param \BetaKiller\Model\HitPage|null $value
+     * @param \BetaKiller\Model\HitPageInterface $value
      *
      * @return \BetaKiller\Model\HitInterface
      */
-    public function setSourcePage(HitPage $value): HitInterface
+    public function setSourcePage(HitPageInterface $value): HitInterface
     {
         $this->set(self::RELATION_SOURCE, $value);
 
@@ -84,11 +105,11 @@ class Hit extends \ORM implements HitInterface
     }
 
     /**
-     * @param \BetaKiller\Model\HitPage $value
+     * @param \BetaKiller\Model\HitPageInterface $value
      *
      * @return \BetaKiller\Model\HitInterface
      */
-    public function setTargetPage(HitPage $value): HitInterface
+    public function setTargetPage(HitPageInterface $value): HitInterface
     {
         $this->set(self::RELATION_TARGET, $value);
 
@@ -118,7 +139,7 @@ class Hit extends \ORM implements HitInterface
     /**
      * @return \BetaKiller\Model\HitPage
      */
-    public function getSourcePage(): HitPage
+    public function getSourcePage(): HitPageInterface
     {
         return $this->getRelatedEntity(self::RELATION_SOURCE);
     }
@@ -126,7 +147,7 @@ class Hit extends \ORM implements HitInterface
     /**
      * @return \BetaKiller\Model\HitPage
      */
-    public function getTargetPage(): HitPage
+    public function getTargetPage(): HitPageInterface
     {
         return $this->getRelatedEntity(self::RELATION_TARGET);
     }

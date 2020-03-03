@@ -230,11 +230,11 @@ class DatabaseSessionStorage implements SessionStorageInterface
             $model = $this->createSessionModel($session);
         }
 
-        $userID = SessionHelper::getUserID($session);
         $origin = SessionHelper::getOriginUrl($session);
 
         // Import user ID from Session only once
-        if ($userID && !$model->hasUser()) {
+        if (SessionHelper::hasUserID($session) && !$model->hasUser()) {
+            $userID = SessionHelper::getUserID($session);
             $model->setUserID($userID);
         }
 

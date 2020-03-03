@@ -3,20 +3,17 @@ declare(strict_types=1);
 
 namespace BetaKiller\HitStat;
 
+use BetaKiller\Command\HitStatStoreCommand;
 use BetaKiller\Dev\RequestProfiler;
+use BetaKiller\Exception\RedirectException;
+use BetaKiller\Exception\SeeOtherHttpException;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
-use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Model\Hit;
-use BetaKiller\Model\HitInterface;
+use BetaKiller\MessageBus\CommandBusInterface;
+use BetaKiller\Middleware\RequestUuidMiddleware;
 use BetaKiller\Model\HitMarkerInterface;
-use BetaKiller\Model\HitPage;
-use BetaKiller\Repository\HitLinkRepository;
-use BetaKiller\Repository\HitPageRepository;
-use BetaKiller\Repository\HitRepository;
 use BetaKiller\Service\HitService;
-use DateTimeImmutable;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -36,24 +33,9 @@ class HitStatMiddleware implements MiddlewareInterface
     private $service;
 
     /**
-     * @var \BetaKiller\Repository\HitRepository
-     */
-    private $hitRepo;
-
-    /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
-
-    /**
-     * @var \BetaKiller\Repository\HitPageRepository
-     */
-    private $pageRepo;
-
-    /**
-     * @var \BetaKiller\Repository\HitLinkRepository
-     */
-    private $linkRepo;
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -66,32 +48,31 @@ class HitStatMiddleware implements MiddlewareInterface
     private $uriFactory;
 
     /**
+     * @var \BetaKiller\MessageBus\CommandBusInterface
+     */
+    private $commandBus;
+
+    /**
      * HitStatMiddleware constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface       $appEnv
-     * @param \BetaKiller\Service\HitService           $service
-     * @param \BetaKiller\Repository\HitRepository     $hitRepo
-     * @param \BetaKiller\Repository\HitPageRepository $pageRepo
-     * @param \BetaKiller\Repository\HitLinkRepository $linkRepo
-     * @param \Psr\Http\Message\UriFactoryInterface    $uriFactory
-     * @param \Psr\Log\LoggerInterface                 $logger
+     * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
+     * @param \BetaKiller\Service\HitService             $service
+     * @param \Psr\Http\Message\UriFactoryInterface      $uriFactory
+     * @param \BetaKiller\MessageBus\CommandBusInterface $commandBus
+     * @param \Psr\Log\LoggerInterface                   $logger
      */
     public function __construct(
         AppEnvInterface $appEnv,
         HitService $service,
-        HitRepository $hitRepo,
-        HitPageRepository $pageRepo,
-        HitLinkRepository $linkRepo,
         UriFactoryInterface $uriFactory,
+        CommandBusInterface $commandBus,
         LoggerInterface $logger
     ) {
         $this->appEnv     = $appEnv;
         $this->service    = $service;
-        $this->hitRepo    = $hitRepo;
-        $this->pageRepo   = $pageRepo;
-        $this->linkRepo   = $linkRepo;
         $this->logger     = $logger;
         $this->uriFactory = $uriFactory;
+        $this->commandBus = $commandBus;
     }
 
     /**
@@ -116,50 +97,24 @@ class HitStatMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        $p = RequestProfiler::begin($request, 'Hit stat processing');
-
         try {
-            $hit = $this->registerHit($request);
+            $p = RequestProfiler::begin($request, 'Hit stat (total processing)');
 
-            if ($hit) {
-                // Inject Hit into Request
-                $request = HitStatRequestHelper::setHit($request, $hit);
-
-                $target = $hit->getTargetPage();
-
-                // If target page is missing and redirect is defined => return redirect
-                if ($target->isMissing()) {
-                    $redirect = $target->getRedirect();
-
-                    if ($redirect) {
-                        return ResponseHelper::redirect($redirect->getUrl());
-                    }
-                }
-
-                // This is required for saving first user hit during registration
-                $this->injectHitInSession($hit, $request);
-            }
+            $this->processHit($request);
+        } catch (RedirectException $e) {
+            // Re-throw redirect
+            throw $e;
         } catch (Throwable $e) {
             $this->logException($this->logger, $e);
         }
 
         RequestProfiler::end($p);
 
-        // Forward call in case of exception
+        // Forward call
         return $handler->handle($request);
     }
 
-    private function injectHitInSession(HitInterface $hit, ServerRequestInterface $request): void
-    {
-        $session = ServerRequestHelper::getSession($request);
-
-        // Store ref hit if it is not exist
-        if (!HitStatSessionHelper::hasFirstHit($session)) {
-            HitStatSessionHelper::setFirstHit($session, $hit);
-        }
-    }
-
-    private function registerHit(ServerRequestInterface $request): ?HitInterface
+    private function processHit(ServerRequestInterface $request): void
     {
         $sourceUrl = ServerRequestHelper::getHttpReferrer($request);
         $targetUri = $request->getUri();
@@ -172,7 +127,7 @@ class HitStatMiddleware implements MiddlewareInterface
             $sourceUri = !$e;
         }
 
-        $p1 = RequestProfiler::begin($request, 'Detect source page');
+        $p1 = RequestProfiler::begin($request, 'Hit stat: detect source page');
 
         // Find source page
         $sourcePage = $sourceUri ? $this->service->getPageByFullUrl($sourceUri) : null;
@@ -181,12 +136,10 @@ class HitStatMiddleware implements MiddlewareInterface
 
         // Skip ignored pages and domains
         if ($sourcePage && $sourcePage->isIgnored()) {
-            return null;
+            return;
         }
 
-        $p2 = RequestProfiler::begin($request, 'Detect target page');
-
-        $now = new DateTimeImmutable;
+        $p2 = RequestProfiler::begin($request, 'Hit stat: detect target page');
 
         // Search for target URL and create if not exists
         $targetPage = $this->service->getPageByFullUrl($targetUri);
@@ -195,93 +148,39 @@ class HitStatMiddleware implements MiddlewareInterface
 
         // Skip ignored pages and domains
         if ($targetPage->isIgnored()) {
-            return null;
+            return;
         }
 
-        $p3 = RequestProfiler::begin($request, 'Process target page');
+        // If target page is missing and redirect is defined => redirect
+        if ($targetPage->isMissing()) {
+            $redirect = $targetPage->getRedirect();
 
-        // Increment hit counter for target URL
-        $targetPage
-            ->incrementHits()
-            ->setLastSeenAt($now);
-
-        $this->pageRepo->save($targetPage);
-
-        RequestProfiler::end($p3);
-
-        // Process source page if exists
-        if ($sourcePage) {
-            $p4 = RequestProfiler::begin($request, 'Process source page');
-
-            $sourcePage->setLastSeenAt($now);
-
-            // If source page is missing, mark it as existing
-            if ($sourcePage->isMissing()) {
-                $sourcePage->markAsOk();
+            if ($redirect) {
+                throw new SeeOtherHttpException($redirect->getUrl());
             }
-
-            $this->pageRepo->save($sourcePage);
-
-            // Register link
-            $this->processLink($sourcePage, $targetPage);
-
-            RequestProfiler::end($p4);
         }
-
-        $p5 = RequestProfiler::begin($request, 'Create hit');
 
         // Detect marker
         $marker = $this->service->getMarkerFromRequest($request);
 
-        // Create new Hit object with source/target pages, marker, ip and other info
-        $hit = new Hit;
+        $session   = ServerRequestHelper::getSession($request);
+        $requestId = RequestUuidMiddleware::getUuid($request);
 
-        $hit
-            ->setTargetPage($targetPage)
-            ->setIP($ip)
-            ->setTimestamp($now);
-
-        if ($sourcePage) {
-            $hit->setSourcePage($sourcePage);
+        // This is required for saving first user hit during registration
+        if (!HitStatSessionHelper::hasFirstHitUuid($session)) {
+            HitStatSessionHelper::setFirstHitUuid($session, $requestId);
         }
 
-        if ($marker) {
-            $hit->setTargetMarker($marker);
-        }
+        $p3 = RequestProfiler::begin($request, 'Hit stat: enqueue command');
 
-        if (ServerRequestHelper::hasUser($request)) {
-            $user = ServerRequestHelper::getUser($request);
+        $user = ServerRequestHelper::getUser($request);
+        $uuid = RequestUuidMiddleware::getUuid($request);
 
-            // Ignore hits of admin users
-            if ($user->hasAdminRole()) {
-                return null;
-            }
+        // Call command
+        $this->commandBus->enqueue(
+            new HitStatStoreCommand($uuid, $user, $ip, $sourcePage, $targetPage, $marker)
+        );
 
-            $hit->bindToUser($user);
-        }
-
-        $this->hitRepo->save($hit);
-
-        RequestProfiler::end($p5);
-
-        return $hit;
-    }
-
-    private function processLink(HitPage $source, HitPage $target): void
-    {
-        $link = $this->service->getLinkBySourceAndTarget($source, $target);
-
-        // Increment link click counter
-        $link->incrementClicks();
-
-        $now = new DateTimeImmutable;
-
-        if (!$link->getFirstSeenAt()) {
-            $link->setFirstSeenAt($now);
-        }
-
-        $link->setLastSeenAt($now);
-
-        $this->linkRepo->save($link);
+        RequestProfiler::end($p3);
     }
 }

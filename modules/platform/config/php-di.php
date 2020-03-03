@@ -33,6 +33,8 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Ramsey\Uuid\UuidFactory;
+use Ramsey\Uuid\UuidFactoryInterface;
 use Spotman\Api\ApiLanguageDetectorInterface;
 use Zend\Diactoros\RequestFactory;
 use Zend\Diactoros\Response\TextResponse;
@@ -203,6 +205,8 @@ return [
         ApiLanguageDetectorInterface::class => autowire(ApiLanguageDetector::class),
 
         MessageActionUrlGeneratorInterface::class => autowire(NotificationMessageActionUrlGenerator::class),
+
+        UuidFactoryInterface::class => autowire(UuidFactory::class)
     ],
 
 ];

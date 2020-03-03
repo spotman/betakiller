@@ -10,6 +10,7 @@ use BetaKiller\Model\HitLink;
 use BetaKiller\Model\HitMarker;
 use BetaKiller\Model\HitMarkerInterface;
 use BetaKiller\Model\HitPage;
+use BetaKiller\Model\HitPageInterface;
 use BetaKiller\Model\HitPageRedirect;
 use BetaKiller\Model\HitPageRedirectInterface;
 use BetaKiller\Repository\HitDomainRepository;
@@ -126,8 +127,11 @@ class HitService
         return $page;
     }
 
-    public function getLinkBySourceAndTarget(HitPage $source, HitPage $target, ?bool $createMissing = null): HitLink
-    {
+    public function getLinkBySourceAndTarget(
+        HitPageInterface $source,
+        HitPageInterface $target,
+        ?bool $createMissing = null
+    ): HitLink {
         $createMissing = $createMissing ?? true;
 
         $link = $this->linkRepo->findBySourceAndTarget($source, $target);
@@ -227,7 +231,7 @@ class HitService
         return $page;
     }
 
-    public function createLink(HitPage $source, HitPage $target): HitLink
+    public function createLink(HitPageInterface $source, HitPageInterface $target): HitLink
     {
         $now = new DateTimeImmutable;
 

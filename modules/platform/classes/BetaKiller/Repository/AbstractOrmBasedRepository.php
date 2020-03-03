@@ -165,7 +165,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     protected function findOne(OrmInterface $orm)
     {
         try {
-            $model = $orm->find();
+            $model = $orm->limit(1)->find();
         } catch (\Kohana_Exception $e) {
             throw RepositoryException::wrap($e);
         }

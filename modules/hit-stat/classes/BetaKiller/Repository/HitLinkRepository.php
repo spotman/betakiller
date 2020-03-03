@@ -3,6 +3,7 @@ namespace BetaKiller\Repository;
 
 use BetaKiller\Model\HitLink;
 use BetaKiller\Model\HitPage;
+use BetaKiller\Model\HitPageInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 /**
@@ -15,14 +16,14 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 class HitLinkRepository extends AbstractOrmBasedRepository
 {
     /**
-     * @param \BetaKiller\Model\HitPage $source
-     * @param \BetaKiller\Model\HitPage $target
+     * @param \BetaKiller\Model\HitPageInterface $source
+     * @param \BetaKiller\Model\HitPageInterface $target
      *
      * @return \BetaKiller\Model\HitLink|null
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function findBySourceAndTarget(HitPage $source, HitPage $target): ?HitLink
+    public function findBySourceAndTarget(HitPageInterface $source, HitPageInterface $target): ?HitLink
     {
         $orm = $this->getOrmInstance();
 

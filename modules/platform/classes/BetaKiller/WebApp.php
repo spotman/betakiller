@@ -22,6 +22,7 @@ use BetaKiller\Middleware\FallbackErrorMiddleware;
 use BetaKiller\Middleware\I18nMiddleware;
 use BetaKiller\Middleware\MaintenanceModeMiddleware;
 use BetaKiller\Middleware\ProfilerMiddleware;
+use BetaKiller\Middleware\RequestUuidMiddleware;
 use BetaKiller\Middleware\SchemeMiddleware;
 use BetaKiller\Middleware\SessionMiddleware;
 use BetaKiller\Middleware\SitemapRequestHandler;
@@ -46,7 +47,6 @@ use Zend\Expressive\Router\Middleware\ImplicitHeadMiddleware;
 use Zend\Expressive\Router\Middleware\ImplicitOptionsMiddleware;
 use Zend\Expressive\Router\Middleware\MethodNotAllowedMiddleware;
 use Zend\Expressive\Router\Middleware\RouteMiddleware;
-use Zend\Stratigility\Middleware\ErrorHandler;
 
 class WebApp
 {
@@ -80,6 +80,9 @@ class WebApp
     {
         // The error handler should be the first (most outer) middleware to catch all Exceptions.
         $this->app->pipe(FallbackErrorMiddleware::class);
+
+        // Generate and bind request ID
+        $this->app->pipe(RequestUuidMiddleware::class);
 
         // Pipe more middleware here that you want to execute on every request:
         // - bootstrapping

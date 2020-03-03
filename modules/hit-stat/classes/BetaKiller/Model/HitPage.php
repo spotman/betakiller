@@ -5,7 +5,7 @@ use BetaKiller\Uri;
 use function mb_strimwidth;
 use Psr\Http\Message\UriInterface;
 
-class HitPage extends \ORM
+final class HitPage extends \ORM implements HitPageInterface
 {
     public const RELATION_DOMAIN   = 'domain';
     public const RELATION_REDIRECT = 'redirect';
@@ -46,14 +46,14 @@ class HitPage extends \ORM
         ]);
     }
 
-    public function setDomain(HitDomain $domain): HitPage
+    public function setDomain(HitDomain $domain): HitPageInterface
     {
         $this->set(self::RELATION_DOMAIN, $domain);
 
         return $this;
     }
 
-    public function setUri(string $url): HitPage
+    public function setUri(string $url): HitPageInterface
     {
         // Truncate URI to 512 symbols
         $url = mb_strimwidth($url, 0, 512, '...');
@@ -63,14 +63,14 @@ class HitPage extends \ORM
         return $this;
     }
 
-    public function incrementHits(): self
+    public function incrementHits(): HitPageInterface
     {
         $this->setHits($this->getHits() + 1);
 
         return $this;
     }
 
-    public function setHits(int $value): HitPage
+    public function setHits(int $value): HitPageInterface
     {
         $this->set('hits', $value);
 
@@ -92,21 +92,21 @@ class HitPage extends \ORM
         return $this->getDomain()->isIgnored() || (bool)$this->get(self::FIELD_IS_IGNORED);
     }
 
-    public function markAsIgnored(): HitPage
+    public function markAsIgnored(): HitPageInterface
     {
         $this->set(self::FIELD_IS_IGNORED, true);
 
         return $this;
     }
 
-    public function markAsMissing(): HitPage
+    public function markAsMissing(): HitPageInterface
     {
         $this->setIsMissing(true);
 
         return $this;
     }
 
-    public function markAsOk(): HitPage
+    public function markAsOk(): HitPageInterface
     {
         $this->setIsMissing(false);
 
@@ -118,7 +118,7 @@ class HitPage extends \ORM
         return (bool)$this->get(self::FIELD_IS_MISSING);
     }
 
-    public function setRedirect(HitPageRedirectInterface $redirect): HitPage
+    public function setRedirect(HitPageRedirectInterface $redirect): HitPageInterface
     {
         $this->set(self::RELATION_REDIRECT, $redirect);
 
@@ -130,14 +130,14 @@ class HitPage extends \ORM
         return $this->getRelatedEntity(self::RELATION_REDIRECT, true);
     }
 
-    public function setLastSeenAt(\DateTimeImmutable $dateTime): HitPage
+    public function setLastSeenAt(\DateTimeImmutable $dateTime): HitPageInterface
     {
         $this->set_datetime_column_value('last_seen_at', $dateTime);
 
         return $this;
     }
 
-    public function setFirstSeenAt(\DateTimeImmutable $dateTime): HitPage
+    public function setFirstSeenAt(\DateTimeImmutable $dateTime): HitPageInterface
     {
         $this->set_datetime_column_value('first_seen_at', $dateTime);
 
