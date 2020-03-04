@@ -12,6 +12,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\UserSession;
+use BetaKiller\Model\UserSessionInterface;
 use BetaKiller\Repository\UserSessionRepository;
 use BetaKiller\Security\Encryption;
 use DateTimeImmutable;
@@ -104,7 +105,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         return $this->getByToken($token);
     }
 
-    private function isExpired(UserSession $model): bool
+    private function isExpired(UserSessionInterface $model): bool
     {
         $expireInterval = $this->config->getLifetime();
 
@@ -118,7 +119,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         return false;
     }
 
-    private function restoreSession(UserSession $model): SessionInterface
+    private function restoreSession(UserSessionInterface $model): SessionInterface
     {
         $content = $model->getContents();
 
@@ -311,7 +312,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         return $token;
     }
 
-    private function getSessionModel(SessionInterface $session): ?UserSession
+    private function getSessionModel(SessionInterface $session): ?UserSessionInterface
     {
         if (!$session instanceof SessionIdentifierAwareInterface) {
             throw new DomainException('Session must implement :interface', [
@@ -322,7 +323,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         return $this->sessionRepo->findByToken($session->getId());
     }
 
-    private function createSessionModel(SessionInterface $session): UserSession
+    private function createSessionModel(SessionInterface $session): UserSessionInterface
     {
         if (!$session instanceof SessionIdentifierAwareInterface) {
             throw new DomainException('Session must implement :interface', [

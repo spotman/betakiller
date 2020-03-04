@@ -7,7 +7,7 @@ use BetaKiller\Exception\DomainException;
 use DateInterval;
 use DateTimeImmutable;
 
-class UserSession extends \ORM
+class UserSession extends \ORM implements UserSessionInterface
 {
     public const TOKEN_LENGTH = 32;
 
@@ -29,7 +29,7 @@ class UserSession extends \ORM
         $this->load_with(['user']);
     }
 
-    public function setToken(string $value): UserSession
+    public function setToken(string $value): UserSessionInterface
     {
         $this->set('token', $value);
 
@@ -46,7 +46,7 @@ class UserSession extends \ORM
         return $this->get_datetime_column_value('created_at');
     }
 
-    public function setCreatedAt(DateTimeImmutable $value): UserSession
+    public function setCreatedAt(DateTimeImmutable $value): UserSessionInterface
     {
         $this->set_datetime_column_value('created_at', $value);
 
@@ -58,14 +58,14 @@ class UserSession extends \ORM
         return $this->get_datetime_column_value('last_active_at');
     }
 
-    public function setLastActiveAt(DateTimeImmutable $value): UserSession
+    public function setLastActiveAt(DateTimeImmutable $value): UserSessionInterface
     {
         $this->set_datetime_column_value('last_active_at', $value);
 
         return $this;
     }
 
-    public function setUser(UserInterface $user): UserSession
+    public function setUser(UserInterface $user): UserSessionInterface
     {
         if ($user instanceof GuestUserInterface) {
             throw new DomainException('Can not link session :id to a guest user', [':id' => $this->getID()]);
@@ -76,7 +76,7 @@ class UserSession extends \ORM
         return $this;
     }
 
-    public function setUserID(string $id): UserSession
+    public function setUserID(string $id): UserSessionInterface
     {
         $this->set('user_id', $id);
 
@@ -106,14 +106,14 @@ class UserSession extends \ORM
         return (string)$this->get('contents');
     }
 
-    public function setContents(string $value): UserSession
+    public function setContents(string $value): UserSessionInterface
     {
         $this->set('contents', $value);
 
         return $this;
     }
 
-    public function setOrigin(string $url): UserSession
+    public function setOrigin(string $url): UserSessionInterface
     {
         $this->set('origin', $url);
 

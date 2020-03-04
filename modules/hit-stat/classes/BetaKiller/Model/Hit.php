@@ -7,9 +7,11 @@ use Ramsey\Uuid\UuidInterface;
 
 class Hit extends \ORM implements HitInterface
 {
-    public const COL_IS_PROCESSED = 'is_processed';
-    public const COL_CREATED_AT   = 'created_at';
-    public const COL_UUID         = 'uuid';
+    public const COL_IS_PROCESSED  = 'is_processed';
+    public const COL_IS_PROTECTED  = 'is_protected';
+    public const COL_CREATED_AT    = 'created_at';
+    public const COL_UUID          = 'uuid';
+    public const COL_SESSION_TOKEN = 'session_token';
 
     private const COL_SOURCE_ID  = 'source_id';
     private const COL_TARGET_ID  = 'target_id';
@@ -17,11 +19,12 @@ class Hit extends \ORM implements HitInterface
     private const COL_USER_ID    = 'user_id';
     private const COL_IP_ADDRESS = 'ip';
 
-    public const RELATION_TARGET = 'target';
+    public const REL_TARGET = 'target';
 
-    private const RELATION_SOURCE = 'source';
-    private const RELATION_MARKER = 'marker';
-    private const RELATION_USER   = 'user';
+    private const REL_SOURCE  = 'source';
+    private const REL_MARKER  = 'marker';
+    private const REL_USER    = 'user';
+    private const REL_SESSION = 'session';
 
     /**
      * Prepares the model database connection, determines the table name,
@@ -34,40 +37,48 @@ class Hit extends \ORM implements HitInterface
         $this->_table_name = 'stat_hits';
 
         $this->belongs_to([
-            self::RELATION_SOURCE => [
+            self::REL_SOURCE => [
                 'model'       => HitPage::getModelName(),
                 'foreign_key' => self::COL_SOURCE_ID,
             ],
 
-            self::RELATION_TARGET => [
+            self::REL_TARGET => [
                 'model'       => HitPage::getModelName(),
                 'foreign_key' => self::COL_TARGET_ID,
             ],
 
-            self::RELATION_MARKER => [
+            self::REL_MARKER => [
                 'model'       => HitMarker::getModelName(),
                 'foreign_key' => self::COL_MARKER_ID,
             ],
 
-            self::RELATION_USER => [
+            self::REL_USER => [
                 'model'       => User::getModelName(),
                 'foreign_key' => self::COL_USER_ID,
+            ],
+
+            self::REL_SESSION => [
+                'model'       => UserSession::getModelName(),
+                'foreign_key' => self::COL_SESSION_TOKEN,
             ],
         ]);
 
         $this->load_with([
-            self::RELATION_SOURCE,
-            self::RELATION_TARGET,
-            self::RELATION_MARKER,
+            self::REL_SESSION,
+            self::REL_SOURCE,
+            self::REL_TARGET,
+            self::REL_MARKER,
         ]);
     }
 
     /**
      * @inheritDoc
      */
-    public function setUuid(UuidInterface $uuid): void
+    public function setUuid(UuidInterface $uuid): HitInterface
     {
         $this->set(self::COL_UUID, $uuid->toString());
+
+        return $this;
     }
 
     /**
@@ -81,13 +92,23 @@ class Hit extends \ORM implements HitInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function bindToUserSession(UserSessionInterface $session): HitInterface
+    {
+        $this->set(self::REL_SESSION, $session);
+
+        return $this;
+    }
+
+    /**
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \BetaKiller\Model\HitInterface
      */
     public function bindToUser(UserInterface $user): HitInterface
     {
-        $this->set(self::RELATION_USER, $user);
+        $this->set(self::REL_USER, $user);
 
         return $this;
     }
@@ -99,7 +120,7 @@ class Hit extends \ORM implements HitInterface
      */
     public function setSourcePage(HitPageInterface $value): HitInterface
     {
-        $this->set(self::RELATION_SOURCE, $value);
+        $this->set(self::REL_SOURCE, $value);
 
         return $this;
     }
@@ -111,7 +132,7 @@ class Hit extends \ORM implements HitInterface
      */
     public function setTargetPage(HitPageInterface $value): HitInterface
     {
-        $this->set(self::RELATION_TARGET, $value);
+        $this->set(self::REL_TARGET, $value);
 
         return $this;
     }
@@ -123,7 +144,7 @@ class Hit extends \ORM implements HitInterface
      */
     public function setTargetMarker(HitMarkerInterface $value): HitInterface
     {
-        $this->set(self::RELATION_MARKER, $value);
+        $this->set(self::REL_MARKER, $value);
 
         return $this;
     }
@@ -141,7 +162,7 @@ class Hit extends \ORM implements HitInterface
      */
     public function getSourcePage(): HitPageInterface
     {
-        return $this->getRelatedEntity(self::RELATION_SOURCE);
+        return $this->getRelatedEntity(self::REL_SOURCE);
     }
 
     /**
@@ -149,7 +170,7 @@ class Hit extends \ORM implements HitInterface
      */
     public function getTargetPage(): HitPageInterface
     {
-        return $this->getRelatedEntity(self::RELATION_TARGET);
+        return $this->getRelatedEntity(self::REL_TARGET);
     }
 
     /**
@@ -157,7 +178,7 @@ class Hit extends \ORM implements HitInterface
      */
     public function getTargetMarker(): HitMarkerInterface
     {
-        return $this->getRelatedEntity(self::RELATION_MARKER);
+        return $this->getRelatedEntity(self::REL_MARKER);
     }
 
     /**
@@ -196,6 +217,24 @@ class Hit extends \ORM implements HitInterface
     public function markAsProcessed(): HitInterface
     {
         $this->set(self::COL_IS_PROCESSED, true);
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isProtected(): bool
+    {
+        return (bool)$this->get(self::COL_IS_PROTECTED);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function markAsProtected(): HitInterface
+    {
+        $this->set(self::COL_IS_PROTECTED, true);
 
         return $this;
     }

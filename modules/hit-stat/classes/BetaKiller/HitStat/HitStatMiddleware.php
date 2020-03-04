@@ -5,7 +5,7 @@ namespace BetaKiller\HitStat;
 
 use BetaKiller\Command\HitStatStoreCommand;
 use BetaKiller\Dev\RequestProfiler;
-use BetaKiller\Exception\RedirectException;
+use BetaKiller\Exception\HttpExceptionExpectedInterface;
 use BetaKiller\Exception\SeeOtherHttpException;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
@@ -22,6 +22,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
+use Zend\Expressive\Session\SessionIdentifierAwareInterface;
 
 class HitStatMiddleware implements MiddlewareInterface
 {
@@ -101,14 +102,14 @@ class HitStatMiddleware implements MiddlewareInterface
             $p = RequestProfiler::begin($request, 'Hit stat (total processing)');
 
             $this->processHit($request);
-        } catch (RedirectException $e) {
+        } catch (HttpExceptionExpectedInterface $e) {
             // Re-throw redirect
             throw $e;
         } catch (Throwable $e) {
             $this->logException($this->logger, $e);
+        } finally {
+            RequestProfiler::end($p);
         }
-
-        RequestProfiler::end($p);
 
         // Forward call
         return $handler->handle($request);
@@ -173,12 +174,13 @@ class HitStatMiddleware implements MiddlewareInterface
 
         $p3 = RequestProfiler::begin($request, 'Hit stat: enqueue command');
 
-        $user = ServerRequestHelper::getUser($request);
-        $uuid = RequestUuidMiddleware::getUuid($request);
+        if (!$session instanceof SessionIdentifierAwareInterface) {
+            throw new \LogicException();
+        }
 
         // Call command
         $this->commandBus->enqueue(
-            new HitStatStoreCommand($uuid, $user, $ip, $sourcePage, $targetPage, $marker)
+            new HitStatStoreCommand($requestId, $session->getId(), $ip, $sourcePage, $targetPage, $marker)
         );
 
         RequestProfiler::end($p3);

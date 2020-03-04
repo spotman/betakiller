@@ -14,9 +14,18 @@ interface HitInterface extends AbstractEntityInterface
     public function bindToUser(UserInterface $user): HitInterface;
 
     /**
-     * @param \Ramsey\Uuid\UuidInterface $uuid
+     * @param \BetaKiller\Model\UserSessionInterface $session
+     *
+     * @return \BetaKiller\Model\HitInterface
      */
-    public function setUuid(UuidInterface $uuid): void;
+    public function bindToUserSession(UserSessionInterface $session): HitInterface;
+
+    /**
+     * @param \Ramsey\Uuid\UuidInterface $uuid
+     *
+     * @return \BetaKiller\Model\HitInterface
+     */
+    public function setUuid(UuidInterface $uuid): HitInterface;
 
     /**
      * @return \Ramsey\Uuid\UuidInterface
@@ -35,7 +44,7 @@ interface HitInterface extends AbstractEntityInterface
      *
      * @return \BetaKiller\Model\HitInterface
      */
-    public function setTargetPage(\BetaKiller\Model\HitPageInterface $value): HitInterface;
+    public function setTargetPage(HitPageInterface $value): HitInterface;
 
     /**
      * @param string $ip
@@ -107,4 +116,14 @@ interface HitInterface extends AbstractEntityInterface
      * @return \BetaKiller\Model\HitInterface
      */
     public function markAsProcessed(): HitInterface;
+
+    /**
+     * @return bool
+     */
+    public function isProtected(): bool;
+
+    /**
+     * @return \BetaKiller\Model\HitInterface
+     */
+    public function markAsProtected(): HitInterface;
 }

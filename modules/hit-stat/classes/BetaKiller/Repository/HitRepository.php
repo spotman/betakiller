@@ -10,8 +10,9 @@ use Ramsey\Uuid\UuidInterface;
  * Class HitRepository
  *
  * @package BetaKiller\Repository
- * @method Hit findById(int $id)
- * @method Hit[] getAll()
+ * @method HitInterface findById(int $id)
+ * @method HitInterface[] getAll()
+ * @method save(HitInterface $entity)
  */
 class HitRepository extends AbstractOrmBasedRepository
 {

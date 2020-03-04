@@ -6,7 +6,7 @@ namespace BetaKiller\Repository;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Model\GuestUserInterface;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Model\UserSession;
+use BetaKiller\Model\UserSessionInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use DateInterval;
 
@@ -14,10 +14,9 @@ use DateInterval;
  * Class UserSessionRepository
  *
  * @package BetaKiller\Repository
- * @method UserSession findOne(OrmInterface $orm)
- * @method UserSession[] findAll(OrmInterface $orm)
- * @method UserSession getOrmInstance()
- * @method void delete(UserSession $entity)
+ * @method UserSessionInterface findOne(OrmInterface $orm)
+ * @method UserSessionInterface[] findAll(OrmInterface $orm)
+ * @method void delete(UserSessionInterface $entity)
  */
 class UserSessionRepository extends AbstractOrmBasedRepository
 {
@@ -29,7 +28,7 @@ class UserSessionRepository extends AbstractOrmBasedRepository
      * @return \BetaKiller\Model\UserSession|null
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function findByToken(string $value): ?UserSession
+    public function findByToken(string $value): ?UserSessionInterface
     {
         $orm = $this->getOrmInstance();
 
@@ -41,10 +40,10 @@ class UserSessionRepository extends AbstractOrmBasedRepository
     /**
      * @param string $value
      *
-     * @return \BetaKiller\Model\UserSession
+     * @return \BetaKiller\Model\UserSessionInterface
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getByToken(string $value): UserSession
+    public function getByToken(string $value): UserSessionInterface
     {
         $model = $this->findByToken($value);
 
@@ -63,7 +62,7 @@ class UserSessionRepository extends AbstractOrmBasedRepository
     /**
      * @param \BetaKiller\Model\UserInterface $user
      *
-     * @return UserSession[]
+     * @return UserSessionInterface[]
      * @throws \BetaKiller\Exception\DomainException
      * @throws \BetaKiller\Repository\RepositoryException
      */

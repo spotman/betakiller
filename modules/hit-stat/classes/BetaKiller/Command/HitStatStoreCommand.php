@@ -42,15 +42,15 @@ final class HitStatStoreCommand implements CommandMessageInterface
     private $uuid;
 
     /**
-     * @var \BetaKiller\Model\UserInterface
+     * @var string
      */
-    private $user;
+    private $sessionId;
 
     /**
      * HitStatStoreCommand constructor.
      *
      * @param \Ramsey\Uuid\UuidInterface                $uuid
-     * @param \BetaKiller\Model\UserInterface      $user
+     * @param string                                    $sessionId
      * @param string                                    $ip
      * @param \BetaKiller\Model\HitPageInterface        $source
      * @param \BetaKiller\Model\HitPageInterface        $target
@@ -60,19 +60,19 @@ final class HitStatStoreCommand implements CommandMessageInterface
      */
     public function __construct(
         UuidInterface $uuid,
-        UserInterface $user,
+        string $sessionId,
         string $ip,
         ?HitPageInterface $source,
         HitPageInterface $target,
         ?HitMarkerInterface $marker
     ) {
         $this->uuid = $uuid;
-        $this->user = $user;
         $this->ip        = $ip;
         $this->source    = $source;
         $this->target    = $target;
         $this->marker    = $marker;
         $this->moment    = new \DateTimeImmutable();
+        $this->sessionId = $sessionId;
     }
 
     /**
@@ -84,11 +84,11 @@ final class HitStatStoreCommand implements CommandMessageInterface
     }
 
     /**
-     * @return \BetaKiller\Model\UserInterface
+     * @return string
      */
-    public function getUser(): UserInterface
+    public function getSessionId(): string
     {
-        return $this->user;
+        return $this->sessionId;
     }
 
     /**

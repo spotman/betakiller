@@ -9,6 +9,7 @@ use BetaKiller\Model\HitPageInterface;
 use BetaKiller\Repository\HitLinkRepository;
 use BetaKiller\Repository\HitPageRepository;
 use BetaKiller\Repository\HitRepository;
+use BetaKiller\Repository\UserSessionRepository;
 use BetaKiller\Service\HitService;
 
 final class HitStatStoreCommandHandler
@@ -34,23 +35,31 @@ final class HitStatStoreCommandHandler
     private $hitRepo;
 
     /**
+     * @var \BetaKiller\Repository\UserSessionRepository
+     */
+    private $sessionRepo;
+
+    /**
      * HitStatStoreCommandHandler constructor.
      *
-     * @param \BetaKiller\Repository\HitPageRepository $pageRepo
-     * @param \BetaKiller\Repository\HitLinkRepository $linkRepo
-     * @param \BetaKiller\Repository\HitRepository     $hitRepo
-     * @param \BetaKiller\Service\HitService           $service
+     * @param \BetaKiller\Repository\HitPageRepository     $pageRepo
+     * @param \BetaKiller\Repository\HitLinkRepository     $linkRepo
+     * @param \BetaKiller\Repository\HitRepository         $hitRepo
+     * @param \BetaKiller\Repository\UserSessionRepository $sessionRepo
+     * @param \BetaKiller\Service\HitService               $service
      */
     public function __construct(
         HitPageRepository $pageRepo,
         HitLinkRepository $linkRepo,
         HitRepository $hitRepo,
+        UserSessionRepository $sessionRepo,
         HitService $service
     ) {
-        $this->pageRepo = $pageRepo;
-        $this->linkRepo = $linkRepo;
-        $this->service  = $service;
-        $this->hitRepo  = $hitRepo;
+        $this->pageRepo    = $pageRepo;
+        $this->linkRepo    = $linkRepo;
+        $this->service     = $service;
+        $this->hitRepo     = $hitRepo;
+        $this->sessionRepo = $sessionRepo;
     }
 
     public function __invoke(HitStatStoreCommand $command): void
@@ -61,12 +70,6 @@ final class HitStatStoreCommandHandler
         $moment = $command->getMoment();
         $ip     = $command->getIp();
         $uuid   = $command->getUuid();
-        $user   = $command->getUser();
-
-        // Ignore hits of admin users
-        if ($user->hasAdminRole()) {
-            return;
-        }
 
         // Skip ignored pages and domains
         if ($source && $source->isIgnored()) {
@@ -100,12 +103,22 @@ final class HitStatStoreCommandHandler
             $this->processLink($source, $target, $moment);
         }
 
+        $sessionId   = $command->getSessionId();
+        $userSession = $this->sessionRepo->getByToken($sessionId);
+
+        $user = $userSession->getUser();
+
         // Create new Hit object with source/target pages, marker, ip and other info
         $hit = new Hit;
 
-        // Store User and hit UUID
-        $hit->setUuid($uuid);
-        $hit->bindToUser($user);
+        // Store User/Session and hit UUID
+        $hit
+            ->setUuid($uuid)
+            ->bindToUserSession($userSession);
+
+        if ($user) {
+            $hit->bindToUser($user);
+        }
 
         $hit
             ->setTargetPage($target)
