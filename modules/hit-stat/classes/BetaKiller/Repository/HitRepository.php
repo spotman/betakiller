@@ -28,6 +28,22 @@ class HitRepository extends AbstractOrmBasedRepository
 
         return $this
             ->filterUuid($orm, $uuid)
+            ->getOne($orm);
+    }
+
+    /**
+     * @param \Ramsey\Uuid\UuidInterface $uuid
+     *
+     * @return \BetaKiller\Model\HitInterface|null
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function findByUuid(UuidInterface $uuid): ?HitInterface
+    {
+        $orm = $this->getOrmInstance();
+
+        return $this
+            ->filterUuid($orm, $uuid)
             ->findOne($orm);
     }
 

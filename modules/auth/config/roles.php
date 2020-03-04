@@ -33,6 +33,7 @@ return [
         RoleConfig::OPTION_DESC     => 'Developer',
         RoleConfig::OPTION_INHERITS => [
             RoleInterface::ADMIN_PANEL, // Developer has access to admin panel
+            RoleInterface::USER_MANAGEMENT, // Allow user management for developers
         ],
     ],
 
