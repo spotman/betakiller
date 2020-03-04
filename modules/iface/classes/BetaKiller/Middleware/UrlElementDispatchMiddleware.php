@@ -135,7 +135,11 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
             throw new NotFoundHttpException;
         }
 
+        $evt = RequestProfiler::begin($request, 'UrlDispatchedEvent');
+
         // Emit event about successful url parsing
         $this->eventBus->emit(new UrlDispatchedEvent($request));
+
+        RequestProfiler::end($evt);
     }
 }
