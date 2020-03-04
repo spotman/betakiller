@@ -111,7 +111,7 @@ abstract class AbstractHasWorkflowStateAclResource extends AbstractEntityRelated
      */
     public function getStateRelatedActionsList(): array
     {
-        return array_merge($this->getAdditionalStateRelatedActions(), [
+        return array_merge($this->getAdditionalStateRelatedPermissions(), [
             self::ACTION_READ,
             self::ACTION_UPDATE,
             self::ACTION_DELETE,
@@ -133,7 +133,7 @@ abstract class AbstractHasWorkflowStateAclResource extends AbstractEntityRelated
         return [];
     }
 
-    protected function getAdditionalStateRelatedActions(): array
+    protected function getAdditionalStateRelatedPermissions(): array
     {
         return [];
     }

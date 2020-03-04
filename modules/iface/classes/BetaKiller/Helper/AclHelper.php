@@ -7,7 +7,6 @@ use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\Model\AbstractEntityInterface;
-use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\GuestUserInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -21,6 +20,7 @@ use Spotman\Acl\AclException;
 use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclUserInterface;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
+use Spotman\Acl\ResourceInterface;
 
 class AclHelper
 {
@@ -143,7 +143,7 @@ class AclHelper
         $urlElementCustomRules = $urlElement->getAdditionalAclRules();
 
         // Check UrlElement custom rules
-        if (!$this->checkCustomAclRules($urlElementCustomRules, $user)) {
+        if (!$this->checkCustomAclRules($urlElementCustomRules, $user, $params)) {
             return false;
         }
 
@@ -198,7 +198,7 @@ class AclHelper
         }
 
         // Check zone rules if defined
-        if ($zoneAclRules && !$this->checkCustomAclRules($zoneAclRules, $user)) {
+        if ($zoneAclRules && !$this->checkCustomAclRules($zoneAclRules, $user, $params)) {
             return false;
         }
 
@@ -232,42 +232,62 @@ class AclHelper
     ): bool {
         $resource = $this->getAclResourceForEntityName($entityName);
 
-        // Fetch entity from UrlContainer if required
-        if ($resource->isEntityRequiredForAction($actionName)) {
-            if (!$params) {
-                throw new AclException('UrlContainer is required for action ":action"', [
-                    ':action' => $actionName,
-                ]);
-            }
+        $entityInstance = $this->fetchEntityIfRequired($resource, $actionName, $params);
 
-            $entityInstance = $params->getEntity($entityName);
-
-            if (!$entityInstance) {
-                throw new AclException('Entity instance ":entity" is absent for action ":action" in ":el"', [
-                    ':entity' => $entityName,
-                    ':action' => $actionName,
-                    ':el'     => $urlElement->getCodename(),
-                ]);
-            }
-
-            // Check zone access
-            if (!$this->isEntityAllowedInZone($entityInstance, $urlElement)) {
-                return false;
-            }
-
+        // Inject Entity if required
+        if ($entityInstance) {
             $resource->setEntity($entityInstance);
+        }
+
+        // Check zone access
+        if ($entityInstance && !$this->isEntityAllowedInZone($entityInstance, $urlElement)) {
+            return false;
         }
 
         return $this->isPermissionAllowed($user, $resource, $actionName);
     }
 
+    private function fetchEntityIfRequired(
+        ResourceInterface $resource,
+        string $actionName,
+        ?UrlContainerInterface $params
+    ): ?AbstractEntityInterface {
+        if (!$resource instanceof EntityRelatedAclResourceInterface) {
+            return null;
+        }
+
+        if (!$resource->isEntityRequiredForAction($actionName)) {
+            return null;
+        }
+
+        // Fetch entity from UrlContainer if required
+        if (!$params) {
+            throw new AclException('UrlContainer is required for action ":action"', [
+                ':action' => $actionName,
+            ]);
+        }
+
+        $entityName = $resource->getResourceId();
+
+        $entityInstance = $params->getEntity($entityName);
+
+        if (!$entityInstance) {
+            throw new AclException('Entity instance ":entity" is absent for action ":action"', [
+                ':entity' => $entityName,
+                ':action' => $actionName,
+            ]);
+        }
+
+        return $entityInstance;
+    }
+
     /**
-     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param \BetaKiller\Url\UrlElementInterface           $urlElement
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
+     * @param \BetaKiller\Url\UrlElementInterface       $urlElement
      *
      * @return bool
      */
-    private function isEntityAllowedInZone(DispatchableEntityInterface $entity, UrlElementInterface $urlElement): bool
+    private function isEntityAllowedInZone(AbstractEntityInterface $entity, UrlElementInterface $urlElement): bool
     {
         $result = $this->getZoneAccessSpec($urlElement)->isEntityAllowed($entity);
 
@@ -340,13 +360,15 @@ class AclHelper
     }
 
     /**
-     * @param string[]                      $rules
-     * @param \Spotman\Acl\AclUserInterface $user
+     * @param string[]                                             $rules
+     * @param \Spotman\Acl\AclUserInterface                        $user
+     *
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return bool
      * @throws \Spotman\Acl\AclException
      */
-    private function checkCustomAclRules(array $rules, AclUserInterface $user): bool
+    private function checkCustomAclRules(array $rules, AclUserInterface $user, ?UrlContainerInterface $params): bool
     {
         // No rules = allow access
         if (!$rules) {
@@ -357,6 +379,12 @@ class AclHelper
             [$resourceIdentity, $permissionIdentity] = explode('.', $value, 2);
 
             $resource = $this->getResource($resourceIdentity);
+
+            $entityInstance = $this->fetchEntityIfRequired($resource, $permissionIdentity, $params);
+
+            if ($entityInstance && $resource instanceof EntityRelatedAclResourceInterface) {
+                $resource->setEntity($entityInstance);
+            }
 
             if (!$this->isPermissionAllowed($user, $resource, $permissionIdentity)) {
                 return false;

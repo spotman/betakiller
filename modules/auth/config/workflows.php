@@ -66,6 +66,7 @@ return [
 
                 WorkflowConfig::TRANSITIONS => [
                     UserWorkflow::TRANSITION_EMAIL_CONFIRMED => UserState::STATE_EMAIL_CONFIRMED,
+                    // Allow redo just in case of user mistake
                     UserWorkflow::TRANSITION_CHANGE_EMAIL    => UserState::STATE_EMAIL_CHANGED,
                     UserWorkflow::TRANSITION_SUSPEND         => UserState::STATE_SUSPENDED,
                     UserWorkflow::TRANSITION_BLOCK           => UserState::STATE_BLOCKED,
