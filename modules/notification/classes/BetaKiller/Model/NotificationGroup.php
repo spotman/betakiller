@@ -30,23 +30,16 @@ class NotificationGroup extends ORM implements NotificationGroupInterface
     {
         $this->_table_name = self::TABLE_NAME;
 
-        // TODO Понять почему без этого не работает NotificationGroupRepository::findGroupUsers()
-        $this->belongs_to([
-            'users' => [
-                'model'       => 'User',
-                'foreign_key' => 'id',
-            ],
-        ]);
-
         $this->has_many([
             self::RELATION_USERS_OFF => [
-                'model'       => 'User',
+                'model'       => User::getModelName(),
                 'through'     => self::USERS_OFF_TABLE_NAME,
                 'foreign_key' => self::USERS_OFF_TABLE_FIELD_GROUP_ID,
                 'far_key'     => self::USERS_OFF_TABLE_FIELD_USER_ID,
             ],
+
             self::RELATION_ROLES     => [
-                'model'       => 'Role',
+                'model'       => Role::getModelName(),
                 'through'     => self::ROLES_TABLE_NAME,
                 'foreign_key' => self::ROLES_TABLE_FIELD_GROUP_ID,
                 'far_key'     => self::ROLES_TABLE_FIELD_ROLE_ID,
@@ -184,15 +177,8 @@ class NotificationGroup extends ORM implements NotificationGroupInterface
      */
     public function isAllowedToUser(UserInterface $user): bool
     {
-        // User has one of group roles => allowed
-        foreach ($this->getRoles() as $role) {
-            if ($user->hasRole($role)) {
-                return true;
-            }
-        }
-
-        // No roles intersection => not allowed
-        return false;
+        // User has any of group roles => allowed
+        return $user->hasAnyOfRoles($this->getRoles());
     }
 
     /**

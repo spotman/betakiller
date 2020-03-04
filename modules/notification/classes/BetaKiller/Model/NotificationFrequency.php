@@ -10,7 +10,7 @@ final class NotificationFrequency extends ORM implements NotificationFrequencyIn
     /**
      * Send immediately
      */
-    public const FREQ_NOW = 'immediately';
+    public const FREQ_IMMEDIATELY = 'immediately';
 
     /**
      * Send once a week
@@ -72,7 +72,7 @@ final class NotificationFrequency extends ORM implements NotificationFrequencyIn
      */
     public function isImmediately(): bool
     {
-        return $this->getCodename() === self::FREQ_NOW;
+        return $this->getCodename() === self::FREQ_IMMEDIATELY;
     }
 
     /**

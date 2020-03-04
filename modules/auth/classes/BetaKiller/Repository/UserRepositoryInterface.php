@@ -27,8 +27,20 @@ interface UserRepositoryInterface extends RepositoryInterface
     /**
      * @param \BetaKiller\Model\RoleInterface $role
      *
+     * @param bool|null                       $checkNested
+     *
      * @return UserInterface[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getUsersWithRole(RoleInterface $role): array;
+    public function getUsersWithRole(RoleInterface $role, bool $checkNested = null): array;
+
+    /**
+     * @param \BetaKiller\Model\RoleInterface[] $roles
+     *
+     * @param bool|null                         $checkNested
+     *
+     * @return UserInterface[]
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function getUsersWithRoles(array $roles, bool $checkNested = null): array;
 }

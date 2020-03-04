@@ -14,6 +14,13 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
                 'far_key'     => $this->getParentIdColumnName(),
                 'through'     => $this->getTreeModelThroughTableName(),
             ],
+
+            'childs' => [
+                'model'       => static::getModelName(),
+                'foreign_key' => $this->getParentIdColumnName(),
+                'far_key'     => $this->getChildIdColumnName(),
+                'through'     => $this->getTreeModelThroughTableName(),
+            ],
         ]);
     }
 
@@ -39,6 +46,16 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
     }
 
     /**
+     * Return direct children
+     *
+     * @return \BetaKiller\Model\MultipleParentsTreeModelInterface[]
+     */
+    public function getChilds(): array
+    {
+        return $this->getChildsRelation()->find_all()->as_array();
+    }
+
+    /**
      * Return all parent models including in hierarchy
      *
      * @return \BetaKiller\Model\MultipleParentsTreeModelInterface[]
@@ -46,6 +63,14 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
     public function getAllParents(): array
     {
         return $this->getAllParentsRecursively($this);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAllChilds(): array
+    {
+        return $this->getAllChildsRecursively($this);
     }
 
     /**
@@ -69,11 +94,39 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
     }
 
     /**
+     * @param \BetaKiller\Model\MultipleParentsTreeModelInterface $parent
+     *
+     * @return \BetaKiller\Model\MultipleParentsTreeModelInterface[]
+     */
+    protected function getAllChildsRecursively(MultipleParentsTreeModelInterface $parent): array
+    {
+        $childs = [];
+
+        foreach ($parent->getChilds() as $child) {
+            $childs[] = $child;
+
+            foreach ($this->getAllChildsRecursively($child) as $grandChild) {
+                $childs[] = $grandChild;
+            }
+        }
+
+        return $childs;
+    }
+
+    /**
      * @return $this
      */
-    protected function getParentsRelation()
+    protected function getParentsRelation(): self
     {
         return $this->get('parents');
+    }
+
+    /**
+     * @return $this
+     */
+    protected function getChildsRelation(): self
+    {
+        return $this->get('childs');
     }
 
     /**
@@ -95,7 +148,6 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
             $this->where($parentIdCol, 'IS', null);
         }
     }
-
 
     /**
      * @param MultipleParentsTreeModelInterface $parent

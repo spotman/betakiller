@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
-use BetaKiller\Model\NotificationFrequencyInterface;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\UserInterface;
 
@@ -46,16 +45,4 @@ interface NotificationGroupRepositoryInterface extends DispatchableRepositoryInt
      * @return \BetaKiller\Model\NotificationGroupInterface[]
      */
     public function getUserGroups(UserInterface $user, bool $includeSystem = null): array;
-
-    /**
-     * @param \BetaKiller\Model\NotificationGroupInterface $groupModel
-     *
-     * @param \BetaKiller\Model\NotificationFrequencyInterface|null $freq
-     *
-     * @return \BetaKiller\Model\UserInterface[]
-     */
-    public function findGroupUsers(
-        NotificationGroupInterface $groupModel,
-        NotificationFrequencyInterface $freq = null
-    ): array;
 }

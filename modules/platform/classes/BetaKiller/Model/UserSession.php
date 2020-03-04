@@ -85,15 +85,12 @@ class UserSession extends \ORM implements UserSessionInterface
 
     public function hasUser(): bool
     {
-        return (bool)$this->getUser();
+        return (bool)$this->get('user_id');
     }
 
     public function getUser(): ?UserInterface
     {
-        /** @var User $user */
-        $user = $this->get('user');
-
-        return $user->loaded() ? $user : null;
+        return $this->getRelatedEntity('user', true);
     }
 
     public function isExpiredIn(DateInterval $interval): bool

@@ -3,16 +3,21 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Notification;
 
+use BetaKiller\Model\NotificationFrequencyInterface;
+use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\NotificationException;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Task\AbstractTask;
+use BetaKiller\Task\TaskException;
 use Psr\Log\LoggerInterface;
 
 final class TargetsFor extends AbstractTask
 {
     private const OPTION_MESSAGE = 'message';
+    private const OPTION_FREQ    = 'freq';
 
     /**
      * @var \BetaKiller\Notification\NotificationFacade
@@ -48,26 +53,36 @@ final class TargetsFor extends AbstractTask
     {
         return [
             self::OPTION_MESSAGE => null,
+            self::OPTION_FREQ    => null,
         ];
     }
 
     public function run(): void
     {
         $messageName = (string)$this->getOption(self::OPTION_MESSAGE, true);
+        $freqName    = (string)$this->getOption(self::OPTION_FREQ, false);
 
         $group = $this->facade->getGroupByMessageCodename($messageName);
 
-        $this->logger->info('Using group ":name"', [':name' => $group->getCodename()]);
+        $this->logger->debug('Using group ":name"', [':name' => $group->getCodename()]);
 
-        $roles = array_map(function (RoleInterface $role) {
+        $roles = array_map(static function (RoleInterface $role) {
             return $role->getName();
         }, $group->getRoles());
 
-        $this->logger->info('Using role(s) ":names"', [
+        $this->logger->debug('Using role(s) ":names"', [
             ':names' => implode('", "', $roles),
         ]);
 
-        $targets = $this->facade->getGroupTargets($group);
+        $freq = $freqName ? $this->facade->getFrequencyByCodename($freqName) : null;
+
+        if ($freq) {
+            $this->logger->debug('Using frequency ":name"', [
+                ':name' => $freqName,
+            ]);
+        }
+
+        $targets = $this->facade->findGroupFreqTargets($group, $freq);
 
         $count = \count($targets);
         if ($count) {
@@ -77,11 +92,13 @@ final class TargetsFor extends AbstractTask
         }
 
         foreach ($targets as $item) {
+            $targetFreq = $this->getTargetGroupFrequencyName($group, $item);
+
             if ($item instanceof UserInterface) {
-                $this->logger->info(':name <:email> [:lang]', [
-                    ':name'  => $item->getFullName(),
+                $this->logger->info('[:lang] :email [:freq]', [
                     ':email' => $item->getEmail(),
                     ':lang'  => $item->getLanguageIsoCode(),
+                    ':freq'  => $targetFreq ? $targetFreq->getCodename() : 'immediate',
                 ]);
             } else {
                 throw new NotificationException('Unknown target type ":type"', [
@@ -89,5 +106,14 @@ final class TargetsFor extends AbstractTask
                 ]);
             }
         }
+    }
+
+    public function getTargetGroupFrequencyName(NotificationGroupInterface $group, MessageTargetInterface $target): ?NotificationFrequencyInterface
+    {
+        if (!$target instanceof UserInterface) {
+            throw new \LogicException();
+        }
+
+        return $this->facade->getGroupFrequency($group, $target);
     }
 }

@@ -4,10 +4,8 @@ declare(strict_types=1);
 namespace BetaKiller\Repository;
 
 use BetaKiller\Model\ExtendedOrmInterface;
-use BetaKiller\Model\NotificationFrequencyInterface;
 use BetaKiller\Model\NotificationGroup;
 use BetaKiller\Model\NotificationGroupInterface;
-use BetaKiller\Model\NotificationGroupUserConfig;
 use BetaKiller\Model\UserInterface;
 
 class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository implements
@@ -112,110 +110,6 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
             ->filterRoles($orm, $user->getAccessControlRoles())
             ->orderByPlace($orm)
             ->findAll($orm);
-    }
-
-    /**
-     * @param \BetaKiller\Model\NotificationGroupInterface          $groupModel
-     * @param \BetaKiller\Model\NotificationFrequencyInterface|null $freq
-     *
-     * @return \BetaKiller\Model\UserInterface[]
-     * @throws \BetaKiller\Exception
-     * @throws \BetaKiller\Factory\FactoryException
-     */
-    public function findGroupUsers(
-        NotificationGroupInterface $groupModel,
-        NotificationFrequencyInterface $freq = null
-    ): array {
-        /*
-        SELECT `user`.*
-        FROM `users` AS `user`
-        LEFT JOIN `roles_users` AS `roles:through`
-        ON (`roles:through`.`user_id` = `user`.`id`)
-        LEFT JOIN `roles` AS `roles`
-        ON (`roles`.`id` = `roles:through`.`role_id`)
-        LEFT JOIN `notification_groups_roles`
-        ON (`notification_groups_roles`.`role_id` = `roles`.`id`)
-        LEFT JOIN `notification_groups_users_off`
-        ON (`notification_groups_users_off`.`group_id` = `notification_groups_roles`.`group_id` AND `notification_groups_users_off`.`user_id` = `user`.`id`)
-        LEFT JOIN `notification_groups`
-        ON (`notification_groups`.`id` = `notification_groups_roles`.`group_id`)
-        WHERE `notification_groups`.`codename` = 'groupCodename2'
-        AND `notification_groups_users_off`.`user_id` IS NULL
-        GROUP BY `user`.`id`
-         */
-
-        $orm = $this->getOrmInstance()->get('users');
-
-        if ($freq) {
-            // Filter users with selected freq for group
-            $orm
-                ->join(NotificationGroupUserConfig::TABLE_NAME, 'left')
-                ->on(
-                    NotificationGroupUserConfig::TABLE_NAME.'.'.NotificationGroupUserConfig::COL_GROUP_ID,
-                    '=',
-                    $orm->object_primary_key()
-                )
-                ->on(
-                    NotificationGroupUserConfig::TABLE_NAME.'.'.NotificationGroupUserConfig::COL_USER_ID,
-                    '=',
-                    'user.id'
-                )
-                ->and_where_open()
-                ->or_where(
-                    NotificationGroupUserConfig::TABLE_NAME.'.'.NotificationGroupUserConfig::COL_FREQ_ID,
-                    '=',
-                    $freq->getID()
-                );
-
-            // No config means "immediately"
-            if ($freq->isImmediately()) {
-                $orm->or_where(
-                    NotificationGroupUserConfig::TABLE_NAME.'.'.NotificationGroupUserConfig::COL_FREQ_ID,
-                    'IS',
-                    null
-                );
-            }
-
-            $orm->and_where_close();
-        }
-
-        return $orm
-            ->join_related('roles', 'roles')
-            ->join(NotificationGroup::ROLES_TABLE_NAME, 'left')
-            ->on(
-                NotificationGroup::ROLES_TABLE_NAME.'.'.NotificationGroup::ROLES_TABLE_FIELD_ROLE_ID,
-                '=',
-                'roles.id'
-            )
-            ->join(NotificationGroup::USERS_OFF_TABLE_NAME, 'left')
-            ->on(
-                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_GROUP_ID,
-                '=',
-                NotificationGroup::ROLES_TABLE_NAME.'.'.NotificationGroup::ROLES_TABLE_FIELD_GROUP_ID
-            )
-            ->on(
-                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_GROUP_ID,
-                '=',
-                $orm->object_column('id')
-            )
-            ->join(NotificationGroup::TABLE_NAME, 'left')
-            ->on(
-                NotificationGroup::TABLE_NAME.'.id',
-                '=',
-                NotificationGroup::ROLES_TABLE_NAME.'.'.NotificationGroup::ROLES_TABLE_FIELD_GROUP_ID
-            )
-            ->where(
-                NotificationGroup::TABLE_NAME.'.id',
-                '=',
-                $groupModel
-            )
-            ->where(
-                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_USER_ID,
-                'IS',
-                null
-            )
-            ->group_by_primary_key()
-            ->get_all();
     }
 
     /**

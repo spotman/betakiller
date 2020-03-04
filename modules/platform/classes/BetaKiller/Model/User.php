@@ -339,6 +339,22 @@ class User extends \ORM implements UserInterface
     }
 
     /**
+     * Returns true if user has any of provided role assigned
+     *
+     * @param \BetaKiller\Model\RoleInterface[] $roles
+     *
+     * @return bool
+     */
+    public function hasAnyOfRoles(array $roles): bool
+    {
+        $rolesNames = array_map(static function(RoleInterface $role) {
+            return $role->getName();
+        }, $roles);
+
+        return $this->hasAnyOfRolesNames($rolesNames);
+    }
+
+    /**
      * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return \BetaKiller\Model\UserInterface

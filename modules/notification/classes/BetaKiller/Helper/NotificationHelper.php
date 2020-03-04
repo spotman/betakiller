@@ -56,7 +56,7 @@ class NotificationHelper
     {
         $group = $this->getMessageGroup($name);
 
-        $targets = $this->notification->getGroupTargets($group);
+        $targets = $this->notification->findGroupFreqTargets($group);
 
         if (!$targets) {
             throw new NotificationException('Missing targets for group ":name"', [

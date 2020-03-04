@@ -123,6 +123,15 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     public function hasAnyOfRolesNames(array $roles): bool;
 
     /**
+     * Returns true if user has any of provided role assigned
+     *
+     * @param \BetaKiller\Model\RoleInterface[] $roles
+     *
+     * @return bool
+     */
+    public function hasAnyOfRoles(array $roles): bool;
+
+    /**
      * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return \BetaKiller\Model\UserInterface

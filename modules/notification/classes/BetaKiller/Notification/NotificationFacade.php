@@ -5,6 +5,7 @@ use BetaKiller\Config\NotificationConfigInterface;
 use BetaKiller\Exception;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Model\NotificationFrequency;
 use BetaKiller\Model\NotificationFrequencyInterface;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\NotificationGroupUserConfig;
@@ -15,6 +16,7 @@ use BetaKiller\Repository\NotificationFrequencyRepositoryInterface;
 use BetaKiller\Repository\NotificationGroupRepositoryInterface;
 use BetaKiller\Repository\NotificationGroupUserConfigRepositoryInterface;
 use BetaKiller\Repository\NotificationLogRepositoryInterface;
+use BetaKiller\Repository\UserRepositoryInterface;
 use DateTimeImmutable;
 use Interop\Queue\Context;
 use Psr\Log\LoggerInterface;
@@ -102,6 +104,11 @@ final class NotificationFacade
     private $actionUrlGenerator;
 
     /**
+     * @var \BetaKiller\Repository\UserRepositoryInterface
+     */
+    private $userRepo;
+
+    /**
      * NotificationFacade constructor.
      *
      * @param \BetaKiller\Notification\TransportFactory                             $transportFactory
@@ -112,6 +119,7 @@ final class NotificationFacade
      * @param \BetaKiller\Repository\NotificationLogRepositoryInterface             $logRepo
      * @param \BetaKiller\Repository\NotificationGroupUserConfigRepositoryInterface $userConfigRepo
      * @param \BetaKiller\Repository\NotificationFrequencyRepositoryInterface       $freqRepo
+     * @param \BetaKiller\Repository\UserRepositoryInterface                        $userRepo
      * @param \Interop\Queue\Context                                                $queueContext
      * @param \BetaKiller\Notification\MessageSerializer                            $serializer
      * @param \BetaKiller\Notification\MessageActionUrlGeneratorInterface           $actionUrlGenerator
@@ -126,6 +134,7 @@ final class NotificationFacade
         NotificationLogRepositoryInterface $logRepo,
         NotificationGroupUserConfigRepositoryInterface $userConfigRepo,
         NotificationFrequencyRepositoryInterface $freqRepo,
+        UserRepositoryInterface $userRepo,
         Context $queueContext,
         MessageSerializer $serializer,
         MessageActionUrlGeneratorInterface $actionUrlGenerator,
@@ -139,6 +148,7 @@ final class NotificationFacade
         $this->actionUrlGenerator = $actionUrlGenerator;
         $this->config             = $config;
         $this->groupRepo          = $groupRepo;
+        $this->userRepo           = $userRepo;
         $this->renderer           = $renderer;
         $this->freqRepo           = $freqRepo;
         $this->logRepo            = $logRepo;
@@ -329,33 +339,46 @@ final class NotificationFacade
     }
 
     /**
-     * @param \BetaKiller\Model\NotificationGroupInterface $group
+     * @param \BetaKiller\Model\NotificationGroupInterface          $group
+     * @param \BetaKiller\Model\NotificationFrequencyInterface|null $freq
      *
      * @return \BetaKiller\Notification\MessageTargetInterface[]
-     * @throws \BetaKiller\Exception
      */
-    public function getGroupTargets(NotificationGroupInterface $group): array
-    {
-        $users = $this->groupRepo->findGroupUsers($group);
-
-        if (!$users) {
-            throw new NotificationException('No users found for group ":codename"', [
-                ':codename' => $group->getCodename(),
+    public function findGroupFreqTargets(
+        NotificationGroupInterface $group,
+        NotificationFrequencyInterface $freq = null
+    ): array {
+        if ($freq && !$group->isFrequencyControlEnabled()) {
+            throw new NotificationException('Frequency control is not allowed for group ":name"', [
+                ':name' => $group->getCodename(),
             ]);
         }
 
-        return $users;
-    }
+        // Fetch target roles (including all in hierarchy)
+        $roles = $group->getRoles();
 
-    /**
-     * @param \BetaKiller\Model\NotificationGroupInterface     $group
-     * @param \BetaKiller\Model\NotificationFrequencyInterface $freq
-     *
-     * @return \BetaKiller\Notification\MessageTargetInterface[]
-     */
-    public function findGroupFreqTargets(NotificationGroupInterface $group, NotificationFrequencyInterface $freq): array
-    {
-        return $this->groupRepo->findGroupUsers($group, $freq);
+        $users = [];
+
+        // Get Users with provided roles (pre-fetch)
+        foreach ($this->userRepo->getUsersWithRoles($roles, true) as $user) {
+            // Check user disabled this group
+            if (!$group->isEnabledForUser($user)) {
+                continue;
+            }
+
+            // Check freq is equal
+            if ($freq) {
+                $userFreq = $this->getGroupFrequency($group, $user);
+
+                if ($userFreq->getCodename() !== $freq->getCodename()) {
+                    continue;
+                }
+            }
+
+            $users[] = $user;
+        }
+
+        return $users;
     }
 
     public function disableMessageForUser(string $messageCodename, UserInterface $user): void
@@ -388,7 +411,7 @@ final class NotificationFacade
     public function getGroupFrequency(
         NotificationGroupInterface $group,
         UserInterface $user
-    ): ?NotificationFrequencyInterface {
+    ): NotificationFrequencyInterface {
         if (!$group->isFrequencyControlEnabled()) {
             throw new NotificationException('Frequency control of group ":name" is not allowed', [
                 ':name' => $group->getCodename(),
@@ -399,7 +422,7 @@ final class NotificationFacade
 
         return $config->hasFrequencyDefined()
             ? $config->getFrequency()
-            : null;
+            : $this->getFrequencyByCodename(NotificationFrequency::FREQ_IMMEDIATELY);
     }
 
     public function setGroupFrequency(

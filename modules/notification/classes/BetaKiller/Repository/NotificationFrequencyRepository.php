@@ -32,7 +32,7 @@ class NotificationFrequencyRepository extends AbstractOrmBasedRepository impleme
         $orm = $this->getOrmInstance();
 
         return $this
-            ->filterCodename($orm, NotificationFrequency::FREQ_NOW, true)
+            ->filterCodename($orm, NotificationFrequency::FREQ_IMMEDIATELY, true)
             ->findAll($orm);
     }
 

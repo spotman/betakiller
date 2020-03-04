@@ -4,18 +4,32 @@ namespace BetaKiller\Model;
 interface MultipleParentsTreeModelInterface
 {
     /**
-     * Return parents models
+     * Return direct parents
      *
      * @return \BetaKiller\Model\MultipleParentsTreeModelInterface[]
      */
     public function getParents(): array;
 
     /**
-     * Return all parent models including in hierarchy
+     * Return all parent including in hierarchy
      *
      * @return \BetaKiller\Model\MultipleParentsTreeModelInterface[]
      */
     public function getAllParents(): array;
+
+    /**
+     * Return direct children
+     *
+     * @return \BetaKiller\Model\MultipleParentsTreeModelInterface[]
+     */
+    public function getChilds(): array;
+
+    /**
+     * Return all children in hierarchy
+     *
+     * @return \BetaKiller\Model\MultipleParentsTreeModelInterface[]
+     */
+    public function getAllChilds(): array;
 
     /**
      * @param \BetaKiller\Model\MultipleParentsTreeModelInterface $parent
