@@ -52,12 +52,13 @@ class CookieHelper
      * CookieHelper constructor.
      *
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
+     * @param \BetaKiller\Helper\AppEnvInterface    $appEnv
      *
      * @throws \HansOtt\PSR7Cookies\InvalidArgumentException
      */
-    public function __construct(AppConfigInterface $appConfig)
+    public function __construct(AppConfigInterface $appConfig, AppEnvInterface $appEnv)
     {
-        if ($appConfig->isSecure()) {
+        if ($appConfig->isSecure() && !$appEnv->isInternalWebServer()) {
             $this->secureOnly = true;
         }
 
