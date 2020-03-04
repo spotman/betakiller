@@ -7,6 +7,7 @@ use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\TextHelper;
 use BetaKiller\Service\HttpClientService;
+use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use BetaKiller\Url\AvailableUrlsCollector;
 use GuzzleHttp\Cookie\CookieJar;
@@ -14,7 +15,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 
-class Warmup extends \BetaKiller\Task\AbstractTask
+class Warmup extends AbstractTask
 {
     /**
      * @var \BetaKiller\Url\AvailableUrlsCollector
@@ -328,8 +329,6 @@ class Warmup extends \BetaKiller\Task\AbstractTask
         $this->logger->debug('Making request to :url', [':url' => $url]);
 
         // see https://github.com/guzzle/guzzle/issues/590
-        $request = $this->httpClient->get($url);
-
-        return $this->httpClient->syncCall($request, $this->cookieJar);
+        return $this->httpClient->syncGet($url, $this->cookieJar);
     }
 }

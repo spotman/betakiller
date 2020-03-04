@@ -5,8 +5,6 @@ namespace BetaKiller\Service;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Cookie\CookieJarInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class HttpClientService
@@ -17,47 +15,39 @@ class HttpClientService
     private $client;
 
     /**
-     * @var \Psr\Http\Message\RequestFactoryInterface
-     */
-    private $requestFactory;
-
-    /**
      * HttpClientService constructor.
      *
-     * @param \GuzzleHttp\ClientInterface               $client
-     * @param \Psr\Http\Message\RequestFactoryInterface $requestFactory
+     * @param \GuzzleHttp\ClientInterface $client
      */
-    public function __construct(ClientInterface $client, RequestFactoryInterface $requestFactory)
+    public function __construct(ClientInterface $client)
     {
-        $this->client         = $client;
-        $this->requestFactory = $requestFactory;
+        $this->client = $client;
     }
 
-    public function getClient(): ClientInterface
-    {
-        return $this->client;
-    }
-
-    public function request(string $method, string $url): RequestInterface
-    {
-        return $this->requestFactory->createRequest($method, $url);
-    }
-
-    public function get(string $url): RequestInterface
-    {
-        return $this->request('GET', $url);
-    }
-
-    public function syncCall(
-        RequestInterface $request,
+    public function syncGet(
+        string $url,
         CookieJarInterface $jar = null,
         array $requestOptions = null
     ): ResponseInterface {
+        return $this->syncRequest('get', $url, $jar, $requestOptions);
+    }
+
+    public function syncRequest(
+        string $method,
+        string $url,
+        CookieJarInterface $jar = null,
+        array $requestOptions = null
+    ): ResponseInterface {
+        return $this->client->request($method, $url, $this->makeRequestOptions($jar, $requestOptions));
+    }
+
+    private function makeRequestOptions(CookieJarInterface $jar = null, array $requestOptions = null): array
+    {
         $options = [
             'allow_redirects' => true,
         ];
 
-        if ($jar) {
+        if ($jar !== null) {
             $options['cookies'] = $jar;
         }
 
@@ -65,6 +55,6 @@ class HttpClientService
             $options = \array_merge($options, $requestOptions);
         }
 
-        return $this->client->send($request, $options);
+        return $options;
     }
 }
