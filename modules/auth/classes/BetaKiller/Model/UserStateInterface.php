@@ -31,4 +31,9 @@ interface UserStateInterface extends WorkflowStateInterface
      * @return bool
      */
     public function isSuspended(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isResumed(): bool;
 }

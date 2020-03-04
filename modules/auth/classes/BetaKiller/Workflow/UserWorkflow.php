@@ -18,8 +18,8 @@ final class UserWorkflow
     public const TRANSITION_BLOCK     = 'block';
     public const TRANSITION_REG_CLAIM = 'reg-claim';
 
-    public const TRANSITION_SUSPEND            = 'suspend';
-    public const TRANSITION_ACTIVATE_SUSPENDED = 'activate';
+    public const TRANSITION_SUSPEND          = 'suspend';
+    public const TRANSITION_RESUME_SUSPENDED = 'resume';
 
     public const NOTIFICATION_EMAIL_VERIFICATION = 'auth/verification';
 
@@ -118,9 +118,9 @@ final class UserWorkflow
         $this->userRepo->save($user);
     }
 
-    public function activateSuspended(UserInterface $user): void
+    public function resumeSuspended(UserInterface $user): void
     {
-        $this->state->doTransition($user, self::TRANSITION_ACTIVATE_SUSPENDED, $user);
+        $this->state->doTransition($user, self::TRANSITION_RESUME_SUSPENDED, $user);
 
         $this->userRepo->save($user);
 

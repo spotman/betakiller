@@ -13,7 +13,7 @@ return [
         WorkflowConfig::STATUS_MODEL => UserState::getModelName(),
 
         WorkflowConfig::STATES => [
-            UserState::STATE_CREATED => [
+            UserState::CREATED => [
                 WorkflowConfig::IS_START => true,
 
                 WorkflowConfig::ACTIONS => [
@@ -27,14 +27,14 @@ return [
                 ],
 
                 WorkflowConfig::TRANSITIONS => [
-                    UserWorkflow::TRANSITION_CHANGE_EMAIL    => UserState::STATE_EMAIL_CHANGED,
-                    UserWorkflow::TRANSITION_EMAIL_CONFIRMED => UserState::STATE_EMAIL_CONFIRMED,
-                    UserWorkflow::TRANSITION_REG_CLAIM       => UserState::STATE_CLAIMED,
-                    UserWorkflow::TRANSITION_BLOCK           => UserState::STATE_BLOCKED,
+                    UserWorkflow::TRANSITION_CHANGE_EMAIL    => UserState::EMAIL_CHANGED,
+                    UserWorkflow::TRANSITION_EMAIL_CONFIRMED => UserState::EMAIL_CONFIRMED,
+                    UserWorkflow::TRANSITION_REG_CLAIM       => UserState::CLAIMED,
+                    UserWorkflow::TRANSITION_BLOCK           => UserState::BLOCKED,
                 ],
             ],
 
-            UserState::STATE_EMAIL_CONFIRMED => [
+            UserState::EMAIL_CONFIRMED => [
                 WorkflowConfig::ACTIONS => [
                     UserResource::ACTION_READ   => [
                         RoleInterface::LOGIN,
@@ -46,14 +46,14 @@ return [
                 ],
 
                 WorkflowConfig::TRANSITIONS => [
-                    UserWorkflow::TRANSITION_EMAIL_CONFIRMED => UserState::STATE_EMAIL_CONFIRMED,
-                    UserWorkflow::TRANSITION_CHANGE_EMAIL    => UserState::STATE_EMAIL_CHANGED,
-                    UserWorkflow::TRANSITION_SUSPEND         => UserState::STATE_SUSPENDED,
-                    UserWorkflow::TRANSITION_BLOCK           => UserState::STATE_BLOCKED,
+                    UserWorkflow::TRANSITION_EMAIL_CONFIRMED => UserState::EMAIL_CONFIRMED,
+                    UserWorkflow::TRANSITION_CHANGE_EMAIL    => UserState::EMAIL_CHANGED,
+                    UserWorkflow::TRANSITION_SUSPEND         => UserState::SUSPENDED,
+                    UserWorkflow::TRANSITION_BLOCK           => UserState::BLOCKED,
                 ],
             ],
 
-            UserState::STATE_EMAIL_CHANGED => [
+            UserState::EMAIL_CHANGED => [
                 WorkflowConfig::ACTIONS => [
                     UserResource::ACTION_READ   => [
                         RoleInterface::LOGIN,
@@ -65,15 +65,15 @@ return [
                 ],
 
                 WorkflowConfig::TRANSITIONS => [
-                    UserWorkflow::TRANSITION_EMAIL_CONFIRMED => UserState::STATE_EMAIL_CONFIRMED,
+                    UserWorkflow::TRANSITION_EMAIL_CONFIRMED => UserState::EMAIL_CONFIRMED,
                     // Allow redo just in case of user mistake
-                    UserWorkflow::TRANSITION_CHANGE_EMAIL    => UserState::STATE_EMAIL_CHANGED,
-                    UserWorkflow::TRANSITION_SUSPEND         => UserState::STATE_SUSPENDED,
-                    UserWorkflow::TRANSITION_BLOCK           => UserState::STATE_BLOCKED,
+                    UserWorkflow::TRANSITION_CHANGE_EMAIL    => UserState::EMAIL_CHANGED,
+                    UserWorkflow::TRANSITION_SUSPEND         => UserState::SUSPENDED,
+                    UserWorkflow::TRANSITION_BLOCK           => UserState::BLOCKED,
                 ],
             ],
 
-            UserState::STATE_SUSPENDED => [
+            UserState::SUSPENDED => [
                 WorkflowConfig::ACTIONS => [
                     UserResource::ACTION_READ   => [
                         RoleInterface::LOGIN,
@@ -85,12 +85,30 @@ return [
                 ],
 
                 WorkflowConfig::TRANSITIONS => [
-                    // Set "created" state to prevent workflow hacks (created => suspended => confirmed)
-                    UserWorkflow::TRANSITION_ACTIVATE_SUSPENDED => UserState::STATE_CREATED,
+                    // Set "resumed" state to prevent workflow hacks (created => suspended => confirmed)
+                    UserWorkflow::TRANSITION_RESUME_SUSPENDED => UserState::RESUMED,
                 ],
             ],
 
-            UserState::STATE_BLOCKED => [
+            UserState::RESUMED => [
+                WorkflowConfig::ACTIONS => [
+                    UserResource::ACTION_READ   => [
+                        RoleInterface::LOGIN,
+                        RoleInterface::USER_MANAGEMENT,
+                    ],
+                    UserResource::ACTION_UPDATE => [
+                        RoleInterface::LOGIN,
+                    ],
+                ],
+
+                WorkflowConfig::TRANSITIONS => [
+                    UserWorkflow::TRANSITION_CHANGE_EMAIL    => UserState::EMAIL_CHANGED,
+                    UserWorkflow::TRANSITION_EMAIL_CONFIRMED => UserState::EMAIL_CONFIRMED,
+                    UserWorkflow::TRANSITION_BLOCK           => UserState::BLOCKED,
+                ],
+            ],
+
+            UserState::BLOCKED => [
                 WorkflowConfig::IS_FINISH => true,
 
                 WorkflowConfig::ACTIONS     => [
@@ -107,7 +125,7 @@ return [
                 WorkflowConfig::TRANSITIONS => [],
             ],
 
-            UserState::STATE_CLAIMED => [
+            UserState::CLAIMED => [
                 WorkflowConfig::IS_FINISH => true,
 
                 WorkflowConfig::ACTIONS     => [
@@ -141,7 +159,7 @@ return [
                 RoleInterface::LOGIN,
             ],
 
-            UserWorkflow::TRANSITION_ACTIVATE_SUSPENDED => [
+            UserWorkflow::TRANSITION_RESUME_SUSPENDED => [
                 RoleInterface::LOGIN,
             ],
 

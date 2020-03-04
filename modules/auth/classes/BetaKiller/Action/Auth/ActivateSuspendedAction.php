@@ -50,7 +50,7 @@ final class ActivateSuspendedAction extends AbstractAction
     {
         $user = ServerRequestHelper::getUser($request);
 
-        $this->userWorkflow->activateSuspended($user);
+        $this->userWorkflow->resumeSuspended($user);
 
         // Redirect to actual page
         $url = $this->urlDetector->detect($user);

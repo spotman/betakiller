@@ -9,12 +9,13 @@ final class UserState extends AbstractWorkflowStateOrm implements UserStateInter
 {
     public const TABLE_NAME = 'user_statuses';
 
-    public const STATE_CREATED         = 'created';      // Just created
-    public const STATE_EMAIL_CONFIRMED = 'confirmed';    // Email confirmed
-    public const STATE_EMAIL_CHANGED   = 'email-changed';    // Email changed
-    public const STATE_BLOCKED         = 'blocked';      // Blocked coz of hacking, spam, or app rules violation
-    public const STATE_CLAIMED         = 'claimed';      // User claimed about registration
-    public const STATE_SUSPENDED       = 'suspended';    // Account removal requested so it will be suspended for 6 months
+    public const CREATED         = 'created';      // Just created
+    public const EMAIL_CONFIRMED = 'confirmed';    // Email confirmed
+    public const EMAIL_CHANGED   = 'email-changed';    // Email changed
+    public const BLOCKED         = 'blocked';      // Blocked coz of hacking, spam, or app rules violation
+    public const CLAIMED         = 'claimed';      // User claimed about registration
+    public const SUSPENDED       = 'suspended';    // Account removal requested so it will be suspended for 6 months
+    public const RESUMED         = 'resumed';    // Resumed from suspend, requires additional confirmation (potential fraud)
 
     protected function configure(): void
     {
@@ -48,7 +49,7 @@ final class UserState extends AbstractWorkflowStateOrm implements UserStateInter
      */
     public function isCreated(): bool
     {
-        return $this->isWorkflowStateCodename(self::STATE_CREATED);
+        return $this->isWorkflowStateCodename(self::CREATED);
     }
 
     /**
@@ -57,7 +58,7 @@ final class UserState extends AbstractWorkflowStateOrm implements UserStateInter
      */
     public function isConfirmed(): bool
     {
-        return $this->isWorkflowStateCodename(self::STATE_EMAIL_CONFIRMED);
+        return $this->isWorkflowStateCodename(self::EMAIL_CONFIRMED);
     }
 
     /**
@@ -66,7 +67,7 @@ final class UserState extends AbstractWorkflowStateOrm implements UserStateInter
      */
     public function isBlocked(): bool
     {
-        return $this->isWorkflowStateCodename(self::STATE_BLOCKED);
+        return $this->isWorkflowStateCodename(self::BLOCKED);
     }
 
     /**
@@ -74,7 +75,7 @@ final class UserState extends AbstractWorkflowStateOrm implements UserStateInter
      */
     public function isClaimed(): bool
     {
-        return $this->isWorkflowStateCodename(self::STATE_CLAIMED);
+        return $this->isWorkflowStateCodename(self::CLAIMED);
     }
 
     /**
@@ -83,6 +84,14 @@ final class UserState extends AbstractWorkflowStateOrm implements UserStateInter
      */
     public function isSuspended(): bool
     {
-        return $this->isWorkflowStateCodename(self::STATE_SUSPENDED);
+        return $this->isWorkflowStateCodename(self::SUSPENDED);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isResumed(): bool
+    {
+        return $this->isWorkflowStateCodename(self::RESUMED);
     }
 }
