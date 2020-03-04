@@ -19,6 +19,7 @@ use DateTimeImmutable;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\UuidInterface;
 use Text;
 use Zend\Expressive\Session\Session;
 use Zend\Expressive\Session\SessionIdentifierAwareInterface;
@@ -87,19 +88,20 @@ class DatabaseSessionStorage implements SessionStorageInterface
      */
     public function initializeSessionFromRequest(ServerRequestInterface $request): SessionInterface
     {
-        $userAgent = ServerRequestHelper::getUserAgent($request);
-        $originUrl = ServerRequestHelper::getUrl($request);
+        $userAgent  = ServerRequestHelper::getUserAgent($request);
+        $originUrl  = ServerRequestHelper::getUrl($request);
+        $originUuid = ServerRequestHelper::getRequestUuid($request);
 
         if (!$userAgent) {
             // Bots, fake requests, etc => regenerate empty session
-            return $this->createSession($originUrl);
+            return $this->createSession($originUrl, $originUuid);
         }
 
         $token = $this->cookies->get($request, self::COOKIE_NAME);
 
         if (!$token) {
             // No session (cleared by browser or new visitor) => regenerate empty session
-            return $this->createSession($originUrl);
+            return $this->createSession($originUrl, $originUuid);
         }
 
         return $this->getByToken($token);
@@ -181,17 +183,22 @@ class DatabaseSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * @param string $originUrl
+     * @param string                          $originUrl
+     * @param \Ramsey\Uuid\UuidInterface|null $originUuid
      *
      * @return \Zend\Expressive\Session\SessionInterface
      */
-    public function createSession(string $originUrl = null): SessionInterface
+    public function createSession(string $originUrl = null, UuidInterface $originUuid = null): SessionInterface
     {
         // Generate new token and fresh session object without data
         $session = $this->sessionFactory($this->generateToken(), []);
 
         if ($originUrl) {
             SessionHelper::setOriginUrl($session, $originUrl);
+        }
+
+        if ($originUuid) {
+            SessionHelper::setOriginUuid($session, $originUuid);
         }
 
         SessionHelper::setCreatedAt($session, new DateTimeImmutable);
@@ -287,7 +294,8 @@ class DatabaseSessionStorage implements SessionStorageInterface
     {
         // Generate new token and create fresh session with empty data
         $newSession = $this->createSession(
-            SessionHelper::getOriginUrl($oldSession)
+            SessionHelper::getOriginUrl($oldSession),
+            SessionHelper::getOriginUuid($oldSession)
         );
 
         $userID = SessionHelper::getUserID($oldSession);

@@ -6,7 +6,6 @@ namespace BetaKiller\Command;
 use BetaKiller\MessageBus\CommandMessageInterface;
 use BetaKiller\Model\HitMarkerInterface;
 use BetaKiller\Model\HitPageInterface;
-use BetaKiller\Model\UserInterface;
 use Ramsey\Uuid\UuidInterface;
 
 final class HitStatStoreCommand implements CommandMessageInterface
@@ -44,13 +43,13 @@ final class HitStatStoreCommand implements CommandMessageInterface
     /**
      * @var string
      */
-    private $sessionId;
+    private $sessionToken;
 
     /**
      * HitStatStoreCommand constructor.
      *
      * @param \Ramsey\Uuid\UuidInterface                $uuid
-     * @param string                                    $sessionId
+     * @param string                                    $sessionToken
      * @param string                                    $ip
      * @param \BetaKiller\Model\HitPageInterface        $source
      * @param \BetaKiller\Model\HitPageInterface        $target
@@ -60,19 +59,19 @@ final class HitStatStoreCommand implements CommandMessageInterface
      */
     public function __construct(
         UuidInterface $uuid,
-        string $sessionId,
+        string $sessionToken,
         string $ip,
         ?HitPageInterface $source,
         HitPageInterface $target,
         ?HitMarkerInterface $marker
     ) {
-        $this->uuid = $uuid;
-        $this->ip        = $ip;
-        $this->source    = $source;
-        $this->target    = $target;
-        $this->marker    = $marker;
-        $this->moment    = new \DateTimeImmutable();
-        $this->sessionId = $sessionId;
+        $this->uuid         = $uuid;
+        $this->ip           = $ip;
+        $this->source       = $source;
+        $this->target       = $target;
+        $this->marker       = $marker;
+        $this->moment       = new \DateTimeImmutable();
+        $this->sessionToken = $sessionToken;
     }
 
     /**
@@ -86,9 +85,9 @@ final class HitStatStoreCommand implements CommandMessageInterface
     /**
      * @return string
      */
-    public function getSessionId(): string
+    public function getSessionToken(): string
     {
-        return $this->sessionId;
+        return $this->sessionToken;
     }
 
     /**

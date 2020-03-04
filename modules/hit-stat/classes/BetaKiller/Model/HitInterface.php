@@ -7,18 +7,21 @@ use Ramsey\Uuid\UuidInterface;
 interface HitInterface extends AbstractEntityInterface
 {
     /**
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param string $token
      *
      * @return \BetaKiller\Model\HitInterface
      */
-    public function bindToUser(UserInterface $user): HitInterface;
+    public function setSessionToken(string $token): HitInterface;
 
     /**
-     * @param \BetaKiller\Model\UserSessionInterface $session
-     *
-     * @return \BetaKiller\Model\HitInterface
+     * @return bool
      */
-    public function bindToUserSession(UserSessionInterface $session): HitInterface;
+    public function hasSessionToken(): bool;
+
+    /**
+     * @return string
+     */
+    public function getSessionToken(): string;
 
     /**
      * @param \Ramsey\Uuid\UuidInterface $uuid
@@ -31,6 +34,18 @@ interface HitInterface extends AbstractEntityInterface
      * @return \Ramsey\Uuid\UuidInterface
      */
     public function getUuid(): UuidInterface;
+
+    /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return \BetaKiller\Model\HitInterface
+     */
+    public function bindToUser(UserInterface $user): HitInterface;
+
+    /**
+     * @return bool
+     */
+    public function isBoundToUser(): bool;
 
     /**
      * @param \BetaKiller\Model\HitPageInterface $value
@@ -73,7 +88,7 @@ interface HitInterface extends AbstractEntityInterface
     public function hasSourcePage(): bool;
 
     /**
-     * @return \BetaKiller\Model\HitPage
+     * @return \BetaKiller\Model\HitPageInterface
      */
     public function getSourcePage(): HitPageInterface;
 

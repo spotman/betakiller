@@ -5,9 +5,14 @@ namespace BetaKiller\Task\HitStat;
 
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\NotificationHelper;
-use BetaKiller\Model\Hit;
+use BetaKiller\Model\HitInterface;
 use BetaKiller\Model\HitPage;
+use BetaKiller\Model\HitPageInterface;
+use BetaKiller\Repository\HitLinkRepository;
+use BetaKiller\Repository\HitPageRepository;
 use BetaKiller\Repository\HitRepository;
+use BetaKiller\Repository\UserSessionRepository;
+use BetaKiller\Service\HitService;
 use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
 
@@ -54,18 +59,50 @@ class ProcessHits extends AbstractTask
     private $notification;
 
     /**
+     * @var \BetaKiller\Repository\UserSessionRepository
+     */
+    private $sessionRepo;
+
+    /**
+     * @var \BetaKiller\Repository\HitPageRepository
+     */
+    private $pageRepo;
+
+    /**
+     * @var \BetaKiller\Repository\HitLinkRepository
+     */
+    private $linkRepo;
+
+    /**
+     * @var \BetaKiller\Service\HitService
+     */
+    private $service;
+
+    /**
      * ProcessHits constructor.
      *
-     * @param \BetaKiller\Repository\HitRepository  $hitsRepository
-     * @param \BetaKiller\Helper\NotificationHelper $notification
-     * @param \Psr\Log\LoggerInterface              $logger
+     * @param \BetaKiller\Repository\HitRepository         $hitsRepository
+     * @param \BetaKiller\Repository\HitPageRepository     $pageRepo
+     * @param \BetaKiller\Repository\HitLinkRepository     $linkRepo
+     * @param \BetaKiller\Repository\UserSessionRepository $sessionRepo
+     * @param \BetaKiller\Service\HitService               $service
+     * @param \BetaKiller\Helper\NotificationHelper        $notification
+     * @param \Psr\Log\LoggerInterface                     $logger
      */
     public function __construct(
         HitRepository $hitsRepository,
+        HitPageRepository $pageRepo,
+        HitLinkRepository $linkRepo,
+        UserSessionRepository $sessionRepo,
+        HitService $service,
         NotificationHelper $notification,
         LoggerInterface $logger
     ) {
         $this->hitsRepository = $hitsRepository;
+        $this->pageRepo       = $pageRepo;
+        $this->linkRepo       = $linkRepo;
+        $this->sessionRepo    = $sessionRepo;
+        $this->service        = $service;
         $this->notification   = $notification;
         $this->logger         = $logger;
 
@@ -97,6 +134,7 @@ class ProcessHits extends AbstractTask
         // Process missing targets
         foreach ($this->hitsRepository->getPending(10000) as $hit) {
             try {
+                $this->processCounters($hit);
                 $this->processMissingTarget($hit, $firstHitTimestamp);
                 $this->processNewSource($hit, $firstHitTimestamp);
 
@@ -142,18 +180,74 @@ class ProcessHits extends AbstractTask
                 continue;
             }
 
+            // Bind to User if exists
+            if ($hit->hasSessionToken()) {
+                // Session may be cleaned by GC at this time (server halted, gc issue, etc)
+                $session = $this->sessionRepo->findByToken($hit->getSessionToken());
+
+                if ($session) {
+                    $hit->bindToUser($session->getUser());
+                }
+            }
+
             $hit->markAsProcessed();
 
             $this->hitsRepository->save($hit);
         }
     }
 
+    private function processCounters(HitInterface $hit): void
+    {
+        $moment = $hit->getTimestamp();
+        $target = $hit->getTargetPage();
+
+        // Increment hit counter for target URL
+        $target
+            ->incrementHits()
+            ->setLastSeenAt($moment);
+
+        $this->pageRepo->save($target);
+
+        // Process source page if exists
+        if ($hit->hasSourcePage()) {
+            $source = $hit->getSourcePage();
+
+            $source->setLastSeenAt($moment);
+
+            // If source page is missing, mark it as existing
+            if ($source->isMissing()) {
+                $source->markAsOk();
+            }
+
+            $this->pageRepo->save($source);
+
+            // Register link
+            $this->processLink($source, $target, $moment);
+        }
+    }
+
+    private function processLink(HitPageInterface $source, HitPageInterface $target, \DateTimeImmutable $moment): void
+    {
+        $link = $this->service->getLinkBySourceAndTarget($source, $target);
+
+        // Increment link click counter
+        $link->incrementClicks();
+
+        if (!$link->getFirstSeenAt()) {
+            $link->setFirstSeenAt($moment);
+        }
+
+        $link->setLastSeenAt($moment);
+
+        $this->linkRepo->save($link);
+    }
+
     /**
-     * @param \BetaKiller\Model\Hit $hit
+     * @param \BetaKiller\Model\HitInterface $hit
      *
-     * @param \DateTimeImmutable    $firstHitTimestamp
+     * @param \DateTimeImmutable             $firstHitTimestamp
      */
-    private function processMissingTarget(Hit $hit, \DateTimeImmutable $firstHitTimestamp): void
+    private function processMissingTarget(HitInterface $hit, \DateTimeImmutable $firstHitTimestamp): void
     {
         $target   = $hit->getTargetPage();
         $targetID = $target->getID();
@@ -182,7 +276,7 @@ class ProcessHits extends AbstractTask
         }
     }
 
-    private function processNewSource(Hit $hit, \DateTimeImmutable $firstHitTimestamp): void
+    private function processNewSource(HitInterface $hit, \DateTimeImmutable $firstHitTimestamp): void
     {
         if (!$hit->hasSourcePage()) {
             return;

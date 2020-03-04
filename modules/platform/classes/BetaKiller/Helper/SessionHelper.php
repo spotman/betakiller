@@ -9,6 +9,8 @@ use BetaKiller\Model\TokenInterface;
 use BetaKiller\Model\UserInterface;
 use DateTimeImmutable;
 use LogicException;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Zend\Expressive\Session\SessionInterface;
 
 class SessionHelper
@@ -17,6 +19,7 @@ class SessionHelper
     public const PERSISTENT   = 'persistent';
     public const AUTH_USER_ID = 'auth_user';
     public const ORIGIN_URL   = 'origin_url';
+    public const ORIGIN_UUID  = 'origin_uuid';
     public const TOKEN_HASH   = 'token';
 
     public static function transferData(SessionInterface $from, SessionInterface $to): void
@@ -92,6 +95,18 @@ class SessionHelper
     public static function setOriginUrl(SessionInterface $session, string $url): void
     {
         $session->set(self::ORIGIN_URL, $url);
+    }
+
+    public static function getOriginUuid(SessionInterface $session): ?UuidInterface
+    {
+        $value = $session->get(self::ORIGIN_UUID);
+
+        return $value ? Uuid::fromString($value) : null;
+    }
+
+    public static function setOriginUuid(SessionInterface $session, UuidInterface $uuid): void
+    {
+        $session->set(self::ORIGIN_UUID, $uuid->toString());
     }
 
     public static function getTokenHash(SessionInterface $session): ?string

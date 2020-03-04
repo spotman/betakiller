@@ -10,9 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactoryInterface;
-use Ramsey\Uuid\UuidInterface;
 
 final class RequestUuidMiddleware implements MiddlewareInterface
 {
@@ -42,12 +40,5 @@ final class RequestUuidMiddleware implements MiddlewareInterface
         $proxy = new RequestIdMiddleware($requestIdProvider);
 
         return $proxy->process($request, $handler);
-    }
-
-    public static function getUuid(ServerRequestInterface $request): UuidInterface
-    {
-        $value = $request->getAttribute(RequestIdMiddleware::ATTRIBUTE_NAME);
-
-        return Uuid::fromString($value);
     }
 }

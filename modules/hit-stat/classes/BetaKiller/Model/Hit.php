@@ -21,10 +21,9 @@ class Hit extends \ORM implements HitInterface
 
     public const REL_TARGET = 'target';
 
-    private const REL_SOURCE  = 'source';
-    private const REL_MARKER  = 'marker';
-    private const REL_USER    = 'user';
-    private const REL_SESSION = 'session';
+    private const REL_SOURCE = 'source';
+    private const REL_MARKER = 'marker';
+    private const REL_USER   = 'user';
 
     /**
      * Prepares the model database connection, determines the table name,
@@ -56,15 +55,9 @@ class Hit extends \ORM implements HitInterface
                 'model'       => User::getModelName(),
                 'foreign_key' => self::COL_USER_ID,
             ],
-
-            self::REL_SESSION => [
-                'model'       => UserSession::getModelName(),
-                'foreign_key' => self::COL_SESSION_TOKEN,
-            ],
         ]);
 
         $this->load_with([
-            self::REL_SESSION,
             self::REL_SOURCE,
             self::REL_TARGET,
             self::REL_MARKER,
@@ -92,13 +85,31 @@ class Hit extends \ORM implements HitInterface
     }
 
     /**
-     * @inheritDoc
+     * @param string $token
+     *
+     * @return \BetaKiller\Model\HitInterface
      */
-    public function bindToUserSession(UserSessionInterface $session): HitInterface
+    public function setSessionToken(string $token): HitInterface
     {
-        $this->set(self::REL_SESSION, $session);
+        $this->set(self::COL_SESSION_TOKEN, $token);
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasSessionToken(): bool
+    {
+        return (bool)$this->get(self::COL_SESSION_TOKEN);
+    }
+
+    /**
+     * @return string
+     */
+    public function getSessionToken(): string
+    {
+        return (string)$this->get(self::COL_SESSION_TOKEN);
     }
 
     /**
@@ -111,6 +122,14 @@ class Hit extends \ORM implements HitInterface
         $this->set(self::REL_USER, $user);
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBoundToUser(): bool
+    {
+        return (bool)$this->get(self::COL_USER_ID);
     }
 
     /**

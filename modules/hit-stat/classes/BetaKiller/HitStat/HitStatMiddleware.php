@@ -11,7 +11,6 @@ use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\MessageBus\CommandBusInterface;
-use BetaKiller\Middleware\RequestUuidMiddleware;
 use BetaKiller\Model\HitMarkerInterface;
 use BetaKiller\Service\HitService;
 use InvalidArgumentException;
@@ -117,9 +116,9 @@ class HitStatMiddleware implements MiddlewareInterface
 
     private function processHit(ServerRequestInterface $request): void
     {
+        $ip        = ServerRequestHelper::getIpAddress($request);
         $sourceUrl = ServerRequestHelper::getHttpReferrer($request);
         $targetUri = $request->getUri();
-        $ip        = ServerRequestHelper::getIpAddress($request);
 
         try {
             $sourceUri = $sourceUrl ? $this->uriFactory->createUri($sourceUrl) : null;
@@ -165,12 +164,7 @@ class HitStatMiddleware implements MiddlewareInterface
         $marker = $this->service->getMarkerFromRequest($request);
 
         $session   = ServerRequestHelper::getSession($request);
-        $requestId = RequestUuidMiddleware::getUuid($request);
-
-        // This is required for saving first user hit during registration
-        if (!HitStatSessionHelper::hasFirstHitUuid($session)) {
-            HitStatSessionHelper::setFirstHitUuid($session, $requestId);
-        }
+        $requestId = ServerRequestHelper::getRequestUuid($request);
 
         $p3 = RequestProfiler::begin($request, 'Hit stat: enqueue command');
 

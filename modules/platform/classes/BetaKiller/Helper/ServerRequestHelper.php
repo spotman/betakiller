@@ -11,8 +11,10 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
 use DebugBar\DebugBar;
+use PhpMiddleware\RequestId\RequestIdMiddleware;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\UriInterface;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Zend\Expressive\Flash\FlashMessageMiddleware;
 use Zend\Expressive\Flash\FlashMessagesInterface;
 use Zend\Expressive\Router\RouteResult;
@@ -300,5 +302,12 @@ class ServerRequestHelper
         $request = $request->withQueryParams($targetQuery);
 
         return $request->withUri($targetUri);
+    }
+
+    public static function getRequestUuid(ServerRequestInterface $request): UuidInterface
+    {
+        $value = $request->getAttribute(RequestIdMiddleware::ATTRIBUTE_NAME);
+
+        return Uuid::fromString($value);
     }
 }
