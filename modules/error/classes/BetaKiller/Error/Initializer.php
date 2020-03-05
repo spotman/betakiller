@@ -62,15 +62,8 @@ class Initializer implements ModuleInitializerInterface
      */
     private function initPhpExceptionStorage(): void
     {
-        $logger    = $this->logger;
-        $container = $this->container;
-
-        $factory = function () use ($logger, $container) {
-            $handler = $container->get(PhpExceptionStorageHandler::class);
-
-//            $handler->setLogger($logger);
-
-            return $handler;
+        $factory = function () {
+            return $this->container->get(PhpExceptionStorageHandler::class);
         };
 
         // PhpExceptionStorage handler

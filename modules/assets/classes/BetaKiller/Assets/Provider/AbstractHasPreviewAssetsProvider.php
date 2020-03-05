@@ -7,6 +7,7 @@ use BetaKiller\Assets\Exception\AssetsModelException;
 use BetaKiller\Assets\Exception\AssetsProviderException;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\Model\HasPreviewAssetsModelInterface;
+use BetaKiller\Helper\LoggerHelper;
 use function count;
 use function in_array;
 
@@ -43,7 +44,7 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
         if (!in_array($size, $this->getAllowedPreviewSizes(), true)) {
             $size = $this->getPreferredPreviewSize();
 
-            LoggerHelperTrait::logException(
+            LoggerHelper::logException(
                 $this->logger, new AssetsProviderException('Preview size ":size" is not allowed', [':size' => $size])
             );
         }

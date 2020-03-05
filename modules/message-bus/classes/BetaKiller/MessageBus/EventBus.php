@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\MessageBus;
 
+use BetaKiller\Helper\LoggerHelper;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -73,7 +74,7 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
         try {
             $handler($message);
         } catch (\Throwable $e) {
-            LoggerHelperTrait::logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e);
         }
     }
 }
