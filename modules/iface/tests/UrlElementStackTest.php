@@ -155,6 +155,7 @@ class UrlElementStackTest extends \BetaKiller\Test\AbstractTestCase
     {
         $obj = $this->prophesize(IFaceModelInterface::class);
         $obj->getCodename()->willReturn($codename);
+        $obj->hasDynamicUrl()->willReturn(false);
 
         return $obj;
     }
