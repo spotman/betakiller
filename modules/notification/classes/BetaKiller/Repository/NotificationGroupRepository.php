@@ -105,9 +105,20 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
             $this->filterSystemGroup($orm, false);
         }
 
+        $roles = [];
+
+        // Fetch all nested roles
+        foreach ($user->getAccessControlRoles() as $role) {
+            $roles[] = $role;
+
+            foreach ($role->getAllParents() as $parent) {
+                $roles[] = $parent;
+            }
+        }
+
         return $this
             ->filterGroupIsEnabled($orm, true)
-            ->filterRoles($orm, $user->getAccessControlRoles())
+            ->filterRoles($orm, $roles)
             ->orderByPlace($orm)
             ->findAll($orm);
     }
