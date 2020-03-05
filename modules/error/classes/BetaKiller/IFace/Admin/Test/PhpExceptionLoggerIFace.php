@@ -2,15 +2,13 @@
 namespace BetaKiller\IFace\Admin\Test;
 
 use BetaKiller\Exception\ServerErrorHttpException;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\IFace\Admin\Error\AbstractErrorAdminIFace;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
 class PhpExceptionLoggerIFace extends AbstractErrorAdminIFace
 {
-    use LoggerHelperTrait;
-
     /**
      * @var \Psr\Log\LoggerInterface
      */
@@ -38,7 +36,7 @@ class PhpExceptionLoggerIFace extends AbstractErrorAdminIFace
     {
         $e = new ServerErrorHttpException();
 
-        $this->logException($this->logger, $e);
+        LoggerHelper::logException($this->logger, $e);
 
         return [];
     }

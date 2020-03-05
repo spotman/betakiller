@@ -4,7 +4,7 @@ namespace BetaKiller;
 use BetaKiller\Assets\StaticAssets;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Url\ZoneInterface;
@@ -20,8 +20,6 @@ use Twig\TwigFunction;
 
 final class TwigExtension extends AbstractExtension
 {
-    use LoggerHelperTrait;
-
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
@@ -405,7 +403,7 @@ final class TwigExtension extends AbstractExtension
 
                     $params = Exception::addPlaceholderPrefixToKeys($params);
 
-                    $this->logException($this->logger, new Exception($message, $params));
+                    LoggerHelper::logException($this->logger, new Exception($message, $params));
                 }
             ),
 

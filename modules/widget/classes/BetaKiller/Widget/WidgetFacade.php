@@ -5,7 +5,7 @@ namespace BetaKiller\Widget;
 
 use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\Dev\RequestProfiler;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\View\ViewFactoryInterface;
@@ -15,8 +15,6 @@ use Psr\Log\LoggerInterface;
 
 class WidgetFacade
 {
-    use LoggerHelperTrait;
-
     /**
      * @var \BetaKiller\Widget\WidgetFactory
      */
@@ -114,7 +112,7 @@ class WidgetFacade
             $result = $view->render();
             RequestProfiler::end($rp);
         } catch (\Throwable $e) {
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e, null, $request);
         }
 
         return $result;

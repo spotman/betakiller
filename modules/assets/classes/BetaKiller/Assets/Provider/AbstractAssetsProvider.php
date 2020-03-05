@@ -23,7 +23,7 @@ use BetaKiller\Assets\Model\HashBasedAssetsModelInterface;
 use BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface;
 use BetaKiller\Assets\Storage\AssetsStorageInterface;
 use BetaKiller\Factory\EntityFactoryInterface;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\IdentityConverterInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\HashStrategyAssetsRepositoryInterface;
@@ -51,8 +51,6 @@ use const UPLOAD_ERR_PARTIAL;
 
 abstract class AbstractAssetsProvider implements AssetsProviderInterface
 {
-    use LoggerHelperTrait;
-
     public const CONFIG_MODEL_UPLOAD_KEY   = 'upload';
     public const CONFIG_MODEL_MAX_SIZE_KEY = 'max-size';
 

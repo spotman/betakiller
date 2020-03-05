@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Content\Shortcode;
 
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Widget\WidgetFacade;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -14,8 +14,6 @@ use Thunder\Shortcode\Shortcode\ShortcodeInterface as ThunderShortcodeInterface;
 
 class ShortcodeFacade
 {
-    use LoggerHelperTrait;
-
     /**
      * @var \BetaKiller\Widget\WidgetFacade
      */
@@ -90,7 +88,7 @@ class ShortcodeFacade
             try {
                 return $this->render($s->getName(), $s->getParameters(), $request, $context);
             } catch (\Throwable $e) {
-                $this->logException($this->logger, $e);
+                LoggerHelper::logException($this->logger, $e);
 
                 return null;
             }

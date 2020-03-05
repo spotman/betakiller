@@ -3,15 +3,13 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url;
 
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\UrlContainerInterface;
 
 class UrlDispatcher implements UrlDispatcherInterface
 {
-    use LoggerHelperTrait;
-
     /**
      * Defines default uri for index element (this used if root IFace has dynamic url behaviour)
      */

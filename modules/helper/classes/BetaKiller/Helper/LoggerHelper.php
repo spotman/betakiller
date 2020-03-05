@@ -2,15 +2,17 @@
 namespace BetaKiller\Helper;
 
 use BetaKiller\Log\Logger;
+use BetaKiller\Model\UserInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-trait LoggerHelperTrait
+class LoggerHelper
 {
-    final protected function logException(
+    public static function logException(
         LoggerInterface $logger,
         Throwable $e,
+        UserInterface $user = null,
         ServerRequestInterface $request = null
     ): void {
         $data = [
@@ -19,6 +21,10 @@ trait LoggerHelperTrait
             ':line'                       => $e->getLine(),
             Logger::CONTEXT_KEY_EXCEPTION => $e,
         ];
+
+        if ($user) {
+            $data[Logger::CONTEXT_KEY_USER] = $user;
+        }
 
         if ($request) {
             $data[Logger::CONTEXT_KEY_REQUEST] = $request;

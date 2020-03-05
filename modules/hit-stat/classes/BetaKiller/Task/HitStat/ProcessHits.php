@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\HitStat;
 
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\HitInterface;
 use BetaKiller\Model\HitPage;
@@ -18,8 +18,6 @@ use Psr\Log\LoggerInterface;
 
 class ProcessHits extends AbstractTask
 {
-    use LoggerHelperTrait;
-
     public const MISSING_TARGETS = 'admin/hit-stat/missing-targets';
     public const NEW_SOURCES     = 'admin/hit-stat/new-sources';
 
@@ -140,7 +138,7 @@ class ProcessHits extends AbstractTask
 
                 $this->processed[] = $hit;
             } catch (\Throwable $e) {
-                $this->logException($this->logger, $e);
+                LoggerHelper::logException($this->logger, $e);
             }
         }
 

@@ -6,7 +6,7 @@ namespace BetaKiller\Daemon;
 use BetaKiller\Api\ApiFacade;
 use BetaKiller\Error\ExceptionService;
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Wamp\WampClient;
 use BetaKiller\Wamp\WampClientBuilder;
@@ -21,8 +21,6 @@ use Thruway\ClientSession;
 
 class ApiWorkerDaemon implements DaemonInterface
 {
-    use LoggerHelperTrait;
-
     public const CODENAME = 'ApiWorker';
 
     public const PROCEDURE_API = 'api';
@@ -180,7 +178,7 @@ class ApiWorkerDaemon implements DaemonInterface
 
     private function makeApiError(Throwable $e, UserInterface $user = null): array
     {
-        $this->logException($this->logger, $e);
+        LoggerHelper::logException($this->logger, $e, $user);
 
         $lang  = $user ? $user->getLanguage() : null;
         $error = $this->exceptionService->getExceptionMessage($e, $lang);

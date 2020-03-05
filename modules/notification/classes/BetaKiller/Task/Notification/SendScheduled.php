@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Notification;
 
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\ScheduleProcessor\ScheduleProcessorInterface;
@@ -14,8 +14,6 @@ use Psr\Log\LoggerInterface;
 
 final class SendScheduled extends AbstractTask
 {
-    use LoggerHelperTrait;
-
     /**
      * @var \BetaKiller\Notification\NotificationFacade
      */
@@ -79,7 +77,7 @@ final class SendScheduled extends AbstractTask
             $messages = $this->notification->getGroupMessagesCodenames($group);
 
             if (count($messages) > 1) {
-                $this->logException($this->logger, new TaskException(
+                LoggerHelper::logException($this->logger, new TaskException(
                     'Multiple messages in scheduled group ":name" are not allowed', [
                     ':name' => $group->getCodename(),
                 ]));

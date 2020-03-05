@@ -7,7 +7,7 @@ use BetaKiller\Error\ExceptionService;
 use BetaKiller\ExceptionInterface;
 use BetaKiller\Factory\IFaceFactory;
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\AbstractHttpErrorIFace;
@@ -26,8 +26,6 @@ use Zend\Diactoros\Response\HtmlResponse;
 
 class ErrorPageMiddleware implements MiddlewareInterface
 {
-    use LoggerHelperTrait;
-
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
@@ -99,7 +97,7 @@ class ErrorPageMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         } catch (\Throwable $e) {
             // Logging exception
-            $this->logException($this->logger, $e, $request);
+            LoggerHelper::logException($this->logger, $e, null, $request);
 
             return $this->handleException($request, $e);
         }
@@ -178,7 +176,7 @@ class ErrorPageMiddleware implements MiddlewareInterface
 
             return new HtmlResponse($body, $httpCode);
         } catch (\Throwable $e) {
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e, null, $request);
 
             return $isDebug
                 ? $this->makeDebugResponse($e, $request)
@@ -265,7 +263,7 @@ class ErrorPageMiddleware implements MiddlewareInterface
                 }
             }
         } catch (\Throwable $e) {
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e);
         }
 
         return null;

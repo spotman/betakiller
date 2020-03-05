@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\I18n;
 
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Model\HasI18nKeyNameInterface;
 use BetaKiller\Model\I18nKeyInterface;
 use BetaKiller\Model\LanguageInterface;
@@ -15,8 +15,6 @@ use RuntimeException;
 
 final class I18nFacade
 {
-    use LoggerHelperTrait;
-
     public const ROLE_TRANSLATOR = 'translator';
 
     public const PLACEHOLDER_PREFIX = ':';
@@ -418,7 +416,7 @@ final class I18nFacade
         ]);
 
         // Store exception with the original key as missing
-        $this->logException($this->logger, $e);
+        LoggerHelper::logException($this->logger, $e);
     }
 
     /**

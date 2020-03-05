@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Wamp;
 
 use BetaKiller\Helper\CookieHelper;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Service\AuthService;
 use BetaKiller\Session\DatabaseSessionStorage;
@@ -20,8 +20,6 @@ use Thruway\Authentication\WampCraUserDbInterface;
  */
 class WampUserDb implements WampCraUserDbInterface
 {
-    use LoggerHelperTrait;
-
     /**
      * @var \BetaKiller\Service\AuthService
      */
@@ -88,7 +86,7 @@ class WampUserDb implements WampCraUserDbInterface
 
             return $this->makeData($authid, $authid);
         } catch (Throwable $e) {
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e);
 
             // Make random key string so auth will never be succeeded
             return $this->makeFakeData($authid);

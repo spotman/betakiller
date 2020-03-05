@@ -18,6 +18,10 @@ class ContextCleanupProcessor
             unset($record['context'][Logger::CONTEXT_KEY_REQUEST]);
         }
 
+        if (isset($record['context'][Logger::CONTEXT_KEY_USER])) {
+            unset($record['context'][Logger::CONTEXT_KEY_USER]);
+        }
+
         return $record;
     }
 }

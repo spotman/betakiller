@@ -5,7 +5,7 @@ namespace BetaKiller\Daemon;
 
 use BetaKiller\Event\EsbExternalEventTransport;
 use BetaKiller\Exception;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Wamp\WampClient;
 use BetaKiller\Wamp\WampClientBuilder;
 use BetaKiller\Wamp\WampClientHelper;
@@ -19,8 +19,6 @@ use Thruway\ClientSession;
 
 class WampEsbBridgeDaemon implements DaemonInterface
 {
-    use LoggerHelperTrait;
-
     public const CODENAME = 'WampEsbBridge';
 
     /**
@@ -210,7 +208,7 @@ class WampEsbBridgeDaemon implements DaemonInterface
                 });
             }
         } catch (Throwable $e) {
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e);
 
             return false;
         }

@@ -6,7 +6,7 @@ namespace BetaKiller\Task\Daemon;
 use BetaKiller\Daemon\DaemonFactory;
 use BetaKiller\Daemon\LockFactory;
 use BetaKiller\Daemon\ShutdownDaemonException;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Database;
@@ -14,8 +14,6 @@ use Psr\Log\LoggerInterface;
 
 class Runner extends AbstractTask
 {
-    use LoggerHelperTrait;
-
     public const START_TIMEOUT = 5;
     public const STOP_TIMEOUT  = 15;
 
@@ -225,7 +223,7 @@ class Runner extends AbstractTask
             $this->shutdown(0);
         } else {
             // Something wrong is going on here
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e);
             $this->shutdown(1);
         }
     }
@@ -272,7 +270,7 @@ class Runner extends AbstractTask
                 ]);
             }
         } catch (\Throwable $e) {
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e);
         }
     }
 

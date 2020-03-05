@@ -6,6 +6,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Log\Logger;
 use BetaKiller\Model\PhpException;
 use BetaKiller\Model\PhpExceptionModelInterface;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\PhpExceptionRepositoryInterface;
 use Debug;
 use Email;
@@ -56,10 +57,10 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      */
     private $notification;
 
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
+//    /**
+//     * @var \Psr\Log\LoggerInterface
+//     */
+//    private $logger;
 
     /**
      * PhpExceptionStorageHandler constructor.
@@ -75,10 +76,10 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         parent::__construct(self::MIN_LEVEL);
     }
 
-    public function setLogger(LoggerInterface $logger): void
-    {
-        $this->logger = $logger;
-    }
+//    public function setLogger(LoggerInterface $logger): void
+//    {
+//        $this->logger = $logger;
+//    }
 
     /**
      * Writes the record down to the log of the implementing handler
@@ -98,8 +99,11 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         /** @var ServerRequestInterface|null $request */
         $request = $record['context'][Logger::CONTEXT_KEY_REQUEST] ?? null;
 
+        /** @var UserInterface|null $user */
+        $user = $record['context'][Logger::CONTEXT_KEY_USER] ?? null;
+
         try {
-            $this->storeException($exception, $request);
+            $this->storeException($exception, $user, $request);
         } catch (Throwable $subsystemException) {
             // Prevent logging recursion
             $this->enabled = false;
@@ -131,6 +135,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
     /**
      * @param \Throwable                                    $exception
+     * @param \BetaKiller\Model\UserInterface|null          $user
      * @param null|\Psr\Http\Message\ServerRequestInterface $request Null in cli mode
      *
      * @return void
@@ -138,8 +143,11 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \ReflectionException
      */
-    private function storeException(Throwable $exception, ?ServerRequestInterface $request): void
-    {
+    private function storeException(
+        Throwable $exception,
+        ?UserInterface $user,
+        ?ServerRequestInterface $request
+    ): void {
         $class = (new ReflectionClass($exception))->getShortName();
         $code  = $exception->getCode();
         $file  = $exception->getFile();
@@ -170,9 +178,9 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         $model = $this->repository->findByHash($hash);
 
         // Fetching user if exists
-        $user = ($request && ServerRequestHelper::hasUser($request))
-            ? ServerRequestHelper::getUser($request)
-            : null;
+        if (!$user && $request && ServerRequestHelper::hasUser($request)) {
+            $user = ServerRequestHelper::getUser($request);
+        }
 
         if ($model) {
             // Mark exception as repeated
@@ -213,7 +221,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
         $isNotificationNeeded = $this->isNotificationNeededFor($model);
 
-        $this->logger->debug('Notification needed is :value', [':value' => $isNotificationNeeded ? 'true' : 'false']);
+//        $this->logger->debug('Notification needed is :value', [':value' => $isNotificationNeeded ? 'true' : 'false']);
 
         if ($isNotificationNeeded) {
             $model->notificationRequired();
@@ -222,7 +230,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         // Saving
         $this->repository->save($model);
 
-        $this->logger->debug('Exception stored with ID :id', [':id' => $model->getID()]);
+//        $this->logger->debug('Exception stored with ID :id', [':id' => $model->getID()]);
     }
 
     protected function makeHashFor($message)
@@ -241,7 +249,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     {
         // Skip ignored exceptions
         if ($model->isIgnored()) {
-            $this->logger->debug('Ignored exception :message', [':message' => $model->getMessage()]);
+//            $this->logger->debug('Ignored exception :message', [':message' => $model->getMessage()]);
 
             return false;
         }

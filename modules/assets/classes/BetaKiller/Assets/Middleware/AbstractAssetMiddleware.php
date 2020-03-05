@@ -18,7 +18,7 @@ use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Exception\SecurityException;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Model\UserInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -27,8 +27,6 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractAssetMiddleware implements RequestHandlerInterface
 {
-    use LoggerHelperTrait;
-
     /**
      * @var \BetaKiller\Assets\AssetsProviderFactory
      */
@@ -78,7 +76,7 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
         try {
             return $this->process($request);
         } catch (AssetsStorageException|AssetsModelException $e) {
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e, null, $request);
 
             throw new NotFoundHttpException();
         }
@@ -162,7 +160,7 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
             // Find asset model by url
             return $this->provider->getModelByPublicUrl($url);
         } catch (AssetsException $e) {
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e, null, $request);
             // File not found
             throw new NotFoundHttpException;
         }

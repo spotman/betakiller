@@ -7,7 +7,7 @@ use BetaKiller\Auth\SessionConfig;
 use BetaKiller\Exception;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Helper\CookieHelper;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
@@ -27,8 +27,6 @@ use Zend\Expressive\Session\SessionInterface;
 
 class DatabaseSessionStorage implements SessionStorageInterface
 {
-    use LoggerHelperTrait;
-
     public const COOKIE_NAME = 'sid';
 
     /**

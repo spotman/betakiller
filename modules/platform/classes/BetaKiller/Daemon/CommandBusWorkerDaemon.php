@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Daemon;
 
 use BetaKiller\Config\ConfigProviderInterface;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\MessageBus\CommandBusInterface;
 use BetaKiller\MessageBus\CommandMessageInterface;
 use BetaKiller\Model\AbstractEntityInterface;
@@ -15,8 +15,6 @@ use React\EventLoop\LoopInterface;
 
 class CommandBusWorkerDaemon implements DaemonInterface
 {
-    use LoggerHelperTrait;
-
     public const CODENAME   = 'CommandBusWorker';
     public const QUEUE_NAME = 'commands';
 
@@ -127,7 +125,7 @@ class CommandBusWorkerDaemon implements DaemonInterface
 
             return true;
         } catch (\Throwable $e) {
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e);
 
             // Temp fix for failing tasks
             return false;

@@ -2,7 +2,7 @@
 namespace BetaKiller\Url;
 
 use BetaKiller\Helper\AclHelper;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -10,8 +10,6 @@ use Psr\Log\LoggerInterface;
 
 class AvailableUrlsCollector
 {
-    use LoggerHelperTrait;
-
     /**
      * @var \BetaKiller\Url\UrlElementTreeInterface
      */

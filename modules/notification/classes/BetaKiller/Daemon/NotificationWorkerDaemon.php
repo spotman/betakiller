@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Daemon;
 
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Notification\MessageSerializer;
 use BetaKiller\Notification\NotificationFacade;
 use Interop\Queue\Context;
@@ -13,8 +13,6 @@ use React\EventLoop\LoopInterface;
 
 class NotificationWorkerDaemon implements DaemonInterface
 {
-    use LoggerHelperTrait;
-
     public const CODENAME = 'NotificationWorker';
 
     /**
@@ -87,7 +85,7 @@ class NotificationWorkerDaemon implements DaemonInterface
             // Send through transports
             return $this->notification->send($message);
         } catch (\Throwable $e) {
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e);
 
             // Temp fix for failing tasks
             return false;

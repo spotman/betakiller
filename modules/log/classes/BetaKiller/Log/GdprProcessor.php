@@ -33,18 +33,23 @@ class GdprProcessor
         // Preserve exception and request as is
         $e = $record['context'][Logger::CONTEXT_KEY_EXCEPTION] ?? null;
         $r = $record['context'][Logger::CONTEXT_KEY_REQUEST] ?? null;
+        $u = $record['context'][Logger::CONTEXT_KEY_USER] ?? null;
 
         foreach ($this->processors as $proc) {
             $record = $proc($record);
         }
 
-        // Restore exception and request
+        // Restore exception, request and user
         if ($e) {
             $record['context'][Logger::CONTEXT_KEY_EXCEPTION] = $e;
         }
 
         if ($r) {
             $record['context'][Logger::CONTEXT_KEY_REQUEST] = $r;
+        }
+
+        if ($u) {
+            $record['context'][Logger::CONTEXT_KEY_USER] = $u;
         }
 
         return $record;

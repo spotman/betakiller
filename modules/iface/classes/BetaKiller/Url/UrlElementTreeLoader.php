@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Url;
 
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Url\ModelProvider\UrlElementProviderDatabase;
 use BetaKiller\Url\ModelProvider\UrlElementProviderXmlConfig;
 use Psr\Log\LoggerInterface;
@@ -12,8 +12,6 @@ use Psr\SimpleCache\CacheInterface;
 
 class UrlElementTreeLoader
 {
-    use LoggerHelperTrait;
-
     /**
      * @var \BetaKiller\Url\ModelProvider\UrlElementProviderDatabase
      */
@@ -121,7 +119,7 @@ class UrlElementTreeLoader
             }
         } catch (\Throwable $e) {
             $this->cache->delete($key);
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e);
 
             return false;
         }

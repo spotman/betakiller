@@ -12,7 +12,7 @@ use BetaKiller\Content\Shortcode\YoutubeShortcode;
 use BetaKiller\Exception\HttpExceptionInterface;
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Exception\ValidationException;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Model\ContentCategory;
 use BetaKiller\Model\ContentComment;
 use BetaKiller\Model\ContentGallery;
@@ -47,8 +47,6 @@ class Wordpress extends AbstractTask
 
     private const WP_OPTION_PARSING_MODE = 'betakiller_parsing_mode';
     private const WP_OPTION_PARSING_PATH = 'betakiller_parsing_path';
-
-    use LoggerHelperTrait;
 
     /**
      * @var string
@@ -853,7 +851,7 @@ class Wordpress extends AbstractTask
             try {
                 $this->shortcodeFacade->createFromTagName($name);
             } catch (\Throwable $e) {
-                $this->logException($this->logger, $e);
+                LoggerHelper::logException($this->logger, $e);
 
                 if (!isset($this->unknownBbTags[$name])) {
                     $this->unknownBbTags[$name] = $uri;
@@ -1167,7 +1165,7 @@ class Wordpress extends AbstractTask
                 // Creating new [image /] tag as replacement for <img />
                 $shortcode = $this->processImgTag($image, $entityItemID);
             } catch (Throwable $e) {
-                $this->logException($this->logger, $e);
+                LoggerHelper::logException($this->logger, $e);
             }
 
             // Exit if something went wrong
@@ -1374,7 +1372,7 @@ class Wordpress extends AbstractTask
                 // Создаём новый тег <youtube /> на замену <iframe />
                 $targetTag = $this->processYoutubeIFrameTag($originalTag, $entityItemID);
             } catch (\Throwable $e) {
-                $this->logException($this->logger, $e);
+                LoggerHelper::logException($this->logger, $e);
             }
 
             // Если новый тег не сформирован, то просто переходим к следующему
@@ -1589,7 +1587,7 @@ class Wordpress extends AbstractTask
                     ':errors' => json_encode($e),
                 ]);
             } catch (Throwable $e) {
-                $this->logException($this->logger, $e);
+                LoggerHelper::logException($this->logger, $e);
             }
         }
     }

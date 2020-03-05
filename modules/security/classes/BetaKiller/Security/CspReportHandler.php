@@ -5,7 +5,7 @@ namespace BetaKiller\Security;
 
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Exception\SecurityException;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
@@ -16,8 +16,6 @@ use Psr\Log\LoggerInterface;
 
 class CspReportHandler implements RequestHandlerInterface
 {
-    use LoggerHelperTrait;
-
     public const URL = '/csp-report-handler';
 
     private const IGNORED_BLOCKED_URI = [
@@ -88,7 +86,7 @@ class CspReportHandler implements RequestHandlerInterface
 
         $uri = $this->uriFactory->createUri($documentUrl);
 
-        $this->logException($this->logger, $e, $request->withUri($uri));
+        LoggerHelper::logException($this->logger, $e, null, $request->withUri($uri));
 
         return ResponseHelper::text('OK');
     }

@@ -4,7 +4,7 @@ namespace BetaKiller\Notification;
 use BetaKiller\Config\NotificationConfigInterface;
 use BetaKiller\Exception;
 use BetaKiller\Exception\DomainException;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Model\NotificationFrequency;
 use BetaKiller\Model\NotificationFrequencyInterface;
 use BetaKiller\Model\NotificationGroupInterface;
@@ -24,8 +24,6 @@ use Throwable;
 
 final class NotificationFacade
 {
-    use LoggerHelperTrait;
-
     public const QUEUE_NAME = 'notifications';
 
     /**
@@ -298,7 +296,7 @@ final class NotificationFacade
                 $log->markAsSucceeded();
             }
         } catch (Throwable $e) {
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e);
 
             // Store exception as result
             $log->markAsFailed(Exception::oneLiner($e));

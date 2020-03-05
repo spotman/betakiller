@@ -8,7 +8,7 @@ use BetaKiller\Event\MissingUrlEvent;
 use BetaKiller\Event\UrlDispatchedEvent;
 use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Exception\SeeOtherHttpException;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Model\LanguageInterface;
@@ -27,8 +27,6 @@ use Psr\Log\LoggerInterface;
 
 class UrlElementDispatchMiddleware implements MiddlewareInterface
 {
-    use LoggerHelperTrait;
-
     /**
      * @var \BetaKiller\Url\UrlProcessor
      */
@@ -129,7 +127,7 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
             throw new NotFoundHttpException();
         } catch (UrlBehaviourException | UrlElementException $e) {
             // Log this exception and keep processing
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e, $user);
 
             // Nothing found
             throw new NotFoundHttpException;

@@ -2,7 +2,7 @@
 namespace BetaKiller\Log;
 
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use Monolog\ErrorHandler;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\HandlerInterface;
@@ -16,10 +16,10 @@ use Psr\Log\LoggerTrait;
 class Logger implements LoggerInterface
 {
     use LoggerTrait;
-    use LoggerHelperTrait;
 
     public const CONTEXT_KEY_EXCEPTION = 'exception';
     public const CONTEXT_KEY_REQUEST   = 'request';
+    public const CONTEXT_KEY_USER      = 'user';
 
     /**
      * @var \Monolog\Logger
@@ -57,7 +57,14 @@ class Logger implements LoggerInterface
         $errorHandler->registerFatalHandler();
 
         // Do not register Monolog exception handler coz it calls exit()
-        \set_exception_handler([$this, 'exceptionHandler']);
+        \set_exception_handler(function (\Throwable $e) {
+            LoggerHelper::logException($this, $e);
+
+            // Exit with error code in CLI mode
+            if ($this->appEnv->isCli()) {
+                exit(1);
+            }
+        });
 
         $isDebug = $this->appEnv->isDebugEnabled();
         $isHuman = $this->appEnv->isHuman();
@@ -159,15 +166,5 @@ class Logger implements LoggerInterface
     public function pushHandler(HandlerInterface $handler): void
     {
         $this->monolog->pushHandler($handler);
-    }
-
-    public function exceptionHandler($e): void
-    {
-        $this->logException($this, $e);
-
-        // Exit with error code in CLI mode
-        if ($this->appEnv->isCli()) {
-            exit(1);
-        }
     }
 }

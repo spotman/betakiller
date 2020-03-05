@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url;
 
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
 use Psr\Log\LoggerInterface;
@@ -11,8 +11,6 @@ use Psr\SimpleCache\CacheInterface;
 
 class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
 {
-    use LoggerHelperTrait;
-
     public const CACHE_TTL = 86400; // 1 day
 
     /**
@@ -179,7 +177,7 @@ class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
         } catch (\Throwable $e) {
             // Log and keep processing as no cache was found
             $this->logger->alert('Error on unpacking UrlDispatcher data');
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e);
 
             // Wipe the cached data to prevent errors
             $this->cache->delete($cacheKey);

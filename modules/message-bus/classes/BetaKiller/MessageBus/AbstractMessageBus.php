@@ -1,15 +1,13 @@
 <?php
 namespace BetaKiller\MessageBus;
 
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractMessageBus implements AbstractMessageBusInterface
 {
-    use LoggerHelperTrait;
-
     /**
      * @var ContainerInterface
      */

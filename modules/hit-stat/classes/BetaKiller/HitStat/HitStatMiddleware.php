@@ -8,7 +8,7 @@ use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception\HttpExceptionExpectedInterface;
 use BetaKiller\Exception\SeeOtherHttpException;
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\MessageBus\CommandBusInterface;
 use BetaKiller\Model\HitMarkerInterface;
@@ -25,8 +25,6 @@ use Zend\Expressive\Session\SessionIdentifierAwareInterface;
 
 class HitStatMiddleware implements MiddlewareInterface
 {
-    use LoggerHelperTrait;
-
     /**
      * @var \BetaKiller\Service\HitService
      */
@@ -105,7 +103,7 @@ class HitStatMiddleware implements MiddlewareInterface
             // Re-throw redirect
             throw $e;
         } catch (Throwable $e) {
-            $this->logException($this->logger, $e);
+            LoggerHelper::logException($this->logger, $e);
         } finally {
             RequestProfiler::end($p);
         }
