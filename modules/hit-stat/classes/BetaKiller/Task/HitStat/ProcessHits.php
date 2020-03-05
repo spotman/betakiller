@@ -144,14 +144,14 @@ class ProcessHits extends AbstractTask
             }
         }
 
-        if ($this->newMissingTargets) {
+        if ($this->newMissingTargets || $this->newMissingSources) {
             // Notify moderators about new missed URL
             $this->notification->groupMessage(self::MISSING_TARGETS, [
-                'targets' => \array_map(function (HitPage $page) {
+                'targets' => \array_map(static function (HitPage $page) {
                     return $page->getFullUrl();
                 }, $this->newMissingTargets),
 
-                'sources' => \array_map(function (HitPage $page) {
+                'sources' => \array_map(static function (HitPage $page) {
                     return $page->getFullUrl();
                 }, $this->newMissingSources),
             ]);
@@ -164,7 +164,7 @@ class ProcessHits extends AbstractTask
         if ($this->newSources) {
             // Notify moderators about new referrers
             $this->notification->groupMessage(self::NEW_SOURCES, [
-                'sources' => \array_map(function (HitPage $page) {
+                'sources' => \array_map(static function (HitPage $page) {
                     return $page->getFullUrl();
                 }, $this->newSources),
             ]);
