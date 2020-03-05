@@ -37,15 +37,12 @@ final class HitStatStoreCommandHandler
         // Create new Hit object with source/target pages, marker, ip and other info
         $hit = new Hit;
 
-        // Store User/Session and hit UUID
         $hit
-            ->setUuid($uuid)
-            ->setSessionToken($token);
-
-        $hit
-            ->setTargetPage($target)
+            ->setTimestamp($moment)
             ->setIP($ip)
-            ->setTimestamp($moment);
+            ->setUuid($uuid)
+            ->setSessionToken($token)
+            ->setTargetPage($target);
 
         if ($source) {
             $hit->setSourcePage($source);

@@ -132,7 +132,7 @@ class ProcessHits extends AbstractTask
         $firstHitTimestamp = $firstNotProcessed->getTimestamp();
 
         // Process missing targets
-        foreach ($this->hitsRepository->getPending(10000) as $hit) {
+        foreach ($this->hitsRepository->getPending(1000) as $hit) {
             try {
                 $this->processCounters($hit);
                 $this->processMissingTarget($hit, $firstHitTimestamp);
