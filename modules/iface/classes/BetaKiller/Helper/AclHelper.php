@@ -142,11 +142,6 @@ class AclHelper
     ): bool {
         $urlElementCustomRules = $urlElement->getAdditionalAclRules();
 
-        // Check UrlElement custom rules
-        if (!$this->checkCustomAclRules($urlElementCustomRules, $user, $params)) {
-            return false;
-        }
-
         // Check DataSource item access
         if ($urlElement->hasDynamicUrl()) {
             $prototype = $this->prototypeService->createPrototypeFromUrlElement($urlElement);
@@ -199,6 +194,11 @@ class AclHelper
 
         // Check zone rules if defined
         if ($zoneAclRules && !$this->checkCustomAclRules($zoneAclRules, $user, $params)) {
+            return false;
+        }
+
+        // Check UrlElement custom rules (process after zone checks, skip zone-related entities if zone is not allowed)
+        if (!$this->checkCustomAclRules($urlElementCustomRules, $user, $params)) {
             return false;
         }
 
