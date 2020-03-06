@@ -183,7 +183,7 @@ class ProcessHits extends AbstractTask
                 // Session may be cleaned by GC at this time (server halted, gc issue, etc)
                 $session = $this->sessionRepo->findByToken($hit->getSessionToken());
 
-                if ($session) {
+                if ($session && $session->hasUser()) {
                     $hit->bindToUser($session->getUser());
                 }
             }
