@@ -8,7 +8,7 @@ final class UserSessionClosedEvent extends AbstractUserSessionEvent
     /**
      * @return string
      */
-    public function getExternalName(): string
+    public function getOutboundName(): string
     {
         return 'user.session.closed';
     }

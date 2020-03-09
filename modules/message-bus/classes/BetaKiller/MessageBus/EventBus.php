@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\MessageBus;
 
+use BetaKiller\Exception;
 use BetaKiller\Helper\LoggerHelper;
 use Psr\Log\LoggerInterface;
 
@@ -35,11 +36,36 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
      */
     public function emit(EventMessageInterface $message): void
     {
-        if ($message instanceof OutboundEventMessageInterface) {
-            $this->transport->emit($message);
-        } else {
-            $this->handle($message);
+        switch (true) {
+            case $message instanceof OutboundEventMessageInterface:
+                $this->transport->emitOutbound($message);
+                break;
+
+            case $message instanceof BoundedEventMessageInterface:
+                $this->transport->emitBounded($message);
+                break;
+
+            default:
+                $this->handle($message);
         }
+    }
+
+    /**
+     * @param string   $messageClassName
+     * @param callable $handler
+     *
+     * @throws \BetaKiller\MessageBus\MessageBusException
+     */
+    public function on(string $messageClassName, callable $handler): void
+    {
+        if (is_a($messageClassName, ExternalEventMessageInterface::class, true)) {
+            throw new Exception('External event :name must be listened on external message queue', [
+                ':name' => $messageClassName
+            ]);
+        }
+
+        // Listen on internal events bus
+        parent::on($messageClassName, $handler);
     }
 
     protected function getMessageHandlersLimit(): int

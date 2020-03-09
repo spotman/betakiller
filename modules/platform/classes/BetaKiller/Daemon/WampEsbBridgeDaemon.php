@@ -140,7 +140,7 @@ class WampEsbBridgeDaemon implements DaemonInterface
 
     private function listenForEsbEvents(LoopInterface $loop): void
     {
-        $topic = $this->context->createTopic(EsbExternalEventTransport::TOPIC_NAME);
+        $topic = $this->context->createTopic(EsbExternalEventTransport::OUTBOUND_TOPIC_NAME);
 
         $consumer = $this->context->createConsumer($topic);
 
@@ -150,7 +150,7 @@ class WampEsbBridgeDaemon implements DaemonInterface
 
             if ($message) {
                 // Ack first coz WAMP processing may take long time
-                $consumer->acknowledge($message);
+//                $consumer->acknowledge($message);
 
                 // process a message
                 $this->forwardEvent($message, $consumer);
@@ -163,7 +163,7 @@ class WampEsbBridgeDaemon implements DaemonInterface
 //        $user = null;
 
         try {
-            $name = $message->getProperty(EsbExternalEventTransport::PROPERTY_MESSAGE_NAME);
+            $name = $message->getProperty(EsbExternalEventTransport::PROPERTY_OUTBOUND_NAME);
             $data = (array)json_decode($message->getBody(), true);
 
             $this->logger->debug('Received ":name" message from ESB with data :data', [

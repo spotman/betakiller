@@ -41,7 +41,7 @@ class EntityChangedEvent implements OutboundEventMessageInterface
         return false;
     }
 
-    public function getExternalName(): string
+    public function getOutboundName(): string
     {
         return sprintf('entity.changed.%s.%s', \mb_strtolower($this->name), $this->id);
     }
@@ -49,7 +49,7 @@ class EntityChangedEvent implements OutboundEventMessageInterface
     /**
      * @return array|null
      */
-    public function getExternalData(): ?array
+    public function getOutboundData(): ?array
     {
         return null;
     }

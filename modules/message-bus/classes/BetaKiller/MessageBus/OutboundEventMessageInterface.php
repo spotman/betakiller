@@ -1,23 +1,21 @@
 <?php
 namespace BetaKiller\MessageBus;
 
-use JsonSerializable;
-
 /**
  * Interface OutboundEventMessageInterface
- * Message requires processing in external message queue (instead of internal one)
+ * Message must be forwarded from the message queue to other sources (another bus, monitoring agent, etc)
  *
  * @package BetaKiller\MessageBus
  */
-interface OutboundEventMessageInterface extends EventMessageInterface
+interface OutboundEventMessageInterface extends ExternalEventMessageInterface
 {
     /**
      * @return string
      */
-    public function getExternalName(): string;
+    public function getOutboundName(): string;
 
     /**
      * @return array|null
      */
-    public function getExternalData(): ?array;
+    public function getOutboundData(): ?array;
 }

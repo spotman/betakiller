@@ -3,14 +3,17 @@ declare(strict_types=1);
 
 namespace BetaKiller\Event;
 
+use BetaKiller\MessageBus\BoundedEventMessageInterface;
 use BetaKiller\MessageBus\ExternalEventTransportInterface;
 use BetaKiller\MessageBus\OutboundEventMessageInterface;
 use Interop\Queue\Context;
 
 class EsbExternalEventTransport implements ExternalEventTransportInterface
 {
-    public const TOPIC_NAME            = 'events';
-    public const PROPERTY_MESSAGE_NAME = 'name';
+    public const OUTBOUND_TOPIC_NAME    = 'events.outbound';
+    public const BOUNDED_TOPIC_NAME     = 'events.bounded';
+    public const PROPERTY_BOUNDED_NAME  = 'external_name';
+    public const PROPERTY_OUTBOUND_NAME = 'internal_name';
 
     /**
      * @var \Interop\Queue\Context
@@ -25,7 +28,12 @@ class EsbExternalEventTransport implements ExternalEventTransportInterface
     /**
      * @var \Interop\Queue\Topic
      */
-    private $topic;
+    private $outboundTopic;
+
+    /**
+     * @var \Interop\Queue\Topic
+     */
+    private $boundedTopic;
 
     /**
      * EsbExternalEventTransport constructor.
@@ -34,24 +42,27 @@ class EsbExternalEventTransport implements ExternalEventTransportInterface
      */
     public function __construct(Context $context)
     {
-        $this->context  = $context;
-        $this->topic    = $context->createTopic(self::TOPIC_NAME);
-        $this->producer = $context->createProducer();
+        $this->context       = $context;
+        $this->outboundTopic = $context->createTopic(self::OUTBOUND_TOPIC_NAME);
+        $this->boundedTopic  = $context->createTopic(self::BOUNDED_TOPIC_NAME);
+        $this->producer      = $context->createProducer();
     }
 
-    /**
-     * @param \BetaKiller\MessageBus\OutboundEventMessageInterface $event
-     *
-     * @return void
-     */
-    public function emit(OutboundEventMessageInterface $event): void
+    public function emitBounded(BoundedEventMessageInterface $event): void
     {
-        $data = $event->getExternalData();
-
-        $msg = $this->context->createMessage(json_encode($data), [
-            self::PROPERTY_MESSAGE_NAME => $event->getExternalName(),
+        $msg = $this->context->createMessage(\serialize($event), [
+            self::PROPERTY_BOUNDED_NAME => \get_class($event),
         ]);
 
-        $this->producer->send($this->topic, $msg);
+        $this->producer->send($this->boundedTopic, $msg);
+    }
+
+    public function emitOutbound(OutboundEventMessageInterface $event): void
+    {
+        $msg = $this->context->createMessage(json_encode($event->getOutboundData()), [
+            self::PROPERTY_OUTBOUND_NAME => $event->getOutboundName(),
+        ]);
+
+        $this->producer->send($this->outboundTopic, $msg);
     }
 }

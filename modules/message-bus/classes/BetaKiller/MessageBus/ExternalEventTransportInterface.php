@@ -6,9 +6,12 @@ namespace BetaKiller\MessageBus;
 interface ExternalEventTransportInterface
 {
     /**
-     * @param \BetaKiller\MessageBus\OutboundEventMessageInterface $message
-     *
-     * @return void
+     * @param \BetaKiller\MessageBus\BoundedEventMessageInterface $message
      */
-    public function emit(OutboundEventMessageInterface $message): void;
+    public function emitBounded(BoundedEventMessageInterface $message): void;
+
+    /**
+     * @param \BetaKiller\MessageBus\OutboundEventMessageInterface $message
+     */
+    public function emitOutbound(OutboundEventMessageInterface $message): void;
 }

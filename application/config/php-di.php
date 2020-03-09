@@ -92,11 +92,11 @@ return [
             ConfigProviderInterface $config
         ) {
             // For each event
-            foreach ((array)$config->load(['events']) as $event => $handlers) {
+            foreach ((array)$config->load(['events']) as $eventName => $handlers) {
                 // Fetch all handlers
                 foreach ($handlers as $handlerClassName) {
                     // Bind lazy-load wrapper
-                    $bus->on($event, static function ($event) use ($container, $handlerClassName) {
+                    $bus->on($eventName, static function ($event) use ($container, $handlerClassName) {
                         $handler = $container->get($handlerClassName);
 
                         $handler($event);

@@ -23,7 +23,7 @@ abstract class AbstractUserSessionEvent implements OutboundEventMessageInterface
     public function __construct(SessionInterface $session)
     {
       if (!$session instanceof SessionIdentifierAwareInterface) {
-        throw new InvaldArgumentException();
+        throw new \InvalidArgumentException();
       }
 
         $this->session = $session;
@@ -42,7 +42,7 @@ abstract class AbstractUserSessionEvent implements OutboundEventMessageInterface
     /**
      * @return array|null
      */
-    public function getExternalData(): ?array
+    public function getOutboundData(): ?array
     {
         return [
             'session' => $this->session->getId(),
