@@ -77,7 +77,8 @@ class NotificationWorkerDaemon implements DaemonInterface
         $regularConsumer  = $this->context->createConsumer($regularQueue);
         $priorityConsumer = $this->context->createConsumer($priorityQueue);
 
-        $this->listenForDismissibleEvents();
+        // TODO Deal with listening of bounded ESB events via eventBus->on()
+//        $this->listenForDismissibleEvents();
 
         $loop->addPeriodicTimer(0.5, function () use ($regularConsumer, $priorityConsumer) {
             // Process priority messages first
@@ -151,6 +152,11 @@ class NotificationWorkerDaemon implements DaemonInterface
 
     private function onDismissibleEvent(EventMessageInterface $event, string $eventName, string $messageCodename): void
     {
+        $this->logger->debug('Dismissible event :event fired', [
+            ':event'   => $eventName,
+            ':message' => $messageCodename,
+        ]);
+
         // Check message is broadcast
         if ($this->notification->isBroadcastMessage($messageCodename)) {
             // Check event type
