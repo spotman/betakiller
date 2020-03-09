@@ -18,17 +18,27 @@ class Message implements MessageInterface
     /**
      * @var MessageTargetInterface
      */
+    private $target;
+
+    /**
+     * @var string
+     */
+    private $transport;
+
+    /**
+     * @var bool
+     */
+    private $critical;
+
+    /**
+     * @var MessageTargetInterface
+     */
     private $from;
 
     /**
      * @var string|null
      */
     private $subject;
-
-    /**
-     * @var MessageTargetInterface
-     */
-    private $target;
 
     /**
      * @var string|null
@@ -48,13 +58,33 @@ class Message implements MessageInterface
     private $templateData = [];
 
     /**
-     * @param string $codename
+     * @param string                                          $codename
+     * @param \BetaKiller\Notification\MessageTargetInterface $target
+     * @param string                                          $transport
+     * @param bool                                            $critical
      *
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function __construct(string $codename)
-    {
-        $this->codename = $this->normalizeCodename($codename);
+    public function __construct(
+        string $codename,
+        MessageTargetInterface $target,
+        string $transport,
+        bool $critical
+    ) {
+        if (!$codename) {
+            throw new NotificationException('Message name is missing');
+        }
+
+        if (!$transport) {
+            throw new NotificationException('Transport is missing for message :name', [
+                ':name' => $codename,
+            ]);
+        }
+
+        $this->codename  = $this->normalizeCodename($codename);
+        $this->transport = $transport;
+        $this->target    = $target;
+        $this->critical  = $critical;
     }
 
     /**
@@ -90,6 +120,14 @@ class Message implements MessageInterface
     }
 
     /**
+     * @return string
+     */
+    public function getTransportName(): string
+    {
+        return $this->transport;
+    }
+
+    /**
      * @return MessageTargetInterface
      */
     public function getFrom(): ?MessageTargetInterface
@@ -114,23 +152,7 @@ class Message implements MessageInterface
      */
     public function getTarget(): MessageTargetInterface
     {
-        if (!$this->target) {
-            throw new NotificationException('Message target must be specified');
-        }
-
         return $this->target;
-    }
-
-    /**
-     * @param MessageTargetInterface $value
-     *
-     * @return MessageInterface
-     */
-    public function setTarget(MessageTargetInterface $value): MessageInterface
-    {
-        $this->target = $value;
-
-        return $this;
     }
 
     /**
@@ -221,5 +243,13 @@ class Message implements MessageInterface
     public function getActionUrl(): string
     {
         return $this->actionUrl;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCritical(): bool
+    {
+        return $this->critical;
     }
 }

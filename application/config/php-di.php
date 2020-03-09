@@ -22,6 +22,7 @@ use BetaKiller\View\TwigLayoutView;
 use BetaKiller\View\TwigViewFactory;
 use BetaKiller\View\ViewFactoryInterface;
 use Doctrine\Common\Cache\Cache;
+use Psr\Container\ContainerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
@@ -85,10 +86,21 @@ return [
 
         ExternalEventTransportInterface::class => DI\autowire(EsbExternalEventTransport::class),
 
-        EventBusInterface::class   => DI\factory(static function (EventBus $bus, ConfigProviderInterface $config) {
+        EventBusInterface::class   => DI\factory(static function (
+            ContainerInterface $container,
+            EventBus $bus,
+            ConfigProviderInterface $config
+        ) {
+            // For each event
             foreach ((array)$config->load(['events']) as $event => $handlers) {
-                foreach ($handlers as $handler) {
-                    $bus->on($event, $handler);
+                // Fetch all handlers
+                foreach ($handlers as $handlerClassName) {
+                    // Bind lazy-load wrapper
+                    $bus->on($event, static function ($event) use ($container, $handlerClassName) {
+                        $handler = $container->get($handlerClassName);
+
+                        $handler($event);
+                    });
                 }
             }
 

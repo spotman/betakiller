@@ -17,12 +17,10 @@ interface MessageRendererInterface
 
     public function hasLocalizedTemplate(
         string $messageCodename,
-        string $transportCodename,
         string $langName
     ): bool;
 
     public function hasGeneralTemplate(
-        string $messageCodename,
-        string $transportCodename
+        string $messageCodename
     ): bool;
 }

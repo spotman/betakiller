@@ -82,7 +82,7 @@ final class TargetsFor extends AbstractTask
             ]);
         }
 
-        $targets = $this->facade->findGroupFreqTargets($group, $freq);
+        $targets = $this->facade->getGroupTargets($group, $freq);
 
         $count = \count($targets);
         if ($count) {

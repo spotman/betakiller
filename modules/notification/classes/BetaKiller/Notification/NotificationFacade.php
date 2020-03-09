@@ -12,6 +12,7 @@ use BetaKiller\Model\NotificationGroupUserConfig;
 use BetaKiller\Model\NotificationGroupUserConfigInterface;
 use BetaKiller\Model\NotificationLog;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Notification\Transport\DismissibleTransportInterface;
 use BetaKiller\Repository\NotificationFrequencyRepositoryInterface;
 use BetaKiller\Repository\NotificationGroupRepositoryInterface;
 use BetaKiller\Repository\NotificationGroupUserConfigRepositoryInterface;
@@ -24,7 +25,8 @@ use Throwable;
 
 final class NotificationFacade
 {
-    public const QUEUE_NAME = 'notifications';
+    public const QUEUE_NAME_REGULAR  = 'notifications';
+    public const QUEUE_NAME_PRIORITY = 'notifications.priority';
 
     /**
      * @var \BetaKiller\Notification\MessageFactory
@@ -40,11 +42,6 @@ final class NotificationFacade
      * @var \BetaKiller\Repository\NotificationGroupRepositoryInterface
      */
     private $groupRepo;
-
-    /**
-     * @var \BetaKiller\Notification\TransportInterface[]
-     */
-    private $transports;
 
     /**
      * @var \BetaKiller\Notification\MessageRendererInterface
@@ -74,7 +71,12 @@ final class NotificationFacade
     /**
      * @var \Interop\Queue\Queue
      */
-    private $queue;
+    private $priorityQueue;
+
+    /**
+     * @var \Interop\Queue\Queue
+     */
+    private $regularQueue;
 
     /**
      * @var \BetaKiller\Notification\MessageSerializer
@@ -153,13 +155,14 @@ final class NotificationFacade
         $this->logger             = $logger;
 
         $this->queueProducer = $this->queueContext->createProducer()->setTimeToLive(10000);
-        $this->queue         = $this->queueContext->createQueue(self::QUEUE_NAME);
+        $this->regularQueue  = $this->queueContext->createQueue(self::QUEUE_NAME_REGULAR);
+        $this->priorityQueue = $this->queueContext->createQueue(self::QUEUE_NAME_PRIORITY);
     }
 
     /**
      * Create raw message
      *
-     * @param string                                          $name
+     * @param string                                          $messageCodename
      * @param \BetaKiller\Notification\MessageTargetInterface $target
      * @param array                                           $data
      * @param array|null                                      $attachments Array of files to attach
@@ -168,14 +171,16 @@ final class NotificationFacade
      * @throws \BetaKiller\Notification\NotificationException
      */
     public function createMessage(
-        string $name,
+        string $messageCodename,
         MessageTargetInterface $target,
         array $data,
         array $attachments = null
     ): MessageInterface {
-        $message = $this->messageFactory->create($name)
-            ->setTemplateData($data)
-            ->setTarget($target);
+        $transportName = $this->config->getMessageTransport($messageCodename);
+        $isCritical    = $this->config->isMessageCritical($messageCodename);
+
+        $message = $this->messageFactory->create($messageCodename, $target, $transportName, $isCritical)
+            ->setTemplateData($data);
 
         if ($attachments) {
             foreach ($attachments as $attach) {
@@ -183,7 +188,7 @@ final class NotificationFacade
             }
         }
 
-        $actionName = $this->config->getMessageAction($name);
+        $actionName = $this->config->getMessageAction($messageCodename);
 
         if ($actionName) {
             $message->setActionUrl($this->actionUrlGenerator->make($actionName, $target, $data));
@@ -233,36 +238,20 @@ final class NotificationFacade
      */
     public function send(MessageInterface $message): bool
     {
+        $transport = $this->transportFactory->create($message->getTransportName());
+
         $target = $message->getTarget();
 
-        $counter  = 0;
-        $attempts = 0;
-
-        foreach ($this->getTransports() as $transport) {
-            if (!$transport->canHandle($message)) {
-                continue;
-            }
-
-            if (!$transport->isEnabledFor($target)) {
-                continue;
-            }
-
-            if ($this->sendThrough($message, $transport)) {
-                $counter++;
-                // Stop processing if message was delivered
-                break;
-            }
-
-            $attempts++;
+        if (!$transport->canHandle($message)) {
+            throw new TransportException('Transport ":transport" can not handle message ":message"', [
+                ':transport' => $transport->getName(),
+                ':message'   => $message->getCodename(),
+            ]);
         }
 
-        // Check message delivery failed
-        return !($attempts && !$counter);
-    }
-
-    private function sendThrough(MessageInterface $message, TransportInterface $transport): bool
-    {
-        $target = $message->getTarget();
+        if (!$transport->isEnabledFor($target)) {
+            return false;
+        }
 
         $hash = $this->calculateHash($message, $target, $transport);
 
@@ -307,6 +296,40 @@ final class NotificationFacade
         return $log->isSucceeded();
     }
 
+    public function dismissDirect(string $messageCodename, MessageTargetInterface $target): void
+    {
+        if ($this->isBroadcastMessage($messageCodename)) {
+            throw new NotificationException('Message ":name" is broadcast, use dedicated method instead', [
+                ':name' => $messageCodename,
+            ]);
+        }
+
+        $transport = $this->getDismissibleMessageTransport($messageCodename);
+
+        $transport->dismissFor($messageCodename, $target);
+    }
+
+    public function dismissBroadcast(string $messageCodename): void
+    {
+        if (!$this->isBroadcastMessage($messageCodename)) {
+            throw new NotificationException('Broadcast for message ":name" is not allowed', [
+                ':name' => $messageCodename,
+            ]);
+        }
+
+        $transport = $this->getDismissibleMessageTransport($messageCodename);
+        $group     = $this->getGroupByMessageCodename($messageCodename);
+
+        foreach ($this->getGroupTargets($group) as $target) {
+            $transport->dismissFor($messageCodename, $target);
+        }
+    }
+
+    public function isBroadcastMessage(string $messageCodename): bool
+    {
+        return $this->config->isMessageBroadcast($messageCodename);
+    }
+
     public function getGroupByMessageCodename(string $messageCodename): NotificationGroupInterface
     {
         // Fetch group by message codename
@@ -337,12 +360,34 @@ final class NotificationFacade
     }
 
     /**
+     * Returns key-value pairs "messageCodename" => ["dismissOnEventName1", "dismissOnEventName2"]
+     *
+     * @return string[]
+     */
+    public function getDismissibleMessages(): array
+    {
+        $data = [];
+
+        foreach ($this->config->getGroups() as $groupCodename) {
+            foreach ($this->config->getGroupMessages($groupCodename) as $messageCodename) {
+                $dismissOn = $this->config->getMessageDismissOnEvents($messageCodename);
+
+                if ($dismissOn) {
+                    $data[$messageCodename] = $dismissOn;
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * @param \BetaKiller\Model\NotificationGroupInterface          $group
      * @param \BetaKiller\Model\NotificationFrequencyInterface|null $freq
      *
      * @return \BetaKiller\Notification\MessageTargetInterface[]
      */
-    public function findGroupFreqTargets(
+    public function getGroupTargets(
         NotificationGroupInterface $group,
         NotificationFrequencyInterface $freq = null
     ): array {
@@ -469,32 +514,6 @@ final class NotificationFacade
         return $this->groupRepo->getUserGroups($user);
     }
 
-    /**
-     * @return \BetaKiller\Notification\TransportInterface[]
-     */
-    private function getTransports(): array
-    {
-        if (!$this->transports) {
-            $this->transports = $this->createTransports();
-        }
-
-        return $this->transports;
-    }
-
-    /**
-     * @return \BetaKiller\Notification\TransportInterface[]
-     */
-    private function createTransports(): array
-    {
-        $instances = [];
-
-        foreach ($this->config->getTransports() as $codename) {
-            $instances[] = $this->transportFactory->create($codename);
-        }
-
-        return $instances;
-    }
-
     private function isMessageEnabledForUser(
         MessageInterface $message,
         MessageTargetInterface $user
@@ -567,12 +586,32 @@ final class NotificationFacade
 
         $queueMessage = $this->queueContext->createMessage($body);
 
+        // Priority queue for critical messages
+        $targetQueue = $message->isCritical()
+            ? $this->priorityQueue
+            : $this->regularQueue;
+
         // Enqueue
-        $this->queueProducer->send($this->queue, $queueMessage);
+        $this->queueProducer->send($targetQueue, $queueMessage);
     }
 
     private function isMessageScheduled(MessageInterface $message): bool
     {
         return $this->getMessageGroup($message)->isFrequencyControlEnabled();
+    }
+
+    private function getDismissibleMessageTransport(string $messageCodename): DismissibleTransportInterface
+    {
+        $transportCodename = $this->config->getMessageTransport($messageCodename);
+
+        $transport = $this->transportFactory->create($transportCodename);
+
+        if (!$transport instanceof DismissibleTransportInterface) {
+            throw new TransportException('Transport ":name" is not dismissible', [
+                ':name' => $transportCodename,
+            ]);
+        }
+
+        return $transport;
     }
 }

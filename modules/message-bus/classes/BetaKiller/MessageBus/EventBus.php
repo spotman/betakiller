@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\MessageBus;
 
 use BetaKiller\Helper\LoggerHelper;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
 class EventBus extends AbstractMessageBus implements EventBusInterface
@@ -17,16 +16,14 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
     /**
      * EventBus constructor.
      *
-     * @param \Psr\Container\ContainerInterface                      $container
      * @param \BetaKiller\MessageBus\ExternalEventTransportInterface $transport
      * @param \Psr\Log\LoggerInterface                               $logger
      */
     public function __construct(
-        ContainerInterface $container,
         ExternalEventTransportInterface $transport,
         LoggerInterface $logger
     ) {
-        parent::__construct($container, $logger);
+        parent::__construct($logger);
 
         $this->transport = $transport;
     }
@@ -58,8 +55,7 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
      */
     private function handle(EventMessageInterface $message): void
     {
-        foreach ($this->getMessageHandlersClassNames($message) as $handlersClassName) {
-            $handler = $this->getHandlerInstance($handlersClassName);
+        foreach ($this->getMessageHandlers($message) as $handler) {
             $this->process($message, $handler);
         }
     }

@@ -6,8 +6,8 @@ namespace BetaKiller\MessageBus;
 interface AbstractMessageBusInterface
 {
     /**
-     * @param string $messageClassName
-     * @param string $handlerClassName
+     * @param string   $messageClassName
+     * @param callable $handler
      */
-    public function on(string $messageClassName, string $handlerClassName): void;
+    public function on(string $messageClassName, callable $handler): void;
 }

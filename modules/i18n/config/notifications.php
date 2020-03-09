@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
 
+use BetaKiller\I18n\I18nFacade;
+use BetaKiller\Notification\Transport\EmailTransport;
+use BetaKiller\Task\Import\I18n;
+
 define('TRANSLATION_MANAGEMENT_GROUP', 'i18n-management');
 
 return [
@@ -15,8 +19,8 @@ return [
      */
     'groups'   => [
         TRANSLATION_MANAGEMENT_GROUP => [
-            'roles' => [
-                \BetaKiller\I18n\I18nFacade::ROLE_TRANSLATOR,
+            'roles'     => [
+                I18nFacade::ROLE_TRANSLATOR,
             ],
         ],
     ],
@@ -32,8 +36,10 @@ return [
      * ]
      */
     'messages' => [
-        \BetaKiller\Task\Import\I18n::NOTIFICATION_NEW_KEYS => [
-            'group' => TRANSLATION_MANAGEMENT_GROUP,
+        I18n::NOTIFICATION_NEW_KEYS => [
+            'group'     => TRANSLATION_MANAGEMENT_GROUP,
+            'transport' => EmailTransport::CODENAME,
+            'broadcast' => true,
         ],
     ],
 ];

@@ -14,7 +14,7 @@ use BetaKiller\Url\Container\UrlContainerInterface;
 
 class AccessRecoveryService
 {
-    public const NOTIFICATION_NAME = 'auth/access-recovery';
+    public const NOTIFICATION_NAME = 'email/user/access-recovery';
 
     private const TOKEN_PERIOD = 'PT4H';
 

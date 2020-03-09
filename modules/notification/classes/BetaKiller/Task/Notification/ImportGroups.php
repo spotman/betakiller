@@ -6,6 +6,12 @@ namespace BetaKiller\Task\Notification;
 use BetaKiller\Config\NotificationConfigInterface;
 use BetaKiller\Model\NotificationGroup;
 use BetaKiller\Model\NotificationGroupInterface;
+use BetaKiller\Notification\DismissBroadcastOnEventMessageInterface;
+use BetaKiller\Notification\DismissDirectOnEventMessageInterface;
+use BetaKiller\Notification\NotificationException;
+use BetaKiller\Notification\Transport\DismissibleTransportInterface;
+use BetaKiller\Notification\TransportException;
+use BetaKiller\Notification\TransportFactory;
 use BetaKiller\Repository\NotificationGroupRepository;
 use BetaKiller\Repository\RoleRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
@@ -29,6 +35,11 @@ class ImportGroups extends AbstractTask
     private $groupRepo;
 
     /**
+     * @var \BetaKiller\Notification\TransportFactory
+     */
+    private $transportFactory;
+
+    /**
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
@@ -39,18 +50,21 @@ class ImportGroups extends AbstractTask
      * @param \BetaKiller\Repository\NotificationGroupRepository $groupRepo
      * @param \BetaKiller\Config\NotificationConfigInterface     $config
      * @param \BetaKiller\Repository\RoleRepositoryInterface     $roleRepo
+     * @param \BetaKiller\Notification\TransportFactory          $transportFactory
      * @param \Psr\Log\LoggerInterface                           $logger
      */
     public function __construct(
         NotificationGroupRepository $groupRepo,
         NotificationConfigInterface $config,
         RoleRepositoryInterface $roleRepo,
+        TransportFactory $transportFactory,
         LoggerInterface $logger
     ) {
-        $this->groupRepo = $groupRepo;
-        $this->config    = $config;
-        $this->roleRepo  = $roleRepo;
-        $this->logger    = $logger;
+        $this->groupRepo        = $groupRepo;
+        $this->config           = $config;
+        $this->roleRepo         = $roleRepo;
+        $this->transportFactory = $transportFactory;
+        $this->logger           = $logger;
 
         parent::__construct();
     }
@@ -114,6 +128,8 @@ class ImportGroups extends AbstractTask
             $group->setPlace($place++);
 
             $this->importGroup($group);
+
+            $this->validateGroup($group);
         }
     }
 
@@ -167,5 +183,55 @@ class ImportGroups extends AbstractTask
         }
 
         $this->groupRepo->save($group);
+    }
+
+    private function validateGroup(NotificationGroupInterface $group): void
+    {
+        $messages = $this->config->getGroupMessages($group->getCodename());
+
+        if (!$messages) {
+            throw new NotificationException('Notification group ":name" has no messages', [
+                ':name' => $group->getCodename(),
+            ]);
+        }
+
+        $isScheduled = $group->isFrequencyControlEnabled();
+
+        if ($isScheduled && count($messages) > 1) {
+            throw new NotificationException('Multiple messages in scheduled group ":name" are not allowed', [
+                ':name' => $group->getCodename(),
+            ]);
+        }
+
+        foreach ($messages as $messageCodename) {
+            $transportCodename = $this->config->getMessageTransport($messageCodename);
+            $dismissOnEvents   = $this->config->getMessageDismissOnEvents($messageCodename);
+            $isBroadcast       = $this->config->isMessageBroadcast($messageCodename);
+
+            $transport = $this->transportFactory->create($transportCodename);
+
+            if ($dismissOnEvents && !$transport instanceof DismissibleTransportInterface) {
+                throw new TransportException(
+                    'Message ":message" has dismiss_on events but transport ":transport" is not dismissible', [
+                    ':message'   => $messageCodename,
+                    ':transport' => $transportCodename,
+                ]);
+            }
+
+            $targetEventType = $isBroadcast
+                ? DismissBroadcastOnEventMessageInterface::class
+                : DismissDirectOnEventMessageInterface::class;
+
+            foreach ($dismissOnEvents as $dismissOn) {
+                if (!is_a($dismissOn, $targetEventType, true)) {
+                    throw new TransportException(
+                        'Message ":message" dismiss_on event ":event" must implement :must', [
+                        ':message' => $messageCodename,
+                        ':event'   => $dismissOn,
+                        ':must'    => $targetEventType,
+                    ]);
+                }
+            }
+        }
     }
 }

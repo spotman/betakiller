@@ -2,9 +2,9 @@
 namespace BetaKiller\MessageBus;
 
 use BetaKiller\Daemon\CommandBusWorkerDaemon;
+use BetaKiller\Helper\LoggerHelper;
 use Interop\Queue\Context;
 use Interop\Queue\Producer;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
 class CommandBus extends AbstractMessageBus implements CommandBusInterface
@@ -27,13 +27,12 @@ class CommandBus extends AbstractMessageBus implements CommandBusInterface
     /**
      * CommandBus constructor.
      *
-     * @param \Interop\Queue\Context            $context
-     * @param \Psr\Container\ContainerInterface $container
-     * @param \Psr\Log\LoggerInterface          $logger
+     * @param \Interop\Queue\Context   $context
+     * @param \Psr\Log\LoggerInterface $logger
      */
-    public function __construct(Context $context, ContainerInterface $container, LoggerInterface $logger)
+    public function __construct(Context $context, LoggerInterface $logger)
     {
-        parent::__construct($container, $logger);
+        parent::__construct($logger);
 
         $this->queueContext = $context;
         $this->queue        = $this->queueContext->createQueue(CommandBusWorkerDaemon::QUEUE_NAME);
@@ -62,17 +61,34 @@ class CommandBus extends AbstractMessageBus implements CommandBusInterface
     /**
      * @param \BetaKiller\MessageBus\CommandMessageInterface $command
      *
+     * @return bool
      * @throws \BetaKiller\MessageBus\MessageBusException
      */
-    public function handle(CommandMessageInterface $command): void
+    public function handle(CommandMessageInterface $command): bool
     {
         // Only one handler per message
-        $handlerClassName = $this->getMessageHandlersClassNames($command)[0];
+        $handler = $this->getMessageHandlers($command)[0];
 
-        /** @var callable $handler */
-        $handler = $this->getHandlerInstance($handlerClassName);
+        return $this->process($command, $handler);
+    }
 
-        $handler($command);
+    /**
+     * @param \BetaKiller\MessageBus\CommandMessageInterface $command
+     * @param callable                                       $handler
+     *
+     * @return bool
+     */
+    private function process(CommandMessageInterface $command, callable $handler): bool
+    {
+        // Wrap every message bus processing with try-catch block and log exceptions
+        try {
+            $handler($command);
+            return true;
+        } catch (\Throwable $e) {
+            LoggerHelper::logException($this->logger, $e);
+        }
+
+        return false;
     }
 
     private function getProducer(): Producer

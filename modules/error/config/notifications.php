@@ -1,7 +1,10 @@
 <?php
 declare(strict_types=1);
 
+use BetaKiller\Error\PhpExceptionStorageHandler;
 use BetaKiller\Model\RoleInterface;
+use BetaKiller\Notification\Transport\EmailTransport;
+use BetaKiller\Task\Error\Notify;
 
 define('ERROR_MANAGEMENT_GROUP', 'error-management');
 
@@ -34,12 +37,16 @@ return [
      * ]
      */
     'messages' => [
-        \BetaKiller\Task\Error\Notify::NOTIFICATION_PHP_EXCEPTION => [
-            'group' => ERROR_MANAGEMENT_GROUP,
+        Notify::NOTIFICATION_PHP_EXCEPTION => [
+            'group'     => ERROR_MANAGEMENT_GROUP,
+            'transport' => EmailTransport::CODENAME,
+            'critical'  => true,
         ],
 
-        \BetaKiller\Error\PhpExceptionStorageHandler::NOTIFICATION_SUBSYSTEM_FAILURE => [
-            'group' => ERROR_MANAGEMENT_GROUP,
+        PhpExceptionStorageHandler::NOTIFICATION_SUBSYSTEM_FAILURE => [
+            'group'     => ERROR_MANAGEMENT_GROUP,
+            'transport' => EmailTransport::CODENAME,
+            'critical'  => true,
         ],
     ],
 ];

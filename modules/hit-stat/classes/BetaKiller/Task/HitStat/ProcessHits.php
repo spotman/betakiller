@@ -144,7 +144,7 @@ class ProcessHits extends AbstractTask
 
         if ($this->newMissingTargets || $this->newMissingSources) {
             // Notify moderators about new missed URL
-            $this->notification->groupMessage(self::MISSING_TARGETS, [
+            $this->notification->broadcastMessage(self::MISSING_TARGETS, [
                 'targets' => \array_map(static function (HitPage $page) {
                     return $page->getFullUrl();
                 }, $this->newMissingTargets),
@@ -161,7 +161,7 @@ class ProcessHits extends AbstractTask
 
         if ($this->newSources) {
             // Notify moderators about new referrers
-            $this->notification->groupMessage(self::NEW_SOURCES, [
+            $this->notification->broadcastMessage(self::NEW_SOURCES, [
                 'sources' => \array_map(static function (HitPage $page) {
                     return $page->getFullUrl();
                 }, $this->newSources),

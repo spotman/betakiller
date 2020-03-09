@@ -15,7 +15,8 @@ interface CommandBusInterface extends AbstractMessageBusInterface
     /**
      * @param \BetaKiller\MessageBus\CommandMessageInterface $command
      *
+     * @return bool
      * @throws \BetaKiller\MessageBus\MessageBusException
      */
-    public function handle(CommandMessageInterface $command): void;
+    public function handle(CommandMessageInterface $command): bool;
 }

@@ -8,9 +8,9 @@ use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
 
-class Send extends AbstractTask
+class SendDirect extends AbstractTask
 {
-    public const NOTIFICATION_TEST = 'developer/test';
+    public const NOTIFICATION_TEST_DIRECT = 'developer/test/direct';
 
     /**
      * @var \BetaKiller\Helper\NotificationHelper
@@ -28,7 +28,7 @@ class Send extends AbstractTask
     private $logger;
 
     /**
-     * Send constructor.
+     * SendDirect constructor.
      *
      * @param \BetaKiller\Helper\NotificationHelper          $notification
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
@@ -67,7 +67,7 @@ class Send extends AbstractTask
             ? $this->userRepo->searchBy($userName)
             : $this->notification->debugEmailTarget();
 
-        $this->notification->directMessage(self::NOTIFICATION_TEST, $target, []);
+        $this->notification->directMessage(self::NOTIFICATION_TEST_DIRECT, $target, []);
 
         $this->logger->debug('Message sent to ":email"', [
             ':email' => $target->getEmail(),

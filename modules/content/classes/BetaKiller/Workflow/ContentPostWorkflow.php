@@ -87,7 +87,7 @@ class ContentPostWorkflow
      */
     private function notifyModeratorAboutCompletePost(ContentPostInterface $post): void
     {
-        $this->notification->groupMessage(self::NOTIFICATION_POST_COMPLETE, [
+        $this->notification->broadcastMessage(self::NOTIFICATION_POST_COMPLETE, [
             'url'   => $this->urlHelper->getReadEntityUrl($post, ZoneInterface::ADMIN),
             'label' => $post->getLabel(),
         ]);

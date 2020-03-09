@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Daemon;
 
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\DI\ContainerInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\MessageBus\CommandBusInterface;
 use BetaKiller\MessageBus\CommandMessageInterface;
@@ -44,15 +45,22 @@ class CommandBusWorkerDaemon implements DaemonInterface
     private $logger;
 
     /**
+     * @var \BetaKiller\DI\ContainerInterface
+     */
+    private $container;
+
+    /**
      * CommandBusWorkerDaemon constructor.
      *
      * @param \BetaKiller\MessageBus\CommandBusInterface $commandBus
+     * @param \BetaKiller\DI\ContainerInterface          $container
      * @param \BetaKiller\Config\ConfigProviderInterface $config
      * @param \Interop\Queue\Context                     $context
      * @param \Psr\Log\LoggerInterface                   $logger
      */
     public function __construct(
         CommandBusInterface $commandBus,
+        ContainerInterface $container,
         ConfigProviderInterface $config,
         Context $context,
         LoggerInterface $logger
@@ -62,13 +70,17 @@ class CommandBusWorkerDaemon implements DaemonInterface
         $this->queueContext = $context;
         $this->queue        = $this->queueContext->createQueue(self::QUEUE_NAME);
         $this->logger       = $logger;
+        $this->container    = $container;
     }
 
     public function start(LoopInterface $loop): void
     {
         // Load all commands from config
         foreach ((array)$this->config->load(['commands']) as $commandClass => $handlerClass) {
-            $this->commandBus->on($commandClass, $handlerClass);
+            // Create handler instance
+            $handler = $this->container->get($handlerClass);
+
+            $this->commandBus->on($commandClass, $handler);
 
             $this->logger->debug('Bind :cmd to :handler', [
                 ':cmd'     => $commandClass,
@@ -121,9 +133,7 @@ class CommandBusWorkerDaemon implements DaemonInterface
             ]);
 
             // Local execute
-            $this->commandBus->handle($message);
-
-            return true;
+            return $this->commandBus->handle($message);
         } catch (\Throwable $e) {
             LoggerHelper::logException($this->logger, $e);
 

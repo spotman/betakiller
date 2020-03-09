@@ -3,12 +3,15 @@ declare(strict_types=1);
 
 namespace BetaKiller\Workflow;
 
-use BetaKiller\Action\Auth\ClaimRegistrationAction;
-use BetaKiller\Factory\UrlHelperFactory;
-use BetaKiller\Helper\NotificationHelper;
+use BetaKiller\Event\UserBlockedEvent;
+use BetaKiller\Event\UserConfirmationEmailRequestedEvent;
+use BetaKiller\Event\UserEmailChangedEvent;
+use BetaKiller\Event\UserResumedEvent;
+use BetaKiller\Event\UserSuspendedEvent;
+use BetaKiller\Event\UserUnlockedEvent;
+use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
-use BetaKiller\Service\TokenService;
 
 final class UserWorkflow
 {
@@ -16,12 +19,11 @@ final class UserWorkflow
     public const TRANSITION_CHANGE_EMAIL    = 'change-email';
 
     public const TRANSITION_BLOCK     = 'block';
+    public const TRANSITION_UNLOCK    = 'unlock';
     public const TRANSITION_REG_CLAIM = 'reg-claim';
 
     public const TRANSITION_SUSPEND          = 'suspend';
     public const TRANSITION_RESUME_SUSPENDED = 'resume';
-
-    public const NOTIFICATION_EMAIL_VERIFICATION = 'auth/verification';
 
     /**
      * @var \BetaKiller\Workflow\StatusWorkflowInterface
@@ -34,44 +36,25 @@ final class UserWorkflow
     private $userRepo;
 
     /**
-     * @var \BetaKiller\Service\TokenService
+     * @var \BetaKiller\MessageBus\EventBusInterface
      */
-    private $tokenService;
-
-    /**
-     * @var \BetaKiller\Helper\NotificationHelper
-     */
-    private $notification;
-
-    /**
-     * @var \BetaKiller\Helper\UrlHelper
-     */
-    private $urlHelper;
+    private $eventBus;
 
     /**
      * UserWorkflow constructor.
      *
      * @param \BetaKiller\Workflow\StatusWorkflowInterface   $workflow
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
-     * @param \BetaKiller\Helper\NotificationHelper          $notificationHelper
-     * @param \BetaKiller\Service\TokenService               $tokenService
-     * @param \BetaKiller\Factory\UrlHelperFactory           $urlHelperFactory
-     *
-     * @throws \DI\DependencyException
-     * @throws \DI\NotFoundException
+     * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
     public function __construct(
         StatusWorkflowInterface $workflow,
         UserRepositoryInterface $userRepo,
-        NotificationHelper $notificationHelper,
-        TokenService $tokenService,
-        UrlHelperFactory $urlHelperFactory
+        EventBusInterface $eventBus
     ) {
-        $this->state        = $workflow;
-        $this->userRepo     = $userRepo;
-        $this->tokenService = $tokenService;
-        $this->notification = $notificationHelper;
-        $this->urlHelper    = $urlHelperFactory->create();
+        $this->state    = $workflow;
+        $this->userRepo = $userRepo;
+        $this->eventBus = $eventBus;
     }
 
     public function justCreated(UserInterface $user): void
@@ -81,7 +64,7 @@ final class UserWorkflow
 
     public function requestConfirmationEmail(UserInterface $user): void
     {
-        $this->sendConfirmationEmail($user);
+        $this->eventBus->emit(new UserConfirmationEmailRequestedEvent($user));
     }
 
     public function confirmEmail(UserInterface $user): void
@@ -100,8 +83,7 @@ final class UserWorkflow
 
         $this->state->doTransition($user, self::TRANSITION_CHANGE_EMAIL, $user);
 
-        // New email => new verification
-        $this->sendConfirmationEmail($user);
+        $this->eventBus->emit(new UserEmailChangedEvent($user));
     }
 
     public function block(UserInterface $user): void
@@ -109,6 +91,17 @@ final class UserWorkflow
         $this->state->doTransition($user, self::TRANSITION_BLOCK, $user);
 
         $this->userRepo->save($user);
+
+        $this->eventBus->emit(new UserBlockedEvent($user));
+    }
+
+    public function unlock(UserInterface $user): void
+    {
+        $this->state->doTransition($user, self::TRANSITION_UNLOCK, $user);
+
+        $this->userRepo->save($user);
+
+        $this->eventBus->emit(new UserUnlockedEvent($user));
     }
 
     public function suspend(UserInterface $user): void
@@ -116,6 +109,8 @@ final class UserWorkflow
         $this->state->doTransition($user, self::TRANSITION_SUSPEND, $user);
 
         $this->userRepo->save($user);
+
+        $this->eventBus->emit(new UserSuspendedEvent($user));
     }
 
     public function resumeSuspended(UserInterface $user): void
@@ -124,8 +119,7 @@ final class UserWorkflow
 
         $this->userRepo->save($user);
 
-        // Send verification link
-        $this->sendConfirmationEmail($user);
+        $this->eventBus->emit(new UserResumedEvent($user));
     }
 
     public function notRegisteredClaim(UserInterface $user): void
@@ -134,25 +128,5 @@ final class UserWorkflow
         $this->state->doTransition($user, self::TRANSITION_REG_CLAIM, $user);
 
         $this->userRepo->save($user);
-    }
-
-    /**
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @throws \BetaKiller\Notification\NotificationException
-     */
-    private function sendConfirmationEmail(UserInterface $user): void
-    {
-        $token = $this->tokenService->create($user, new \DateInterval('P14D'));
-
-        $abuseElement = $this->urlHelper->getUrlElementByCodename(ClaimRegistrationAction::codename());
-
-        $emailData = [
-            'claim_url' => $this->urlHelper->makeUrl($abuseElement),
-            // For action URL generation
-            '$token'    => $token,
-        ];
-
-        $this->notification->directMessage(self::NOTIFICATION_EMAIL_VERIFICATION, $user, $emailData);
     }
 }

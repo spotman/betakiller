@@ -120,25 +120,18 @@ class GroupListIFace extends AbstractAdminIFace
 
     private function checkMessageTemplates(string $messageCodename): array
     {
-        $languages  = $this->langRepo->getAppLanguages(true);
-        $transports = $this->config->getTransports();
+        $languages = $this->langRepo->getAppLanguages(true);
 
         $data = [];
 
-        // Iterate transports first
-        foreach ($transports as $transportName) {
-            if ($this->messageRenderer->hasGeneralTemplate($messageCodename, $transportName)) {
-                $data[$transportName] = true;
-            } else {
-                // Iterate languages next
-                foreach ($languages as $language) {
-                    $langName = $language->getIsoCode();
+        $hasGeneralTemplate = $this->messageRenderer->hasGeneralTemplate($messageCodename);
 
-                    // Make matrix
-                    $data[$transportName][$langName] = $this->messageRenderer->hasLocalizedTemplate($messageCodename,
-                        $transportName, $langName);
-                }
-            }
+        foreach ($languages as $language) {
+            $langName = $language->getIsoCode();
+
+            // Make matrix
+            $data[$langName] = $hasGeneralTemplate || $this->messageRenderer->hasLocalizedTemplate($messageCodename,
+                    $langName);
         }
 
         return $data;

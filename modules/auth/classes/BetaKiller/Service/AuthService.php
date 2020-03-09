@@ -21,7 +21,7 @@ use Zend\Expressive\Session\SessionInterface;
 
 class AuthService
 {
-    public const REQUEST_PASSWORD_CHANGE = 'auth/password-change-request';
+    public const REQUEST_PASSWORD_CHANGE = 'email/user/password-change-request';
 
     public const PASSWORD_MIN_LENGTH = 8;
     public const PASSWORD_MAX_LENGTH = 50;

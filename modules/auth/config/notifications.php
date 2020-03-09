@@ -2,10 +2,11 @@
 declare(strict_types=1);
 
 use BetaKiller\Action\Auth\ConfirmEmailAction;
+use BetaKiller\EventHandler\UserConfirmationEmailHandler;
 use BetaKiller\Model\RoleInterface;
+use BetaKiller\Notification\Transport\EmailTransport;
 use BetaKiller\Service\AccessRecoveryService;
 use BetaKiller\Service\AuthService;
-use BetaKiller\Workflow\UserWorkflow;
 
 define('AUTH_USER_GROUP', 'auth-user');
 
@@ -41,16 +42,19 @@ return [
      */
     'messages' => [
         AccessRecoveryService::NOTIFICATION_NAME => [
-            'group' => AUTH_USER_GROUP,
+            'group'     => AUTH_USER_GROUP,
+            'transport' => EmailTransport::CODENAME,
         ],
 
-        UserWorkflow::NOTIFICATION_EMAIL_VERIFICATION => [
-            'group' => AUTH_USER_GROUP,
-            'action' => ConfirmEmailAction::codename(),
+        UserConfirmationEmailHandler::EMAIL_VERIFICATION => [
+            'group'     => AUTH_USER_GROUP,
+            'action'    => ConfirmEmailAction::codename(),
+            'transport' => EmailTransport::CODENAME,
         ],
 
         AuthService::REQUEST_PASSWORD_CHANGE => [
-            'group' => AUTH_USER_GROUP,
+            'group'     => AUTH_USER_GROUP,
+            'transport' => EmailTransport::CODENAME,
         ],
     ],
 ];

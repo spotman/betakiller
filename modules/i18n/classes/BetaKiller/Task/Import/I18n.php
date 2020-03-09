@@ -134,7 +134,7 @@ class I18n extends AbstractTask
         if ($total > 0) {
             $urlHelper = $this->urlHelperFactory->create();
 
-            $this->notification->groupMessage(self::NOTIFICATION_NEW_KEYS, [
+            $this->notification->broadcastMessage(self::NOTIFICATION_NEW_KEYS, [
                 'count'    => $total,
                 'keys'     => $this->getMissedKeysData($urlHelper),
                 'list_url' => $urlHelper->getListEntityUrl(

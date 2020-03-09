@@ -14,6 +14,11 @@ interface MessageInterface
     public function getCodename(): string;
 
     /**
+     * @return string
+     */
+    public function getTransportName(): string;
+
+    /**
      * @return MessageTargetInterface
      */
     public function getFrom(): ?MessageTargetInterface;
@@ -29,13 +34,6 @@ interface MessageInterface
      * @return \BetaKiller\Notification\MessageTargetInterface
      */
     public function getTarget(): MessageTargetInterface;
-
-    /**
-     * @param MessageTargetInterface $value
-     *
-     * @return MessageInterface
-     */
-    public function setTarget(MessageTargetInterface $value): MessageInterface;
 
     /**
      * @return array
@@ -93,4 +91,9 @@ interface MessageInterface
      * @return \BetaKiller\Notification\MessageInterface
      */
     public function setSubject(string $value): MessageInterface;
+
+    /**
+     * @return bool
+     */
+    public function isCritical(): bool;
 }

@@ -10,6 +10,8 @@ use BetaKiller\Repository\UserRepositoryInterface;
 class MessageSerializer
 {
     private const KEY_NAME        = 'name';
+    private const KEY_TRANSPORT   = 'transport';
+    private const KEY_CRITICAL    = 'critical';
     private const KEY_FROM        = 'from';
     private const KEY_TARGET      = 'target';
     private const KEY_DATA        = 'data';
@@ -47,6 +49,8 @@ class MessageSerializer
             self::KEY_NAME        => $message->getCodename(),
             self::KEY_FROM        => $message->getFrom(),
             self::KEY_TARGET      => $this->serializeTarget($message->getTarget()),
+            self::KEY_TRANSPORT   => $message->getTransportName(),
+            self::KEY_CRITICAL    => $message->isCritical(),
             self::KEY_DATA        => $message->getTemplateData(),
             self::KEY_ATTACHMENTS => $message->getAttachments(),
             self::KEY_ACTION_URL  => $message->hasActionUrl() ? $message->getActionUrl() : null,
@@ -59,11 +63,14 @@ class MessageSerializer
     {
         $data = json_decode($packed, false);
 
-        $message = new Message($data->{self::KEY_NAME});
+        $name       = $data->{self::KEY_NAME};
+        $transport  = $data->{self::KEY_TRANSPORT};
+        $target     = $this->unserializeTarget((array)$data->{self::KEY_TARGET});
+        $isCritical = (bool)$data->{self::KEY_CRITICAL};
 
-        $message
-            ->setTarget($this->unserializeTarget((array)$data->{self::KEY_TARGET}))
-            ->setTemplateData((array)$data->{self::KEY_DATA});
+        $message = new Message($name, $target, $transport, $isCritical);
+
+        $message->setTemplateData((array)$data->{self::KEY_DATA});
 
         if ($data->{self::KEY_FROM}) {
             $message->setFrom($data->{self::KEY_FROM});

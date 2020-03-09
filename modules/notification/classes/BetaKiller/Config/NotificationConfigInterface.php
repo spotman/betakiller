@@ -58,4 +58,38 @@ interface NotificationConfigInterface
      * @return string
      */
     public function getMessageAction(string $messageCodename): string;
+
+    /**
+     * Returns transport codename
+     *
+     * @param string $messageCodename
+     *
+     * @return string
+     */
+    public function getMessageTransport(string $messageCodename): string;
+
+    /**
+     * May return empty array if no events defined
+     *
+     * @param string $messageCodename
+     *
+     * @return array
+     */
+    public function getMessageDismissOnEvents(string $messageCodename): array;
+
+    /**
+     * @param string $messageCodename
+     *
+     * @return bool
+     */
+    public function isMessageBroadcast(string $messageCodename): bool;
+
+    /**
+     * Returns true if message must be prioritized
+     *
+     * @param string $messageCodename
+     *
+     * @return bool
+     */
+    public function isMessageCritical(string $messageCodename): bool;
 }

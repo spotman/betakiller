@@ -18,8 +18,8 @@ return [
     'auth.regular.sign_in'         => 'Sign in',
     'auth.regular.access_recovery' => 'Forgot password?',
 
-    'notification.auth.access-recovery.subj'         => 'Access recovery',
-    'notification.auth.password-change-request.subj' => 'Password change request',
+    'notification.email.user.access-recovery.subj'         => 'Access recovery',
+    'notification.email.user.password-change-request.subj' => 'Password change request',
 
     'iface.auth.password-change.label' => 'Change password',
     'iface.auth.password-change.title' => 'Change password',

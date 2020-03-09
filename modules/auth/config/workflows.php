@@ -122,7 +122,9 @@ return [
                 ],
 
                 // No transitions for blocked Users
-                WorkflowConfig::TRANSITIONS => [],
+                WorkflowConfig::TRANSITIONS => [
+                    UserWorkflow::TRANSITION_UNLOCK => UserState::RESUMED,
+                ],
             ],
 
             UserState::CLAIMED => [
@@ -164,6 +166,10 @@ return [
             ],
 
             UserWorkflow::TRANSITION_BLOCK => [
+                RoleInterface::USER_MANAGEMENT,
+            ],
+
+            UserWorkflow::TRANSITION_UNLOCK => [
                 RoleInterface::USER_MANAGEMENT,
             ],
         ],

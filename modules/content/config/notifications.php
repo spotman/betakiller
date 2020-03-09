@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use BetaKiller\Content\Content;
 use BetaKiller\Model\RoleInterface;
+use BetaKiller\Notification\Transport\EmailTransport;
 use BetaKiller\Workflow\ContentCommentWorkflow;
 use BetaKiller\Workflow\ContentPostWorkflow;
 
@@ -21,7 +22,7 @@ return [
      */
     'groups'   => [
         POST_MODERATION => [
-            'roles' => [
+            'roles'     => [
                 Content::ROLE_CONTENT_MODERATOR,
             ],
         ],
@@ -46,15 +47,19 @@ return [
      */
     'messages' => [
         ContentPostWorkflow::NOTIFICATION_POST_COMPLETE => [
-            'group' => POST_MODERATION,
+            'group'     => POST_MODERATION,
+            'transport' => EmailTransport::CODENAME,
+            'broadcast' => true,
         ],
 
         ContentCommentWorkflow::NOTIFICATION_AUTHOR_APPROVE => [
-            'group' => COMMENT_USER_EVENT,
+            'group'     => COMMENT_USER_EVENT,
+            'transport' => EmailTransport::CODENAME,
         ],
 
         ContentCommentWorkflow::NOTIFICATION_PARENT_REPLY => [
-            'group' => COMMENT_USER_EVENT,
+            'group'     => COMMENT_USER_EVENT,
+            'transport' => EmailTransport::CODENAME,
         ],
     ],
 ];

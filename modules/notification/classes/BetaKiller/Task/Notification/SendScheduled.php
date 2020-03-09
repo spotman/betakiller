@@ -89,7 +89,7 @@ final class SendScheduled extends AbstractTask
             $processor = $this->processorFactory->create($messageCodename);
 
             // Get all users with selected schedule option for group
-            $targets = $this->notification->findGroupFreqTargets($group, $freq);
+            $targets = $this->notification->getGroupTargets($group, $freq);
 
             // Skip group if no targets had selected freq
             if (!$targets) {

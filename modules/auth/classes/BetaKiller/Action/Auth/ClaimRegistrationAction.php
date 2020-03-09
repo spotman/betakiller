@@ -19,7 +19,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class ClaimRegistrationAction extends AbstractAction
 {
-    public const NOTIFICATION = 'support/claim-registration';
+    public const NOTIFICATION = 'email/support/claim-registration';
 
     /**
      * @var \BetaKiller\Helper\NotificationHelper
@@ -85,7 +85,7 @@ class ClaimRegistrationAction extends AbstractAction
         if (!$user->isRegistrationClaimed()) {
             $this->userWorkflow->notRegisteredClaim($user);
 
-            $this->facade->groupMessage(self::NOTIFICATION, [
+            $this->facade->broadcastMessage(self::NOTIFICATION, [
                 'email'             => $log->getTargetString(),
                 'ip'                => ServerRequestHelper::getIpAddress($request),
                 'notification_url'  => $urlHelper->getReadEntityUrl($log, ZoneInterface::ADMIN),

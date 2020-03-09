@@ -1,14 +1,16 @@
 <?php
 declare(strict_types=1);
 
+use BetaKiller\Model\RoleInterface;
 use BetaKiller\Notification\Transport\EmailTransport;
+use BetaKiller\Task\Test\Notification\SendBroadcast;
+use BetaKiller\Task\Test\Notification\SendDirect;
 
 define('TEST_NOTIFICATIONS_GROUP', 'test-notifications');
 
 return [
     'transports' => [
-        // Lowest priority by default
-        EmailTransport::CODENAME => 1000,
+        EmailTransport::CODENAME,
     ],
 
     /**
@@ -20,10 +22,10 @@ return [
      *   ...
      * ]
      */
-    'groups'   => [
+    'groups'     => [
         TEST_NOTIFICATIONS_GROUP => [
             'roles' => [
-                \BetaKiller\Model\RoleInterface::DEVELOPER,
+                RoleInterface::DEVELOPER,
             ],
         ],
     ],
@@ -39,9 +41,17 @@ return [
      *   ...
      * ]
      */
-    'messages' => [
-        \BetaKiller\Task\Test\Notification\Send::NOTIFICATION_TEST => [
-            'group' => TEST_NOTIFICATIONS_GROUP,
+    'messages'   => [
+        SendDirect::NOTIFICATION_TEST_DIRECT => [
+            'group'     => TEST_NOTIFICATIONS_GROUP,
+            'transport' => EmailTransport::CODENAME,
+            'critical'  => true,
+        ],
+
+        SendBroadcast::NOTIFICATION_TEST_BROADCAST => [
+            'group'     => TEST_NOTIFICATIONS_GROUP,
+            'transport' => EmailTransport::CODENAME,
+            'broadcast' => true,
         ],
     ],
 ];

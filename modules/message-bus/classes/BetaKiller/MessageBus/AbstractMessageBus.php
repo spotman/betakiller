@@ -1,18 +1,10 @@
 <?php
 namespace BetaKiller\MessageBus;
 
-use BetaKiller\Helper\LoggerHelper;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractMessageBus implements AbstractMessageBusInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
     /**
      * @var LoggerInterface
      */
@@ -23,15 +15,9 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
      */
     private $bindings = [];
 
-    /**
-     * @var array MessageHandlerInterface[]
-     */
-    private $handlerInstances = [];
-
-    public function __construct(ContainerInterface $container, LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger)
     {
-        $this->container = $container;
-        $this->logger    = $logger;
+        $this->logger = $logger;
     }
 
     /**
@@ -40,12 +26,12 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
     abstract protected function getMessageHandlersLimit(): int;
 
     /**
-     * @param string $messageClassName
-     * @param string $handlerClassName
+     * @param string   $messageClassName
+     * @param callable $handler
      *
      * @throws \BetaKiller\MessageBus\MessageBusException
      */
-    public function on(string $messageClassName, string $handlerClassName): void
+    public function on(string $messageClassName, callable $handler): void
     {
         $this->bindings[$messageClassName] = $this->bindings[$messageClassName] ?? [];
 
@@ -59,16 +45,16 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
         }
 
         // Push handler
-        $this->bindings[$messageClassName][] = $handlerClassName;
+        $this->bindings[$messageClassName][] = $handler;
     }
 
     /**
      * @param \BetaKiller\MessageBus\MessageInterface $message
      *
-     * @return string[]
+     * @return callable[]
      * @throws \BetaKiller\MessageBus\MessageBusException
      */
-    protected function getMessageHandlersClassNames(MessageInterface $message): array
+    protected function getMessageHandlers(MessageInterface $message): array
     {
         $name = $this->getMessageName($message);
 
@@ -79,37 +65,6 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
         }
 
         return $handlers;
-    }
-
-    /**
-     * @param string $handlerName
-     *
-     * @return mixed
-     * @throws \BetaKiller\MessageBus\MessageBusException
-     */
-    protected function getHandlerInstance(string $handlerName)
-    {
-        if (isset($this->handlerInstances[$handlerName])) {
-            return $this->handlerInstances[$handlerName];
-        }
-
-        // Convert class name to instance
-        try {
-            $instance = $this->container->get($handlerName);
-        } catch (ContainerExceptionInterface $e) {
-            throw MessageBusException::wrap($e);
-        }
-
-        if (!is_callable($instance)) {
-            throw new MessageBusException('Handler :class must be callable for using in :bus', [
-                ':class' => \get_class($instance),
-                ':bus'   => \get_class($this),
-            ]);
-        }
-
-        $this->handlerInstances[$handlerName] = $instance;
-
-        return $instance;
     }
 
     protected function getMessageName(MessageInterface $message): string

@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
 
+use BetaKiller\Model\RoleInterface;
+use BetaKiller\Notification\Transport\EmailTransport;
+use BetaKiller\Task\HitStat\ProcessHits;
+
 define('HIT_STAT_GROUP', 'hit-stat');
 
 return [
@@ -15,8 +19,8 @@ return [
      */
     'groups'   => [
         HIT_STAT_GROUP => [
-            'roles' => [
-                \BetaKiller\Model\RoleInterface::DEVELOPER,
+            'roles'     => [
+                RoleInterface::DEVELOPER,
             ],
         ],
     ],
@@ -33,12 +37,16 @@ return [
      * ]
      */
     'messages' => [
-        \BetaKiller\Task\HitStat\ProcessHits::MISSING_TARGETS => [
-            'group' => HIT_STAT_GROUP,
+        ProcessHits::MISSING_TARGETS => [
+            'group'     => HIT_STAT_GROUP,
+            'transport' => EmailTransport::CODENAME,
+            'broadcast' => true,
         ],
 
-        \BetaKiller\Task\HitStat\ProcessHits::NEW_SOURCES => [
-            'group' => HIT_STAT_GROUP,
+        ProcessHits::NEW_SOURCES => [
+            'group'     => HIT_STAT_GROUP,
+            'transport' => EmailTransport::CODENAME,
+            'broadcast' => true,
         ],
     ],
 ];

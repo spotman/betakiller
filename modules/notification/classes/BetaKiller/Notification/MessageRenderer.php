@@ -74,27 +74,22 @@ class MessageRenderer implements MessageRendererInterface
 
     public function hasLocalizedTemplate(
         string $messageCodename,
-        string $transportCodename,
         string $langName
     ): bool {
-        $file = $this->makeTemplateFileName($messageCodename, $transportCodename, $langName);
+        $file = $this->makeTemplateFileName($messageCodename, $langName);
 
         return $this->viewFactory->exists($file);
     }
 
-    public function hasGeneralTemplate(string $messageCodename, string $transportCodename): bool
+    public function hasGeneralTemplate(string $messageCodename): bool
     {
-        $file = $this->makeTemplateFileName($messageCodename, $transportCodename);
+        $file = $this->makeTemplateFileName($messageCodename);
 
         return $this->viewFactory->exists($file);
     }
 
-    private function makeTemplateFileName(
-        string $messageCodename,
-        string $transportCodename,
-        string $langName = null
-    ): string {
-        $templateName = $messageCodename.'-'.$transportCodename;
+    private function makeTemplateFileName(string $messageCodename,string $langName = null): string {
+        $templateName = $messageCodename;
 
         if ($langName) {
             $templateName .= '-'.$langName;
@@ -141,13 +136,13 @@ class MessageRenderer implements MessageRendererInterface
         // User language in templates
         $langName = $target->getLanguageIsoCode();
 
-        $localizedFile = $this->makeTemplateFileName($message->getCodename(), $transport->getName(), $langName);
+        $localizedFile = $this->makeTemplateFileName($message->getCodename(), $langName);
 
         if ($this->viewFactory->exists($localizedFile)) {
             return $localizedFile;
         }
 
-        $commonFile = $this->makeTemplateFileName($message->getCodename(), $transport->getName());
+        $commonFile = $this->makeTemplateFileName($message->getCodename());
 
         if ($this->viewFactory->exists($commonFile)) {
             return $commonFile;

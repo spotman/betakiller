@@ -52,11 +52,17 @@ class NotificationHelper
      *
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function groupMessage(string $name, array $templateData, array $attachments = null): void
+    public function broadcastMessage(string $name, array $templateData, array $attachments = null): void
     {
+        if (!$this->notification->isBroadcastMessage($name)) {
+            throw new NotificationException('Direct message ":name" must not be send via broadcast', [
+                ':name' => $name,
+            ]);
+        }
+
         $group = $this->getMessageGroup($name);
 
-        $targets = $this->notification->findGroupFreqTargets($group);
+        $targets = $this->notification->getGroupTargets($group);
 
         if (!$targets) {
             throw new NotificationException('Missing targets for group ":name"', [
@@ -65,7 +71,9 @@ class NotificationHelper
         }
 
         foreach ($targets as $target) {
-            $this->directMessage($name, $target, $templateData, $attachments);
+            $message = $this->notification->createMessage($name, $target, $templateData, $attachments);
+
+            $this->notification->enqueueImmediate($message);
         }
     }
 
@@ -85,10 +93,26 @@ class NotificationHelper
         array $templateData,
         array $attachments = null
     ): void {
+        if ($this->notification->isBroadcastMessage($name)) {
+            throw new NotificationException('Broadcast message ":name" can not be send directly', [
+                ':name' => $name,
+            ]);
+        }
+
         $message = $this->notification->createMessage($name, $target, $templateData, $attachments);
 
         // Send only if target user allowed this message group
         $this->notification->enqueueImmediate($message);
+    }
+
+    public function dismissBroadcast(string $name): void
+    {
+        $this->notification->dismissBroadcast($name);
+    }
+
+    public function dismissDirect(string $name, MessageTargetInterface $target): void
+    {
+        $this->notification->dismissDirect($name, $target);
     }
 
     /**
