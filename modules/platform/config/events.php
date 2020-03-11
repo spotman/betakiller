@@ -4,10 +4,12 @@ declare(strict_types=1);
 use BetaKiller\Event\UserBlockedEvent;
 use BetaKiller\Event\UserConfirmationEmailRequestedEvent;
 use BetaKiller\Event\UserEmailChangedEvent;
+use BetaKiller\Event\UserPasswordChangeRequestedEvent;
 use BetaKiller\Event\UserResumedEvent;
 use BetaKiller\Event\UserSuspendedEvent;
 use BetaKiller\Event\UserUnlockedEvent;
 use BetaKiller\EventHandler\UserConfirmationEmailHandler;
+use BetaKiller\EventHandler\UserPasswordChangeRequestedEmailHandler;
 
 return [
     UserBlockedEvent::class => [
@@ -35,5 +37,10 @@ return [
     UserConfirmationEmailRequestedEvent::class => [
         // Confirmation Email
         UserConfirmationEmailHandler::class,
+    ],
+
+    UserPasswordChangeRequestedEvent::class => [
+        // Confirmation Email
+        UserPasswordChangeRequestedEmailHandler::class,
     ],
 ];

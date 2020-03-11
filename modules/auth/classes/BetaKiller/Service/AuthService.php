@@ -3,26 +3,21 @@ declare(strict_types=1);
 
 namespace BetaKiller\Service;
 
-use BetaKiller\Action\Auth\ClaimRegistrationAction;
-use BetaKiller\Action\Auth\VerifyPasswordChangeTokenAction;
 use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\Auth\InactiveException;
 use BetaKiller\Auth\SessionConfig;
+use BetaKiller\Event\UserPasswordChangeRequestedEvent;
 use BetaKiller\Factory\GuestUserFactory;
-use BetaKiller\Factory\UrlHelperFactory;
-use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\SessionHelper;
+use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RoleRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Session\SessionStorageInterface;
-use DateInterval;
 use Zend\Expressive\Session\SessionInterface;
 
 class AuthService
 {
-    public const REQUEST_PASSWORD_CHANGE = 'email/user/password-change-request';
-
     public const PASSWORD_MIN_LENGTH = 8;
     public const PASSWORD_MAX_LENGTH = 50;
 
@@ -52,19 +47,9 @@ class AuthService
     private $guestUserFactory;
 
     /**
-     * @var \BetaKiller\Helper\NotificationHelper
+     * @var \BetaKiller\MessageBus\EventBusInterface
      */
-    private $notification;
-
-    /**
-     * @var \BetaKiller\Helper\UrlHelper
-     */
-    private $urlHelper;
-
-    /**
-     * @var \BetaKiller\Service\TokenService
-     */
-    private $tokenService;
+    private $eventBus;
 
     /**
      * AuthService constructor.
@@ -74,9 +59,7 @@ class AuthService
      * @param \BetaKiller\Factory\GuestUserFactory           $guestUserFactory
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
      * @param \BetaKiller\Repository\RoleRepositoryInterface $roleRepo
-     * @param \BetaKiller\Helper\NotificationHelper          $notification
-     * @param \BetaKiller\Service\TokenService               $tokenService
-     * @param \BetaKiller\Factory\UrlHelperFactory           $urlHelperFactory
+     * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
     public function __construct(
         SessionConfig $config,
@@ -84,18 +67,14 @@ class AuthService
         GuestUserFactory $guestUserFactory,
         UserRepositoryInterface $userRepo,
         RoleRepositoryInterface $roleRepo,
-        NotificationHelper $notification,
-        TokenService $tokenService,
-        UrlHelperFactory $urlHelperFactory
+        EventBusInterface $eventBus
     ) {
         $this->config           = $config;
         $this->sessionStorage   = $sessionStorage;
         $this->guestUserFactory = $guestUserFactory;
         $this->userRepo         = $userRepo;
         $this->roleRepo         = $roleRepo;
-        $this->notification     = $notification;
-        $this->tokenService     = $tokenService;
-        $this->urlHelper        = $urlHelperFactory->create();
+        $this->eventBus         = $eventBus;
     }
 
     public function searchBy(string $loginOrEmail): ?UserInterface
@@ -190,16 +169,7 @@ class AuthService
 
     public function requestPasswordChange(UserInterface $user): void
     {
-        $token = $this->tokenService->create($user, new DateInterval('PT8H'));
-
-        $params      = $this->urlHelper->createUrlContainer()->setEntity($token);
-        $action      = $this->urlHelper->getUrlElementByCodename(VerifyPasswordChangeTokenAction::codename());
-        $claimAction = $this->urlHelper->getUrlElementByCodename(ClaimRegistrationAction::codename());
-
-        $this->notification->directMessage(self::REQUEST_PASSWORD_CHANGE, $user, [
-            'action_url' => $this->urlHelper->makeUrl($action, $params, false),
-            'claim_url'  => $this->urlHelper->makeUrl($claimAction),
-        ]);
+        $this->eventBus->emit(new UserPasswordChangeRequestedEvent($user));
     }
 
     /**

@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 use BetaKiller\Action\Auth\ConfirmEmailAction;
 use BetaKiller\EventHandler\UserConfirmationEmailHandler;
+use BetaKiller\EventHandler\UserPasswordChangeRequestedEmailHandler;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Notification\Transport\EmailTransport;
 use BetaKiller\Service\AccessRecoveryService;
-use BetaKiller\Service\AuthService;
 
 define('AUTH_USER_GROUP', 'auth-user');
 
@@ -52,7 +52,7 @@ return [
             'transport' => EmailTransport::CODENAME,
         ],
 
-        AuthService::REQUEST_PASSWORD_CHANGE => [
+        UserPasswordChangeRequestedEmailHandler::REQUEST_PASSWORD_CHANGE => [
             'group'     => AUTH_USER_GROUP,
             'transport' => EmailTransport::CODENAME,
         ],
