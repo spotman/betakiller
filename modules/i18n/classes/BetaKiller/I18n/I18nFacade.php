@@ -22,8 +22,7 @@ final class I18nFacade
     // Placeholder for primary language ISO code
     public const PRIMARY_LANG_ISO = 'primary';
 
-    // TODO Remove underscore and replace all i18n keys
-    private const KEY_REGEX = '/^[a-z0-9_-]+(?:[\.]{1}[a-z0-9-_+]+)+$/m';
+    private const KEY_REGEX = '/^[a-z0-9-]+(?:[\.]{1}[a-z0-9-+]+)+$/m';
 
     /**
      * @var \BetaKiller\Model\LanguageInterface[]
