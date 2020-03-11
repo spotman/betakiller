@@ -69,24 +69,15 @@ final class RequestProfiler
         $event->stop();
     }
 
-    public static function begin(ServerRequestInterface $request, string $label): ?array
+    public static function begin(ServerRequestInterface $request, string $label): array
     {
-        // Skip production
-        if (!DebugServerRequestHelper::hasProfiler($request)) {
-            return null;
-        }
-
         $event = DebugServerRequestHelper::getProfiler($request)->start($label);
 
         return [$request, $event];
     }
 
-    public static function end(?array $pack): void
+    public static function end(array $pack): void
     {
-        if (!$pack) {
-            return;
-        }
-
         /** @var ServerRequestInterface $request */
         /** @var StopwatchEvent $event */
         [$request, $event] = $pack;
