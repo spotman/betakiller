@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\RequestHandler\App\I18next;
 
+use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\TextHelper;
@@ -40,6 +41,8 @@ class FetchTranslationRequestHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $p = RequestProfiler::begin($request, 'Translation table');
+
         $user = ServerRequestHelper::getUser($request);
 
         $langIsoCode = $request->getAttribute('lang');
@@ -66,6 +69,8 @@ class FetchTranslationRequestHandler implements RequestHandlerInterface
                 }
             }
         }
+
+        RequestProfiler::end($p);
 
         return ResponseHelper::json($data);
     }
