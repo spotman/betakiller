@@ -22,7 +22,7 @@ final class I18nFacade
     // Placeholder for primary language ISO code
     public const PRIMARY_LANG_ISO = 'primary';
 
-    private const KEY_REGEX = '/^[a-z0-9-]+(?:[\.]{1}[a-z0-9-+]+)+$/m';
+    public const KEY_REGEX = '/^[a-z0-9-]+(?:[\.]{1}[a-z0-9-+]+)+$/m';
 
     /**
      * @var \BetaKiller\Model\LanguageInterface[]

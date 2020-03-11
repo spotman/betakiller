@@ -21,7 +21,7 @@ class TranslationKeyRepository extends AbstractI18nKeyRepository
      */
     public function getUrlKeyName(): string
     {
-        return TranslationKey::TABLE_FIELD_KEY;
+        return TranslationKey::COL_KEY;
     }
 
     public function findByKeyName(string $i18nKey): ?TranslationKeyModelInterface
@@ -35,13 +35,13 @@ class TranslationKeyRepository extends AbstractI18nKeyRepository
 
     private function filterKey(ExtendedOrmInterface $orm, string $key): self
     {
-        $orm->where($orm->object_column(TranslationKey::TABLE_FIELD_KEY), '=', $key);
+        $orm->where($orm->object_column(TranslationKey::COL_KEY), '=', $key);
 
         return $this;
     }
 
     protected function getI18nValuesColumnName(ExtendedOrmInterface $orm): string
     {
-        return $orm->object_column(TranslationKey::TABLE_FIELD_I18N);
+        return $orm->object_column(TranslationKey::COL_I18N);
     }
 }
