@@ -5,7 +5,7 @@ class UserDoesNotExistsException extends AbstractAuthException
 {
     public function getDefaultMessageI18nKey(): ?string
     {
-        return 'error.auth.user_not_exists';
+        return 'error.auth.user-not-exists';
     }
 
     public function isNotificationEnabled(): bool

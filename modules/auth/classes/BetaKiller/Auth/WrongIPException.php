@@ -10,6 +10,6 @@ class WrongIPException extends AbstractAuthException
 {
     public function getDefaultMessageI18nKey(): ?string
     {
-        return 'error.auth.wrong_ip';
+        return 'error.auth.wrong-ip';
     }
 }

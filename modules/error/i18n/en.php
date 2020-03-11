@@ -9,8 +9,8 @@ return [
     'error.http.401.label'        => 'Authorization required',
     'error.http.403.label'        => 'Access denied',
     'error.http.403.message'      => 'You have no enough privileges for viewing current page.',
-    'error.http.403.login_button' => 'Sign in',
-    'error.http.back_button'      => 'Return to the safe place',
+    'error.http.403.login-button' => 'Sign in',
+    'error.http.back-button'      => 'Return to the safe place',
 
     'error.http.404.label'          => 'Page not found',
     'error.http.404.p1'             => 'The page you are looking for is not exists.',

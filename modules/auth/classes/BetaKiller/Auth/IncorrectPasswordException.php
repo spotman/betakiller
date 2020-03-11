@@ -5,6 +5,6 @@ class IncorrectPasswordException extends AbstractAuthException
 {
     public function getDefaultMessageI18nKey(): ?string
     {
-        return 'error.auth.incorrect_password';
+        return 'error.auth.incorrect-password';
     }
 }

@@ -11,8 +11,8 @@ return [
 
     'error.http.403.label'        => 'Доступ запрещён',
     'error.http.403.message'      => 'У Вас недостаточно привилегий для просмотра этой страницы.',
-    'error.http.403.login_button' => 'Войти',
-    'error.http.back_button'      => 'Вернуться назад',
+    'error.http.403.login-button' => 'Войти',
+    'error.http.back-button'      => 'Вернуться назад',
 
     'error.http.404.label'          => 'Страница не найдена',
     'error.http.404.p1'             => 'Страница, на которую вы перешли, не существует.',

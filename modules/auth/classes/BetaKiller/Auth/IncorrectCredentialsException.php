@@ -5,6 +5,6 @@ class IncorrectCredentialsException extends AbstractAuthException
 {
     public function getDefaultMessageI18nKey(): ?string
     {
-        return 'error.auth.incorrect_credentials';
+        return 'error.auth.incorrect-credentials';
     }
 }
