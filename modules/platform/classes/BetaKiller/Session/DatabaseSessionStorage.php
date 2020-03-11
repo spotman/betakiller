@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace BetaKiller\Session;
 
 use BetaKiller\Auth\SessionConfig;
+use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Helper\CookieHelper;
-use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
@@ -18,7 +18,6 @@ use BetaKiller\Security\Encryption;
 use DateTimeImmutable;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\UuidInterface;
 use Text;
 use Zend\Expressive\Session\Session;
@@ -40,11 +39,6 @@ class DatabaseSessionStorage implements SessionStorageInterface
     private $sessionRepo;
 
     /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var \BetaKiller\Security\Encryption
      */
     private $encryption;
@@ -61,18 +55,15 @@ class DatabaseSessionStorage implements SessionStorageInterface
      * @param \BetaKiller\Auth\SessionConfig               $config
      * @param \BetaKiller\Security\Encryption              $encryption
      * @param \BetaKiller\Helper\CookieHelper              $cookies
-     * @param \Psr\Log\LoggerInterface                     $logger
      */
     public function __construct(
         UserSessionRepository $sessionRepo,
         SessionConfig $config,
         Encryption $encryption,
-        CookieHelper $cookies,
-        LoggerInterface $logger
+        CookieHelper $cookies
     ) {
         $this->sessionRepo = $sessionRepo;
         $this->config      = $config;
-        $this->logger      = $logger;
         $this->encryption  = $encryption;
         $this->cookies     = $cookies;
     }
@@ -85,6 +76,17 @@ class DatabaseSessionStorage implements SessionStorageInterface
      * @return \Zend\Expressive\Session\SessionInterface
      */
     public function initializeSessionFromRequest(ServerRequestInterface $request): SessionInterface
+    {
+        $p = RequestProfiler::begin($request, 'Initialize session from request');
+
+        $session = $this->fetchSessionFromRequest($request);
+
+        RequestProfiler::end($p);
+
+        return $session;
+    }
+
+    private function fetchSessionFromRequest(ServerRequestInterface $request): SessionInterface
     {
         $userAgent  = ServerRequestHelper::getUserAgent($request);
         $originUrl  = ServerRequestHelper::getUrl($request);
