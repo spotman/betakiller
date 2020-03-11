@@ -10,6 +10,7 @@ class AccessRecoveryRequestIFace extends AbstractIFace
 {
     public const FLASH_STATUS         = 'access_recovery_status';
     public const FLASH_STATUS_OK      = 'ok';
+    public const FLASH_STATUS_BLOCKED = 'blocked';
     public const FLASH_STATUS_MISSING = 'missing';
 
     /**
@@ -34,6 +35,7 @@ class AccessRecoveryRequestIFace extends AbstractIFace
                 'actionUrl' => $urlHelper->makeUrl($actionElement),
                 'isOk'      => $status && $status === self::FLASH_STATUS_OK,
                 'isMissing' => $status && $status === self::FLASH_STATUS_MISSING,
+                'isBlocked' => $status && $status === self::FLASH_STATUS_BLOCKED,
                 'userEmail' => !$user->isGuest() ? $user->getEmail() : null,
             ],
         ];

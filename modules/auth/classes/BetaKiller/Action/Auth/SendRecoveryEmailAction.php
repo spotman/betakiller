@@ -72,9 +72,15 @@ class SendRecoveryEmailAction extends AbstractAction implements PostRequestActio
 
         $user = $this->userRepo->searchBy($email);
 
-        // TODO Separate status and message for blocked users
-        if (!$user || $user->isBlocked()) {
+        if (!$user) {
             $flash->flash(AccessRecoveryRequestIFace::FLASH_STATUS, AccessRecoveryRequestIFace::FLASH_STATUS_MISSING);
+
+            return $response;
+        }
+
+        // Separate status and message for blocked users
+        if ($user->isBlocked()) {
+            $flash->flash(AccessRecoveryRequestIFace::FLASH_STATUS, AccessRecoveryRequestIFace::FLASH_STATUS_BLOCKED);
 
             return $response;
         }
