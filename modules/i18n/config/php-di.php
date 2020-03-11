@@ -2,22 +2,26 @@
 
 use BetaKiller\I18n\I18nKeysLoaderInterface;
 use BetaKiller\I18n\JsonPluralBagFormatter;
+use BetaKiller\I18n\LazyAggregateLoader;
 use BetaKiller\I18n\PluralBagFactory;
 use BetaKiller\I18n\PluralBagFactoryInterface;
 use BetaKiller\I18n\PluralBagFormatterInterface;
 use BetaKiller\Repository\LanguageRepository;
 use BetaKiller\Repository\LanguageRepositoryInterface;
+use BetaKiller\Repository\TranslationKeyRepository;
+use BetaKiller\Repository\TranslationKeyRepositoryInterface;
+use function DI\autowire;
 
 return [
 
     'definitions' => [
+        I18nKeysLoaderInterface::class => autowire(LazyAggregateLoader::class),
 
-        I18nKeysLoaderInterface::class => \DI\autowire(\BetaKiller\I18n\LazyAggregateLoader::class),
+        PluralBagFactoryInterface::class   => autowire(PluralBagFactory::class),
+        PluralBagFormatterInterface::class => autowire(JsonPluralBagFormatter::class),
 
-        PluralBagFactoryInterface::class   => \DI\autowire(PluralBagFactory::class),
-        PluralBagFormatterInterface::class => \DI\autowire(JsonPluralBagFormatter::class),
-
-        LanguageRepositoryInterface::class => \DI\autowire(LanguageRepository::class),
+        LanguageRepositoryInterface::class       => autowire(LanguageRepository::class),
+        TranslationKeyRepositoryInterface::class => autowire(TranslationKeyRepository::class),
     ],
 
 ];
