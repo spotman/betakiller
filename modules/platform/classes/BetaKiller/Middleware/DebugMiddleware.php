@@ -8,6 +8,7 @@ use BetaKiller\Dev\DebugBarCookiesDataCollector;
 use BetaKiller\Dev\DebugBarHttpDriver;
 use BetaKiller\Dev\DebugBarSessionDataCollector;
 use BetaKiller\Dev\DebugBarUserDataCollector;
+use BetaKiller\Dev\DebugServerRequestHelper;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\CookieHelper;
@@ -260,11 +261,13 @@ class DebugMiddleware implements MiddlewareInterface
             {
                 $response = $this->handler->handle($request);
 
-                $profiler = ServerRequestHelper::getProfiler($request);
-                $debugBar = ServerRequestHelper::getDebugBar($request);
+                if (DebugServerRequestHelper::hasProfiler($request)) {
+                    $profiler = DebugServerRequestHelper::getProfiler($request);
+                    $debugBar = DebugServerRequestHelper::getDebugBar($request);
 
-                // Push measures to DebugBar
-                $profiler->transferMeasuresToDebugBar($debugBar);
+                    // Push measures to DebugBar
+                    $profiler->transferMeasuresToDebugBar($debugBar);
+                }
 
                 return $response;
             }

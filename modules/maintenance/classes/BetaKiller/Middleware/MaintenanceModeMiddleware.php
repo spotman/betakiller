@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
+use BetaKiller\Dev\DebugServerRequestHelper;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception\NotAvailableHttpException;
 use BetaKiller\Helper\AppEnvInterface;
@@ -59,10 +60,10 @@ class MaintenanceModeMiddleware implements MiddlewareInterface
 
         $user = ServerRequestHelper::getUser($request);
 
-        if (ServerRequestHelper::hasDebugBar($request)) {
+        if (DebugServerRequestHelper::hasDebugBar($request)) {
             $model = $this->service->getModel();
 
-            ServerRequestHelper::getDebugBar($request)
+            DebugServerRequestHelper::getDebugBar($request)
                 ->addCollector(new MaintenanceModeDebugBarDataCollector($model));
         }
 

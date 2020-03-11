@@ -82,7 +82,9 @@ class IFaceView
      */
     public function render(IFaceInterface $iface, ServerRequestInterface $request): string
     {
-        $dataPack = RequestProfiler::begin($request, $iface->getCodename().' IFace data');
+        $codename = $iface->getCodename();
+
+        $dataPack = RequestProfiler::begin($request, $codename.' IFace data');
 
         $i18n  = ServerRequestHelper::getI18n($request);
         $lang  = $i18n->getLang();
@@ -99,7 +101,7 @@ class IFaceView
         }
 
         RequestProfiler::end($dataPack);
-        $renderPack = RequestProfiler::begin($request, $iface->getCodename().' IFace render');
+        $prepareRenderPack = RequestProfiler::begin($request, $codename.' IFace prepare render');
 
         // Send current request to widgets
         $ifaceView->set(self::REQUEST_KEY, $request);
@@ -113,7 +115,7 @@ class IFaceView
         ]);
 
         // Detect IFace layout
-        $layoutCodename = $this->getLayoutCodename($model, $this->elementHelper);
+        $layoutCodename = $this->getLayoutCodename($model);
 
         // Create instance of renderer
         $meta         = new Meta;
@@ -137,6 +139,9 @@ class IFaceView
             ->setContentType()
             ->setLayoutCodename($layoutCodename);
 
+        RequestProfiler::end($prepareRenderPack);
+        $renderPack = RequestProfiler::begin($request, $codename.' IFace render');
+
         $result = $this->layoutView->render($ifaceView, $renderHelper);
 
         RequestProfiler::end($renderPack);
@@ -147,13 +152,11 @@ class IFaceView
     /**
      * @param \BetaKiller\Url\IFaceModelInterface $model
      *
-     * @param \BetaKiller\Helper\UrlElementHelper $helper
-     *
      * @return string
      */
-    private function getLayoutCodename(IFaceModelInterface $model, UrlElementHelper $helper): string
+    private function getLayoutCodename(IFaceModelInterface $model): string
     {
-        $layoutCodename = $helper->detectLayoutCodename($model);
+        $layoutCodename = $this->elementHelper->detectLayoutCodename($model);
 
         return $layoutCodename ?: $this->getDefaultLayoutCodename();
     }

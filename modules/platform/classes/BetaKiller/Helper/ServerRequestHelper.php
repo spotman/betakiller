@@ -4,13 +4,11 @@ declare(strict_types=1);
 namespace BetaKiller\Helper;
 
 use Aidantwoods\SecureHeaders\SecureHeaders;
-use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
-use DebugBar\DebugBar;
 use PhpMiddleware\RequestId\RequestIdMiddleware;
 use Psr\Http\Message\ServerRequestInterface;
 use Ramsey\Uuid\Uuid;
@@ -260,21 +258,6 @@ class ServerRequestHelper
     public static function hasI18n(ServerRequestInterface $request): I18nHelper
     {
         return $request->getAttribute(I18nHelper::class);
-    }
-
-    public static function getProfiler(ServerRequestInterface $request): RequestProfiler
-    {
-        return $request->getAttribute(RequestProfiler::class);
-    }
-
-    public static function hasDebugBar(ServerRequestInterface $request): bool
-    {
-        return (bool)$request->getAttribute(DebugBar::class);
-    }
-
-    public static function getDebugBar(ServerRequestInterface $request): DebugBar
-    {
-        return $request->getAttribute(DebugBar::class);
     }
 
     public static function hasCsp(ServerRequestInterface $request): bool
