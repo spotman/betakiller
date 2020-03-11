@@ -20,6 +20,7 @@ final class FsWatcher
     private const WATCH_IGNORE_DIRS = [
         'cache',
         'logs',
+        'i18n',
     ];
 
     /**
