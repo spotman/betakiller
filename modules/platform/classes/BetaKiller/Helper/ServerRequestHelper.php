@@ -206,6 +206,11 @@ class ServerRequestHelper
         return $request->getAttribute(UrlElementStack::class);
     }
 
+    public static function hasUrlHelper(ServerRequestInterface $request): bool
+    {
+        return (bool)$request->getAttribute(UrlHelper::class);
+    }
+
     public static function getUrlHelper(ServerRequestInterface $request): UrlHelper
     {
         return $request->getAttribute(UrlHelper::class);

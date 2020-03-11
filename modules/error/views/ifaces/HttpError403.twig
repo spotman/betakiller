@@ -24,7 +24,7 @@
                   {{ "error.http.403.login_button"|i18n }}
                 </a>
               {% else %}
-                <a href="{{ allowed_url }}" class="btn btn-secondary">
+                <a href="javascript:history.back()" class="btn btn-secondary">
                   {{ "error.http.back_button"|i18n }}
                 </a>
               {% endif %}

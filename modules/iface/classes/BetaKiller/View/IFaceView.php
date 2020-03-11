@@ -20,6 +20,7 @@ class IFaceView
     public const META_KEY       = '__meta__';
     public const I18N_KEY       = '__i18n__';
     public const IFACE_KEY      = '__iface__';
+    public const IFACE_NAME_KEY = 'codename';
     public const IFACE_ZONE_KEY = 'zone';
 
     /**
@@ -83,10 +84,8 @@ class IFaceView
     {
         $dataPack = RequestProfiler::begin($request, $iface->getCodename().' IFace data');
 
-        $urlHelper = ServerRequestHelper::getUrlHelper($request);
-        $params    = ServerRequestHelper::getUrlContainer($request);
-        $i18n      = ServerRequestHelper::getI18n($request);
-
+        $i18n  = ServerRequestHelper::getI18n($request);
+        $lang  = $i18n->getLang();
         $model = $iface->getModel();
 
         // Hack for dropping original iface data on processing exception error page
@@ -109,9 +108,8 @@ class IFaceView
         $ifaceView->set(self::I18N_KEY, $i18n);
 
         $ifaceView->set(self::IFACE_KEY, [
-            'codename' => $model->getCodename(),
-            'label'    => $this->elementHelper->getLabel($model, $params, $i18n->getLang()),
-            'zone'     => $model->getZoneName(),
+            self::IFACE_NAME_KEY => $model->getCodename(),
+            self::IFACE_ZONE_KEY => $model->getZoneName(),
         ]);
 
         // Detect IFace layout
@@ -122,14 +120,22 @@ class IFaceView
         $assets       = $this->assetsFactory->create();
         $renderHelper = new HtmlRenderHelper($meta, $assets);
 
-        $meta->setCanonical($urlHelper->makeUrl($model, null, false));
+        // Errors may be fired early and UrlHelper may be not initialized
+        if (ServerRequestHelper::hasUrlHelper($request)) {
+            $urlHelper = ServerRequestHelper::getUrlHelper($request);
+            $meta->setCanonical($urlHelper->makeUrl($model, null, false));
+
+            $params = ServerRequestHelper::getUrlContainer($request);
+
+            $renderHelper
+                ->setTitle($this->elementHelper->getTitle($model, $params, $lang))
+                ->setMetaDescription($this->elementHelper->getDescription($model, $params, $lang));
+        }
 
         $renderHelper
-            ->setLang($i18n->getLang())
+            ->setLang($lang)
             ->setContentType()
-            ->setLayoutCodename($layoutCodename)
-            ->setTitle($this->elementHelper->getTitle($model, $params, $i18n->getLang()))
-            ->setMetaDescription($this->elementHelper->getDescription($model, $params, $i18n->getLang()));
+            ->setLayoutCodename($layoutCodename);
 
         $result = $this->layoutView->render($ifaceView, $renderHelper);
 

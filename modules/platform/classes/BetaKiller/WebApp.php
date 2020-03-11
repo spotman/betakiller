@@ -128,7 +128,7 @@ class WebApp
 
         $this->app->pipe(UrlHelperMiddleware::class);
 
-        // Exceptions handling (depends on i18n and UrlElementStack)
+        // Exceptions handling (depends on i18n and UrlElementStack for custom error pages)
         $this->app->pipe(ErrorPageMiddleware::class);
         $this->app->pipe(ExpectedExceptionMiddleware::class);
 
@@ -166,17 +166,20 @@ class WebApp
         // Register the dispatch middleware in the middleware pipeline
         $this->app->pipe(DispatchMiddleware::class);
 
-        // Save stat (referrer, target, utm markers, etc)
-        $this->app->pipe(HitStatMiddleware::class);
-
         // At this point, if no Response is returned by any middleware, the
         // NotFoundHandler kicks in; alternately, you can provide other fallback
         // middleware to execute.
+
+        // Save stat (referrer, target, utm markers, etc)
+        $this->app->pipe(HitStatMiddleware::class);
+
+        // Depends on UrlHelper
         $this->app->pipe(UrlElementDispatchMiddleware::class);
 
         // Prevent access for locked users
         $this->app->pipe(UserStatusMiddleware::class);
 
+        // Render UrlElement
         $this->app->pipe(UrlElementRenderMiddleware::class);
     }
 
