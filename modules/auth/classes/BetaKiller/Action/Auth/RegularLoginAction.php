@@ -73,7 +73,7 @@ class RegularLoginAction extends AbstractAction implements PostRequestActionInte
      *
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Auth\AccessDeniedException
-     * @throws \BetaKiller\Auth\InactiveException
+     * @throws \BetaKiller\Auth\UserBlockedException
      * @throws \BetaKiller\Auth\IncorrectCredentialsException
      * @throws \BetaKiller\Exception\BadRequestHttpException
      * @throws \BetaKiller\Exception\ValidationException

@@ -5,7 +5,7 @@
  */
 return [
     'error.auth.user-not-exists'                                => 'Неверный логин или пароль',
-    'error.auth.inactive'                                       => 'Ваш аккаунт отключён, обратитесь к администратору',
+    'error.auth.blocked'                                       => 'Ваш аккаунт отключён, обратитесь к администратору',
     'error.auth.incorrect-credentials'                             => 'Неверный логин или пароль',
     'error.auth.incorrect-password'                             => 'Неверный пароль',
     'error.auth.common'                                         => 'Ошибка авторизации, обратитесь к администратору',

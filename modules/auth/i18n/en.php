@@ -6,7 +6,7 @@
 return [
     'error.auth.common'                => 'Authentication failed',
     'error.auth.required'              => 'Authorization required',
-    'error.auth.inactive'              => 'Your account was switched off',
+    'error.auth.blocked'              => 'Your account was blocked',
     'error.auth.incorrect-password'    => 'Incorrect password',
     'error.auth.incorrect-credentials' => 'Your credentials are invalid',
     'error.auth.user-not-exists'       => 'User does not exists',

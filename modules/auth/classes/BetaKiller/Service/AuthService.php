@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Service;
 
 use BetaKiller\Auth\AccessDeniedException;
-use BetaKiller\Auth\InactiveException;
+use BetaKiller\Auth\UserBlockedException;
 use BetaKiller\Auth\SessionConfig;
 use BetaKiller\Event\UserPasswordChangeRequestedEvent;
 use BetaKiller\Factory\GuestUserFactory;
@@ -121,7 +121,7 @@ class AuthService
      *
      * @return void
      * @throws \BetaKiller\Auth\AccessDeniedException
-     * @throws \BetaKiller\Auth\InactiveException
+     * @throws \BetaKiller\Auth\UserBlockedException
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
@@ -131,7 +131,7 @@ class AuthService
     ): void {
         // Check account is active
         if (!$user->isActive()) {
-            throw new InactiveException();
+            throw new UserBlockedException();
         }
 
         $loginRole = $this->roleRepo->getLoginRole();

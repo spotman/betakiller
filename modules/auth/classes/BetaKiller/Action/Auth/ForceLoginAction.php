@@ -69,7 +69,7 @@ final class ForceLoginAction extends AbstractAction
      *
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Auth\AccessDeniedException
-     * @throws \BetaKiller\Auth\InactiveException
+     * @throws \BetaKiller\Auth\UserBlockedException
      * @throws \BetaKiller\Auth\IncorrectCredentialsException
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
