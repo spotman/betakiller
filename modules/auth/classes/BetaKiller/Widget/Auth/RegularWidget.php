@@ -2,6 +2,7 @@
 namespace BetaKiller\Widget\Auth;
 
 use BetaKiller\Action\Auth\RegularLoginAction;
+use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Auth\AccessRecoveryRequestIFace;
 use BetaKiller\Widget\AbstractPublicWidget;
@@ -9,6 +10,25 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class RegularWidget extends AbstractPublicWidget
 {
+    /**
+     * @var \BetaKiller\Helper\UrlHelper
+     */
+    private $urlHelper;
+
+    /**
+     * RegularWidget constructor.
+     *
+     * @param \BetaKiller\Factory\UrlHelperFactory $urlHelperFactory
+     *
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
+     */
+    public function __construct(UrlHelperFactory $urlHelperFactory)
+    {
+        // Use separate instance coz error pages processing can be done before UrlHelper initialized in middleware
+        $this->urlHelper = $urlHelperFactory->create();
+    }
+
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param array                                    $context
@@ -18,19 +38,17 @@ class RegularWidget extends AbstractPublicWidget
      */
     public function getData(ServerRequestInterface $request, array $context): array
     {
-        $i18n          = ServerRequestHelper::getI18n($request);
-        $urlHelper     = ServerRequestHelper::getUrlHelper($request);
-        $recoveryIFace = $urlHelper->getUrlElementByCodename(AccessRecoveryRequestIFace::codename());
-        $loginAction   = $urlHelper->getUrlElementByCodename(RegularLoginAction::codename());
+        $lang = ServerRequestHelper::getI18n($request)->getLang();
 
-        $lang = $i18n->getLang();
+        $recoveryIFace = $this->urlHelper->getUrlElementByCodename(AccessRecoveryRequestIFace::codename());
+        $loginAction   = $this->urlHelper->getUrlElementByCodename(RegularLoginAction::codename());
 
-        $params = $urlHelper->createUrlContainer()
+        $params = $this->urlHelper->createUrlContainer()
             ->setEntity($lang);
 
         return [
-            'login_url'           => $urlHelper->makeUrl($loginAction, $params),
-            'access_recovery_url' => $urlHelper->makeUrl($recoveryIFace, $params),
+            'login_url'           => $this->urlHelper->makeUrl($loginAction, $params),
+            'access_recovery_url' => $this->urlHelper->makeUrl($recoveryIFace, $params),
         ];
     }
 }

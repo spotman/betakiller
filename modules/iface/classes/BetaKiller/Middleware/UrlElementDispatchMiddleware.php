@@ -67,8 +67,6 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $pid = RequestProfiler::begin($request, 'UrlElement dispatch');
-
         $stack  = ServerRequestHelper::getUrlElementStack($request);
         $params = ServerRequestHelper::getUrlContainer($request);
         $user   = ServerRequestHelper::getUser($request);
@@ -84,8 +82,6 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
             $i18n->setLang($lang);
         }
 
-        RequestProfiler::end($pid);
-
         // Forward call
         return $handler->handle($request);
     }
@@ -96,18 +92,22 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
         UrlContainerInterface $params,
         UserInterface $user
     ): void {
+        $pid = RequestProfiler::begin($request, 'UrlElement dispatch');
+
         $url = ServerRequestHelper::getUrl($request);
 
         try {
             $this->urlProcessor->process($url, $stack, $params, $user);
+
+            // Emit event about successful url parsing
+            $this->eventBus->emit(new UrlDispatchedEvent($request));
         } catch (MissingUrlElementException $e) {
             LoggerHelper::logException($this->logger, $e, null, $request);
 
             $this->processMissingUrl($request, $e);
+        } finally {
+            RequestProfiler::end($pid);
         }
-
-        // Emit event about successful url parsing
-        $this->eventBus->emit(new UrlDispatchedEvent($request));
     }
 
     private function processMissingUrl(ServerRequestInterface $request, MissingUrlElementException $e): void
