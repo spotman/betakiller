@@ -6,17 +6,14 @@ namespace BetaKiller\Middleware;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Event\MissingUrlEvent;
 use BetaKiller\Event\UrlDispatchedEvent;
-use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Exception\SeeOtherHttpException;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\MissingUrlElementException;
-use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlProcessor;
 use Psr\Http\Message\ResponseInterface;
@@ -104,40 +101,38 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
         try {
             $this->urlProcessor->process($url, $stack, $params, $user);
         } catch (MissingUrlElementException $e) {
-            $parentModel = $e->getParentUrlElement();
+            LoggerHelper::logException($this->logger, $e, null, $request);
 
-            $urlHelper = ServerRequestHelper::getUrlHelper($request);
-            $ip        = ServerRequestHelper::getIpAddress($request);
-            $referrer  = ServerRequestHelper::getHttpReferrer($request);
-
-            $redirectToUrl = $parentModel && $e->getRedirectToParent()
-                ? $urlHelper->makeUrl($parentModel, $params, false)
-                : null;
-
-            $this->eventBus->emit(
-                new MissingUrlEvent($request->getUri(), $parentModel, $redirectToUrl, $ip, $referrer)
-            );
-
-            if ($redirectToUrl) {
-                // Missing but see other
-                throw new SeeOtherHttpException($redirectToUrl);
-            }
-
-            // Simply not found
-            throw new NotFoundHttpException();
-        } catch (UrlBehaviourException | UrlElementException $e) {
-            // Log this exception and keep processing
-            LoggerHelper::logException($this->logger, $e, $user);
-
-            // Nothing found
-            throw new NotFoundHttpException;
+            $this->processMissingUrl($request, $e);
         }
-
-        $evt = RequestProfiler::begin($request, 'UrlDispatchedEvent');
 
         // Emit event about successful url parsing
         $this->eventBus->emit(new UrlDispatchedEvent($request));
+    }
 
-        RequestProfiler::end($evt);
+    private function processMissingUrl(ServerRequestInterface $request, MissingUrlElementException $e): void
+    {
+        $parentModel = $e->getParentUrlElement();
+        $params      = $e->getUrlContainer();
+
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+        $ip        = ServerRequestHelper::getIpAddress($request);
+        $referrer  = ServerRequestHelper::getHttpReferrer($request);
+
+        $redirectToUrl = $parentModel && $e->getRedirectToParent()
+            ? $urlHelper->makeUrl($parentModel, $params, false)
+            : null;
+
+        $this->eventBus->emit(
+            new MissingUrlEvent($request->getUri(), $parentModel, $redirectToUrl, $ip, $referrer)
+        );
+
+        if ($redirectToUrl) {
+            // Missing but see other
+            throw new SeeOtherHttpException($redirectToUrl);
+        }
+
+        // Allow custom error page processing
+        throw $e;
     }
 }

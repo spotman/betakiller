@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url;
 
-use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -53,7 +52,6 @@ class UrlDispatcher implements UrlDispatcherInterface
      *
      * @return void
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\MissingUrlElementException
      */
     public function process(string $uri, UrlElementStack $stack, UrlContainerInterface $params): void
@@ -63,11 +61,18 @@ class UrlDispatcher implements UrlDispatcherInterface
 
         $path = parse_url($uri, PHP_URL_PATH);
 
-        // Parse path first and detect target UrlElement
-        $this->parseUriPath($path, $stack, $params);
+        try {
+            // Parse path first and detect target UrlElement
+            $this->parseUriPath($path, $stack, $params);
 
-        // Parse query parts for target UrlElement
-        $this->parseQueryParts($stack->getCurrent(), $params);
+            // Parse query parts for target UrlElement
+            $this->parseQueryParts($stack->getCurrent(), $params);
+        } catch (UrlBehaviourException $e) {
+            // Fetch last processed parent (use root if not exists)
+            $last = $stack->hasCurrent() ? $stack->getCurrent() : null;
+
+            throw new MissingUrlElementException($params, $last, false, $e);
+        }
     }
 
     /**
@@ -76,6 +81,9 @@ class UrlDispatcher implements UrlDispatcherInterface
      * @param \BetaKiller\Url\UrlElementInterface             $element
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     private function parseQueryParts(UrlElementInterface $element, UrlContainerInterface $params): void
@@ -85,6 +93,16 @@ class UrlDispatcher implements UrlDispatcherInterface
         }
     }
 
+    /**
+     * @param string                                          $key
+     * @param string                                          $binding
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParams
+     *
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
+     * @throws \BetaKiller\Url\UrlPrototypeException
+     */
     private function processQueryPart(string $key, string $binding, UrlContainerInterface $urlParams): void
     {
         $partValue = $urlParams->getQueryPart($key);
@@ -117,9 +135,8 @@ class UrlDispatcher implements UrlDispatcherInterface
      * @param \BetaKiller\Url\UrlElementStack                 $stack
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParams
      *
-     * @return void
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Url\UrlElementException
+     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \BetaKiller\Url\MissingUrlElementException
      */
     private function parseUriPath(string $uri, UrlElementStack $stack, UrlContainerInterface $urlParams): void
@@ -129,21 +146,17 @@ class UrlDispatcher implements UrlDispatcherInterface
 
         $parent = null;
 
-        try {
-            // Dispatch childs
-            // Loop through every uri part and initialize it`s iface
-            do {
-                $urlElement = $this->detectUrlElement($urlIterator, $urlParams, $parent);
+        // Dispatch childs
+        // Loop through every uri part and initialize it`s iface
+        do {
+            $urlElement = $this->detectUrlElement($urlIterator, $urlParams, $parent);
 
-                $parent = $urlElement;
+            $parent = $urlElement;
 
-                $stack->push($urlElement);
+            $stack->push($urlElement);
 
-                $urlIterator->next();
-            } while ($urlIterator->valid());
-        } catch (UrlBehaviourException $e) {
-            throw new MissingUrlElementException($parent, false, $e);
-        }
+            $urlIterator->next();
+        } while ($urlIterator->valid());
     }
 
     /**
@@ -153,7 +166,6 @@ class UrlDispatcher implements UrlDispatcherInterface
      *
      * @return \BetaKiller\Url\UrlElementInterface
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \BetaKiller\Url\MissingUrlElementException
      */
@@ -178,7 +190,7 @@ class UrlDispatcher implements UrlDispatcherInterface
         // Empty layer (bad copy-paste, mistake, etc)
         if (!$layer) {
             // Force redirect to parent URL
-            throw new MissingUrlElementException($parent, true);
+            throw new MissingUrlElementException($params, $parent, true);
         }
 
         // Search for appropriate model in current layer
@@ -186,7 +198,7 @@ class UrlDispatcher implements UrlDispatcherInterface
 
         if (!$urlElement) {
             // No UrlElement found
-            throw new MissingUrlElementException($parent);
+            throw new MissingUrlElementException($params, $parent);
         }
 
         return $urlElement;

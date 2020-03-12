@@ -3,9 +3,10 @@ html, body {
 }
 
 .error-503 {
-    height: 100%;
-    max-width: 300px;
-    margin: 0 auto;
+    height:     100%;
+    max-width:  350px;
+    margin:     0 auto;
+    padding:    0 1rem;
     text-align: center;
 }
 
@@ -14,16 +15,16 @@ html, body {
 }
 
 .error-503 p {
-    display: block;
+    display:    block;
     margin-top: 15px;
 }
 
 .error-503 .progress-bar {
-    width: 100%;
-    max-width: 0;
-    transition: max-width 1s linear;
+    width:              100%;
+    max-width:          0;
+    transition:         max-width 1s linear;
     -webkit-transition: max-width 1s linear;
-    -moz-transition: max-width 1s linear;
-    -ms-transition: max-width 1s linear;
-    -o-transition: max-width 1s linear;
+    -moz-transition:    max-width 1s linear;
+    -ms-transition:     max-width 1s linear;
+    -o-transition:      max-width 1s linear;
 }

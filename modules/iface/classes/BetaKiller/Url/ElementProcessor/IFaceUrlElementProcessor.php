@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Url\ElementProcessor;
 
-use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Factory\IFaceFactory;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -86,14 +85,6 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
 
         try {
             $output = $this->ifaceView->render($iface, $request);
-
-            // TODO Apply to other UrlElement types (Action)
-            $unusedParts = $urlContainer->getUnusedQueryPartsKeys();
-            if ($unusedParts) {
-                throw new BadRequestHttpException('Request have unused query parts: :keys', [
-                    ':keys' => implode(', ', $unusedParts),
-                ]);
-            }
 
             $response = ResponseHelper::html($output);
             $response = ResponseHelper::setExpires($response, $iface->getExpiresDateTime());

@@ -158,11 +158,12 @@ class HitStatMiddleware implements MiddlewareInterface
             }
         }
 
-        // Detect marker
-        $marker = $this->service->getMarkerFromRequest($request);
-
         $session   = ServerRequestHelper::getSession($request);
         $requestId = ServerRequestHelper::getRequestUuid($request);
+        $params    = ServerRequestHelper::getUrlContainer($request);
+
+        // Detect marker
+        $marker = $this->service->getMarkerFromUrlContainer($params);
 
         $p3 = RequestProfiler::begin($request, 'Hit stat: enqueue command');
 

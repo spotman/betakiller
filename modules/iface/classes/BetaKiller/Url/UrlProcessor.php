@@ -44,6 +44,18 @@ class UrlProcessor
         $this->aclHelper       = $aclHelper;
     }
 
+    /**
+     * @param string                                          $url
+     * @param \BetaKiller\Url\UrlElementStack                 $stack
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     * @param \BetaKiller\Model\UserInterface                 $user
+     *
+     * @throws \BetaKiller\Auth\AccessDeniedException
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Url\MissingUrlElementException
+     * @throws \Spotman\Acl\AclException
+     */
     public function process(
         string $url,
         UrlElementStack $stack,

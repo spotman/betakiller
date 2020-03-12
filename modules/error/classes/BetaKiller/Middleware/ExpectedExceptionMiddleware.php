@@ -37,9 +37,6 @@ class ExpectedExceptionMiddleware implements MiddlewareInterface
             $message = $e->getFirstItem()->getMessage();
 
             throw new PublicException($message);
-        } catch (\Throwable $e) {
-            // Rethrow other exceptions
-            throw $e;
         }
     }
 }

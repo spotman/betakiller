@@ -1,10 +1,6 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\IFace\Auth\LoginIFace;
-use BetaKiller\Url\BeforeProcessingInterface;
-use BetaKiller\Widget\AuthWidget;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractHttpErrorIFace extends AbstractIFace
@@ -21,13 +17,13 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
      */
     public function getData(ServerRequestInterface $request): array
     {
-        $redirectData = [
-            AuthWidget::REDIRECT_KEY => ServerRequestHelper::getUrl($request),
-        ];
+//        $redirectData = [
+//            AuthWidget::REDIRECT_KEY => ServerRequestHelper::getUrl($request),
+//        ];
 
         return [
-            'login_url' => LoginIFace::URL.'?'.http_build_query($redirectData),
-            'is_guest'  => ServerRequestHelper::isGuest($request),
+//            'login_url' => LoginIFace::URL.'?'.http_build_query($redirectData),
+//            'is_guest'  => ServerRequestHelper::isGuest($request),
         ];
     }
 

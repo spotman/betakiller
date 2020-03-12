@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Service;
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\HitDomain;
 use BetaKiller\Model\HitLink;
 use BetaKiller\Model\HitMarker;
@@ -18,8 +17,8 @@ use BetaKiller\Repository\HitLinkRepository;
 use BetaKiller\Repository\HitMarkerRepository;
 use BetaKiller\Repository\HitPageRedirectRepository;
 use BetaKiller\Repository\HitPageRepository;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use DateTimeImmutable;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
 class HitService
@@ -168,10 +167,8 @@ class HitService
         return $model;
     }
 
-    public function getMarkerFromRequest(ServerRequestInterface $request): ?HitMarkerInterface
+    public function getMarkerFromUrlContainer(UrlContainerInterface $params): ?HitMarkerInterface
     {
-        $params = ServerRequestHelper::getUrlContainer($request);
-
         // Fetch UTM tags if exists
         $source   = $params->getQueryPart(HitMarkerInterface::UTM_QUERY_SOURCE);
         $medium   = $params->getQueryPart(HitMarkerInterface::UTM_QUERY_MEDIUM);

@@ -15,6 +15,7 @@ use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 use BetaKiller\Assets\StaticFilesDeployHandler;
 use BetaKiller\HitStat\HitStatMiddleware;
 use BetaKiller\Middleware\ContentNegotiationMiddleware;
+use BetaKiller\Middleware\CustomNotFoundPageMiddleware;
 use BetaKiller\Middleware\DebugMiddleware;
 use BetaKiller\Middleware\ErrorPageMiddleware;
 use BetaKiller\Middleware\ExpectedExceptionMiddleware;
@@ -126,12 +127,11 @@ class WebApp
         $this->app->pipe(ContentType::class);
         $this->app->pipe(I18nMiddleware::class);
 
-        $this->app->pipe(UrlHelperMiddleware::class);
-
-        // Exceptions handling (depends on i18n and UrlElementStack for custom error pages)
+        // Exceptions handling (depends on i18n)
         $this->app->pipe(ErrorPageMiddleware::class);
         $this->app->pipe(ExpectedExceptionMiddleware::class);
 
+        // Throws raw 501 exception, proceeded by ErrorPageMiddleware
         $this->app->pipe(MaintenanceModeMiddleware::class);
 
         // Flash messages for Post-Redirect-Get flow (requires Session)
@@ -170,8 +170,14 @@ class WebApp
         // NotFoundHandler kicks in; alternately, you can provide other fallback
         // middleware to execute.
 
-        // Save stat (referrer, target, utm markers, etc)
+        // Heavy operation, defer
+        $this->app->pipe(UrlHelperMiddleware::class);
+
+        // Save stat (referrer, target, utm markers, etc) (depends on UrlContainer)
         $this->app->pipe(HitStatMiddleware::class);
+
+        // Display custom 404 page for dispatched UrlElement
+        $this->app->pipe(CustomNotFoundPageMiddleware::class);
 
         // Depends on UrlHelper
         $this->app->pipe(UrlElementDispatchMiddleware::class);

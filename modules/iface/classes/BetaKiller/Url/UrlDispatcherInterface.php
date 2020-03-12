@@ -14,8 +14,6 @@ interface UrlDispatcherInterface
      *
      * @return void
      * @throws \BetaKiller\Url\MissingUrlElementException
-     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
-     * @throws \BetaKiller\Url\UrlElementException
      */
     public function process(string $uri, UrlElementStack $stack, UrlContainerInterface $params): void;
 }

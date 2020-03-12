@@ -61,6 +61,13 @@ class ActionUrlElementProcessor implements UrlElementProcessorInterface
                 $getData      = $request->getQueryParams();
                 $getArguments = $this->argumentsFacade->prepareArguments($getData, $getDefinition);
 
+                // Fetch query keys to prevent "unused query keys" exception
+                $params = ServerRequestHelper::getUrlContainer($request);
+
+                foreach ($getData as $key => $value) {
+                    $params->getQueryPart($key);
+                }
+
                 $request = $request->withAttribute(ActionRequestHelper::GET_ATTRIBUTE, $getArguments);
             }
 

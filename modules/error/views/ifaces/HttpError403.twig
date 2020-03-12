@@ -2,6 +2,7 @@
 
 {% block content %}
 
+  {{ js("ifaces/HttpError403.js") }}
   {{ css("ifaces/HttpError403.css") }}
 
   <div class="container error-403">
@@ -19,15 +20,9 @@
             <p>{{ "error.http.403.message"|i18n }}</p>
 
             <p class="center-align">
-              {% if is_guest %}
-                <a href="{{ login_url }}" class="btn btn-secondary">
-                  {{ "error.http.403.login-button"|i18n }}
-                </a>
-              {% else %}
-                <a href="javascript:history.back()" class="btn btn-secondary">
-                  {{ "error.http.back-button"|i18n }}
-                </a>
-              {% endif %}
+              <button class="btn btn-primary back-button">
+                {{ "error.http.back-button"|i18n }}
+              </button>
             </p>
           </div>
         </div>

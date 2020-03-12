@@ -13,7 +13,6 @@ use BetaKiller\IFace\AbstractHttpErrorIFace;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Url\IFaceModelInterface;
-use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\View\IFaceView;
 use Psr\Http\Message\ResponseInterface;
@@ -130,11 +129,8 @@ class ErrorPageRenderer implements ErrorPageRendererInterface
 
         $httpCode = $this->exceptionService->getHttpCode($exception);
 
-        $stack = ServerRequestHelper::getUrlElementStack($request);
-        $last  = $stack->hasCurrent() ? $stack->getCurrent() : null;
-
         try {
-            $iface = $this->getErrorIFaceForCode($httpCode, $last);
+            $iface = $this->getErrorIFaceForCode($httpCode);
 
             if ($iface instanceof AbstractHttpErrorIFace) {
                 $iface->setException($exception);
@@ -172,17 +168,16 @@ class ErrorPageRenderer implements ErrorPageRendererInterface
     }
 
     /**
-     * @param int                                      $code
-     * @param \BetaKiller\Url\UrlElementInterface|null $lastElement
+     * @param int $code
      *
      * @return \BetaKiller\IFace\IFaceInterface|null
      * @throws \BetaKiller\Factory\FactoryException
      */
-    private function getErrorIFaceForCode(int $code, ?UrlElementInterface $lastElement): ?IFaceInterface
+    private function getErrorIFaceForCode(int $code): ?IFaceInterface
     {
         // Try to find IFace provided code first and use default IFace if failed
         foreach ([$code, ExceptionService::DEFAULT_HTTP_CODE] as $tryCode) {
-            $model = $this->searchErrorIFaceInBranch($tryCode, $lastElement);
+            $model = $this->findErrorIFace($tryCode);
 
             if ($model) {
                 return $this->ifaceFactory->createFromUrlElement($model);
@@ -193,36 +188,13 @@ class ErrorPageRenderer implements ErrorPageRendererInterface
     }
 
     /**
-     * @param int                                      $code
-     * @param \BetaKiller\Url\UrlElementInterface|null $parent
+     * @param int $code
      *
      * @return \BetaKiller\IFace\IFaceInterface|null
      */
-    private function searchErrorIFaceInBranch(int $code, ?UrlElementInterface $parent): ?IFaceModelInterface
+    private function findErrorIFace(int $code): ?IFaceModelInterface
     {
         try {
-            // Try to find dedicated IFace first
-            do {
-                $layer = $parent
-                    ? $this->tree->getChildren($parent)
-                    : $this->tree->getRoot();
-
-                foreach ($layer as $item) {
-                    if (!$item instanceof IFaceModelInterface) {
-                        continue;
-                    }
-
-                    if (strpos($item->getCodename(), 'Error'.$code) !== false) {
-                        return $item;
-                    }
-                }
-
-                if ($parent) {
-                    $parent = $this->tree->getParent($parent);
-                }
-            } while ($parent);
-
-            // Use default IFace if failed
             $codename = 'HttpError'.$code;
 
             if ($this->tree->has($codename)) {
