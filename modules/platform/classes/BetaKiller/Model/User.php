@@ -347,7 +347,7 @@ class User extends \ORM implements UserInterface
      */
     public function hasAnyOfRoles(array $roles): bool
     {
-        $rolesNames = array_map(static function(RoleInterface $role) {
+        $rolesNames = array_map(static function (RoleInterface $role) {
             return $role->getName();
         }, $roles);
 
@@ -444,7 +444,13 @@ class User extends \ORM implements UserInterface
      */
     public function isActive(): bool
     {
-        return ($this->loaded() && !$this->getWorkflowState()->isBlocked());
+        if (!$this->loaded()) {
+            return false;
+        }
+
+        $state = $this->getWorkflowState();
+
+        return !($state->isBlocked() || $state->isClaimed());
     }
 
     /**

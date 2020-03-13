@@ -30,6 +30,7 @@ return [
                     UserWorkflow::TRANSITION_CHANGE_EMAIL    => UserState::EMAIL_CHANGED,
                     UserWorkflow::TRANSITION_EMAIL_CONFIRMED => UserState::EMAIL_CONFIRMED,
                     UserWorkflow::TRANSITION_REG_CLAIM       => UserState::CLAIMED,
+                    UserWorkflow::TRANSITION_SUSPEND         => UserState::SUSPENDED,
                     UserWorkflow::TRANSITION_BLOCK           => UserState::BLOCKED,
                 ],
             ],
@@ -104,6 +105,7 @@ return [
                 WorkflowConfig::TRANSITIONS => [
                     UserWorkflow::TRANSITION_CHANGE_EMAIL    => UserState::EMAIL_CHANGED,
                     UserWorkflow::TRANSITION_EMAIL_CONFIRMED => UserState::EMAIL_CONFIRMED,
+                    UserWorkflow::TRANSITION_SUSPEND         => UserState::SUSPENDED,
                     UserWorkflow::TRANSITION_BLOCK           => UserState::BLOCKED,
                 ],
             ],
