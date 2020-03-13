@@ -5,8 +5,8 @@ namespace BetaKiller\Exception;
 
 class BadRequestHttpException extends HttpException
 {
-    public function __construct(string $message = null, array $variables = null)
+    public function __construct(string $message = null, array $variables = null, \Throwable $previous = null)
     {
-        parent::__construct(400, $message, $variables);
+        parent::__construct(400, $message, $variables, $previous);
     }
 }
