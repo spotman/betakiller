@@ -86,7 +86,7 @@ class ActionUrlElementProcessor implements UrlElementProcessorInterface
             throw new BadRequestHttpException('Arguments validation error for action ":action": :error', [
                 ':error'  => $e->getMessage(),
                 ':action' => get_class($action),
-            ]);
+            ], $e);
         }
 
         return $action->handle($request);
