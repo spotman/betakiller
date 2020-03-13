@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
+use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\MissingUrlElementException;
@@ -53,13 +54,13 @@ class CustomNotFoundPageMiddleware implements MiddlewareInterface
         try {
             return $handler->handle($request);
         } catch (MissingUrlElementException $e) {
+            LoggerHelper::logException($this->logger, $e, null, $request);
+
             $page = $this->detectCustomPage($e);
 
             if (!$page) {
-                throw $e;
+                throw new NotFoundHttpException();
             }
-
-            LoggerHelper::logException($this->logger, $e, null, $request);
 
             return $this->renderer->render($page, $request);
         }
