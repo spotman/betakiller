@@ -148,4 +148,16 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
         // at this moment there is no need to store IFace data in database.
         return [];
     }
+
+    /**
+     * Returns codename of MenuCounter provider (or null if not defined)
+     *
+     * @return string|null
+     */
+    public function getMenuCounterCodename(): ?string
+    {
+        // realization temporarily is absent.
+        // at this moment there is no need to store IFace data in database.
+        return null;
+    }
 }

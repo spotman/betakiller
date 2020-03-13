@@ -6,8 +6,11 @@ namespace BetaKiller\Url;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 
-interface HasMenuCounterInterface
+interface MenuCounterInterface
 {
+    public const NAMESPACES = ['MenuCounter'];
+    public const SUFFIX     = 'MenuCounter';
+
     /**
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      * @param \BetaKiller\Model\UserInterface                 $user

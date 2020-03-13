@@ -11,6 +11,11 @@ trait UrlElementForMenuPlainModelTrait
     private $menuName;
 
     /**
+     * @var string|null
+     */
+    private $menuCounter;
+
+    /**
      * @var string[]
      */
     private $menuOrder = [];
@@ -36,10 +41,24 @@ trait UrlElementForMenuPlainModelTrait
         return $this->menuOrder;
     }
 
+    /**
+     * Returns codename of MenuCounter provider (or null if not defined)
+     *
+     * @return string|null
+     */
+    public function getMenuCounterCodename(): ?string
+    {
+        return $this->menuCounter;
+    }
+
     protected function menuFromArray(array $data): void
     {
         if (isset($data[self::OPTION_MENU_NAME])) {
             $this->menuName = mb_strtolower($data[self::OPTION_MENU_NAME]);
+        }
+
+        if (isset($data[self::OPTION_MENU_COUNTER])) {
+            $this->menuCounter = $data[self::OPTION_MENU_COUNTER];
         }
 
         if (isset($data[self::OPTION_MENU_ORDER])) {
@@ -52,8 +71,9 @@ trait UrlElementForMenuPlainModelTrait
     protected function menuToArray(): array
     {
         return [
-            self::OPTION_MENU_NAME  => $this->getMenuName(),
-            self::OPTION_MENU_ORDER => implode(',', $this->getMenuOrder()),
+            self::OPTION_MENU_NAME    => $this->getMenuName(),
+            self::OPTION_MENU_ORDER   => implode(',', $this->getMenuOrder()),
+            self::OPTION_MENU_COUNTER => $this->getMenuCounterCodename(),
         ];
     }
 }

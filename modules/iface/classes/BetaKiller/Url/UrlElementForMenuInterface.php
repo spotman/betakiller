@@ -5,8 +5,9 @@ namespace BetaKiller\Url;
 
 interface UrlElementForMenuInterface extends UrlElementWithLabelInterface
 {
-    public const OPTION_MENU_NAME  = 'menu';
-    public const OPTION_MENU_ORDER = 'order';
+    public const OPTION_MENU_NAME    = 'menu';
+    public const OPTION_MENU_ORDER   = 'order';
+    public const OPTION_MENU_COUNTER = 'counter';
 
     /**
      * Returns menu codename to which URL is assigned
@@ -14,6 +15,13 @@ interface UrlElementForMenuInterface extends UrlElementWithLabelInterface
      * @return null|string
      */
     public function getMenuName(): ?string;
+
+    /**
+     * Returns codename of MenuCounter provider (or null if not defined)
+     *
+     * @return string|null
+     */
+    public function getMenuCounterCodename(): ?string;
 
     /**
      * Returns sorted array of URL values for dynamic urls or numeric index for static urls

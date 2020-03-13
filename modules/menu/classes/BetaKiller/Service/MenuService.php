@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Service;
 
 use BetaKiller\Exception\DomainException;
-use BetaKiller\Factory\UrlElementInstanceFactory;
+use BetaKiller\Factory\MenuCounterFactory;
 use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\TextHelper;
 use BetaKiller\Helper\UrlElementHelper;
@@ -16,7 +16,6 @@ use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\ElementFilter\AggregateUrlElementFilter;
 use BetaKiller\Url\ElementFilter\MenuCodenameUrlElementFilter;
 use BetaKiller\Url\ElementFilter\UrlElementFilterInterface;
-use BetaKiller\Url\HasMenuCounterInterface;
 use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementForMenuInterface;
 use BetaKiller\Url\UrlElementInterface;
@@ -79,31 +78,31 @@ class MenuService
     private $depth;
 
     /**
-     * @var \BetaKiller\Factory\UrlElementInstanceFactory
+     * @var \BetaKiller\Factory\MenuCounterFactory
      */
-    private $elementFactory;
+    private $counterFactory;
 
     /**
-     * AuthWidget constructor.
+     * MenuService constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface       $tree
      * @param \BetaKiller\Helper\AclHelper                  $aclHelper
      * @param \BetaKiller\Helper\UrlElementHelper           $elementHelper
-     * @param \BetaKiller\Factory\UrlElementInstanceFactory $elementFactory
+     * @param \BetaKiller\Factory\MenuCounterFactory        $counterFactory
      * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
      */
     public function __construct(
         UrlElementTreeInterface $tree,
         AclHelper $aclHelper,
         UrlElementHelper $elementHelper,
-        UrlElementInstanceFactory $elementFactory,
+        MenuCounterFactory $counterFactory,
         UrlBehaviourFactory $behaviourFactory
     ) {
         $this->tree             = $tree;
         $this->aclHelper        = $aclHelper;
         $this->behaviourFactory = $behaviourFactory;
         $this->elementHelper    = $elementHelper;
-        $this->elementFactory   = $elementFactory;
+        $this->counterFactory   = $counterFactory;
     }
 
     /**
@@ -237,8 +236,6 @@ class MenuService
 
             if ($useCurrent) {
                 // Element is in menu, processing
-                $instance = $this->elementFactory->createFromUrlElement($urlElement);
-
                 $orderedItemsBaseCounter = $totalCounter;
                 $availableUrlCounter     = 0;
 
@@ -260,8 +257,8 @@ class MenuService
                     $url = $availableUrl->getUrl();
 
                     // Calculate menu counter if needed
-                    $counter = $instance instanceof HasMenuCounterInterface
-                        ? $instance->getMenuCounter($params, $this->user)
+                    $counter = $urlElement instanceof UrlElementForMenuInterface
+                        ? $this->getMenuItemCounter($urlElement, $params)
                         : null;
 
                     // Calculate order
@@ -365,5 +362,16 @@ class MenuService
         throw new UrlElementException('Can not detect menu order for URL ":url"', [
             ':url' => $url,
         ]);
+    }
+
+    private function getMenuItemCounter(UrlElementForMenuInterface $urlElement, UrlContainerInterface $params): ?int
+    {
+        $codename = $urlElement->getMenuCounterCodename();
+
+        if (!$codename) {
+            return null;
+        }
+
+        return $this->counterFactory->create($codename)->getMenuCounter($params, $this->user);
     }
 }
