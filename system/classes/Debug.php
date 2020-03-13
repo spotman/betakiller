@@ -2,6 +2,7 @@
 
 use BetaKiller\Exception\HttpExceptionInterface;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\View\ViewInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Debug extends Kohana_Debug
@@ -27,7 +28,7 @@ class Debug extends Kohana_Debug
     public static function htmlStacktrace(\Throwable $e, ?ServerRequestInterface $request = null): string
     {
         try {
-            if (!\interface_exists(\BetaKiller\View\ViewInterface::class)) {
+            if (!\interface_exists(ViewInterface::class)) {
                 return Kohana_Kohana_Exception::text($e);
             }
 
