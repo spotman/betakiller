@@ -73,8 +73,8 @@ final class TwigExtension extends AbstractExtension
              */
             new TwigFunction(
                 'js',
-                function (array $context, string $location, string $condition = null) {
-                    $this->getStaticAssets($context)->addJs($location, $condition);
+                function (array $context, string $location, ?array $attributes = null, string $condition = null) {
+                    $this->getStaticAssets($context)->addJs($location, $attributes, $condition);
                 },
                 ['needs_context' => true, 'is_safe' => ['html']]
             ),
@@ -84,8 +84,8 @@ final class TwigExtension extends AbstractExtension
              */
             new TwigFunction(
                 'css',
-                function (array $context, string $location, string $condition = null): void {
-                    $this->getStaticAssets($context)->addCss($location, $condition);
+                function (array $context, string $location, ?array $attributes = null, string $condition = null): void {
+                    $this->getStaticAssets($context)->addCss($location, $attributes, $condition);
                 },
                 ['needs_context' => true, 'is_safe' => ['html']]
             ),

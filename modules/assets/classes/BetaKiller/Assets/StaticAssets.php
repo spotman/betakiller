@@ -46,7 +46,7 @@ class StaticAssets
         $this->config = $config;
     }
 
-    public function addJs(string $location, ?string $condition = null): void
+    public function addJs(string $location, ?array $attributes = null, ?string $condition = null): void
     {
         if (!$this->isAbsoluteUrl($location)) {
             $location = $this->getFullUrl($location);
@@ -60,10 +60,11 @@ class StaticAssets
         $this->jsData[$location] = [
             'location'  => $location,
             'condition' => $condition,
+            'attributes' => $attributes ?? [],
         ];
     }
 
-    public function addCss(string $location, ?string $condition = null): void
+    public function addCss(string $location, ?array $attributes = null, ?string $condition = null): void
     {
         if (!$this->isAbsoluteUrl($location)) {
             $location = $this->getFullUrl($location);
@@ -77,6 +78,7 @@ class StaticAssets
         $this->cssData[$location] = [
             'location'  => $location,
             'condition' => $condition,
+            'attributes' => $attributes ?? [],
         ];
     }
 
@@ -87,8 +89,8 @@ class StaticAssets
     {
         $jsCode = '';
 
-        foreach ($this->jsData as $location => $jsData) {
-            $jsCode .= $this->getScriptTag($location, $jsData['condition'])."\n";
+        foreach ($this->jsData as $jsData) {
+            $jsCode .= $this->getScriptTag($jsData)."\n";
         }
 
         return $jsCode;
@@ -102,8 +104,8 @@ class StaticAssets
         $cssCode = '';
 
         // Not need to build one css file
-        foreach ($this->cssData as $location => $cssData) {
-            $cssCode .= $this->getCssLink($location, $cssData['condition'])."\n";
+        foreach ($this->cssData as $cssData) {
+            $cssCode .= $this->getCssLink($cssData)."\n";
         }
 
         return $cssCode;
@@ -171,14 +173,17 @@ class StaticAssets
     /**
      * Gets html code of the css loading
      *
-     * @param  string      $location
-     * @param  string|null $condition
+     * @param array $data
      *
      * @return string
      */
-    private function getCssLink(string $location, string $condition = null): string
+    private function getCssLink(array $data): string
     {
-        $code = HTML::style($location, ['media' => 'all']);
+        $location = $data['location'];
+        $attributes = $data['attributes'];
+        $condition = $data['condition'];
+
+        $code = HTML::style($location, $attributes + ['media' => 'all']);
 
         if ($condition) {
             $code = $this->wrapInCondition($code, $condition);
@@ -190,14 +195,17 @@ class StaticAssets
     /**
      * Gets html code of the script loading
      *
-     * @param  string      $location
-     * @param  string|null $condition
+     * @param array $data
      *
      * @return string
      */
-    private function getScriptTag(string $location, string $condition = null): string
+    private function getScriptTag(array $data): string
     {
-        $code = HTML::script($location);
+        $location = $data['location'];
+        $attributes = $data['attributes'];
+        $condition = $data['condition'];
+
+        $code = HTML::script($location, $attributes);
 
         if ($condition) {
             $code = $this->wrapInCondition($code, $condition);
