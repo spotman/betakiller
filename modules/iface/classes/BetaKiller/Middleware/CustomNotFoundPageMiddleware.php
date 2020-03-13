@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Exception\NotFoundHttpException;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\MissingUrlElementException;
 use BetaKiller\Url\UrlElementRendererInterface;
@@ -12,6 +12,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
 
 class CustomNotFoundPageMiddleware implements MiddlewareInterface
 {
@@ -26,15 +27,22 @@ class CustomNotFoundPageMiddleware implements MiddlewareInterface
     private $renderer;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * CustomNotFoundPageMiddleware constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface     $tree
      * @param \BetaKiller\Url\UrlElementRendererInterface $renderer
+     * @param \Psr\Log\LoggerInterface                    $logger
      */
-    public function __construct(UrlElementTreeInterface $tree, UrlElementRendererInterface $renderer)
+    public function __construct(UrlElementTreeInterface $tree, UrlElementRendererInterface $renderer, LoggerInterface $logger)
     {
         $this->tree     = $tree;
         $this->renderer = $renderer;
+        $this->logger = $logger;
     }
 
     /**
@@ -48,8 +56,10 @@ class CustomNotFoundPageMiddleware implements MiddlewareInterface
             $page = $this->detectCustomPage($e);
 
             if (!$page) {
-                throw new NotFoundHttpException();
+                throw $e;
             }
+
+            LoggerHelper::logException($this->logger, $e, null, $request);
 
             return $this->renderer->render($page, $request);
         }
