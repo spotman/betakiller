@@ -192,16 +192,17 @@ class DebugMiddleware implements MiddlewareInterface
     private function addCspRules(JavascriptRenderer $renderer, SecureHeaders $csp): void
     {
         $inlineJs  = $renderer->getAssets('inline_js');
-        $inlineCss = $renderer->getAssets('inline_css');
+//        $inlineCss = $renderer->getAssets('inline_css');
         $initJs    = \str_replace(['<script type="text/javascript">', '</script>'], '', \trim($renderer->render()));
 
         foreach ($inlineJs as $js) {
             $csp->cspHash('script', $js);
         }
 
-        foreach ($inlineCss as $css) {
-            $csp->cspHash('style', $css);
-        }
+        // Temporary disable coz 'unsafe-inline' for styles enabled (pain in the ass with third-party widgets)
+//        foreach ($inlineCss as $css) {
+//            $csp->cspHash('style', $css);
+//        }
 
         $csp->cspHash('script', $initJs);
 
