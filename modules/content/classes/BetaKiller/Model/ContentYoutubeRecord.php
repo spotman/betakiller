@@ -46,7 +46,8 @@ class ContentYoutubeRecord extends ORM implements ContentElementInterface
 
     public function getYoutubeEmbedUrl(): string
     {
-        return 'https://www.youtube.com/embed/'.$this->getYoutubeId();
+        // Prevent tracking
+        return 'https://www.youtube-nocookie.com/embed/'.$this->getYoutubeId();
     }
 
     public function getPreviewUrl(): string
