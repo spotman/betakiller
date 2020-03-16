@@ -340,6 +340,13 @@ final class TwigExtension extends AbstractExtension
             ),
 
             new TwigFunction(
+                'in_testing',
+                function (): bool {
+                    return $this->appEnv->inTestingMode();
+                }
+            ),
+
+            new TwigFunction(
                 'in_dev',
                 function (): bool {
                     return $this->appEnv->inDevelopmentMode();
