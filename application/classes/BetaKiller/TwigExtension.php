@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller;
 
+use Aidantwoods\SecureHeaders\SecureHeaders;
 use BetaKiller\Assets\StaticAssets;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
@@ -547,6 +548,21 @@ final class TwigExtension extends AbstractExtension
                 return $this->getI18n($context)->translateKeyName($text, $values);
             }, ['needs_context' => true, 'is_safe' => ['html']]),
 
+            /**
+             * Calculate CSP hashes for provided content (<script> or <style> tags)
+             * Use with Twig "apply" tag
+             */
+            new TwigFilter('csp_hash', function (array $context, string $text) {
+                $request = $this->getRequest($context);
+
+                $csp = ServerRequestHelper::getCsp($request);
+
+                $this->processHashesForStyleTags($text, $csp);
+                $this->processHashesForScriptTags($text, $csp);
+
+                // Return unprocessed text
+                return $text;
+            }, ['needs_context' => true, 'is_safe' => ['html']]),
         ];
     }
 
@@ -568,5 +584,33 @@ final class TwigExtension extends AbstractExtension
     private function getMeta(array $context): Meta
     {
         return $context[IFaceView::META_KEY];
+    }
+
+    private function processHashesForScriptTags(string $text, SecureHeaders $csp): void
+    {
+        foreach ($this->findTagsContents('script', $text) as $content) {
+            $csp->cspHash('script', $content);
+        }
+    }
+
+    private function processHashesForStyleTags(string $text, SecureHeaders $csp): void
+    {
+        foreach ($this->findTagsContents('style', $text) as $content) {
+            $csp->cspHash('style', $content);
+        }
+    }
+
+    private function findTagsContents(string $tagName, string $text): \Generator
+    {
+        /** @see http://www.regular-expressions.info/examples.html */
+        $regex = '#<'.$tagName.'[^>]*>(.*?)<\/'.$tagName.'>#ims';
+
+        if (!\preg_match_all($regex, $text, $matches, PREG_SET_ORDER)) {
+            return;
+        }
+
+        foreach ($matches as $match) {
+            yield $match[1]; // Remove cr/lf
+        }
     }
 }
