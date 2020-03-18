@@ -4,11 +4,13 @@ declare(strict_types=1);
 namespace BetaKiller\Url;
 
 use BetaKiller\Auth\AccessDeniedException;
+use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Factory\UrlElementInstanceFactory;
 use BetaKiller\Helper\AclHelper;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\Parameter\UrlParameterInterface;
 
 class UrlProcessor
 {
@@ -76,6 +78,11 @@ class UrlProcessor
             // Check current user access (may depend on Entities injected in afterDispatching() hook)
             $this->checkUrlElementAccess($urlElement, $params, $user);
         }
+
+        // Check access to UrlParameters
+        foreach ($params->getAllParameters() as $urlParameter) {
+            $this->checkUrlParameterAccess($urlParameter, $user);
+        }
     }
 
     /**
@@ -112,6 +119,23 @@ class UrlProcessor
                 ':name'   => $urlElement->getCodename(),
                 ':who'    => $user->isGuest() ? 'Guest' : $user->getID(),
                 ':params' => implode(', ', $params),
+            ]);
+        }
+    }
+
+    private function checkUrlParameterAccess(
+        UrlParameterInterface $param,
+        UserInterface $user
+    ): void {
+        if (!$param instanceof AbstractEntityInterface) {
+            return;
+        }
+
+        // Perform Entity check
+        if (!$this->aclHelper->isEntityPermissionAllowed($user, $param, CrudlsActionsInterface::ACTION_READ)) {
+            throw new AccessDeniedException('Entity ":name" is not allowed to User ":who"', [
+                ':name' => $param::getModelName(),
+                ':who'  => $user->isGuest() ? 'Guest' : $user->getID(),
             ]);
         }
     }
