@@ -66,6 +66,5 @@ return [
     'admin'        => MODPATH.'admin',                 // Basic admin
 
     // Various helper modules
-    'cookies-notification' => MODPATH.'cookies-notification',
     'outdated-browser'     => MODPATH.'outdated-browser',
 ];
