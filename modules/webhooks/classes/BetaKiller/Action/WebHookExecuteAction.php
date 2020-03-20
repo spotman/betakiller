@@ -13,8 +13,6 @@ use BetaKiller\Model\WebHookModelInterface;
 use BetaKiller\Repository\WebHookLogRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Spotman\Defence\ArgumentsInterface;
-use Spotman\Defence\DefinitionBuilderInterface;
 
 class WebHookExecuteAction extends AbstractAction
 {
