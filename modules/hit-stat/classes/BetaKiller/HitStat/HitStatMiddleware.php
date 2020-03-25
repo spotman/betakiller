@@ -95,6 +95,13 @@ class HitStatMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
+        $user = ServerRequestHelper::getUser($request);
+
+        // Skip processing for admins
+        if ($user->hasAdminRole()) {
+            return $handler->handle($request);
+        }
+
         try {
             $p = RequestProfiler::begin($request, 'Hit stat (total processing)');
 
