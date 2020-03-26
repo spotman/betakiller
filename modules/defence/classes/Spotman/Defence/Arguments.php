@@ -63,7 +63,7 @@ class Arguments implements ArgumentsInterface
      */
     public function isNull(string $key): bool
     {
-        return $this->args[$key] === null;
+        return \array_key_exists($key, $this->args) && $this->args[$key] === null;
     }
 
     /**
