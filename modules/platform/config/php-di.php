@@ -1,5 +1,9 @@
 <?php
 
+use BetaKiller\Acl\EntityPermissionResolver;
+use BetaKiller\Acl\EntityPermissionResolverInterface;
+use BetaKiller\Acl\UrlElementAccessResolver;
+use BetaKiller\Acl\UrlElementAccessResolverInterface;
 use BetaKiller\Api\ApiLanguageDetector;
 use BetaKiller\Exception;
 use BetaKiller\Factory\EntityFactory;
@@ -206,7 +210,11 @@ return [
 
         MessageActionUrlGeneratorInterface::class => autowire(NotificationMessageActionUrlGenerator::class),
 
-        UuidFactoryInterface::class => autowire(UuidFactory::class)
+        UuidFactoryInterface::class => autowire(UuidFactory::class),
+
+        // Basic implementation
+        UrlElementAccessResolverInterface::class => autowire(UrlElementAccessResolver::class),
+        EntityPermissionResolverInterface::class => autowire(EntityPermissionResolver::class),
     ],
 
 ];

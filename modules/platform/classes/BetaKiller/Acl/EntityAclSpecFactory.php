@@ -5,7 +5,7 @@ namespace BetaKiller\Acl;
 
 use BetaKiller\Acl\Spec\EntityAclSpecInterface;
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
-use BetaKiller\Model\AbstractEntityInterface;
+use BetaKiller\Model\EntityWithAclSpecInterface;
 
 final class EntityAclSpecFactory
 {
@@ -28,7 +28,7 @@ final class EntityAclSpecFactory
             ->cacheInstances();
     }
 
-    public function createFor(AbstractEntityInterface $entity): EntityAclSpecInterface
+    public function createFor(EntityWithAclSpecInterface $entity): EntityAclSpecInterface
     {
         $name = $entity::getModelName();
 

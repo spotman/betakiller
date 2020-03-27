@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
+use BetaKiller\Acl\EntityPermissionResolverInterface;
 use BetaKiller\Acl\Resource\ContentPostResource;
 use BetaKiller\Exception\NotFoundHttpException;
-use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\Model\UserInterface;
@@ -11,22 +11,12 @@ use BetaKiller\Repository\EntityRepository;
 use BetaKiller\Repository\ShortcodeRepository;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PostItemIFace extends AbstractContentAdminIFace
+final class PostItemIFace extends AbstractContentAdminIFace
 {
-    /**
-     * @var \BetaKiller\Helper\ContentUrlContainerHelper
-     */
-    private $urlParametersHelper;
-
     /**
      * @var \BetaKiller\Model\UserInterface
      */
     private $user;
-
-    /**
-     * @var \BetaKiller\Helper\AclHelper
-     */
-    private $aclHelper;
 
     /**
      * @var \BetaKiller\Helper\AssetsHelper
@@ -44,29 +34,31 @@ class PostItemIFace extends AbstractContentAdminIFace
     private $entityRepo;
 
     /**
+     * @var \BetaKiller\Acl\EntityPermissionResolverInterface
+     */
+    private $entityPermissionResolver;
+
+    /**
      * PostItem constructor.
      *
-     * @param \BetaKiller\Helper\ContentUrlContainerHelper $urlParametersHelper
-     * @param \BetaKiller\Model\UserInterface              $user
-     * @param \BetaKiller\Helper\AclHelper                 $aclHelper
-     * @param \BetaKiller\Helper\AssetsHelper              $assetsHelper
-     * @param \BetaKiller\Repository\ShortcodeRepository   $shortcodeRepo
-     * @param \BetaKiller\Repository\EntityRepository      $entityRepo
+     * @param \BetaKiller\Model\UserInterface                   $user
+     * @param \BetaKiller\Acl\EntityPermissionResolverInterface $entityPermissionResolver
+     * @param \BetaKiller\Helper\AssetsHelper                   $assetsHelper
+     * @param \BetaKiller\Repository\ShortcodeRepository        $shortcodeRepo
+     * @param \BetaKiller\Repository\EntityRepository           $entityRepo
      */
     public function __construct(
-        ContentUrlContainerHelper $urlParametersHelper,
         UserInterface $user,
-        AclHelper $aclHelper,
+        EntityPermissionResolverInterface $entityPermissionResolver,
         AssetsHelper $assetsHelper,
         ShortcodeRepository $shortcodeRepo,
         EntityRepository $entityRepo
     ) {
-        $this->urlParametersHelper = $urlParametersHelper;
-        $this->user                = $user;
-        $this->aclHelper           = $aclHelper;
-        $this->assetsHelper        = $assetsHelper;
-        $this->shortcodeRepo       = $shortcodeRepo;
-        $this->entityRepo          = $entityRepo;
+        $this->user                     = $user;
+        $this->assetsHelper             = $assetsHelper;
+        $this->shortcodeRepo            = $shortcodeRepo;
+        $this->entityRepo               = $entityRepo;
+        $this->entityPermissionResolver = $entityPermissionResolver;
     }
 
     /**
@@ -81,12 +73,11 @@ class PostItemIFace extends AbstractContentAdminIFace
      * @throws \BetaKiller\Exception\NotFoundHttpException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \Kohana_Exception
      * @throws \Spotman\Acl\AclException
      */
     public function getData(ServerRequestInterface $request): array
     {
-        $post = $this->urlParametersHelper->getContentPost();
+        $post = ContentUrlContainerHelper::getContentPost($request);
 
         if (!$post) {
             throw new NotFoundHttpException();
@@ -105,7 +96,7 @@ class PostItemIFace extends AbstractContentAdminIFace
 
         $status = $post->getWorkflowState();
 
-        $updateAllowed = $this->aclHelper->isEntityPermissionAllowed($this->user, $post,
+        $updateAllowed = $this->entityPermissionResolver->isAllowed($this->user, $post,
             ContentPostResource::ACTION_UPDATE);
 
         return [

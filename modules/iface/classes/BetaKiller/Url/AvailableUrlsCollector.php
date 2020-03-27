@@ -1,8 +1,9 @@
 <?php
 namespace BetaKiller\Url;
 
-use BetaKiller\Helper\AclHelper;
-use BetaKiller\Helper\LoggerHelper;
+use BetaKiller\Acl\UrlElementAccessResolverInterface;
+use BetaKiller\Factory\GuestUserFactory;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -21,36 +22,45 @@ class AvailableUrlsCollector
     private $logger;
 
     /**
-     * @var \BetaKiller\Helper\AclHelper
-     */
-    private $aclHelper;
-
-    /**
      * @var \BetaKiller\Url\Behaviour\UrlBehaviourFactory
      */
     private $behaviourFactory;
 
     /**
+     * @var \BetaKiller\Factory\GuestUserFactory
+     */
+    private $guestFactory;
+
+    /**
+     * @var \BetaKiller\Acl\UrlElementAccessResolverInterface
+     */
+    private $elementAccessResolver;
+
+    /**
      * AvailableUrlsCollector constructor.
      *
-     * @param \BetaKiller\Url\UrlElementTreeInterface       $tree
-     * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
-     * @param \BetaKiller\Helper\AclHelper                  $aclHelper
+     * @param \BetaKiller\Url\UrlElementTreeInterface           $tree
+     * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory     $behaviourFactory
+     * @param \BetaKiller\Acl\UrlElementAccessResolverInterface $elementAccessResolver
+     * @param \BetaKiller\Factory\GuestUserFactory              $guestFactory
+     * @param \Psr\Log\LoggerInterface                          $logger
      */
     public function __construct(
         UrlElementTreeInterface $tree,
         UrlBehaviourFactory $behaviourFactory,
-        AclHelper $aclHelper,
+        UrlElementAccessResolverInterface $elementAccessResolver,
+        GuestUserFactory $guestFactory,
         LoggerInterface $logger
     ) {
-        $this->tree             = $tree;
-        $this->aclHelper        = $aclHelper;
-        $this->behaviourFactory = $behaviourFactory;
-        $this->logger           = $logger;
+        $this->tree                  = $tree;
+        $this->guestFactory          = $guestFactory;
+        $this->behaviourFactory      = $behaviourFactory;
+        $this->logger                = $logger;
+        $this->elementAccessResolver = $elementAccessResolver;
     }
 
     /**
-     * @param bool|null                    $useHidden
+     * @param bool|null $useHidden
      *
      * @return \BetaKiller\Url\AvailableUri[]|\Generator
      * @throws \BetaKiller\Factory\FactoryException
@@ -58,14 +68,20 @@ class AvailableUrlsCollector
      */
     public function getPublicAvailableUrls(?bool $useHidden = null): \Generator
     {
+        yield from $this->getUserAvailableUrls($this->guestFactory->create(), $useHidden);
+    }
+
+    public function getUserAvailableUrls(UserInterface $forUser, ?bool $useHidden = null): \Generator
+    {
         $useHidden = $useHidden ?? false;
 
         $root = $this->tree->getRoot();
 
-        yield from $this->processLayer($root, null, $useHidden);
+        yield from $this->processLayer($forUser, $root, null, $useHidden);
     }
 
     /**
+     * @param \BetaKiller\Model\UserInterface                 $forUser
      * @param \BetaKiller\Url\UrlElementInterface[]           $models
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      * @param bool|null                                       $useHidden
@@ -75,6 +91,7 @@ class AvailableUrlsCollector
      * @throws \BetaKiller\Url\UrlElementException
      */
     private function processLayer(
+        UserInterface $forUser,
         array $models,
         ?UrlContainerInterface $params = null,
         ?bool $useHidden = null
@@ -87,6 +104,7 @@ class AvailableUrlsCollector
             }
 
             yield from $this->processSingle(
+                $forUser,
                 $urlElement,
                 // Use empty UrlContainer on each root element iteration (so no intersection of models between paths)
                 $params ?: ResolvingUrlContainer::create(),
@@ -96,6 +114,7 @@ class AvailableUrlsCollector
     }
 
     /**
+     * @param \BetaKiller\Model\UserInterface                 $forUser
      * @param \BetaKiller\Url\UrlElementInterface             $urlElement
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
@@ -107,6 +126,7 @@ class AvailableUrlsCollector
      * @link https://github.com/MarkBaker/GeneratorQuadTrees/blob/master/src/PointQuadTree.php
      */
     private function processSingle(
+        UserInterface $forUser,
         UrlElementInterface $urlElement,
         UrlContainerInterface $params,
         ?bool $useHidden = null
@@ -121,7 +141,6 @@ class AvailableUrlsCollector
         ]);
 
         $urlCounter = 0;
-        $guest      = $this->aclHelper->getGuestUser();
 
         foreach ($this->getAvailableIFaceUrls($urlElement, $params) as $availableUrl) {
             $urlParameter = $availableUrl->getUrlParameter();
@@ -132,7 +151,7 @@ class AvailableUrlsCollector
             }
 
             try {
-                if (!$this->aclHelper->isUrlElementAllowed($guest, $urlElement, $params)) {
+                if (!$this->elementAccessResolver->isAllowed($forUser, $urlElement, $params)) {
                     $this->logger->debug('Skip ":codename" URL element coz it is not allowed', [
                         ':codename' => $urlElement->getCodename(),
                     ]);
@@ -146,7 +165,7 @@ class AvailableUrlsCollector
             $urlCounter++;
 
             // Recursion for childs
-            foreach ($this->processLayer($childs, $params, $useHidden) as $childAvailableUrl) {
+            foreach ($this->processLayer($forUser, $childs, $params, $useHidden) as $childAvailableUrl) {
                 yield $childAvailableUrl;
                 $urlCounter++;
             }

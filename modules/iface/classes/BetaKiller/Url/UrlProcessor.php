@@ -3,14 +3,16 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url;
 
+use BetaKiller\Acl\EntityPermissionResolverInterface;
+use BetaKiller\Acl\UrlElementAccessResolverInterface;
 use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Factory\UrlElementInstanceFactory;
-use BetaKiller\Helper\AclHelper;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
+use BetaKiller\Url\Zone\ZoneAccessSpecFactory;
 
 class UrlProcessor
 {
@@ -25,25 +27,41 @@ class UrlProcessor
     private $instanceFactory;
 
     /**
-     * @var \BetaKiller\Helper\AclHelper
+     * @var \BetaKiller\Url\Zone\ZoneAccessSpecFactory
      */
-    private $aclHelper;
+    private $specFactory;
+
+    /**
+     * @var \BetaKiller\Acl\UrlElementAccessResolverInterface
+     */
+    private $elementAccessResolver;
+
+    /**
+     * @var \BetaKiller\Acl\EntityPermissionResolverInterface
+     */
+    private $entityPermissionResolver;
 
     /**
      * UrlProcessor constructor.
      *
-     * @param \BetaKiller\Url\UrlDispatcherInterface        $urlDispatcher
-     * @param \BetaKiller\Factory\UrlElementInstanceFactory $instanceFactory
-     * @param \BetaKiller\Helper\AclHelper                  $aclHelper
+     * @param \BetaKiller\Url\UrlDispatcherInterface            $urlDispatcher
+     * @param \BetaKiller\Factory\UrlElementInstanceFactory     $instanceFactory
+     * @param \BetaKiller\Acl\UrlElementAccessResolverInterface $elementAccessResolver
+     * @param \BetaKiller\Acl\EntityPermissionResolverInterface $entityPermissionResolver
+     * @param \BetaKiller\Url\Zone\ZoneAccessSpecFactory        $specFactory
      */
     public function __construct(
         UrlDispatcherInterface $urlDispatcher,
         UrlElementInstanceFactory $instanceFactory,
-        AclHelper $aclHelper
+        UrlElementAccessResolverInterface $elementAccessResolver,
+        EntityPermissionResolverInterface $entityPermissionResolver,
+        ZoneAccessSpecFactory $specFactory
     ) {
-        $this->urlDispatcher   = $urlDispatcher;
-        $this->instanceFactory = $instanceFactory;
-        $this->aclHelper       = $aclHelper;
+        $this->urlDispatcher            = $urlDispatcher;
+        $this->instanceFactory          = $instanceFactory;
+        $this->elementAccessResolver    = $elementAccessResolver;
+        $this->entityPermissionResolver = $entityPermissionResolver;
+        $this->specFactory              = $specFactory;
     }
 
     /**
@@ -102,9 +120,9 @@ class UrlProcessor
         UserInterface $user
     ): void {
         // Force authorization for non-public zones before security check
-        $this->aclHelper->forceAuthorizationIfNeeded($urlElement, $user);
+        $this->forceAuthorizationIfNeeded($urlElement, $user);
 
-        if (!$this->aclHelper->isUrlElementAllowed($user, $urlElement, $urlParameters)) {
+        if (!$this->elementAccessResolver->isAllowed($user, $urlElement, $urlParameters)) {
             $params = [];
 
             foreach ($urlParameters->getAllParameters() as $item) {
@@ -132,11 +150,27 @@ class UrlProcessor
         }
 
         // Perform Entity check
-        if (!$this->aclHelper->isEntityPermissionAllowed($user, $param, CrudlsActionsInterface::ACTION_READ)) {
+        if (!$this->entityPermissionResolver->isAllowed($user, $param, CrudlsActionsInterface::ACTION_READ)) {
             throw new AccessDeniedException('Entity ":name" is not allowed to User ":who"', [
                 ':name' => $param::getModelName(),
                 ':who'  => $user->isGuest() ? 'Guest' : $user->getID(),
             ]);
+        }
+    }
+
+    /**
+     * @param \BetaKiller\Url\UrlElementInterface $urlElement
+     * @param \BetaKiller\Model\UserInterface     $user
+     *
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
+     */
+    public function forceAuthorizationIfNeeded(UrlElementInterface $urlElement, UserInterface $user): void
+    {
+        $zoneSpec = $this->specFactory->createFromUrlElement($urlElement);
+
+        // User authorization is required for entering protected zones
+        if ($zoneSpec->isAuthRequired() && $user->isGuest()) {
+            $user->forceAuthorization();
         }
     }
 }

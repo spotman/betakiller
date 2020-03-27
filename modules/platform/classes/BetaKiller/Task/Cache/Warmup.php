@@ -135,7 +135,7 @@ class Warmup extends AbstractTask
             ]);
         }
 
-        $items   = $this->urlCollector->getPublicAvailableUrls();
+        $items   = $this->urlCollector->getPublicAvailableUrls(true);
         $counter = 0;
 
         // Make HTTP requests to temporary created PHP internal web-server instance

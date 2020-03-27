@@ -1,8 +1,8 @@
 <?php
 namespace BetaKiller\Widget\Admin;
 
+use BetaKiller\Acl\UrlElementAccessResolverInterface;
 use BetaKiller\CrudlsActionsInterface;
-use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
@@ -35,26 +35,33 @@ class BarWidget extends AbstractAdminWidget
 //    private $contentHelper;
 
     /**
-     * @var \BetaKiller\Helper\AclHelper
-     */
-    private $aclHelper;
-
-    /**
      * @var \BetaKiller\Helper\UrlElementHelper
      */
     private $elementHelper;
 
+    /**
+     * @var \BetaKiller\Acl\UrlElementAccessResolverInterface
+     */
+    private $elementAccessResolver;
+
+    /**
+     * BarWidget constructor.
+     *
+     * @param \BetaKiller\Url\UrlElementTreeInterface           $tree
+     * @param \BetaKiller\Acl\UrlElementAccessResolverInterface $elementAccessResolver
+     * @param \BetaKiller\Helper\UrlElementHelper               $elementHelper
+     */
     public function __construct(
         UrlElementTreeInterface $tree,
-        AclHelper $aclHelper,
+        UrlElementAccessResolverInterface $elementAccessResolver,
         UrlElementHelper $elementHelper
 //        ContentHelper $contentHelper
     )
     {
-        $this->tree      = $tree;
-        $this->aclHelper = $aclHelper;
+        $this->tree = $tree;
 //        $this->contentHelper  = $contentHelper;
-        $this->elementHelper = $elementHelper;
+        $this->elementHelper         = $elementHelper;
+        $this->elementAccessResolver = $elementAccessResolver;
     }
 
     /**
@@ -154,7 +161,7 @@ class BarWidget extends AbstractAdminWidget
             ZoneInterface::ADMIN);
 
         foreach ($urlElements as $urlElement) {
-            if (!$this->aclHelper->isUrlElementAllowed($user, $urlElement)) {
+            if (!$this->elementAccessResolver->isAllowed($user, $urlElement, $params)) {
                 continue;
             }
 

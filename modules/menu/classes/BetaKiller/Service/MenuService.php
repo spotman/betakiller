@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace BetaKiller\Service;
 
+use BetaKiller\Acl\UrlElementAccessResolverInterface;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Factory\MenuCounterFactory;
-use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\TextHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Helper\UrlHelper;
@@ -31,11 +31,6 @@ class MenuService
      * @var \BetaKiller\Url\UrlElementTreeInterface
      */
     private $tree;
-
-    /**
-     * @var \BetaKiller\Helper\AclHelper
-     */
-    private $aclHelper;
 
     /**
      * @var \BetaKiller\Url\Behaviour\UrlBehaviourFactory
@@ -83,26 +78,31 @@ class MenuService
     private $counterFactory;
 
     /**
+     * @var \BetaKiller\Acl\UrlElementAccessResolverInterface
+     */
+    private $elementAccessResolver;
+
+    /**
      * MenuService constructor.
      *
-     * @param \BetaKiller\Url\UrlElementTreeInterface       $tree
-     * @param \BetaKiller\Helper\AclHelper                  $aclHelper
-     * @param \BetaKiller\Helper\UrlElementHelper           $elementHelper
-     * @param \BetaKiller\Factory\MenuCounterFactory        $counterFactory
-     * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
+     * @param \BetaKiller\Url\UrlElementTreeInterface           $tree
+     * @param \BetaKiller\Acl\UrlElementAccessResolverInterface $elementAccessResolver
+     * @param \BetaKiller\Helper\UrlElementHelper               $elementHelper
+     * @param \BetaKiller\Factory\MenuCounterFactory            $counterFactory
+     * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory     $behaviourFactory
      */
     public function __construct(
         UrlElementTreeInterface $tree,
-        AclHelper $aclHelper,
+        UrlElementAccessResolverInterface $elementAccessResolver,
         UrlElementHelper $elementHelper,
         MenuCounterFactory $counterFactory,
         UrlBehaviourFactory $behaviourFactory
     ) {
-        $this->tree             = $tree;
-        $this->aclHelper        = $aclHelper;
-        $this->behaviourFactory = $behaviourFactory;
-        $this->elementHelper    = $elementHelper;
-        $this->counterFactory   = $counterFactory;
+        $this->tree                  = $tree;
+        $this->behaviourFactory      = $behaviourFactory;
+        $this->elementHelper         = $elementHelper;
+        $this->counterFactory        = $counterFactory;
+        $this->elementAccessResolver = $elementAccessResolver;
     }
 
     /**
@@ -330,7 +330,7 @@ class MenuService
     {
         try {
             // Security check
-            return $this->aclHelper->isUrlElementAllowed($this->user, $element, $params);
+            return $this->elementAccessResolver->isAllowed($this->user, $element, $params);
         } catch (AclException $e) {
             throw UrlElementException::wrap($e);
         }

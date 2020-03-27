@@ -4,6 +4,7 @@ namespace BetaKiller\Api\AccessResolver;
 use BetaKiller\Acl\EntityAclSpecFactory;
 use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\Api\Method\EntityBasedApiMethodInterface;
+use BetaKiller\Model\EntityWithAclSpecInterface;
 use BetaKiller\Model\UserInterface;
 use Spotman\Acl\AclInterface;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
@@ -23,7 +24,7 @@ class EntityRelatedAclApiMethodAccessResolver extends AclApiMethodAccessResolver
     private $aclSpecFactory;
 
     /**
-     * AclApiMethodAccessResolver constructor.
+     * EntityRelatedAclApiMethodAccessResolver constructor.
      *
      * @param \Spotman\Acl\AclInterface            $acl
      * @param \BetaKiller\Acl\EntityAclSpecFactory $aclSpecFactory
@@ -62,6 +63,13 @@ class EntityRelatedAclApiMethodAccessResolver extends AclApiMethodAccessResolver
 
         if ($resource->isEntityRequiredForAction($method->getName())) {
             $entity = $method->getEntity($arguments);
+
+            if (!$entity instanceof EntityWithAclSpecInterface) {
+                throw new ApiMethodException('Entity ":entity" must implement :interface and provide AclSpec', [
+                    ':entity'    => $entity::getModelName(),
+                    ':interface' => EntityWithAclSpecInterface::class,
+                ]);
+            }
 
             $spec = $this->aclSpecFactory->createFor($entity);
 

@@ -1,10 +1,10 @@
 <?php
 namespace BetaKiller\Workflow;
 
+use BetaKiller\Acl\EntityPermissionResolverInterface;
 use BetaKiller\Config\WorkflowConfigInterface;
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Factory\RepositoryFactory;
-use BetaKiller\Helper\AclHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\WorkflowStateRepositoryInterface;
 
@@ -16,27 +16,30 @@ final class StatusWorkflow implements StatusWorkflowInterface
     private $config;
 
     /**
-     * @var \BetaKiller\Helper\AclHelper
-     */
-    private $acl;
-
-    /**
      * @var \BetaKiller\Factory\RepositoryFactory
      */
     private $repoFactory;
 
     /**
+     * @var \BetaKiller\Acl\EntityPermissionResolverInterface
+     */
+    private $permissionResolver;
+
+    /**
      * StatusWorkflow constructor.
      *
-     * @param \BetaKiller\Config\WorkflowConfigInterface $config
-     * @param \BetaKiller\Helper\AclHelper               $acl
-     * @param \BetaKiller\Factory\RepositoryFactory      $repoFactory
+     * @param \BetaKiller\Config\WorkflowConfigInterface        $config
+     * @param \BetaKiller\Acl\EntityPermissionResolverInterface $permissionResolver
+     * @param \BetaKiller\Factory\RepositoryFactory             $repoFactory
      */
-    public function __construct(WorkflowConfigInterface $config, AclHelper $acl, RepositoryFactory $repoFactory)
-    {
-        $this->config      = $config;
-        $this->acl         = $acl;
-        $this->repoFactory = $repoFactory;
+    public function __construct(
+        WorkflowConfigInterface $config,
+        EntityPermissionResolverInterface $permissionResolver,
+        RepositoryFactory $repoFactory
+    ) {
+        $this->config             = $config;
+        $this->repoFactory        = $repoFactory;
+        $this->permissionResolver = $permissionResolver;
     }
 
     /**
@@ -79,7 +82,7 @@ final class StatusWorkflow implements StatusWorkflowInterface
         string $codename,
         UserInterface $user
     ): bool {
-        return $this->acl->isEntityPermissionAllowed($user, $model, $codename);
+        return $this->permissionResolver->isAllowed($user, $model, $codename);
     }
 
     public function setStartState(HasWorkflowStateInterface $model): void
