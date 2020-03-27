@@ -59,11 +59,11 @@
         this.$emit('addItem');
       },
       emitSelectItemEvent(id) {
-        console.log('selectItem event fired');
+        //console.log('selectItem event fired');
         this.$emit('selectItem', id);
       },
       emitContextItemEvent(id) {
-        console.log('contextItem event fired');
+        //console.log('contextItem event fired');
         this.$emit('contextItem', id);
       }
     }

@@ -118,15 +118,15 @@
         this.emitContextItemEvent(id);
       },
       emitSelectItemEvent(id) {
-        console.log('selectItem event fired');
+        //console.log('selectItem event fired');
         this.$emit('selectItem', id);
       },
       emitDeselectItemEvent(id) {
-        console.log('deselectItem event fired');
+        //console.log('deselectItem event fired');
         this.$emit('deselectItem', id);
       },
       emitContextItemEvent(id) {
-        console.log('contextItem event fired');
+        //console.log('contextItem event fired');
         this.$emit('contextItem', id);
       },
       isSelected(id) {

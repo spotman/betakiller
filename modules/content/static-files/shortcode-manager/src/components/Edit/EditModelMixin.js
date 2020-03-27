@@ -33,7 +33,7 @@ export default {
   },
 
   mounted() {
-    console.log('[mixin] model form mounted');
+    //console.log('[mixin] model form mounted');
     this.loadModelData();
   },
 
@@ -41,7 +41,7 @@ export default {
     loadModelData() {
       ApiRpc.contentElement.read(this.shortcodeName, this.id)
         .done((data) => {
-          console.log('edit-model data loaded', data);
+          //console.log('edit-model data loaded', data);
           this.modelData = data;
           this.emitItemReady();
         })
@@ -50,7 +50,7 @@ export default {
         });
     },
     modelDataChanged() {
-      console.log('model data changed');
+      //console.log('model data changed');
       this.emitModelChanged();
 
       this.throttleSaving(250, () => {
@@ -69,11 +69,11 @@ export default {
       }
 
       this.savingInProgress = true;
-      console.log('saving model data');
+      //console.log('saving model data');
 
       ApiRpc.contentElement.update(this.shortcodeName, this.id, this.modelData)
         .done(() => {
-          console.log('model data saved');
+          //console.log('model data saved');
           this.emitModelSaved();
           this.savingInProgress = false;
         })

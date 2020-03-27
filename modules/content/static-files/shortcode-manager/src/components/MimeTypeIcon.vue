@@ -147,7 +147,7 @@
 
     computed: {
       icon() {
-        console.log(this.size);
+        //console.log(this.size);
         return this.mimeType ? mime2fa(this.mimeType) : this.default;
       }
     }

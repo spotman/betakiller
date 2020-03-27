@@ -68,7 +68,7 @@
 
     watch: {
       selected(val) {
-        console.log('selected items changed', val);
+        //console.log('selected items changed', val);
       },
       showGlobal() {
         this.fetchData();
@@ -76,7 +76,7 @@
       itemsLoaded(val) {
         if(val === true) {
           this.$nextTick(() => {
-            console.log('ItemsIndex itemsLoaded');
+            //console.log('ItemsIndex itemsLoaded');
             this.emitItemsReadyEvent();
           })
         }
@@ -84,7 +84,7 @@
     },
 
     mounted() {
-      console.log('ItemsIndex mounted');
+      //console.log('ItemsIndex mounted');
       this.fetchData();
     },
 
@@ -112,7 +112,7 @@
       },
 
       emitItemsReadyEvent() {
-        console.log('itemsReady event fired');
+        //console.log('itemsReady event fired');
         this.$emit('itemsReady');
       },
     }

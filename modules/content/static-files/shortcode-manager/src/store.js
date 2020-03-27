@@ -35,7 +35,7 @@ export default new Vuex.Store({
       }
 
       state.initialized = true;
-      console.log('store initialized');
+      //console.log('store initialized');
     },
   },
   getters: {

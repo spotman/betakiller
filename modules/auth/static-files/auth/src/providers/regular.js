@@ -59,7 +59,7 @@ export default class {
     this.$alert.textContent = message;
     this.$alert.classList.remove(this.alertHiddenClass);
 
-    console.log(message || 'error');
+    //console.log(message || 'error');
     this.$submitButton.removeAttribute('disabled');
   }
 }

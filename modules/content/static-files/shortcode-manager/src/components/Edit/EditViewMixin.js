@@ -10,7 +10,7 @@ export default {
   methods: {
 
     itemReadyHandler() {
-      console.log('item ready event received');
+      //console.log('item ready event received');
       this.itemReady = true;
     },
 

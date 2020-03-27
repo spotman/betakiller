@@ -136,7 +136,7 @@
       },
 
       valueChanged(name, value) {
-        console.log('value changed', name, value);
+        //console.log('value changed', name, value);
         this.attributes[name] = value;
 
         this.updateActuality();

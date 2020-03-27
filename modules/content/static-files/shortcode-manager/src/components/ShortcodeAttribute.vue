@@ -154,7 +154,7 @@
 
     watch: {
       enabled(val) {
-        console.log('enabled changed to', val);
+        //console.log('enabled changed to', val);
         this.value = val ? this.currentValue : this.defaultValue;
       },
       value() {

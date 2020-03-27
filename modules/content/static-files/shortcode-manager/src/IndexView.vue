@@ -86,15 +86,15 @@
 
     watch: {
       files() {
-        console.log('this.files changed');
-        console.log(this.files);
+        //console.log('this.files changed');
+        //console.log(this.files);
       }
     },
 
     beforeRouteEnter(to, from, next) {
       next(vm => {
         //vm.fetchData();
-        console.log('beforeRouteEnter event');
+        //console.log('beforeRouteEnter event');
       })
     },
 
@@ -144,7 +144,7 @@
             const response = newFile.response;
             if (response && response.response === "ok") {
               // TODO success (add)
-              console.log(response.message);
+              //console.log(response.message);
             } else {
               // TODO Error
             }

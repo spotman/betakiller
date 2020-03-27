@@ -13,7 +13,7 @@ new Vue({
   store: Store,
 
   mounted: function () {
-    console.log('root mounted');
+    //console.log('root mounted');
     this.$store.commit(Mutations.INIT, this.$el.dataset);
   },
 })
