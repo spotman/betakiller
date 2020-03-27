@@ -5,14 +5,14 @@ namespace BetaKiller\IFace\Admin\WebHooks;
 
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
-use BetaKiller\Repository\WebHookRepository;
+use BetaKiller\Repository\WebHookRepositoryInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ListItemsIFace extends AbstractAdminIFace
 {
     /**
-     * @var \BetaKiller\Repository\WebHookRepository
+     * @var \BetaKiller\Repository\WebHookRepositoryInterface
      */
     private $webHookRepository;
 
@@ -24,11 +24,11 @@ class ListItemsIFace extends AbstractAdminIFace
     /**
      * Index constructor.
      *
-     * @param \BetaKiller\Repository\WebHookRepository $webHookRepository
-     * @param \BetaKiller\Url\UrlElementTreeInterface  $tree
+     * @param \BetaKiller\Repository\WebHookRepositoryInterface $webHookRepository
+     * @param \BetaKiller\Url\UrlElementTreeInterface           $tree
      */
     public function __construct(
-        WebHookRepository $webHookRepository,
+        WebHookRepositoryInterface $webHookRepository,
         UrlElementTreeInterface $tree
     ) {
         $this->webHookRepository = $webHookRepository;

@@ -135,7 +135,7 @@ class Warmup extends AbstractTask
             ]);
         }
 
-        $items   = $this->urlCollector->getPublicAvailableUrls(true);
+        $items   = $this->urlCollector->getPublicAvailableUrls();
         $counter = 0;
 
         // Make HTTP requests to temporary created PHP internal web-server instance
@@ -319,6 +319,7 @@ class Warmup extends AbstractTask
         }
     }
 
+    /** @noinspection CurlSslServerSpoofingInspection */
     private function makeHttpRequest(string $url): ResponseInterface
     {
         $path = \parse_url($url, \PHP_URL_PATH);
@@ -329,6 +330,12 @@ class Warmup extends AbstractTask
         $this->logger->debug('Making request to :url', [':url' => $url]);
 
         // see https://github.com/guzzle/guzzle/issues/590
-        return $this->httpClient->syncGet($url, $this->cookieJar);
+        return $this->httpClient->syncGet($url, $this->cookieJar, [
+            'curl' => [
+                // No SSL is using so no checks
+                \CURLOPT_SSL_VERIFYHOST => false,
+                \CURLOPT_SSL_VERIFYPEER => false,
+            ],
+        ]);
     }
 }

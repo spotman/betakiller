@@ -14,7 +14,7 @@ use BetaKiller\Model\WebHookModelInterface;
  * @method WebHookModelInterface[] getAll()
  * @method WebHookModelInterface[] findItemByUrlKeyValue()
  */
-class WebHookRepository extends AbstractConfigBasedDispatchableRepository
+final class WebHookRepository extends AbstractConfigBasedDispatchableRepository implements WebHookRepositoryInterface
 {
     /**
      * @return string
@@ -31,7 +31,7 @@ class WebHookRepository extends AbstractConfigBasedDispatchableRepository
      */
     public function getByServiceName(string $serviceName): array
     {
-        return \array_filter($this->getAll(), function (WebHookModelInterface $model) use ($serviceName) {
+        return \array_filter($this->getAll(), static function (WebHookModelInterface $model) use ($serviceName) {
             return $model->getServiceName() === $serviceName;
         });
     }
