@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use BetaKiller\Action\Auth\ConfirmEmailAction;
+use BetaKiller\Action\Auth\VerifyPasswordChangeTokenAction;
 use BetaKiller\EventHandler\UserConfirmationEmailHandler;
 use BetaKiller\EventHandler\UserPasswordChangeRequestedEmailHandler;
 use BetaKiller\Model\RoleInterface;
@@ -54,6 +55,7 @@ return [
 
         UserPasswordChangeRequestedEmailHandler::REQUEST_PASSWORD_CHANGE => [
             'group'     => AUTH_USER_GROUP,
+            'action'    => VerifyPasswordChangeTokenAction::codename(),
             'transport' => EmailTransport::CODENAME,
         ],
     ],
