@@ -188,10 +188,10 @@ final class NotificationFacade
             }
         }
 
-        $actionName = $this->config->getMessageAction($messageCodename);
+        $actionUrl = $this->actionUrlGenerator->make($message);
 
-        if ($actionName) {
-            $message->setActionUrl($this->actionUrlGenerator->make($actionName, $target, $data));
+        if ($actionUrl) {
+            $message->setActionUrl($actionUrl);
         }
 
         return $message;
@@ -253,11 +253,9 @@ final class NotificationFacade
             return false;
         }
 
-        $hash = $this->calculateHash($message, $target, $transport);
-
         $log = new NotificationLog;
 
-        $log->setHash($hash);
+        $log->setHash($message->getHash());
 
         try {
             $log
@@ -275,7 +273,7 @@ final class NotificationFacade
             }
 
             // Render message template
-            $body = $this->renderer->makeBody($message, $target, $transport, $hash);
+            $body = $this->renderer->makeBody($message, $target, $transport);
 
             // Save data to log file (transport name, target string (email, phone, etc), body)
             $log->setBody($body);
@@ -551,19 +549,6 @@ final class NotificationFacade
         $messageCodename = $message->getCodename();
 
         return $this->getGroupByMessageCodename($messageCodename);
-    }
-
-    private function calculateHash(
-        MessageInterface $message,
-        MessageTargetInterface $target,
-        TransportInterface $transport
-    ): string {
-        return sha1(implode('-', [
-            microtime(),
-            $message->getCodename(),
-            $target->getEmail(),
-            $transport->getName(),
-        ]));
     }
 
     /**

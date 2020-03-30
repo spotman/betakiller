@@ -35,16 +35,13 @@ class MessageRenderer implements MessageRendererInterface
      * @param \BetaKiller\Notification\MessageTargetInterface $target
      * @param \BetaKiller\Notification\TransportInterface     $transport
      *
-     * @param string                                          $hash
-     *
      * @return string
      * @throws \BetaKiller\Notification\NotificationException
      */
     public function makeBody(
         MessageInterface $message,
         MessageTargetInterface $target,
-        TransportInterface $transport,
-        string $hash
+        TransportInterface $transport
     ): string {
         $file = $this->detectTemplateFile($message, $target, $transport);
         $view = $this->viewFactory->create($file);
@@ -53,7 +50,7 @@ class MessageRenderer implements MessageRendererInterface
         $data = $this->getFullDataForTarget($message, $target);
 
         // Message hash (to distinguish messages)
-        $data['__hash__'] = $hash;
+        $data['__hash__'] = $message->getHash();
 
         // Get additional transport data
         if ($transport->isSubjectRequired()) {

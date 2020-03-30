@@ -92,4 +92,13 @@ interface NotificationConfigInterface
      * @return bool
      */
     public function isMessageCritical(string $messageCodename): bool;
+
+    /**
+     * Returns UTM markers for provided transport
+     *
+     * @param string $transportCodename
+     *
+     * @return string[]
+     */
+    public function getUtmMarkers(string $transportCodename): array;
 }

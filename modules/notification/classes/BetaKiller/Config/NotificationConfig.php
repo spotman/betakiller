@@ -21,6 +21,8 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     public const PATH_MESSAGE_CRITICAL   = ['messages', 'messageCodename' => '', 'critical'];
     public const PATH_MESSAGE_DISMISS_ON = ['messages', 'messageCodename' => '', 'dismiss_on'];
 
+    public const PATH_TRANSPORT_UTM = ['utm', 'transportCodename' => ''];
+
     /**
      * @return string
      */
@@ -189,5 +191,16 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
         $path['messageCodename'] = $messageCodename;
 
         return (bool)$this->get($path, true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getUtmMarkers(string $transportCodename): array
+    {
+        $path                      = self::PATH_TRANSPORT_UTM;
+        $path['transportCodename'] = $transportCodename;
+
+        return (array)$this->get($path, true);
     }
 }

@@ -16,6 +16,11 @@ class Message implements MessageInterface
     private $codename;
 
     /**
+     * @var string
+     */
+    private $hash;
+
+    /**
      * @var MessageTargetInterface
      */
     private $target;
@@ -85,6 +90,8 @@ class Message implements MessageInterface
         $this->transport = $transport;
         $this->target    = $target;
         $this->critical  = $critical;
+
+        $this->calculateHash();
     }
 
     /**
@@ -117,6 +124,16 @@ class Message implements MessageInterface
     public function getCodename(): string
     {
         return $this->codename;
+    }
+
+    /**
+     * Returns unique SHA-1 hash based on time, codename, transport and target
+     *
+     * @return string
+     */
+    public function getHash(): string
+    {
+        return $this->hash;
     }
 
     /**
@@ -251,5 +268,15 @@ class Message implements MessageInterface
     public function isCritical(): bool
     {
         return $this->critical;
+    }
+
+    private function calculateHash(): void
+    {
+        $this->hash = sha1(implode('-', [
+            microtime(),
+            $this->getCodename(),
+            $this->getTarget()->getEmail(),
+            $this->getTransportName(),
+        ]));
     }
 }

@@ -14,6 +14,13 @@ interface MessageInterface
     public function getCodename(): string;
 
     /**
+     * Returns unique SHA-1 hash based on time, codename, transport and target
+     *
+     * @return string
+     */
+    public function getHash(): string;
+
+    /**
      * @return string
      */
     public function getTransportName(): string;

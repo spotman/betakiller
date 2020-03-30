@@ -6,11 +6,11 @@ namespace BetaKiller\Notification;
 interface MessageActionUrlGeneratorInterface
 {
     /**
-     * @param string                                          $actionName
-     * @param \BetaKiller\Notification\MessageTargetInterface $target
-     * @param array                                           $data
+     * Returns null if no action defined for provided message
      *
-     * @return string
+     * @param \BetaKiller\Notification\MessageInterface $message
+     *
+     * @return string|null
      */
-    public function make(string $actionName, MessageTargetInterface $target, array $data): string;
+    public function make(MessageInterface $message): ?string;
 }

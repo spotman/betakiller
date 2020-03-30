@@ -6,8 +6,7 @@ interface MessageRendererInterface
     public function makeBody(
         MessageInterface $message,
         MessageTargetInterface $target,
-        TransportInterface $transport,
-        string $hash
+        TransportInterface $transport
     ): string;
 
     public function makeSubject(
