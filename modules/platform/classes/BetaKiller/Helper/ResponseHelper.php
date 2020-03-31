@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Helper;
 
 use DateTimeImmutable;
+use DateInterval;
 use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\HtmlResponse;
@@ -119,10 +120,9 @@ class ResponseHelper
 
     public static function disableCaching(ResponseInterface $response): ResponseInterface
     {
-        $expiresAt = (new \DateTimeImmutable())->sub(new \DateInterval('PT1H'));
+        $expiresAt = (new DateTimeImmutable())->sub(new DateInterval('PT1H'));
 
         $response = self::setExpires($response, $expiresAt);
-
         $response = self::setPragmaNoCache($response);
 
         return self::setCacheControl($response, 'no-cache, no-store, must-revalidate');
@@ -131,7 +131,7 @@ class ResponseHelper
     public static function enableCaching(
         ResponseInterface $response,
         DateTimeImmutable $lastModified,
-        \DateInterval $ttl
+        DateInterval $ttl
     ): ResponseInterface {
         $reference = new DateTimeImmutable;
         $expiresAt = $reference->add($ttl);
