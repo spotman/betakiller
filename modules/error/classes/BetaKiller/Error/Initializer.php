@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Error;
 
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Log\FilterExceptionsHandler;
 use BetaKiller\Log\LazyLoadProxyHandler;
 use BetaKiller\Log\LoggerInterface;
@@ -20,17 +21,25 @@ class Initializer implements ModuleInitializerInterface
     private $container;
 
     /**
+     * @var \BetaKiller\Helper\AppEnvInterface
+     */
+    private $appEnv;
+
+    /**
      * Initializer constructor.
      *
-     * @param \Psr\Container\ContainerInterface $container
-     * @param \BetaKiller\Log\LoggerInterface   $logger
+     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \Psr\Container\ContainerInterface  $container
+     * @param \BetaKiller\Log\LoggerInterface    $logger
      */
     public function __construct(
+        AppEnvInterface $appEnv,
         ContainerInterface $container,
         LoggerInterface $logger
     ) {
         $this->logger    = $logger;
         $this->container = $container;
+        $this->appEnv    = $appEnv;
     }
 
     /**
@@ -41,6 +50,10 @@ class Initializer implements ModuleInitializerInterface
      */
     public function init(): void
     {
+        if ($this->appEnv->inDevelopmentMode() && !$this->appEnv->isDebugEnabled()) {
+            return;
+        }
+
         $this->initPhpExceptionStorage();
     }
 
