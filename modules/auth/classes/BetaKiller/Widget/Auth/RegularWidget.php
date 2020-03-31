@@ -5,6 +5,7 @@ use BetaKiller\Action\Auth\RegularLoginAction;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Auth\AccessRecoveryRequestIFace;
+use BetaKiller\Security\CsrfService;
 use BetaKiller\Widget\AbstractPublicWidget;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -16,17 +17,25 @@ class RegularWidget extends AbstractPublicWidget
     private $urlHelper;
 
     /**
+     * @var \BetaKiller\Security\CsrfService
+     */
+    private $csrf;
+
+    /**
      * RegularWidget constructor.
      *
      * @param \BetaKiller\Factory\UrlHelperFactory $urlHelperFactory
      *
+     * @param \BetaKiller\Security\CsrfService     $csrf
+     *
      * @throws \DI\DependencyException
      * @throws \DI\NotFoundException
      */
-    public function __construct(UrlHelperFactory $urlHelperFactory)
+    public function __construct(UrlHelperFactory $urlHelperFactory, CsrfService $csrf)
     {
         // Use separate instance coz error pages processing can be done before UrlHelper initialized in middleware
         $this->urlHelper = $urlHelperFactory->create();
+        $this->csrf      = $csrf;
     }
 
     /**
@@ -49,6 +58,7 @@ class RegularWidget extends AbstractPublicWidget
         return [
             'login_url'           => $this->urlHelper->makeUrl($loginAction, $params),
             'access_recovery_url' => $this->urlHelper->makeUrl($recoveryIFace, $params),
+            'token'               => $this->csrf->createRequestToken($request),
         ];
     }
 }

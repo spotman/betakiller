@@ -9,6 +9,7 @@ export default class {
     this.$form              = this.$widget.querySelector('form[name="regular-login-form"]');
     this.$login             = this.$form.querySelector('input[name="user-login"]');
     this.$pass              = this.$form.querySelector('input[name="user-password"]');
+    this.$csrf              = this.$form.querySelector('input[name="csrf"]');
     this.$submitButton      = this.$form.querySelector('button[type="submit"]');
     this.$alert             = this.$widget.querySelector(".alert");
     this.alertHiddenClass   = this.$alert.getAttribute('data-hidden-class');
@@ -37,7 +38,8 @@ export default class {
 
     $.post(this.$form.getAttribute('action'), {
         'user-login':    login,
-        'user-password': password
+        'user-password': password,
+        'csrf': this.$csrf.value,
       }, '', 'json')
       .done((result) => {
         if (result.response && result.response === 'ok') {

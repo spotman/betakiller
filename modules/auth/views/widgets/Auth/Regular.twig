@@ -25,6 +25,8 @@
           </div>
         </div>
 
+        <input type="hidden" name="csrf" value="{{ token }}">
+
         <button type="submit" class="btn btn-primary">
           {{ 'auth.regular.sign-in'|i18n }}
         </button>
@@ -32,7 +34,6 @@
         <a href="{{ access_recovery_url }}" class="btn btn-link mt-3 d-block">
           {{ 'auth.regular.access-recovery'|i18n }}
         </a>
-
       </div>
     </div>
 

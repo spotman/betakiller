@@ -13,6 +13,7 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
+use BetaKiller\Security\CsrfService;
 use BetaKiller\Service\AuthService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -45,17 +46,24 @@ class RegularLoginAction extends AbstractAction implements PostRequestActionInte
     private $eventBus;
 
     /**
+     * @var \BetaKiller\Security\CsrfService
+     */
+    private $csrf;
+
+    /**
      * RegularLoginAction constructor.
      *
      * @param \BetaKiller\Service\AuthService                $auth
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
+     * @param \BetaKiller\Security\CsrfService               $csrf
      * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
-    public function __construct(AuthService $auth, UserRepositoryInterface $userRepo, EventBusInterface $eventBus)
+    public function __construct(AuthService $auth, UserRepositoryInterface $userRepo, CsrfService $csrf, EventBusInterface $eventBus)
     {
         $this->auth     = $auth;
         $this->userRepo = $userRepo;
         $this->eventBus = $eventBus;
+        $this->csrf = $csrf;
     }
 
     /**
@@ -66,6 +74,8 @@ class RegularLoginAction extends AbstractAction implements PostRequestActionInte
         $builder
             ->string(self::ARG_LOGIN)
             ->string(self::ARG_PASSWORD);
+
+        $this->csrf->addArgumentsDefinition($builder);
     }
 
     /**
@@ -88,6 +98,8 @@ class RegularLoginAction extends AbstractAction implements PostRequestActionInte
         if (!$referrer) {
             throw new BadRequestHttpException('Missing ref');
         }
+
+        $this->csrf->checkActionToken($request);
 
         $post = ActionRequestHelper::postArguments($request);
 

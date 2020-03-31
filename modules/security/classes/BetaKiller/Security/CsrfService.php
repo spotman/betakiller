@@ -15,7 +15,7 @@ use Zend\Expressive\Session\SessionInterface;
 
 class CsrfService implements ArgumentsDefinitionProviderInterface
 {
-    public const SESSION_TOKENS_KEY = 'csrf.';
+    public const SESSION_TOKENS_KEY = 'csrf';
     public const REQUEST_TOKEN_KEY  = 'csrf';
 
     /**
@@ -108,6 +108,6 @@ class CsrfService implements ArgumentsDefinitionProviderInterface
 
     private function makeSessionTokenName(string $hash): string
     {
-        return self::SESSION_TOKENS_KEY.$hash;
+        return self::SESSION_TOKENS_KEY.'.'.$hash;
     }
 }
