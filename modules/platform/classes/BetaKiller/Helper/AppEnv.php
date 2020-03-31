@@ -74,7 +74,7 @@ class AppEnv implements AppEnvInterface
 
     private function detectDebugMode(): void
     {
-        if (!$this->inProductionMode() && \getenv('APP_DEBUG')) {
+        if (!$this->inProductionMode() && (bool)\getenv('APP_DEBUG')) {
             $this->enableDebug();
         }
     }
@@ -82,10 +82,6 @@ class AppEnv implements AppEnvInterface
     private function detectAppMode(): void
     {
         $this->mode = $this->getEnvVariable(self::APP_MODE);
-
-        if ($this->inDevelopmentMode()) {
-            $this->enableDebug();
-        }
     }
 
     private function detectCliEnv(): void
