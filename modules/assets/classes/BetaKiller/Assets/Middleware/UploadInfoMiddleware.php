@@ -73,6 +73,8 @@ class UploadInfoMiddleware extends AbstractAssetMiddleware
 //            $data['preview'] = $this->provider->getAllowedPreviewSizes();
 //        }
 
-        return ResponseHelper::successJson($data);
+        return ResponseHelper::disableCaching(
+            ResponseHelper::successJson($data)
+        );
     }
 }
