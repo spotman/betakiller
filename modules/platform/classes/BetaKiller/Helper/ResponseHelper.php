@@ -121,7 +121,27 @@ class ResponseHelper
     {
         $expiresAt = (new \DateTimeImmutable())->sub(new \DateInterval('PT1H'));
 
-        return self::setExpires($response, $expiresAt);
+        $response = self::setExpires($response, $expiresAt);
+
+        $response = self::setPragmaNoCache($response);
+
+        return self::setCacheControl($response, 'no-cache, no-store, must-revalidate');
+    }
+
+    public static function enableCaching(
+        ResponseInterface $response,
+        DateTimeImmutable $lastModified,
+        \DateInterval $ttl
+    ): ResponseInterface {
+        $reference = new DateTimeImmutable;
+        $expiresAt = $reference->add($ttl);
+
+        $expiresInSeconds = $expiresAt->getTimestamp() - $reference->getTimestamp();
+
+        $response = self::setExpires($response, $expiresAt);
+        $response = self::setLastModified($response, $lastModified);
+
+        return self::setCacheControl($response, 'private, must-revalidate, max-age='.$expiresInSeconds);
     }
 
     public static function setLastModified(
