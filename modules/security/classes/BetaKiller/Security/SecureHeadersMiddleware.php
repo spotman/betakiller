@@ -6,10 +6,12 @@ namespace BetaKiller\Security;
 use Aidantwoods\SecureHeaders\Http\Psr7Adapter;
 use Aidantwoods\SecureHeaders\SecureHeaders;
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Helper\LoggerHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
 
 class SecureHeadersMiddleware implements MiddlewareInterface
 {
@@ -24,15 +26,22 @@ class SecureHeadersMiddleware implements MiddlewareInterface
     private $securityConfig;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * SecureHeadersMiddleware constructor.
      *
      * @param \BetaKiller\Config\AppConfigInterface        $appConfig
      * @param \BetaKiller\Security\SecurityConfigInterface $securityConfig
+     * @param \Psr\Log\LoggerInterface                     $logger
      */
-    public function __construct(AppConfigInterface $appConfig, SecurityConfigInterface $securityConfig)
+    public function __construct(AppConfigInterface $appConfig, SecurityConfigInterface $securityConfig, LoggerInterface $logger)
     {
         $this->appConfig      = $appConfig;
         $this->securityConfig = $securityConfig;
+        $this->logger = $logger;
     }
 
     /**
@@ -108,6 +117,12 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         }
 
         foreach ($this->securityConfig->getHeadersToAdd() as $headerName => $headerValue) {
+            if ($response->hasHeader($headerName)){
+                $this->logger->warning('Duplicate HTTP header ":name"', [
+                    ':name' => $headerName,
+                ]);
+            }
+
             $response = $response->withHeader($headerName, $headerValue);
         }
 
