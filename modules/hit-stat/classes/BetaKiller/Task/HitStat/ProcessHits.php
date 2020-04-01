@@ -142,7 +142,7 @@ class ProcessHits extends AbstractTask
             }
         }
 
-        if ($this->newMissingTargets || $this->newMissingSources) {
+        if (count($this->newMissingTargets) > 0 || count($this->newMissingSources) > 0) {
             // Notify moderators about new missed URL
             $this->notification->broadcastMessage(self::MISSING_TARGETS, [
                 'targets' => \array_map(static function (HitPage $page) {
@@ -159,7 +159,7 @@ class ProcessHits extends AbstractTask
             ]);
         }
 
-        if ($this->newSources) {
+        if (count($this->newSources) > 0) {
             // Notify moderators about new referrers
             $this->notification->broadcastMessage(self::NEW_SOURCES, [
                 'sources' => \array_map(static function (HitPage $page) {
