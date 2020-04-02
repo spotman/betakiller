@@ -52,10 +52,8 @@ class SessionRestartAction extends AbstractAction
 
         $this->auth->login($session, $user);
 
-        $element = $urlHelper->getUrlElementByCodename(AuthRootIFace::codename());
-
         return ResponseHelper::redirect(
-            $urlHelper->makeUrl($element)
+            $urlHelper->makeCodenameUrl(AuthRootIFace::codename())
         );
     }
 }

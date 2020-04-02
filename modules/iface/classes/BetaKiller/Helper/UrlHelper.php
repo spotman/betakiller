@@ -105,14 +105,19 @@ class UrlHelper
      * @param string                                               $codename
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
+     * @param bool|null                                            $removeCyclingLinks
+     *
      * @return string
      * @throws \BetaKiller\Url\UrlElementException
      */
-    public function makeCodenameUrl(string $codename, ?UrlContainerInterface $params = null): string
-    {
+    public function makeCodenameUrl(
+        string $codename,
+        ?UrlContainerInterface $params = null,
+        ?bool $removeCyclingLinks = null
+    ): string {
         $element = $this->getUrlElementByCodename($codename);
 
-        return $this->makeUrl($element, $params);
+        return $this->makeUrl($element, $params, $removeCyclingLinks);
     }
 
     /**

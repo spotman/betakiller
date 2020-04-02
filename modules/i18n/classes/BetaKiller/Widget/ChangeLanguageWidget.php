@@ -56,13 +56,11 @@ class ChangeLanguageWidget extends AbstractPublicWidget
             $links[$lang->getIsoCode()] = $data;
         }
 
-        $changeAction = $urlHelper->getUrlElementByCodename(ChangeUserLanguageAction::codename());
-
         return [
             'current'   => $currentLang->getIsoCode(),
             'lang_list' => $links,
 
-            'action_url'      => $urlHelper->makeUrl($changeAction),
+            'action_url'      => $urlHelper->makeCodenameUrl(ChangeUserLanguageAction::codename()),
             'action_key_lang' => ChangeUserLanguageAction::ARG_LANG,
             'action_key_url'  => ChangeUserLanguageAction::ARG_URL,
         ];

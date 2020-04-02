@@ -20,10 +20,8 @@ class AccessRecoveryTokenError404IFace extends AbstractIFace
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        $recoveryElement = $urlHelper->getUrlElementByCodename(AccessRecoveryRequestIFace::codename());
-
         return [
-            'request_url' => $urlHelper->makeUrl($recoveryElement, null, false),
+            'request_url' => $urlHelper->makeCodenameUrl(AccessRecoveryRequestIFace::codename()),
         ];
     }
 }

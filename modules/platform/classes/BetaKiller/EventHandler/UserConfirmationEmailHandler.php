@@ -44,10 +44,8 @@ final class UserConfirmationEmailHandler
 
         $token = $this->tokenService->create($user, new \DateInterval('P14D'));
 
-        $abuseElement = $this->urlHelper->getUrlElementByCodename(ClaimRegistrationAction::codename());
-
         $emailData = [
-            'claim_url' => $this->urlHelper->makeUrl($abuseElement),
+            'claim_url' => $this->urlHelper->makeCodenameUrl(ClaimRegistrationAction::codename()),
             // For action URL generation
             '$token'    => $token,
         ];

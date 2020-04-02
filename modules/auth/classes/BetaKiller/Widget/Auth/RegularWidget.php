@@ -49,15 +49,12 @@ class RegularWidget extends AbstractPublicWidget
     {
         $lang = ServerRequestHelper::getI18n($request)->getLang();
 
-        $recoveryIFace = $this->urlHelper->getUrlElementByCodename(AccessRecoveryRequestIFace::codename());
-        $loginAction   = $this->urlHelper->getUrlElementByCodename(RegularLoginAction::codename());
-
         $params = $this->urlHelper->createUrlContainer()
             ->setEntity($lang);
 
         return [
-            'login_url'           => $this->urlHelper->makeUrl($loginAction, $params),
-            'access_recovery_url' => $this->urlHelper->makeUrl($recoveryIFace, $params),
+            'login_url'           => $this->urlHelper->makeCodenameUrl(AccessRecoveryRequestIFace::codename(), $params),
+            'access_recovery_url' => $this->urlHelper->makeCodenameUrl(RegularLoginAction::codename(), $params),
             'token'               => $this->csrf->createRequestToken($request),
         ];
     }

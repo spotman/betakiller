@@ -57,12 +57,10 @@ class VerifyAccessRecoveryTokenAction extends AbstractTokenVerificationAction
     protected function getSuccessUrl(UrlHelper $urlHelper, UserInterface $user): string
     {
         // Password change is required after successful access recovery
-        $element = $urlHelper->getUrlElementByCodename(PasswordChangeIFace::codename());
-
         // Bind user language
         $params = $urlHelper->createUrlContainer()
             ->setEntity($user);
 
-        return $urlHelper->makeUrl($element, $params);
+        return $urlHelper->makeCodenameUrl(PasswordChangeIFace::codename(), $params);
     }
 }

@@ -21,10 +21,8 @@ class AuthRootIFace extends AbstractAdminIFace
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        $sessionRestartAction = $urlHelper->getUrlElementByCodename(SessionRestartAction::codename());
-
         return [
-            'restart_session_url' => $urlHelper->makeUrl($sessionRestartAction),
+            'restart_session_url' => $urlHelper->makeCodenameUrl(SessionRestartAction::codename()),
         ];
     }
 }

@@ -53,15 +53,13 @@ class PasswordChangeIFace extends AbstractIFace
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
         $user      = ServerRequestHelper::getUser($request);
 
-        $actionElement = $urlHelper->getUrlElementByCodename(ChangePasswordAction::codename());
-
         // Check was password really changed
         $isChanged = (bool)ServerRequestHelper::getFlash($request)->getFlash(self::FLASH_STATUS);
 
         return [
             'app_state' => [
                 'userName'  => $user->getFirstName(),
-                'actionUrl' => $urlHelper->makeUrl($actionElement),
+                'actionUrl' => $urlHelper->makeCodenameUrl(ChangePasswordAction::codename()),
                 'nextUrl'   => $this->urlDetector->detect($user),
                 'isChanged' => $isChanged,
                 'csrf'      => !$isChanged ? $this->csrf->createRequestToken($request) : null,

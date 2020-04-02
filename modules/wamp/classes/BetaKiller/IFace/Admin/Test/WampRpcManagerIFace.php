@@ -19,15 +19,11 @@ class WampRpcManagerIFace extends AbstractIFace
     public function getData(ServerRequestInterface $request): array
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
-
-        $testElement = $urlHelper->getUrlElementByCodename(WampRpcRunnerIFace::codename());
-        $testUrl     = $urlHelper->makeUrl($testElement, null, false);
-
         $userAgent = ServerRequestHelper::getUserAgent($request);
 
         return [
             'userAgent' => $userAgent,
-            'testUrl'   => $testUrl,
+            'testUrl'   => $urlHelper->makeCodenameUrl(WampRpcRunnerIFace::codename(), null, false),
             'cases'     => DataApiMethod::AVAILABLE_CASES,
         ];
     }

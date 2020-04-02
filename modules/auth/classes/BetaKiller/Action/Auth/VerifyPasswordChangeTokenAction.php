@@ -17,12 +17,10 @@ class VerifyPasswordChangeTokenAction extends AbstractTokenVerificationAction
      */
     protected function getSuccessUrl(UrlHelper $urlHelper, UserInterface $user): string
     {
-        $element = $urlHelper->getUrlElementByCodename(PasswordChangeIFace::codename());
-
         $params = $urlHelper->createUrlContainer()
             ->setEntity($user);
 
-        return $urlHelper->makeUrl($element, $params, false);
+        return $urlHelper->makeCodenameUrl(PasswordChangeIFace::codename(), $params, false);
     }
 
     /**

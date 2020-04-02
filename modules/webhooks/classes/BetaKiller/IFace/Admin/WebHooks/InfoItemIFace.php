@@ -35,10 +35,13 @@ class InfoItemIFace extends AbstractAdminIFace
      * @param \BetaKiller\Repository\WebHookLogRepository $logRepo
      * @param \BetaKiller\IdentityConverterInterface      $converter
      */
-    public function __construct(WebHookFactory $factory, WebHookLogRepository $logRepo, IdentityConverterInterface $converter)
-    {
-        $this->factory = $factory;
-        $this->logRepo = $logRepo;
+    public function __construct(
+        WebHookFactory $factory,
+        WebHookLogRepository $logRepo,
+        IdentityConverterInterface $converter
+    ) {
+        $this->factory   = $factory;
+        $this->logRepo   = $logRepo;
         $this->converter = $converter;
     }
 
@@ -59,18 +62,15 @@ class InfoItemIFace extends AbstractAdminIFace
         /** @var WebHookModelInterface $model */
         $model = ServerRequestHelper::getEntity($request, WebHookModelInterface::class);
 
-        //
-        $listIFace    = $urlHelper->getUrlElementByCodename(ListItemsIFace::codename());
-        $listItemsUrl = $urlHelper->makeUrl($listIFace, null, false);
+        $listItemsUrl = $urlHelper->makeCodenameUrl(ListItemsIFace::codename(), null, false);
 
-        //
         $webHook    = $this->factory->createFromModel($model);
         $definition = $webHook->getRequestDefinition();
 
-        $param = $urlHelper->createUrlContainer();
-        $param->setEntity($model);
-        $executeAction = $urlHelper->getUrlElementByCodename(WebHookExecuteAction::codename());
-        $requestAction = $urlHelper->makeUrl($executeAction, $param, false);
+        $param = $urlHelper->createUrlContainer()
+            ->setEntity($model);
+
+        $requestAction = $urlHelper->makeCodenameUrl(WebHookExecuteAction::codename(), $param, false);
 
         $codeName    = $model->getCodename();
         $serviceName = $model->getServiceName();

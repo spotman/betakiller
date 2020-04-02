@@ -71,7 +71,6 @@ class AccessRecoveryService
      * @param \BetaKiller\Model\UserInterface                 $user
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParams
      *
-     * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
@@ -81,15 +80,13 @@ class AccessRecoveryService
         $ttl   = $this->getTokenPeriod();
         $token = $this->tokenService->create($user, $ttl);
 
-        $actionElement = $this->urlHelper->getUrlElementByCodename(VerifyAccessRecoveryTokenAction::codename());
-        $actionParams  = $this->urlHelper->createUrlContainer()->setEntity($token);
-
-        $claimElement = $this->urlHelper->getUrlElementByCodename(ClaimRegistrationAction::codename());
+        $actionParams = $this->urlHelper->createUrlContainer()->setEntity($token);
 
         $this->notification->directMessage(self::NOTIFICATION_NAME, $user, [
             // User Language will be fetched from Token
-            'recovery_url' => $this->urlHelper->makeUrl($actionElement, $actionParams, false),
-            'claim_url'    => $this->urlHelper->makeUrl($claimElement, $actionParams, false),
+            'recovery_url' => $this->urlHelper->makeCodenameUrl(VerifyAccessRecoveryTokenAction::codename(),
+                $actionParams),
+            'claim_url'    => $this->urlHelper->makeCodenameUrl(ClaimRegistrationAction::codename(), $actionParams),
         ]);
 
         $this->eventBus->emit(new AccessRecoveryRequestedEvent($user, $urlParams));

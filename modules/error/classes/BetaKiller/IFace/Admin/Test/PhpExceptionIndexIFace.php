@@ -21,12 +21,9 @@ class PhpExceptionIndexIFace extends AbstractErrorAdminIFace
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        $http500IFace = $urlHelper->getUrlElementByCodename('Admin_Test_PhpExceptionHttp500');
-        $loggerIFace  = $urlHelper->getUrlElementByCodename('Admin_Test_PhpExceptionLogger');
-
         return [
-            'http_500_test_url' => $urlHelper->makeUrl($http500IFace),
-            'logger_test_url'   => $urlHelper->makeUrl($loggerIFace),
+            'http_500_test_url' => $urlHelper->makeCodenameUrl(PhpExceptionHttp500IFace::codename()),
+            'logger_test_url'   => $urlHelper->makeCodenameUrl(PhpExceptionLoggerIFace::codename()),
         ];
     }
 }

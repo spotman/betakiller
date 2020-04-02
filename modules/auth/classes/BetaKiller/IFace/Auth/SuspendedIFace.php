@@ -21,10 +21,8 @@ class SuspendedIFace extends AbstractIFace
     {
         $helper = ServerRequestHelper::getUrlHelper($request);
 
-        $action = $helper->getUrlElementByCodename(ActivateSuspendedAction::codename());
-
         return [
-            'activate_url' => $helper->makeUrl($action),
+            'activate_url' => $helper->makeCodenameUrl(ActivateSuspendedAction::codename()),
         ];
     }
 }

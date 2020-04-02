@@ -100,8 +100,7 @@ class GroupListIFace extends AbstractAdminIFace
     {
         $messages = [];
 
-        $logIndex    = $urlHelper->getUrlElementByCodename(LogIndexIFace::codename());
-        $logIndexUrl = $urlHelper->makeUrl($logIndex);
+        $logIndexUrl = $urlHelper->makeCodenameUrl(LogIndexIFace::codename());
 
         foreach ($this->config->getGroupMessages($group->getCodename()) as $messageCodename) {
             $messages[] = [

@@ -51,10 +51,8 @@ class PostIndexIFace extends AbstractContentAdminIFace
             ];
         }
 
-        $createPostIFace = $urlHelper->getUrlElementByCodename('Admin_Content_PostCreate');
-
         return [
-            'createUrl' => $urlHelper->makeUrl($createPostIFace),
+            'createUrl' => $urlHelper->makeCodenameUrl(PostCreateIFace::codename()),
             'posts'     => $data,
         ];
     }

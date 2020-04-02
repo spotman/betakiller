@@ -6,7 +6,6 @@ use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\PhpExceptionHistoryModelInterface;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
-use BetaKiller\Url\UrlElementInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class PhpExceptionItemIFace extends AbstractErrorAdminIFace
@@ -48,8 +47,6 @@ class PhpExceptionItemIFace extends AbstractErrorAdminIFace
 
 //        $traceIFace      = $urlHelper->getUrlElementByCodename('Admin_Error_PhpExceptionStackTrace');
 
-        $backIFace = $this->getBackIFace($model, $urlHelper);
-
         $history = [];
 
         foreach ($model->getHistoricalRecords() as $record) {
@@ -65,7 +62,7 @@ class PhpExceptionItemIFace extends AbstractErrorAdminIFace
         $trace = $model->getTraceSize() > 0 ? $model->getTrace() : null;
 
         return [
-            'backUrl'    => $urlHelper->makeUrl($backIFace),
+            'backUrl'    => $this->getBackIFaceUrl($model, $urlHelper),
             'hash'       => $model->getHash(),
             'urls'       => $model->getUrls(),
             'paths'      => $paths,
@@ -81,15 +78,15 @@ class PhpExceptionItemIFace extends AbstractErrorAdminIFace
         ];
     }
 
-    private function getBackIFace(PhpExceptionModelInterface $model, UrlHelper $helper): UrlElementInterface
+    private function getBackIFaceUrl(PhpExceptionModelInterface $model, UrlHelper $helper): string
     {
         if ($model->isIgnored()) {
-            return $helper->getUrlElementByCodename(IgnoredPhpExceptionIndexIFace::codename());
+            return $helper->makeCodenameUrl(IgnoredPhpExceptionIndexIFace::codename());
         }
 
         return $model->isResolved()
-            ? $helper->getUrlElementByCodename(ResolvedPhpExceptionIndexIFace::codename())
-            : $helper->getUrlElementByCodename(UnresolvedPhpExceptionIndexIFace::codename());
+            ? $helper->makeCodenameUrl(ResolvedPhpExceptionIndexIFace::codename())
+            : $helper->makeCodenameUrl(UnresolvedPhpExceptionIndexIFace::codename());
     }
 
     private function getHistoricalRecordData(PhpExceptionHistoryModelInterface $record): array

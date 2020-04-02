@@ -95,11 +95,10 @@ class ClaimRegistrationAction extends AbstractAction
 
         $lang = $this->langRepo->getByIsoCode($log->getLanguageIsoCode());
 
-        $thanksElement = $urlHelper->getUrlElementByCodename(RegistrationClaimThanksIFace::codename());
-        $params        = $urlHelper->createUrlContainer()->setEntity($lang);
+        $params = $urlHelper->createUrlContainer()->setEntity($lang);
 
         return ResponseHelper::redirect(
-            $urlHelper->makeUrl($thanksElement, $params)
+            $urlHelper->makeCodenameUrl(RegistrationClaimThanksIFace::codename(), $params)
         );
     }
 }
