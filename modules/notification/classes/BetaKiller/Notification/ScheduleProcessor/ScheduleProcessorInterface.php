@@ -16,5 +16,5 @@ interface ScheduleProcessorInterface
      *
      * @return bool
      */
-    public function makeMessage(MessageInterface $message, MessageTargetInterface $target): bool;
+    public function fillUpMessage(MessageInterface $message, MessageTargetInterface $target): bool;
 }

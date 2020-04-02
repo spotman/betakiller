@@ -116,7 +116,7 @@ final class SendScheduled extends AbstractTask
         $message = $this->notification->createMessage($messageCodename, $target, []);
 
         // Message does not need to be sent
-        if (!$processor->makeMessage($message, $target)) {
+        if (!$processor->fillUpMessage($message, $target)) {
             return;
         }
 
