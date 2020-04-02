@@ -34,7 +34,7 @@ final class UrlHelperFactory
      */
     public function create(UrlContainerInterface $params = null, UrlElementStack $stack = null): UrlHelper
     {
-        $params = $params ?? new ResolvingUrlContainer;
+        $params = $params ?? ResolvingUrlContainer::create();
         $stack  = $stack ?? new UrlElementStack($params);
 
         return $this->container->make(UrlHelper::class, [

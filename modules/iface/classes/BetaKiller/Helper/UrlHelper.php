@@ -96,48 +96,9 @@ class UrlHelper
         return $this->tree->getDefault();
     }
 
-    /**
-     * @param \BetaKiller\Url\UrlElementInterface                  $model
-     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
-     *
-     * @return bool
-     */
-    public function inStack(UrlElementInterface $model, UrlContainerInterface $params = null): bool
-    {
-        return $this->stack->has($model, $params);
-    }
-
-    /**
-     * @return \BetaKiller\Url\UrlElementInterface
-     */
-    public function getCurrentElement(): UrlElementInterface
-    {
-        return $this->stack->getCurrent();
-    }
-
-    /**
-     * Returns current UrlElementStack
-     *
-     * @return \BetaKiller\Url\UrlElementStack
-     */
-    public function getStack(): UrlElementStack
-    {
-        return $this->stack;
-    }
-
     public function createUrlContainer(): UrlContainerInterface
     {
         return ResolvingUrlContainer::create();
-    }
-
-    /**
-     * Returns current UrlContainer
-     *
-     * @return \BetaKiller\Url\Container\UrlContainerInterface
-     */
-    public function getUrlContainer(): UrlContainerInterface
-    {
-        return $this->urlContainer;
     }
 
     /**

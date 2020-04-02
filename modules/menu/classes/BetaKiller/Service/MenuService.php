@@ -8,10 +8,10 @@ use BetaKiller\Exception\DomainException;
 use BetaKiller\Factory\MenuCounterFactory;
 use BetaKiller\Helper\TextHelper;
 use BetaKiller\Helper\UrlElementHelper;
-use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Menu\MenuItem;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
+use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\ElementFilter\AggregateUrlElementFilter;
 use BetaKiller\Url\ElementFilter\MenuCodenameUrlElementFilter;
@@ -19,6 +19,7 @@ use BetaKiller\Url\ElementFilter\UrlElementFilterInterface;
 use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementForMenuInterface;
 use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlElementTreeRecursiveIterator;
 use Generator;
@@ -27,6 +28,11 @@ use Spotman\Acl\AclException;
 
 class MenuService
 {
+    /**
+     * @var \BetaKiller\Url\UrlElementStack
+     */
+    private $stack;
+
     /**
      * @var \BetaKiller\Url\UrlElementTreeInterface
      */
@@ -41,11 +47,6 @@ class MenuService
      * @var \BetaKiller\Helper\UrlElementHelper
      */
     private $elementHelper;
-
-    /**
-     * @var UrlHelper
-     */
-    private $urlHelper;
 
     /**
      * @var UserInterface
@@ -106,11 +107,13 @@ class MenuService
     }
 
     /**
-     * @param string                          $menuName
-     * @param \BetaKiller\Helper\UrlHelper    $urlHelper
-     * @param \BetaKiller\Model\UserInterface $user
-     * @param int                             $level Menu level to start (1, 2, 3, etc)
-     * @param int                             $depth Menu depth in levels (1, 2, 3, etc)
+     * @param string                                          $menuName
+     * @param \BetaKiller\Model\UserInterface                 $user
+     * @param int                                             $level Menu level to start (1, 2, 3, etc)
+     * @param int                                             $depth Menu depth in levels (1, 2, 3, etc)
+     *
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParams
+     * @param \BetaKiller\Url\UrlElementStack                 $stack
      *
      * @return \BetaKiller\Menu\MenuItem[]
      * @throws \BetaKiller\Factory\FactoryException
@@ -119,8 +122,14 @@ class MenuService
      * @throws \BetaKiller\Url\ElementFilter\UrlElementFilterException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function getItems(string $menuName, UrlHelper $urlHelper, UserInterface $user, int $level, int $depth): array
-    {
+    public function getItems(
+        string $menuName,
+        UserInterface $user,
+        int $level,
+        int $depth,
+        UrlContainerInterface $urlParams,
+        UrlElementStack $stack
+    ): array {
         // Get all items with proper 'menu' attribute (merge in root)
         // If level is not null => get only items in provided depth filtered by current stack (search for items in result set)
 
@@ -131,16 +140,17 @@ class MenuService
 
         $this->startLevel = $level;
         $this->depth      = $depth;
-        $this->urlHelper  = $urlHelper;
         $this->user       = $user;
+
+        $this->stack = $stack;
 
         // Iterate over all tree (filtering will be done later)
         $iterator = new UrlElementTreeRecursiveIterator($this->tree);
 
         // was null (new container on every branch)
-        $rootParams = $urlHelper->createUrlContainer();
+        $rootParams = ResolvingUrlContainer::create();
 
-        $rootParams->import($urlHelper->getUrlContainer());
+        $rootParams->import($urlParams);
 
         // Start from 1 for simplicity
         $totalCounter = 1;
@@ -191,8 +201,6 @@ class MenuService
 
         // Iterate over every url element
         foreach ($iterator as $urlElement) {
-            //$params = $params ?: $this->urlHelper->createUrlContainer();
-
             // Check current UrlElement is in menu
             $isInMenu = $this->filter->isAvailable($urlElement);
 
@@ -210,7 +218,7 @@ class MenuService
 
                 // Skip branches which are not active right now (leveled menu depends on currently selected items)
                 // Keep diving in if we are in menu branch already
-                if ($isInMenu && !$this->urlHelper->inStack($urlElement, $params)) {
+                if ($isInMenu && !$this->stack->has($urlElement, $params)) {
                     $useChildren = false;
                 }
             } elseif ($this->currentLevel < $this->startLevel) {
@@ -270,7 +278,7 @@ class MenuService
                     $item = new MenuItem(
                         $url,
                         $this->elementHelper->getLabel($urlElement, $params, $this->user->getLanguage()),
-                        $this->urlHelper->inStack($urlElement, $params),
+                        $this->stack->has($urlElement, $params),
                         $urlElement->getCodename(),
                         $counter,
                         $itemOrder + $orderedItemsBaseCounter

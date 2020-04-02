@@ -33,10 +33,11 @@ class UserStatusMiddleware implements MiddlewareInterface
         }
 
         $helper  = ServerRequestHelper::getUrlHelper($request);
+        $stack   = ServerRequestHelper::getUrlElementStack($request);
         $element = $helper->getUrlElementByCodename($elementCodename);
 
         // Prevent cycling redirects and allow activation action
-        if ($helper->inStack($element)) {
+        if ($stack->has($element)) {
             return $handler->handle($request);
         }
 

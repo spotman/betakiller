@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace BetaKiller\Api\Method\Menu;
 
-use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\MenuService;
+use BetaKiller\Url\Container\ResolvingUrlContainer;
+use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlProcessor;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\Method\AbstractApiMethod;
@@ -45,25 +46,17 @@ class ReadApiMethod extends AbstractApiMethod
     private $urlProcessor;
 
     /**
-     * @var \BetaKiller\Factory\UrlHelperFactory
-     */
-    private $urlHelperFactory;
-
-    /**
      * ReadApiMethod constructor.
      *
-     * @param \BetaKiller\Service\MenuService      $service
-     * @param \BetaKiller\Url\UrlProcessor         $urlProcessor
-     * @param \BetaKiller\Factory\UrlHelperFactory $urlHelperFactory
+     * @param \BetaKiller\Service\MenuService $service
+     * @param \BetaKiller\Url\UrlProcessor    $urlProcessor
      */
     public function __construct(
         MenuService $service,
-        UrlProcessor $urlProcessor,
-        UrlHelperFactory $urlHelperFactory
+        UrlProcessor $urlProcessor
     ) {
-        $this->service          = $service;
-        $this->urlHelperFactory = $urlHelperFactory;
-        $this->urlProcessor     = $urlProcessor;
+        $this->service      = $service;
+        $this->urlProcessor = $urlProcessor;
     }
 
     /**
@@ -93,16 +86,14 @@ class ReadApiMethod extends AbstractApiMethod
         $level    = $arguments->getInt(self::ARG_LEVEL);
         $depth    = $arguments->getInt(self::ARG_DEPTH);
 
-        $urlHelper = $this->urlHelperFactory->create();
-
-        $stack  = $urlHelper->getStack();
-        $params = $urlHelper->getUrlContainer();
+        $params = ResolvingUrlContainer::create();
+        $stack  = new UrlElementStack($params);
 
         // Parse provided URL for active items detection
         $this->urlProcessor->process($url, $stack, $params, $user);
 
         return $this->response(
-            $this->service->getItems($menuName, $urlHelper, $user, $level, $depth)
+            $this->service->getItems($menuName, $user, $level, $depth, $params, $stack)
         );
     }
 }

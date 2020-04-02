@@ -39,14 +39,15 @@ abstract class AbstractMenuWidget extends AbstractWidget
     public function getData(ServerRequestInterface $request, array $context): array
     {
         $user      = ServerRequestHelper::getUser($request);
-        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+        $urlParams = ServerRequestHelper::getUrlContainer($request);
+        $stack     = ServerRequestHelper::getUrlElementStack($request);
 
         // Menu codename from widget context
         $menuCodename = (string)$context['menu'];
         $level        = $context['level'] ?? 1;
         $depth        = $context['depth'] ?? 1;
 
-        $items = $this->service->getItems($menuCodename, $urlHelper, $user, $level, $depth);
+        $items = $this->service->getItems($menuCodename, $user, $level, $depth, $urlParams, $stack);
 
         return [
             'items' => $this->service->convertToJson($items),
