@@ -262,7 +262,7 @@ class WebApp
             'assets-delete');
 
         // API HTTP gate
-        $app->post('/api/v{version:\d+}/{type:.+}', ApiRequestHandler::class, 'api');
+        $app->post('/api/v{version:\d+}/{type:.+}', ApiRequestHandler::class, 'api-gate');
 
         // I18n handlers
         $app->get('/i18n/{lang}', FetchTranslationRequestHandler::class, 'i18n-fetch');
