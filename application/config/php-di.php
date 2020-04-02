@@ -108,7 +108,7 @@ return [
         }),
 
         // Handlers will be added in workers
-        CommandBusInterface::class => DI\autowire(CommandBus::class),
+        CommandBusInterface::class => DI\autowire(CommandBus::class)->lazy(),
     ],
 
 ];
