@@ -39,11 +39,14 @@ class CustomNotFoundPageMiddleware implements MiddlewareInterface
      * @param \BetaKiller\Url\UrlElementRendererInterface $renderer
      * @param \Psr\Log\LoggerInterface                    $logger
      */
-    public function __construct(UrlElementTreeInterface $tree, UrlElementRendererInterface $renderer, LoggerInterface $logger)
-    {
+    public function __construct(
+        UrlElementTreeInterface $tree,
+        UrlElementRendererInterface $renderer,
+        LoggerInterface $logger
+    ) {
         $this->tree     = $tree;
         $this->renderer = $renderer;
-        $this->logger = $logger;
+        $this->logger   = $logger;
     }
 
     /**
