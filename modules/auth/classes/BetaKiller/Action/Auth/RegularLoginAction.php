@@ -58,12 +58,16 @@ class RegularLoginAction extends AbstractAction implements PostRequestActionInte
      * @param \BetaKiller\Security\CsrfService               $csrf
      * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
-    public function __construct(AuthService $auth, UserRepositoryInterface $userRepo, CsrfService $csrf, EventBusInterface $eventBus)
-    {
+    public function __construct(
+        AuthService $auth,
+        UserRepositoryInterface $userRepo,
+        CsrfService $csrf,
+        EventBusInterface $eventBus
+    ) {
         $this->auth     = $auth;
         $this->userRepo = $userRepo;
         $this->eventBus = $eventBus;
-        $this->csrf = $csrf;
+        $this->csrf     = $csrf;
     }
 
     /**
@@ -73,9 +77,8 @@ class RegularLoginAction extends AbstractAction implements PostRequestActionInte
     {
         $builder
             ->string(self::ARG_LOGIN)
-            ->string(self::ARG_PASSWORD);
-
-        $this->csrf->addArgumentsDefinition($builder);
+            ->string(self::ARG_PASSWORD)
+            ->import($this->csrf);
     }
 
     /**
@@ -127,6 +130,9 @@ class RegularLoginAction extends AbstractAction implements PostRequestActionInte
 
         // Notify other subsystems
         $this->eventBus->emit(new WebLoginEvent($user, ServerRequestHelper::getUrlContainer($request)));
+
+        // Clear CSRF token on successful action
+        $this->csrf->clearActionToken($request);
 
         return ServerRequestHelper::isJsonPreferred($request)
             ? ResponseHelper::successJson()

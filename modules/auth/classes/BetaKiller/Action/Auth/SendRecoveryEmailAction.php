@@ -10,6 +10,7 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Auth\AccessRecoveryRequestIFace;
 use BetaKiller\Repository\UserRepositoryInterface;
+use BetaKiller\Security\CsrfService;
 use BetaKiller\Service\AccessRecoveryService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -30,21 +31,31 @@ class SendRecoveryEmailAction extends AbstractAction implements PostRequestActio
     private $recovery;
 
     /**
+     * @var \BetaKiller\Security\CsrfService
+     */
+    private $csrf;
+
+    /**
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
      * @param \BetaKiller\Service\AccessRecoveryService      $recovery
+     * @param \BetaKiller\Security\CsrfService               $csrf
      */
     public function __construct(
         UserRepositoryInterface $userRepo,
-        AccessRecoveryService $recovery
+        AccessRecoveryService $recovery,
+        CsrfService $csrf
     ) {
         $this->userRepo = $userRepo;
         $this->recovery = $recovery;
+        $this->csrf     = $csrf;
     }
 
     public function definePostArguments(DefinitionBuilderInterface $builder): void
     {
         $builder
-            ->email(self::ARG_EMAIL);
+            ->email(self::ARG_EMAIL)
+            //
+            ->import($this->csrf);
     }
 
     /**
@@ -64,8 +75,11 @@ class SendRecoveryEmailAction extends AbstractAction implements PostRequestActio
         $post      = ActionRequestHelper::postArguments($request);
         $flash     = ServerRequestHelper::getFlash($request);
 
-        $requestIFace = $urlHelper->getUrlElementByCodename(AccessRecoveryRequestIFace::codename());
-        $response     = ResponseHelper::redirect($urlHelper->makeUrl($requestIFace));
+        // Clear immediately coz there is a redirect
+        $this->csrf->checkActionToken($request);
+        $this->csrf->clearActionToken($request);
+
+        $response = ResponseHelper::redirect($urlHelper->makeCodenameUrl(AccessRecoveryRequestIFace::codename()));
 
         // checking email on duplicate
         $email = $post->getString(self::ARG_EMAIL);

@@ -68,7 +68,7 @@ class ActionUrlElementProcessor implements UrlElementProcessorInterface
                     $params->getQueryPart($key);
                 }
 
-                $request = $request->withAttribute(ActionRequestHelper::GET_ATTRIBUTE, $getArguments);
+                $request = ActionRequestHelper::withGetArguments($request, $getArguments);
             }
 
             if ($action instanceof PostRequestActionInterface) {
@@ -80,7 +80,7 @@ class ActionUrlElementProcessor implements UrlElementProcessorInterface
                 $postData      = ServerRequestHelper::getPost($request);
                 $postArguments = $this->argumentsFacade->prepareArguments($postData, $postDefinition);
 
-                $request = $request->withAttribute(ActionRequestHelper::POST_ATTRIBUTE, $postArguments);
+                $request = ActionRequestHelper::withPostArguments($request, $postArguments);
             }
         } catch (InvalidArgumentException $e) {
             throw new BadRequestHttpException('Arguments validation error for action ":action": :error', [

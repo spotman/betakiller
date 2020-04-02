@@ -77,6 +77,11 @@ class CsrfService implements ArgumentsDefinitionProviderInterface
                 ':value' => $token,
             ]);
         }
+    }
+
+    public function clearSessionToken(SessionInterface $session, string $token): void
+    {
+        $key = $this->makeSessionTokenName($token);
 
         // Remove one-time token
         $session->unset($key);
@@ -89,13 +94,25 @@ class CsrfService implements ArgumentsDefinitionProviderInterface
         $this->checkSessionToken($session, $token);
     }
 
-    public function checkActionToken(ServerRequestInterface $request): void
+    public function clearRequestToken(ServerRequestInterface $request, string $token): void
     {
-        $token = ActionRequestHelper::postArguments($request)->getString(self::REQUEST_TOKEN_KEY);
-
         $session = ServerRequestHelper::getSession($request);
 
-        $this->checkSessionToken($session, $token);
+        $this->clearSessionToken($session, $token);
+    }
+
+    public function checkActionToken(ServerRequestInterface $request): void
+    {
+        $token = $this->getActionToken($request);
+
+        $this->checkRequestToken($request, $token);
+    }
+
+    public function clearActionToken(ServerRequestInterface $request): void
+    {
+        $token = $this->getActionToken($request);
+
+        $this->clearRequestToken($request, $token);
     }
 
     /**
@@ -109,5 +126,10 @@ class CsrfService implements ArgumentsDefinitionProviderInterface
     private function makeSessionTokenName(string $hash): string
     {
         return self::SESSION_TOKENS_KEY.'.'.$hash;
+    }
+
+    private function getActionToken(ServerRequestInterface $request): string
+    {
+        return ActionRequestHelper::postArguments($request)->getString(self::REQUEST_TOKEN_KEY);
     }
 }

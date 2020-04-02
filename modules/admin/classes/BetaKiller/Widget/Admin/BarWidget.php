@@ -203,29 +203,29 @@ class BarWidget extends AbstractAdminWidget
 //        ];
 //    }
 
-    /**
-     * @param \BetaKiller\Helper\UrlHelper $helper
-     *
-     * @return IFaceModelInterface
-     * @throws \BetaKiller\Url\UrlElementException
-     * @uses \BetaKiller\IFace\Admin\Content\CommentListByStatusIFace
-     */
-    private function getCommentsListByStatusIface(UrlHelper $helper): UrlElementInterface
-    {
-        return $helper->getUrlElementByCodename('Admin_Content_CommentListByStatus');
-    }
-
-    /**
-     * @param \BetaKiller\Helper\UrlHelper $helper
-     *
-     * @return \BetaKiller\Url\UrlElementInterface
-     * @throws \BetaKiller\Url\UrlElementException
-     * @uses \BetaKiller\IFace\Admin\Content\CommentIndexIFace
-     */
-    private function getCommentsRootIface(UrlHelper $helper): UrlElementInterface
-    {
-        return $helper->getUrlElementByCodename('Admin_Content_CommentIndex');
-    }
+//    /**
+//     * @param \BetaKiller\Helper\UrlHelper $helper
+//     *
+//     * @return IFaceModelInterface
+//     * @throws \BetaKiller\Url\UrlElementException
+//     * @uses \BetaKiller\IFace\Admin\Content\CommentListByStatusIFace
+//     */
+//    private function getCommentsListByStatusIface(UrlHelper $helper): UrlElementInterface
+//    {
+//        return $helper->getUrlElementByCodename('Admin_Content_CommentListByStatus');
+//    }
+//
+//    /**
+//     * @param \BetaKiller\Helper\UrlHelper $helper
+//     *
+//     * @return \BetaKiller\Url\UrlElementInterface
+//     * @throws \BetaKiller\Url\UrlElementException
+//     * @uses \BetaKiller\IFace\Admin\Content\CommentIndexIFace
+//     */
+//    private function getCommentsRootIface(UrlHelper $helper): UrlElementInterface
+//    {
+//        return $helper->getUrlElementByCodename('Admin_Content_CommentIndex');
+//    }
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity

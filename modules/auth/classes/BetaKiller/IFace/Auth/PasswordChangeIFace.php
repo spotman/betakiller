@@ -6,6 +6,7 @@ use BetaKiller\Auth\UserUrlDetectorInterface;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\IFace\AbstractIFace;
+use BetaKiller\Security\CsrfService;
 use Psr\Http\Message\ServerRequestInterface;
 
 class PasswordChangeIFace extends AbstractIFace
@@ -18,13 +19,20 @@ class PasswordChangeIFace extends AbstractIFace
     private $urlDetector;
 
     /**
+     * @var \BetaKiller\Security\CsrfService
+     */
+    private $csrf;
+
+    /**
      * PasswordChangeIFace constructor.
      *
      * @param \BetaKiller\Auth\UserUrlDetectorInterface $urlDetector
+     * @param \BetaKiller\Security\CsrfService          $csrf
      */
-    public function __construct(UserUrlDetectorInterface $urlDetector)
+    public function __construct(UserUrlDetectorInterface $urlDetector, CsrfService $csrf)
     {
         $this->urlDetector = $urlDetector;
+        $this->csrf        = $csrf;
     }
 
     /**
@@ -56,6 +64,7 @@ class PasswordChangeIFace extends AbstractIFace
                 'actionUrl' => $urlHelper->makeUrl($actionElement),
                 'nextUrl'   => $this->urlDetector->detect($user),
                 'isChanged' => $isChanged,
+                'csrf'      => !$isChanged ? $this->csrf->createRequestToken($request) : null,
             ],
         ];
     }

@@ -55,15 +55,11 @@ class DefaultUserUrlDetector implements UserUrlDetectorInterface
         }
 
         if ($user->isBlocked()) {
-            $blocked = $this->urlHelper->getUrlElementByCodename(BlockedIFace::codename());
-
-            return $this->urlHelper->makeUrl($blocked);
+            return $this->urlHelper->makeCodenameUrl(BlockedIFace::codename());
         }
 
         if ($user->isSuspended()) {
-            $suspended = $this->urlHelper->getUrlElementByCodename(SuspendedIFace::codename());
-
-            return $this->urlHelper->makeUrl($suspended);
+            return $this->urlHelper->makeCodenameUrl(SuspendedIFace::codename());
         }
 
         return null;

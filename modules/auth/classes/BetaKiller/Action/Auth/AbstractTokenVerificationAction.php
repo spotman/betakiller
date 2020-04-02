@@ -101,9 +101,7 @@ abstract class AbstractTokenVerificationAction extends AbstractAction
     {
         // Redirect to password change IFace in case of empty password (initial password setting)
         if (!$user->hasPassword()) {
-            $changePassIFace = $urlHelper->getUrlElementByCodename(PasswordChangeIFace::codename());
-
-            return $urlHelper->makeUrl($changePassIFace);
+            return $urlHelper->makeCodenameUrl(PasswordChangeIFace::codename());
         }
 
         return $this->urlDetector->detect($user);

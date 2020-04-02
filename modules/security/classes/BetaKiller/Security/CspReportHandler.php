@@ -7,7 +7,6 @@ use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Exception\SecurityException;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ResponseHelper;
-use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriFactoryInterface;

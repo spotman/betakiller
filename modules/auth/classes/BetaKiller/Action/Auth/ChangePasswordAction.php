@@ -10,6 +10,7 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\IFace\Auth\PasswordChangeIFace;
+use BetaKiller\Security\CsrfService;
 use BetaKiller\Service\AuthService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -25,13 +26,19 @@ class ChangePasswordAction extends AbstractAction implements PostRequestActionIn
     private $auth;
 
     /**
+     * @var \BetaKiller\Security\CsrfService
+     */
+    private $csrf;
+
+    /**
      * ChangePasswordAction constructor.
      *
      * @param \BetaKiller\Service\AuthService $auth
      */
-    public function __construct(AuthService $auth)
+    public function __construct(AuthService $auth, CsrfService $csrf)
     {
         $this->auth = $auth;
+        $this->csrf = $csrf;
     }
 
     /**
@@ -43,7 +50,9 @@ class ChangePasswordAction extends AbstractAction implements PostRequestActionIn
     {
         $builder
             ->string(self::ARG_PASS)
-            ->lengthBetween(AuthService::PASSWORD_MIN_LENGTH, AuthService::PASSWORD_MAX_LENGTH);
+            ->lengthBetween(AuthService::PASSWORD_MIN_LENGTH, AuthService::PASSWORD_MAX_LENGTH)
+            //
+            ->import($this->csrf);
     }
 
     /**
@@ -64,17 +73,19 @@ class ChangePasswordAction extends AbstractAction implements PostRequestActionIn
         // Ensure user had been authorized via one-time token
         SessionHelper::checkToken($session);
 
+        $this->csrf->checkActionToken($request);
+
         // Update password
         $password = ActionRequestHelper::postArguments($request)->getString(self::ARG_PASS);
 
         $this->auth->updateUserPassword($user, $password);
 
+        $this->csrf->clearActionToken($request);
+
         // Mark password as changed
         ServerRequestHelper::getFlash($request)->flash(PasswordChangeIFace::FLASH_STATUS, true);
 
         // Redirect back to IFace
-        $nextElement = $urlHelper->getUrlElementByCodename(PasswordChangeIFace::codename());
-
-        return ResponseHelper::redirect($urlHelper->makeUrl($nextElement));
+        return ResponseHelper::redirect($urlHelper->makeCodenameUrl(PasswordChangeIFace::codename()));
     }
 }
