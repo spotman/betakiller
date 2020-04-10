@@ -226,6 +226,9 @@ class User extends \ORM implements UserInterface
      */
     public function setUsername(string $value): UserInterface
     {
+        // Lowercase to prevent collisions
+        $value = \mb_strtolower($value);
+
         return $this->set(self::COL_USERNAME, $value);
     }
 
@@ -522,6 +525,9 @@ class User extends \ORM implements UserInterface
      */
     public function setEmail(string $value): UserInterface
     {
+        // Lowercase to prevent collisions
+        $value = \mb_strtolower($value);
+
         return $this->set(self::COL_EMAIL, $value);
     }
 

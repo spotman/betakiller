@@ -39,6 +39,9 @@ class UserRepository extends AbstractHasWorkflowStateRepository implements UserR
     {
         $orm = $this->getOrmInstance();
 
+        // Lowercase to prevent collisions
+        $loginOrEmail = \mb_strtolower($loginOrEmail);
+
         $orm->where($this->getUniqueKey($loginOrEmail), '=', $loginOrEmail);
 
         return $this->findOne($orm);
