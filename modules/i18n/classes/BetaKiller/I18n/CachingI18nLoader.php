@@ -40,7 +40,7 @@ class CachingI18nLoader implements I18nKeysLoaderInterface
 
         if (!$data) {
             $data = $this->proxy->loadI18nKeys();
-            $this->cache->save($key, $data, 30);
+            $this->cache->save($key, $data);
         }
 
         return $data;
