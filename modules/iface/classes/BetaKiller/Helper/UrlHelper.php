@@ -210,7 +210,7 @@ class UrlHelper
         ?bool $removeCycling = null
     ): string {
         $params = $this->createUrlContainer();
-        $params->setParameter($entity);
+        $params->setEntity($entity);
 
         // Search for URL element with provided entity, action and zone
         $urlElement = $this->tree->getByEntityActionAndZone($entity::getModelName(), $action, $zone);
