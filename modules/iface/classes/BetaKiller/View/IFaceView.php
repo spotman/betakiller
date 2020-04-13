@@ -129,9 +129,13 @@ class IFaceView
 
             $params = ServerRequestHelper::getUrlContainer($request);
 
+            $titleDescPack = RequestProfiler::begin($request, $codename.' IFace title/description');
+
             $renderHelper
                 ->setTitle($this->elementHelper->getTitle($model, $params, $lang))
                 ->setMetaDescription($this->elementHelper->getDescription($model, $params, $lang));
+
+            RequestProfiler::end($titleDescPack);
         }
 
         $renderHelper
