@@ -13,7 +13,7 @@ use BetaKiller\Model\I18nKeyInterface;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\TranslationKey;
 use BetaKiller\Repository\LanguageRepositoryInterface;
-use BetaKiller\Repository\TranslationKeyRepository;
+use BetaKiller\Repository\TranslationKeyRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Log\LoggerInterface;
@@ -33,7 +33,7 @@ class I18n extends AbstractTask
     private $filesystemLoader;
 
     /**
-     * @var \BetaKiller\Repository\TranslationKeyRepository
+     * @var \BetaKiller\Repository\TranslationKeyRepositoryInterface
      */
     private $keyRepo;
 
@@ -70,18 +70,19 @@ class I18n extends AbstractTask
     /**
      * I18n constructor.
      *
-     * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
-     * @param \BetaKiller\I18n\FilesystemI18nKeysLoader          $filesystemLoader
-     * @param \BetaKiller\Repository\TranslationKeyRepository    $keyRepo
-     * @param \BetaKiller\I18n\PluralBagFormatterInterface       $formatter
-     * @param \BetaKiller\Helper\NotificationHelper              $notificationHelper
-     * @param \BetaKiller\Factory\UrlHelperFactory               $urlHelperFactory
-     * @param \Psr\Log\LoggerInterface                           $logger
+     * @param \BetaKiller\Repository\LanguageRepositoryInterface       $langRepo
+     * @param \BetaKiller\I18n\FilesystemI18nKeysLoader                $filesystemLoader
+     * @param \BetaKiller\Repository\TranslationKeyRepositoryInterface $keyRepo
+     * @param \BetaKiller\Factory\EntityFactoryInterface               $entityFactory
+     * @param \BetaKiller\I18n\PluralBagFormatterInterface             $formatter
+     * @param \BetaKiller\Helper\NotificationHelper                    $notificationHelper
+     * @param \BetaKiller\Factory\UrlHelperFactory                     $urlHelperFactory
+     * @param \Psr\Log\LoggerInterface                                 $logger
      */
     public function __construct(
         LanguageRepositoryInterface $langRepo,
         FilesystemI18nKeysLoader $filesystemLoader,
-        TranslationKeyRepository $keyRepo,
+        TranslationKeyRepositoryInterface $keyRepo,
         EntityFactoryInterface $entityFactory,
         PluralBagFormatterInterface $formatter,
         NotificationHelper $notificationHelper,
@@ -170,9 +171,9 @@ class I18n extends AbstractTask
 
         // Create new if not exists
         if (!$keyModel) {
-            /** @var \BetaKiller\Model\TranslationKeyModelInterface $keyModel */
-            $keyModel = $this->entityFactory->create(TranslationKey::getModelName());
+            $keyModel = new TranslationKey;
             $keyModel->setI18nKey($keyName);
+
             $this->logger->info('I18n key ":key" added', [
                 ':key' => $keyName,
             ]);

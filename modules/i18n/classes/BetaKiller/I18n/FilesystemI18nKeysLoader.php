@@ -4,7 +4,8 @@ declare(strict_types=1);
 namespace BetaKiller\I18n;
 
 use BetaKiller\Model\LanguageInterface;
-use BetaKiller\Repository\LanguageRepository;
+use BetaKiller\Repository\LanguageRepositoryInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class FilesystemI18nKeysLoader implements I18nKeysLoaderInterface
 {
@@ -19,19 +20,19 @@ class FilesystemI18nKeysLoader implements I18nKeysLoaderInterface
     private $bagFactory;
 
     /**
-     * @var \BetaKiller\Repository\LanguageRepository
+     * @var \BetaKiller\Repository\LanguageRepositoryInterface
      */
     private $langRepo;
 
     /**
      * FilesystemI18nKeysLoader constructor.
      *
-     * @param \BetaKiller\Repository\LanguageRepository    $langRepo
-     * @param \BetaKiller\I18n\PluralBagFormatterInterface $bagFormatter
-     * @param \BetaKiller\I18n\PluralBagFactoryInterface   $bagFactory
+     * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
+     * @param \BetaKiller\I18n\PluralBagFormatterInterface       $bagFormatter
+     * @param \BetaKiller\I18n\PluralBagFactoryInterface         $bagFactory
      */
     public function __construct(
-        LanguageRepository $langRepo,
+        LanguageRepositoryInterface $langRepo,
         PluralBagFormatterInterface $bagFormatter,
         PluralBagFactoryInterface $bagFactory
     ) {
@@ -52,7 +53,7 @@ class FilesystemI18nKeysLoader implements I18nKeysLoaderInterface
         foreach ($this->langRepo->getAppLanguages(true) as $lang) {
             foreach ($this->getLangData($lang) as $keyName => $i18nValue) {
                 // Create key if not exists
-                $key = $keys[$keyName] ?? $keys[$keyName] = new I18nKey($keyName);
+                $key = $keys[$keyName] = $keys[$keyName] ?? new I18nKey($keyName);
 
                 $key->setI18nValue($lang, $i18nValue);
             }
@@ -80,15 +81,20 @@ class FilesystemI18nKeysLoader implements I18nKeysLoaderInterface
             // Create a path for this set of parts
             $path = implode(DIRECTORY_SEPARATOR, $parts);
 
-            $files = \Kohana::find_file('i18n', $path, null, true);
+            $files = \Kohana::find_file('i18n', $path, 'yml', true);
 
             if ($files) {
                 $t = [];
                 foreach ($files as $file) {
-                    /** @noinspection PhpIncludeInspection */
-                    $values = include $file;
+//                    $values = \Kohana::load($file);
+                    $values = Yaml::parseFile($file);
 
                     foreach ($values as $key => $value) {
+                        // Use universal new-line separator
+                        if (\strpos($value, "\n") !== false) {
+                            $value = \str_replace("\n", "\r\n", $value);
+                        }
+
                         if (\is_array($value)) {
                             // Plural forms are in array
                             $bag = $this->bagFactory->create($value);

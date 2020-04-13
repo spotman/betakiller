@@ -3,21 +3,21 @@ declare(strict_types=1);
 
 namespace BetaKiller\I18n;
 
-use BetaKiller\Repository\TranslationKeyRepository;
+use BetaKiller\Repository\TranslationKeyRepositoryInterface;
 
 class DatabaseI18nLoader implements I18nKeysLoaderInterface
 {
     /**
-     * @var \BetaKiller\Repository\TranslationKeyRepository
+     * @var \BetaKiller\Repository\TranslationKeyRepositoryInterface
      */
     private $repo;
 
     /**
      * DatabaseI18nLoader constructor.
      *
-     * @param \BetaKiller\Repository\TranslationKeyRepository $repo
+     * @param \BetaKiller\Repository\TranslationKeyRepositoryInterface $repo
      */
-    public function __construct(TranslationKeyRepository $repo)
+    public function __construct(TranslationKeyRepositoryInterface $repo)
     {
         $this->repo = $repo;
     }
@@ -26,8 +26,6 @@ class DatabaseI18nLoader implements I18nKeysLoaderInterface
      * Returns keys models with all translations
      *
      * @return \BetaKiller\Model\I18nKeyInterface[]
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function loadI18nKeys(): array
     {

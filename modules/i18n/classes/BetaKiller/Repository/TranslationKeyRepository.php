@@ -14,7 +14,7 @@ use BetaKiller\Model\TranslationKeyModelInterface;
  * @method save(TranslationKeyModelInterface $model)
  * @method TranslationKeyModelInterface[] getAll()
  */
-class TranslationKeyRepository extends AbstractI18nKeyRepository
+class TranslationKeyRepository extends AbstractI18nKeyRepository implements TranslationKeyRepositoryInterface
 {
     /**
      * @return string

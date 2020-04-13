@@ -6,7 +6,7 @@ namespace BetaKiller\I18n;
 use BetaKiller\Helper\AppEnvInterface;
 use Psr\Container\ContainerInterface;
 
-class LazyAggregateLoader implements I18nKeysLoaderInterface
+class LazyAggregateI18nLoader implements I18nKeysLoaderInterface
 {
     /**
      * @var \Psr\Container\ContainerInterface
@@ -29,7 +29,7 @@ class LazyAggregateLoader implements I18nKeysLoaderInterface
     private $loader;
 
     /**
-     * LazyAggregateLoader constructor.
+     * LazyAggregateI18nLoader constructor.
      *
      * @param \Psr\Container\ContainerInterface  $container
      * @param \BetaKiller\I18n\I18nConfig        $config
@@ -67,11 +67,11 @@ class LazyAggregateLoader implements I18nKeysLoaderInterface
             throw new I18nException('No i18n loaders defined');
         }
 
-        // If dev mode
-        if ($this->appEnv->inDevelopmentMode()) {
-            // Inject file-based loader as a primary source fallback
-            $loadersClassNames[] = FilesystemI18nKeysLoader::class;
-        }
+//        // If dev mode
+//        if ($this->appEnv->inDevelopmentMode()) {
+//            // Inject file-based loader as a primary source fallback
+//            $loadersClassNames[] = FilesystemI18nKeysLoader::class;
+//        }
 
         $loadersInstances = [];
 

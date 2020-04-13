@@ -1,0 +1,4 @@
+assets.upload.duplicate: |
+  Upload with duplicate hash ":hash" for provider ":provider"
+
+#TODO Other error messages
