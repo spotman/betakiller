@@ -3,12 +3,12 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Workflow\AbstractWorkflowStateOrm;
 
-class ContentCommentStatus extends AbstractWorkflowStateOrm
+class ContentCommentState extends AbstractWorkflowStateOrm
 {
-    public const STATUS_PENDING  = 1;
-    public const STATUS_APPROVED = 2;
-    public const STATUS_SPAM     = 3;
-    public const STATUS_TRASH    = 4;
+    public const PENDING  = 'pending';
+    public const APPROVED = 'approved';
+    public const SPAM     = 'spam';
+    public const TRASH    = 'trash';
 
     protected function configure(): void
     {

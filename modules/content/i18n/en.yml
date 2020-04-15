@@ -1,0 +1,64 @@
+custom-tag.attachment.title: 'Download the file :name'
+custom-tag.attachment.alt: 'download button'
+
+error.post.preview-not-allowed: 'You can not preview this post'
+
+post.action.edit: 'Edit'
+post.action.save: 'Save'
+
+post.status.draft: 'Draft'
+post.status.pending: 'Pending'
+post.status.published: 'Published'
+post.status.paused: 'Paused'
+post.status.fix-requested: 'Fix requested'
+
+post.status.transition.complete: 'Ready to publish'
+post.status.transition.publish: 'Publish'
+post.status.transition.pause: 'Pause'
+post.status.transition.fix: 'Fix'
+
+comments.form.header: 'Leave a comment'
+
+comments.count:
+  none: 'No comments'
+  one: ':count comment'
+  other: ':count comments'
+
+comment.reply: 'Reply'
+comment.save: 'Сохранить'
+comment.datetime: ':date at :time'
+
+comment.list.empty: 'No comments here yet'
+
+comment.status.pending: 'Pending'
+comment.status.approved: 'Approved'
+comment.status.spam: 'SPAM'
+comment.status.trash: 'Removed'
+
+comment.action.edit: 'Edit'
+comment.action.save: 'Save'
+
+comment.status.transition.approve: 'Approve'
+comment.status.transition.reject: 'Reject'
+comment.status.transition.mark-as-spam: 'SPAM'
+comment.status.transition.move-to-trash: 'Trash'
+comment.status.transition.restore-from-trash: 'Restore'
+
+notification.email.moderator.post.complete.subj: |
+  Post ":label" is ready for publishing
+
+notification.email.user.comment.author-approve.subj: |
+  Your comment for post ":label" approved
+
+notification.email.user.comment.parent-author-reply.subj: |
+  Someone replied to your comment on ":label"
+
+entities.post: 'Posts and pages'
+
+shortcode.attribute.id.label: 'ID'
+shortcode.attribute.layout.label: 'Layout'
+shortcode.attribute.align.label: 'Align'
+shortcode.attribute.zoomable.label: 'Zoomable'
+shortcode.attribute.width.label: 'Width'
+shortcode.attribute.label.label: 'Label'
+shortcode.attribute.image-id.label: 'Image'

@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use BetaKiller\Content\Content;
+use BetaKiller\Helper\ContentHelper;
 use BetaKiller\Model\RoleInterface;
 
 final class DefaultContentElementResource extends AbstractAssetsAclResource
@@ -12,8 +12,8 @@ final class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getUploadDefaultAccessList(): array
     {
         return [
-            Content::ROLE_WRITER,
-            Content::ROLE_CONTENT_MODERATOR,
+            ContentHelper::ROLE_WRITER,
+            ContentHelper::ROLE_CONTENT_MODERATOR,
         ];
     }
 
@@ -23,8 +23,8 @@ final class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getStoreDefaultAccessList(): array
     {
         return [
-            Content::ROLE_WRITER,
-            Content::ROLE_CONTENT_MODERATOR,
+            ContentHelper::ROLE_WRITER,
+            ContentHelper::ROLE_CONTENT_MODERATOR,
         ];
     }
 
@@ -45,8 +45,8 @@ final class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getUpdateDefaultAccessList(): array
     {
         return [
-            Content::ROLE_WRITER,
-            Content::ROLE_CONTENT_MODERATOR,
+            ContentHelper::ROLE_WRITER,
+            ContentHelper::ROLE_CONTENT_MODERATOR,
         ];
     }
 
@@ -56,8 +56,8 @@ final class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getDeleteDefaultAccessList(): array
     {
         return [
-            Content::ROLE_WRITER,
-            Content::ROLE_CONTENT_MODERATOR,
+            ContentHelper::ROLE_WRITER,
+            ContentHelper::ROLE_CONTENT_MODERATOR,
         ];
     }
 
@@ -67,8 +67,8 @@ final class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getListDefaultAccessList(): array
     {
         return [
-            Content::ROLE_WRITER,
-            Content::ROLE_CONTENT_MODERATOR,
+            ContentHelper::ROLE_WRITER,
+            ContentHelper::ROLE_CONTENT_MODERATOR,
         ];
     }
 
@@ -78,8 +78,8 @@ final class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getSearchDefaultAccessList(): array
     {
         return [
-            Content::ROLE_WRITER,
-            Content::ROLE_CONTENT_MODERATOR,
+            ContentHelper::ROLE_WRITER,
+            ContentHelper::ROLE_CONTENT_MODERATOR,
         ];
     }
 }

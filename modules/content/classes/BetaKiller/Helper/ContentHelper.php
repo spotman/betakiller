@@ -6,11 +6,19 @@ use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\AttachmentAssetsProviderInterface;
 use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 use BetaKiller\Content\Shortcode\ShortcodeFacade;
-use BetaKiller\Factory\RepositoryFactory;
 use BetaKiller\Model\ContentPost;
 
 class ContentHelper
 {
+    /**
+     * Simplified role for moderators
+     */
+    public const ROLE_CONTENT_MODERATOR = 'content-moderator';
+    /**
+     * Role for writers
+     */
+    public const ROLE_WRITER = 'writer';
+
     /**
      * @var \BetaKiller\Content\Shortcode\ShortcodeFacade
      */

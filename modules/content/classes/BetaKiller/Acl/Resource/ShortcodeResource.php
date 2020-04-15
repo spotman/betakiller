@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use BetaKiller\Content\Content;
+use BetaKiller\Helper\ContentHelper;
 
 final class ShortcodeResource extends AbstractEntityRelatedAclResource
 {
@@ -19,40 +19,40 @@ final class ShortcodeResource extends AbstractEntityRelatedAclResource
     {
         return [
             self::ACTION_VERIFY => [
-                Content::ROLE_WRITER,
-                Content::ROLE_CONTENT_MODERATOR,
+                ContentHelper::ROLE_WRITER,
+                ContentHelper::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_GET_ATTRIBUTES_DEFINITION => [
-                Content::ROLE_WRITER,
-                Content::ROLE_CONTENT_MODERATOR,
+                ContentHelper::ROLE_WRITER,
+                ContentHelper::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_CREATE => [
-                Content::ROLE_CONTENT_MODERATOR,
+                ContentHelper::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_READ => [
-                Content::ROLE_WRITER,
-                Content::ROLE_CONTENT_MODERATOR,
+                ContentHelper::ROLE_WRITER,
+                ContentHelper::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_UPDATE => [
-                Content::ROLE_CONTENT_MODERATOR,
+                ContentHelper::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_DELETE => [
-                Content::ROLE_CONTENT_MODERATOR,
+                ContentHelper::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_LIST => [
-                Content::ROLE_WRITER,
-                Content::ROLE_CONTENT_MODERATOR,
+                ContentHelper::ROLE_WRITER,
+                ContentHelper::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_SEARCH => [
-                Content::ROLE_WRITER,
-                Content::ROLE_CONTENT_MODERATOR,
+                ContentHelper::ROLE_WRITER,
+                ContentHelper::ROLE_CONTENT_MODERATOR,
             ],
         ];
     }

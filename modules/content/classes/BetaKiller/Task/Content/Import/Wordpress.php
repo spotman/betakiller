@@ -104,6 +104,12 @@ class Wordpress extends AbstractTask
     private $commentRepository;
 
     /**
+     * @var \BetaKiller\Workflow\ContentCommentWorkflow
+     * @Inject
+     */
+    private $commentWorkflow;
+
+    /**
      * @var \BetaKiller\Repository\ContentCategoryRepository
      * @Inject
      */
@@ -518,8 +524,8 @@ class Wordpress extends AbstractTask
             $name      = $post['post_title'];
             $type      = $post['post_type'];
             $content   = $post['post_content'];
-            $createdAt = new DateTime($post['post_date']);
-            $updatedAt = new DateTime($post['post_modified']);
+            $createdAt = new DateTimeImmutable($post['post_date']);
+            $updatedAt = new DateTimeImmutable($post['post_modified']);
 
             $meta        = $this->wp->getPostMeta($wpID);
             $title       = $meta['_aioseop_title'] ?? null;
@@ -1668,13 +1674,13 @@ class Wordpress extends AbstractTask
         $isTrash    = (mb_strtolower($wpApproved) === 'trash');
 
         if ($isSpam) {
-            $model->initAsSpam();
+            $this->commentWorkflow->initAsSpam($model);
         } elseif ($isTrash) {
-            $model->initAsTrash();
+            $this->commentWorkflow->initAsTrash($model);
         } elseif ($isApproved) {
-            $model->initAsApproved();
+            $this->commentWorkflow->initAsApproved($model);
         } else {
-            $model->initAsPending();
+            $this->commentWorkflow->initAsPending($model);
         }
 
         $model->setMessage($message);

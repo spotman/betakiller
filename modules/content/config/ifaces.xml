@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
-    <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в UrlElementTree::admin() -->
     <iface uri="posts" name="Admin\Content\PostIndex" parent="Admin\Index" label="Posts" entity="ContentPost"
-           entityAction="list">
+           entityAction="list" menu="admin">
         <iface uri="create" name="Admin\Content\PostCreate" label="Create post" entity="ContentPost"
                entityAction="create"/>
         <iface uri="{ContentPost.id}" name="Admin\Content\PostItem" label="{ContentPost.label}" entity="ContentPost"
@@ -18,11 +17,11 @@
     </iface>
 
     <iface uri="comments" name="Admin\Content\CommentIndex" parent="Admin\Index" label="Comments"
-           entity="ContentComment" entityAction="list">
+           entity="ContentComment" entityAction="list" menu="admin">
         <iface uri="by-status" name="Admin\Content\CommentAggregateByStatus" label="Status statistic"
                entity="ContentComment" entityAction="list">
-            <iface uri="{ContentCommentStatus.codename}" name="Admin\Content\CommentListByStatus"
-                   label="{ContentCommentStatus.getLabel()}" entity="ContentComment"
+            <iface uri="{ContentCommentState.codename}" name="Admin\Content\CommentListByStatus"
+                   label="{ContentCommentState.getLabel()}" entity="ContentComment"
                    entityAction="list"/>
         </iface>
         <iface uri="{ContentComment.id}" name="Admin\Content\CommentItem" label="{ContentComment.getLabel()}"

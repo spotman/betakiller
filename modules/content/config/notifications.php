@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use BetaKiller\Content\Content;
+use BetaKiller\Helper\ContentHelper;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Notification\Transport\EmailTransport;
 use BetaKiller\Workflow\ContentCommentWorkflow;
@@ -23,7 +23,7 @@ return [
     'groups'   => [
         POST_MODERATION => [
             'roles'     => [
-                Content::ROLE_CONTENT_MODERATOR,
+                ContentHelper::ROLE_CONTENT_MODERATOR,
             ],
         ],
 

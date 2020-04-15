@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use BetaKiller\Content\Content;
+use BetaKiller\Helper\ContentHelper;
 use BetaKiller\Model\RoleInterface;
 
 final class ContentCommentStatusResource extends AbstractEntityRelatedAclResource
@@ -21,7 +21,7 @@ final class ContentCommentStatusResource extends AbstractEntityRelatedAclResourc
             ],
 
             self::ACTION_READ => [
-                Content::ROLE_CONTENT_MODERATOR,
+                ContentHelper::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_UPDATE => [

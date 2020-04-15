@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use BetaKiller\Content\Content;
+use BetaKiller\Helper\ContentHelper;
 use BetaKiller\Model\RoleInterface;
 
 final class ContentPostResource extends AbstractHasWorkflowStateAclResource
@@ -14,8 +14,8 @@ final class ContentPostResource extends AbstractHasWorkflowStateAclResource
     protected function getCreatePermissionRoles(): array
     {
         return [
-            Content::ROLE_CONTENT_MODERATOR,
-            Content::ROLE_WRITER,
+            ContentHelper::ROLE_CONTENT_MODERATOR,
+            ContentHelper::ROLE_WRITER,
         ];
     }
 
@@ -28,6 +28,7 @@ final class ContentPostResource extends AbstractHasWorkflowStateAclResource
     {
         return [
             RoleInterface::GUEST,
+            RoleInterface::LOGIN,
         ];
     }
 
@@ -40,6 +41,7 @@ final class ContentPostResource extends AbstractHasWorkflowStateAclResource
     {
         return [
             RoleInterface::GUEST,
+            RoleInterface::LOGIN,
         ];
     }
 }

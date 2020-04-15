@@ -24,12 +24,16 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     public function defineArguments(DefinitionBuilderInterface $builder): void
     {
         $builder
+            ->identity()
             ->composite(self::ARG_DATA)
+            //
             ->string(self::ARG_LABEL)->optional()
             ->string(self::ARG_URI)->optional()
             ->string(self::ARG_TITLE)->optional()
             ->string(self::ARG_DESC)->optional()
-            ->string(self::ARG_CONTENT)->optional();
+            ->string(self::ARG_CONTENT)->optional()
+            //
+            ->endComposite();
     }
 
     /**
@@ -72,6 +76,6 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
 
         $this->saveEntity($model);
 
-        return true;
+        return $model;
     }
 }

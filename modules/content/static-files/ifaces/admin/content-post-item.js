@@ -10,7 +10,6 @@ require([
   };
 
   $(function () {
-
     const $form = $('#post-form');
     const $transitionButtons = $(".transition-button");
     const $saveButton = $(".save-post-button");
@@ -23,6 +22,10 @@ require([
     if (!$content.length) {
       throw new Error('Missing content element');
     }
+
+    //if (typeof $content.ckeditor === 'undefined') {
+    //  throw new Error('Missing CKEditor');
+    //}
 
     if ($category.length) {
       $category.formSelect();
@@ -48,7 +51,7 @@ require([
       window.CKEDITOR.dtd.$inline[name] = 1;
     });
 
-    const entitySlug = $content.data('entity-slug'),
+    const entitySlug   = $content.data('entity-slug'),
           entityItemId = $content.data('entity-item-id');
 
     if (!entitySlug || !entityItemId) {
@@ -111,7 +114,7 @@ require([
       // Replace CKEditor custom tags with original shortcodes
       formData.content = convertCustomTagsToShortcodes(formData.content, shortcodes);
 
-      api.post.update(formData)
+      api.post.update(formData.id, formData)
         .done(function () {
           doneCallback();
         })
@@ -191,7 +194,7 @@ require([
   function convertShortcodesToCustomTags(input, shortcodes) {
     const matches = input.match(/\[(\S+)\s*([^\/\]]*)\/\]/ig);
 
-    $.each(matches, function(i, original) {
+    $.each(matches, function (i, original) {
       $.each(shortcodes, function (j, shortcodeName) {
         const regex = new RegExp("\\[" + shortcodeName);
 
@@ -213,7 +216,7 @@ require([
   function convertCustomTagsToShortcodes(input, shortcodes) {
     const matches = input.match(/\<(\S+)\s*([^\/\>]*)\/\>/ig);
 
-    $.each(matches, function(i, original) {
+    $.each(matches, function (i, original) {
       $.each(shortcodes, function (j, shortcodeName) {
         const tagName = getShortcodeCustomTag(shortcodeName);
         const regex = new RegExp("\\<" + tagName);

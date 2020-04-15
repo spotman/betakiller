@@ -21,9 +21,9 @@ interface ContentCommentInterface extends SingleParentTreeModelInterface, Entity
     /**
      * @param string $value
      *
-     * @return $this
+     * @return ContentCommentInterface
      */
-    public function setGuestAuthorEmail(string $value);
+    public function setGuestAuthorEmail(string $value): ContentCommentInterface;
 
     /**
      * @return string
@@ -33,16 +33,21 @@ interface ContentCommentInterface extends SingleParentTreeModelInterface, Entity
     /**
      * @param string $value
      *
-     * @return $this
+     * @return ContentCommentInterface
      */
-    public function setGuestAuthorName(string $value);
+    public function setGuestAuthorName(string $value): ContentCommentInterface;
 
     /**
      * @return string
      */
     public function getGuestAuthorName(): string;
 
-    public function setAuthorUser(UserInterface $value = null);
+    /**
+     * @param \BetaKiller\Model\UserInterface|null $value
+     *
+     * @return \BetaKiller\Model\ContentCommentInterface
+     */
+    public function setAuthorUser(UserInterface $value = null): ContentCommentInterface;
 
     /**
      * @return UserInterface|null
@@ -61,9 +66,9 @@ interface ContentCommentInterface extends SingleParentTreeModelInterface, Entity
     /**
      * @param string $value
      *
-     * @return $this
+     * @return ContentCommentInterface
      */
-    public function setMessage(string $value);
+    public function setMessage(string $value): ContentCommentInterface;
 
     /**
      * @return string
@@ -73,9 +78,9 @@ interface ContentCommentInterface extends SingleParentTreeModelInterface, Entity
     /**
      * @param string $value
      *
-     * @return $this
+     * @return ContentCommentInterface
      */
-    public function setIpAddress(string $value);
+    public function setIpAddress(string $value): ContentCommentInterface;
 
     /**
      * @return string
@@ -85,9 +90,9 @@ interface ContentCommentInterface extends SingleParentTreeModelInterface, Entity
     /**
      * @param string $value
      *
-     * @return $this
+     * @return ContentCommentInterface
      */
-    public function setGuestAuthorUser(string $value);
+    public function setGuestAuthorUser(string $value): ContentCommentInterface;
 
     /**
      * @return string
@@ -97,9 +102,9 @@ interface ContentCommentInterface extends SingleParentTreeModelInterface, Entity
     /**
      * @param string $value
      *
-     * @return $this
+     * @return ContentCommentInterface
      */
-    public function setUserAgent(string $value);
+    public function setUserAgent(string $value): ContentCommentInterface;
 
     /**
      * @return string
@@ -109,9 +114,9 @@ interface ContentCommentInterface extends SingleParentTreeModelInterface, Entity
     /**
      * @param \DateTimeInterface|null $value
      *
-     * @return $this
+     * @return ContentCommentInterface
      */
-    public function setCreatedAt(DateTimeInterface $value = null);
+    public function setCreatedAt(DateTimeInterface $value = null): ContentCommentInterface;
 
     public function getCreatedAt(): DateTimeImmutable;
 
@@ -123,10 +128,9 @@ interface ContentCommentInterface extends SingleParentTreeModelInterface, Entity
     /**
      * @param string $value
      *
-     * @return $this
-     * @throws \Kohana_Exception
+     * @return ContentCommentInterface
      */
-    public function setPath(string $value);
+    public function setPath(string $value): ContentCommentInterface;
 
     public function getLevel(): int;
 
@@ -149,31 +153,4 @@ interface ContentCommentInterface extends SingleParentTreeModelInterface, Entity
      * @return bool
      */
     public function isDeleted(): bool;
-
-    /**
-     * @return $this
-     */
-    public function initAsPending();
-
-    /**
-     * @return $this
-     */
-    public function initAsApproved();
-
-    /**
-     * @return $this
-     */
-    public function initAsSpam();
-
-    /**
-     * @return $this
-     */
-    public function initAsTrash();
-
-    /**
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @return bool
-     */
-    public function isApproveAllowed(UserInterface $user): bool;
 }

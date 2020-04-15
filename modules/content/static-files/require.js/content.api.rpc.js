@@ -34,7 +34,7 @@ define([
         return rpc(postResource, 'pause', arguments);
       },
 
-      update: function (data) {
+      update: function (id, data) {
         return rpc(postResource, 'update', arguments);
       }
     },

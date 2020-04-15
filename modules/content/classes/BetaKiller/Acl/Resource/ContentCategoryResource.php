@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use BetaKiller\Content\Content;
+use BetaKiller\Helper\ContentHelper;
 use BetaKiller\Model\RoleInterface;
 
 final class ContentCategoryResource extends AbstractEntityRelatedAclResource
@@ -17,7 +17,7 @@ final class ContentCategoryResource extends AbstractEntityRelatedAclResource
     {
         return [
             self::ACTION_CREATE => [
-                Content::ROLE_CONTENT_MODERATOR,
+                ContentHelper::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_READ => [
@@ -25,11 +25,11 @@ final class ContentCategoryResource extends AbstractEntityRelatedAclResource
             ],
 
             self::ACTION_UPDATE => [
-                Content::ROLE_CONTENT_MODERATOR,
+                ContentHelper::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_DELETE => [
-                Content::ROLE_CONTENT_MODERATOR,
+                ContentHelper::ROLE_CONTENT_MODERATOR,
             ],
 
             self::ACTION_LIST => [

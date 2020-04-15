@@ -10,10 +10,10 @@ use URL;
 
 class ContentPostWorkflow
 {
-    public const TRANSITION_COMPLETE = 'complete';
-    public const TRANSITION_PUBLISH  = 'publish';
-    public const TRANSITION_PAUSE    = 'pause';
-    public const TRANSITION_FIX      = 'fix';
+    public const COMPLETE         = 'complete';
+    public const PUBLISH = 'publish';
+    public const PAUSE   = 'pause';
+    public const FIX     = 'fix';
 
     public const NOTIFICATION_POST_COMPLETE = 'moderator/post/complete';
 
@@ -69,10 +69,10 @@ class ContentPostWorkflow
      */
     public function complete(ContentPostInterface $post, UserInterface $user): void
     {
-        $this->status->doTransition($post, self::TRANSITION_COMPLETE, $user);
+        $this->status->doTransition($post, self::COMPLETE, $user);
 
         // Publish post if it is allowed
-        if ($this->status->isTransitionAllowed($post, self::TRANSITION_PUBLISH, $user)) {
+        if ($this->status->isTransitionAllowed($post, self::PUBLISH, $user)) {
             $this->publish($post, $user);
         } else {
             $this->notifyModeratorAboutCompletePost($post);
@@ -102,7 +102,7 @@ class ContentPostWorkflow
      */
     public function publish(ContentPostInterface $post, UserInterface $user): void
     {
-        $this->status->doTransition($post, self::TRANSITION_PUBLISH, $user);
+        $this->status->doTransition($post, self::PUBLISH, $user);
 
         $this->makeUri($post);
 
@@ -120,7 +120,7 @@ class ContentPostWorkflow
      */
     public function pause(ContentPostInterface $post, UserInterface $user): void
     {
-        $this->status->doTransition($post, self::TRANSITION_PAUSE, $user);
+        $this->status->doTransition($post, self::PAUSE, $user);
     }
 
     /**
@@ -131,7 +131,7 @@ class ContentPostWorkflow
      */
     public function fix(ContentPostInterface $post, UserInterface $user): void
     {
-        $this->status->doTransition($post, self::TRANSITION_FIX, $user);
+        $this->status->doTransition($post, self::FIX, $user);
 
         $this->notifyEditorAboutFixRequest();
     }

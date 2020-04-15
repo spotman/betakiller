@@ -2,9 +2,10 @@
 namespace BetaKiller\Repository;
 
 use BetaKiller\Factory\OrmFactory;
+use BetaKiller\Model\AbstractOrmBasedModelWithRevisions;
 use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ContentPost;
-use BetaKiller\Model\ModelWithRevisionsInterface;
+use BetaKiller\Model\ContentPostState;
 use BetaKiller\Search\SearchResultsInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
@@ -17,7 +18,7 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
  * @method ContentPost|null findByWpID(int $id)
  * @method ContentPost[] getAll()
  */
-class ContentPostRepository extends AbstractOrmBasedDispatchableRepository implements RepositoryHasWordpressIdInterface
+class ContentPostRepository extends AbstractHasWorkflowStateRepository implements ContentPostRepositoryInterface
 {
     use OrmBasedRepositoryHasWordpressIdTrait;
 
@@ -49,12 +50,20 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
         return 'uri';
     }
 
+    protected function getStateRelationKey(): string
+    {
+        return ContentPost::getWorkflowStateRelationKey();
+    }
+
+    protected function getStateCodenameColumnName(): string
+    {
+        return ContentPostState::COL_CODENAME;
+    }
+
     protected function customFilterForUrlDispatching(OrmInterface $orm, UrlContainerInterface $parameters): void
     {
         // Load pages first
         $this->prioritizeByPostTypes($orm);
-
-        $category = $parameters->getEntityByClassName(ContentCategoryInterface::class);
 
         $orm->and_where_open();
 
@@ -70,6 +79,8 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
         // Articles
         $orm->or_where_open();
         $this->filterType($orm, ContentPost::TYPE_ARTICLE);
+
+        $category = $parameters->getEntityByClassName(ContentCategoryInterface::class);
 
         if ($category) {
             // Concrete category
@@ -140,7 +151,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      */
     private function search(OrmInterface $orm, string $term): ContentPostRepository
     {
-        $revisionKey = ModelWithRevisionsInterface::ACTUAL_REVISION_KEY;
+        $revisionKey = AbstractOrmBasedModelWithRevisions::ACTUAL_REVISION_KEY;
 
         $orm->search_query($term, [
             $revisionKey.'.label',

@@ -10,26 +10,29 @@
     "fix":              { color: "orange", icon: "settings_backup_restore", autosave: false },
   } %}
 
-  {% set isUpdateAllowed = post.isUpdateAllowed %}
+  {% set is_update_allowed = post.is_update_allowed %}
 
   {{ js("require.js/content.config.js") }}
 
   {{ js("ckeditor/ckeditor.js") }}
-  {#{{ js("ckeditor/adapters/jquery.js") }}#}
+  {{ js("ckeditor/adapters/jquery.js") }}
 
   {{ js("ifaces/admin/content-post-item.js") }}
   {{ css("ifaces/admin/content-post-item.css") }}
 
+  {# For CKEditor 4 #}
+  {{ csp("script", "'unsafe-inline'") }}
+
   <div class="row">
     <div class="col s12 xl9">
       <div class="row">
-        <form id="post-form" action="" method="post" class="col s12" data-update-allowed="{{ isUpdateAllowed|bool }}">
+        <form id="post-form" action="" method="post" class="col s12" data-update-allowed="{{ is_update_allowed|bool }}">
           <input type="hidden" name="id" value="{{ post.id }}"/>
           <div class="row">
             <div class="input-field col s12">
               <i class="material-icons prefix">label_outline</i>
               <input name="label" id="article-label" placeholder="Post label"
-                     value="{{ post.label }}" {{ isUpdateAllowed ? "" : "disabled" }} />
+                     value="{{ post.label }}" {{ is_update_allowed ? "" : "disabled" }} />
               <label for="article-label" class="active">Label</label>
             </div>
           </div>
@@ -46,7 +49,7 @@
             <div class="row">
               <div class="input-field col s12">
                 <i class="material-icons prefix">layers</i>
-                <select name="category" id="article-category" {{ isUpdateAllowed ? "" : "disabled" }}>
+                <select name="category" id="article-category" {{ is_update_allowed ? "" : "disabled" }}>
                   <option value="" disabled>Select category</option>
                   {# TODO category selection #}
                 </select>
@@ -66,8 +69,7 @@
 
           <div class="row">
             <div class="input-field col s12">
-              {#<div id="article-content" data-custom-tags="{{ shortcodes|join(",") }}">{{ post.content|raw }}</div>#}
-              <textarea id="article-content" name="content" {{ isUpdateAllowed ? "" : "disabled" }}
+              <textarea id="article-content" name="content" {{ is_update_allowed ? "" : "disabled" }}
                         rows="25" style="height: 100vh" data-shortcodes="{{ shortcodes|join(",") }}"
                         data-entity-slug="{{ entity_slug }}" data-entity-item-id="{{ post.id }}">
                     {{ post.content }}
@@ -79,7 +81,7 @@
             <div class="input-field col s12">
               <i class="material-icons prefix">title</i>
               <input name="title" id="article-title" value="{{ post.title }}" data-length="60"
-                     placeholder="Post title, used in HTML &lsaquo;title&rsaquo; tag" {{ isUpdateAllowed ? "" : "disabled" }} />
+                     placeholder="Post title, used in HTML &lsaquo;title&rsaquo; tag" {{ is_update_allowed ? "" : "disabled" }} />
               <label for="article-title" class="active">HTML &lt;title&gt;</label>
             </div>
           </div>
@@ -89,7 +91,7 @@
               <i class="material-icons prefix">description</i>
               <textarea name="description" id="article-description" class="materialize-textarea" rows="3"
                         data-length="160"
-                        placeholder="Post title, used in HTML &lt;description&gt; meta tag" {{ isUpdateAllowed ? "" : "disabled" }}>{{ post.description }}</textarea>
+                        placeholder="Post title, used in HTML &lt;description&gt; meta tag" {{ is_update_allowed ? "" : "disabled" }}>{{ post.description }}</textarea>
               <label for="article-description">HTML &lt;description&gt; meta tag</label>
             </div>
           </div>
@@ -109,7 +111,7 @@
                 {% endfor %}
               </div>
 
-              <button class="btn save-post-button" data-id="{{ post.id }}" {{ isUpdateAllowed ? "" : "disabled" }}>
+              <button class="btn save-post-button" data-id="{{ post.id }}" {{ is_update_allowed ? "" : "disabled" }}>
                 {{ "post.action.save"|i18n }}
               </button>
             </div>

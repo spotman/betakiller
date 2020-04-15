@@ -56,7 +56,7 @@ return [
     'notification.user.comment.author-approve.subj'      => ':target_name, ваш комментарий от :created_at к записи ":label" утверждён и опубликован',
     'notification.user.comment.parent-author-reply.subj' => ':target_name, вам ответили на комментарий к записи ":label"',
 
-    'error.post.preview_not_allowed' => 'Предпросмотр статей разрешён только редакторам',
+    'error.post.preview-not-allowed' => 'Предпросмотр статей разрешён только редакторам',
 
     'entities.post' => 'Статьи и страницы',
 

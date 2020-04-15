@@ -4,13 +4,13 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Workflow\AbstractWorkflowStateOrm;
 
-class ContentPostStatus extends AbstractWorkflowStateOrm
+class ContentPostState extends AbstractWorkflowStateOrm
 {
-    public const DRAFT_ID         = 1;
-    public const PENDING_ID       = 2;
-    public const PUBLISHED_ID     = 3;
-    public const PAUSED_ID        = 4;
-    public const FIX_REQUESTED_ID = 5;
+    public const DRAFT         = 'draft';
+    public const PENDING       = 'pending';
+    public const PUBLISHED     = 'published';
+    public const PAUSED        = 'paused';
+    public const FIX_REQUESTED = 'fix-requested';
 
     protected function configure(): void
     {

@@ -3,7 +3,6 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Workflow\HasWorkflowStateModelOrmTrait;
-use DateTime;
 use Kohana_Exception;
 use ORM;
 use Validation;
@@ -123,7 +122,7 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
      */
     public static function getWorkflowStateModelName(): string
     {
-        return ContentPostStatus::getModelName();
+        return ContentPostState::getModelName();
     }
 
     /**
@@ -269,11 +268,11 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
     }
 
     /**
-     * @param \DateTimeInterface $value
+     * @param \DateTimeImmutable $value
      *
      * @return $this
      */
-    public function setCreatedAt(\DateTimeInterface $value): ContentPostInterface
+    public function setCreatedAt(\DateTimeImmutable $value): ContentPostInterface
     {
         return $this->set_datetime_column_value('created_at', $value);
     }
@@ -287,11 +286,11 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
     }
 
     /**
-     * @param \DateTimeInterface $value
+     * @param \DateTimeImmutable $value
      *
      * @return $this
      */
-    public function setUpdatedAt(\DateTimeInterface $value): ContentPostInterface
+    public function setUpdatedAt(\DateTimeImmutable $value): ContentPostInterface
     {
         return $this->set_datetime_column_value('updated_at', $value);
     }
@@ -319,7 +318,7 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
      */
     public function getCreatedBy(): UserInterface
     {
-        return $this->get('created_by');
+        return $this->getRelatedEntity('created_by');
     }
 
     /**
@@ -371,7 +370,7 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
     /**
      * @return \ORM
      */
-    protected function getThumbnailsRelation(): \ORM
+    protected function getThumbnailsRelation(): ORM
     {
         return $this->get('thumbnails');
     }
@@ -406,16 +405,6 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
     }
 
     /**
-     * Return TRUE if you need status transition history
-     *
-     * @return bool
-     */
-    public function isWorkflowStateHistoryEnabled(): bool
-    {
-        return false;
-    }
-
-    /**
      * Insert a new object to the database
      *
      * @param Validation $validation Validation object
@@ -423,11 +412,9 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
      * @return ORM
      * @throws Kohana_Exception
      */
-    public function create(Validation $validation = null): \ORM
+    public function create(Validation $validation = null): ORM
     {
-        $this
-            ->setCreatedAt(new DateTime)
-            ->setStartStatus();
+        $this->setCreatedAt(new \DateTimeImmutable());
 
         return parent::create($validation);
     }
@@ -442,12 +429,12 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
      * @return ORM
      * @throws Kohana_Exception
      */
-    public function update(Validation $validation = null): \ORM
+    public function update(Validation $validation = null): ORM
     {
         $changed = array_intersect($this->_changed, self::$updatedAtMarkers) && !$this->changed('updated_at');
 
         if ($changed || $this->isRevisionDataChanged()) {
-            $this->setUpdatedAt(new DateTime);
+            $this->setUpdatedAt(new \DateTimeImmutable());
         }
 
         return parent::update($validation);

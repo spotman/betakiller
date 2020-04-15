@@ -36,9 +36,11 @@ trait OrmBasedEntityItemRelatedRepositoryTrait
         OrmInterface $orm,
         ?EntityModelInterface $entity,
         ?int $entityItemId
-    ): void {
+    ): self {
         $this->filterEntityID($orm, $entity ? $entity->getID() : null);
         $this->filterEntityItemID($orm, $entityItemId);
+
+        return $this;
     }
 
     protected function filterEntityOrEntityItemID(

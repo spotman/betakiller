@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use BetaKiller\Content\Content;
+use BetaKiller\Helper\ContentHelper;
 use BetaKiller\Model\RoleInterface;
 
 final class ContentCommentResource extends AbstractHasWorkflowStateAclResource
@@ -15,6 +15,7 @@ final class ContentCommentResource extends AbstractHasWorkflowStateAclResource
     {
         return [
             RoleInterface::GUEST,
+            RoleInterface::LOGIN,
         ];
     }
 
@@ -27,6 +28,7 @@ final class ContentCommentResource extends AbstractHasWorkflowStateAclResource
     {
         return [
             RoleInterface::GUEST,
+            RoleInterface::LOGIN,
         ];
     }
 
@@ -38,7 +40,7 @@ final class ContentCommentResource extends AbstractHasWorkflowStateAclResource
     protected function getSearchPermissionRoles(): array
     {
         return [
-            Content::ROLE_CONTENT_MODERATOR,
+            ContentHelper::ROLE_CONTENT_MODERATOR,
         ];
     }
 }

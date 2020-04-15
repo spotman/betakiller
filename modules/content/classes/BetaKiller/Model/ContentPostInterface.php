@@ -12,6 +12,7 @@ interface ContentPostInterface extends
     EntityHasWordpressIdInterface,
     HasWorkflowStateInterface,
     ModelWithRevisionsInterface,
+    EntityWithAclSpecInterface,
     SeoMetaInterface,
     HasPublicZoneAccessSpecInterface
 {
@@ -70,11 +71,11 @@ interface ContentPostInterface extends
     public function getContent(): string;
 
     /**
-     * @param \DateTimeInterface $value
+     * @param \DateTimeImmutable $value
      *
      * @return $this
      */
-    public function setCreatedAt(\DateTimeInterface $value): self;
+    public function setCreatedAt(\DateTimeImmutable $value): self;
 
     /**
      * @return \DateTimeImmutable
@@ -82,11 +83,11 @@ interface ContentPostInterface extends
     public function getCreatedAt(): \DateTimeImmutable;
 
     /**
-     * @param \DateTimeInterface $value
+     * @param \DateTimeImmutable $value
      *
      * @return $this
      */
-    public function setUpdatedAt(\DateTimeInterface $value): self;
+    public function setUpdatedAt(\DateTimeImmutable $value): self;
 
     /**
      * @return \DateTimeImmutable|null

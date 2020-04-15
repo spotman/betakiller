@@ -2,10 +2,13 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Exception;
-use DateTime;
+use BetaKiller\Exception\DomainException;
 
 abstract class AbstractOrmBasedModelWithRevisions extends \ORM implements ModelWithRevisionsInterface
 {
+    public const ALL_REVISIONS_KEY   = 'all_revisions';
+    public const ACTUAL_REVISION_KEY = 'actual_revision';
+
     /**
      * @var \BetaKiller\Model\UserInterface
      */
@@ -25,28 +28,28 @@ abstract class AbstractOrmBasedModelWithRevisions extends \ORM implements ModelW
     protected function initializeRevisionsRelations(): void
     {
         $this->belongs_to([
-            ModelWithRevisionsInterface::ACTUAL_REVISION_KEY => [
+            self::ACTUAL_REVISION_KEY => [
                 'model'       => $this->getRevisionModelName(),
                 'foreign_key' => $this->getRelatedModelRevisionForeignKey(),
             ],
         ]);
 
         $this->has_many([
-            ModelWithRevisionsInterface::ALL_REVISIONS_KEY => [
+            self::ALL_REVISIONS_KEY => [
                 'model'       => $this->getRevisionModelName(),
                 'foreign_key' => $this->getRevisionModelForeignKey(),
             ],
         ]);
 
         // Autoload actual revision model
-        $this->load_with([ModelWithRevisionsInterface::ACTUAL_REVISION_KEY]);
+        $this->load_with([self::ACTUAL_REVISION_KEY]);
     }
 
     /**
      * Handles getting of column
      * Override this method to add custom get behavior
      *
-     * @param   string $column Column name
+     * @param string $column Column name
      *
      * @return $this|\BetaKiller\Model\ExtendedOrmInterface
      * @throws \Kohana_Exception
@@ -64,8 +67,8 @@ abstract class AbstractOrmBasedModelWithRevisions extends \ORM implements ModelW
      * Handles setting of columns
      * Override this method to add custom set behavior
      *
-     * @param  string $column Column name
-     * @param  mixed  $value  Column value
+     * @param string $column Column name
+     * @param mixed  $value  Column value
      *
      * @return $this|\BetaKiller\Model\ExtendedOrmInterface
      * @throws \Kohana_Exception
@@ -99,7 +102,16 @@ abstract class AbstractOrmBasedModelWithRevisions extends \ORM implements ModelW
      */
     public function useActualRevision(): void
     {
-        $this->setCurrentRevision($this->getActualRevision());
+        $revision = $this->getActualRevision();
+
+        if (!$revision) {
+            throw new DomainException('Missing actual revision for ":model"->":id"', [
+                ':model' => $this::getModelName(),
+                ':id'    => $this->getID(),
+            ]);
+        }
+
+        $this->setCurrentRevision($revision);
     }
 
     /**
@@ -139,15 +151,15 @@ abstract class AbstractOrmBasedModelWithRevisions extends \ORM implements ModelW
         return $this->getAllRevisionsRelation()->orderByCreatedAt()->get_all();
     }
 
-    /**
-     * @return $this
-     */
-    public function filterHavingActualRevision()
-    {
-        $column = $this->object_column($this->getRelatedModelRevisionForeignKey());
-
-        return $this->where($column, 'IS NOT', null);
-    }
+//    /**
+//     * @return $this
+//     */
+//    public function filterHavingActualRevision()
+//    {
+//        $column = $this->object_column($this->getRelatedModelRevisionForeignKey());
+//
+//        return $this->where($column, 'IS NOT', null);
+//    }
 
     public function hasActualRevision(): bool
     {
@@ -191,7 +203,7 @@ abstract class AbstractOrmBasedModelWithRevisions extends \ORM implements ModelW
     /**
      * Insert a new object to the database
      *
-     * @param  \Validation $validation Validation object
+     * @param \Validation $validation Validation object
      *
      * @return $this|\BetaKiller\Model\ExtendedOrmInterface
      * @throws \Kohana_Exception
@@ -221,7 +233,7 @@ abstract class AbstractOrmBasedModelWithRevisions extends \ORM implements ModelW
      *
      * @chainable
      *
-     * @param  \Validation $validation Validation object
+     * @param \Validation $validation Validation object
      *
      * @return $this|\BetaKiller\Model\ExtendedOrmInterface
      * @throws \BetaKiller\Exception
@@ -267,7 +279,7 @@ abstract class AbstractOrmBasedModelWithRevisions extends \ORM implements ModelW
 
         $user->forceAuthorization();
 
-        $revision->setCreatedAt(new DateTime);
+        $revision->setCreatedAt(new \DateTimeImmutable());
         $revision->setCreatedBy($user);
 
         // Link new revision to current entity
@@ -319,7 +331,7 @@ abstract class AbstractOrmBasedModelWithRevisions extends \ORM implements ModelW
     private function getActualRevision(): ?RevisionModelInterface
     {
         /** @var \BetaKiller\Model\RevisionModelInterface $model */
-        $model = $this->get(ModelWithRevisionsInterface::ACTUAL_REVISION_KEY);
+        $model = $this->get(self::ACTUAL_REVISION_KEY);
 
         return $model->hasID() ? $model : null;
     }
@@ -331,7 +343,7 @@ abstract class AbstractOrmBasedModelWithRevisions extends \ORM implements ModelW
      */
     private function setActualRevision(RevisionModelInterface $model): void
     {
-        $this->set(ModelWithRevisionsInterface::ACTUAL_REVISION_KEY, $model);
+        $this->set(self::ACTUAL_REVISION_KEY, $model);
     }
 
     private function getLatestRevision(): RevisionModelInterface
@@ -344,7 +356,7 @@ abstract class AbstractOrmBasedModelWithRevisions extends \ORM implements ModelW
      */
     private function getAllRevisionsRelation(): AbstractRevisionOrmModel
     {
-        return $this->get(ModelWithRevisionsInterface::ALL_REVISIONS_KEY);
+        return $this->get(self::ALL_REVISIONS_KEY);
     }
 
     /**

@@ -1,14 +1,12 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\Workflow\HasWorkflowStateModelOrmTrait;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
-use Validation;
 
 /**
  * Class ContentComment
@@ -53,7 +51,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
      */
     public static function getWorkflowStateModelName(): string
     {
-        return ContentCommentStatus::getModelName();
+        return ContentCommentState::getModelName();
     }
 
     /**
@@ -134,7 +132,6 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
 
     /**
      * @return string
-     * @throws \BetaKiller\Exception
      */
     public function getRelatedContentLabel(): string
     {
@@ -154,7 +151,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
      *
      * @return $this
      */
-    public function setGuestAuthorEmail(string $value)
+    public function setGuestAuthorEmail(string $value): ContentCommentInterface
     {
         $this->set('author_email', $value);
 
@@ -174,7 +171,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
      *
      * @return $this
      */
-    public function setGuestAuthorName(string $value)
+    public function setGuestAuthorName(string $value): ContentCommentInterface
     {
         $this->set('author_name', $value);
 
@@ -189,7 +186,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
         return $this->get('author_name');
     }
 
-    public function setAuthorUser(UserInterface $value = null)
+    public function setAuthorUser(UserInterface $value = null): ContentCommentInterface
     {
         $this->set('author', $value);
 
@@ -240,7 +237,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
      *
      * @return $this
      */
-    public function setMessage(string $value)
+    public function setMessage(string $value): ContentCommentInterface
     {
         $this->set('message', $value);
 
@@ -260,7 +257,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
      *
      * @return $this
      */
-    public function setIpAddress(string $value)
+    public function setIpAddress(string $value): ContentCommentInterface
     {
         $this->set('ip_address', $value);
 
@@ -280,7 +277,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
      *
      * @return $this
      */
-    public function setGuestAuthorUser(string $value)
+    public function setGuestAuthorUser(string $value): ContentCommentInterface
     {
         $this->set('author_user', $value);
 
@@ -300,7 +297,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
      *
      * @return $this
      */
-    public function setUserAgent(string $value)
+    public function setUserAgent(string $value): ContentCommentInterface
     {
         $this->set('user_agent', $value);
 
@@ -315,7 +312,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
         return $this->get('user_agent');
     }
 
-    public function setCreatedAt(DateTimeInterface $value = null)
+    public function setCreatedAt(DateTimeInterface $value = null): ContentCommentInterface
     {
         $this->set_datetime_column_value('created_at', $value ?: new DateTimeImmutable);
 
@@ -329,7 +326,6 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
 
     /**
      * @return string
-     * @throws \Kohana_Exception
      */
     public function getPath(): ?string
     {
@@ -342,7 +338,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
      * @return $this
      * @throws \Kohana_Exception
      */
-    public function setPath(string $value)
+    public function setPath(string $value): ContentCommentInterface
     {
         $this->set('path', $value);
 
@@ -355,21 +351,11 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
     }
 
     /**
-     * Return TRUE if you need status transition history
-     *
-     * @return bool
-     */
-    public function isWorkflowStateHistoryEnabled(): bool
-    {
-        return false;
-    }
-
-    /**
      * @return bool
      */
     public function isPending(): bool
     {
-        return $this->getStatusID() === ContentCommentStatus::STATUS_PENDING;
+        return $this->isInWorkflowState(ContentCommentState::PENDING);
     }
 
     /**
@@ -377,7 +363,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
      */
     public function isApproved(): bool
     {
-        return $this->getStatusID() === ContentCommentStatus::STATUS_APPROVED;
+        return $this->isInWorkflowState(ContentCommentState::APPROVED);
     }
 
     /**
@@ -385,7 +371,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
      */
     public function isSpam(): bool
     {
-        return $this->getStatusID() === ContentCommentStatus::STATUS_SPAM;
+        return $this->isInWorkflowState(ContentCommentState::SPAM);
     }
 
     /**
@@ -393,60 +379,6 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
      */
     public function isDeleted(): bool
     {
-        return $this->getStatusID() === ContentCommentStatus::STATUS_TRASH;
-    }
-
-    public function initAsPending()
-    {
-        $status = $this->getStatusByID(ContentCommentStatus::STATUS_PENDING);
-
-        $this->initStatus($status);
-
-        return $this;
-    }
-
-    public function initAsApproved()
-    {
-        $status = $this->getStatusByID(ContentCommentStatus::STATUS_APPROVED);
-
-        return $this->initStatus($status);
-    }
-
-    public function initAsSpam()
-    {
-        $status = $this->getStatusByID(ContentCommentStatus::STATUS_SPAM);
-
-        return $this->initStatus($status);
-    }
-
-    public function initAsTrash()
-    {
-        $status = $this->getStatusByID(ContentCommentStatus::STATUS_TRASH);
-
-        return $this->initStatus($status);
-    }
-
-    /**
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @return bool
-     * @deprecated
-     */
-    public function isApproveAllowed(UserInterface $user): bool
-    {
-        throw new NotImplementedHttpException();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function create(Validation $validation = null)
-    {
-        // Preset default status
-        if (!$this->hasCurrentStatus()) {
-            $this->initAsPending();
-        }
-
-        return parent::create($validation);
+        return $this->isInWorkflowState(ContentCommentState::TRASH);
     }
 }

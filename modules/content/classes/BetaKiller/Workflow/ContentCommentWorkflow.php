@@ -5,17 +5,18 @@ use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Repository\ContentCommentStateRepository;
 
 class ContentCommentWorkflow
 {
-    public const NOTIFICATION_AUTHOR_APPROVE = 'user/comment/author-approve';
-    public const NOTIFICATION_PARENT_REPLY   = 'user/comment/parent-author-reply';
+    public const NOTIFICATION_AUTHOR_APPROVE = 'email/user/comment/author-approve';
+    public const NOTIFICATION_PARENT_REPLY   = 'email/user/comment/parent-author-reply';
 
-    public const TRANSITION_APPROVE            = 'approve';
-    public const TRANSITION_REJECT             = 'reject';
-    public const TRANSITION_MARK_AS_SPAM       = 'markAsSpam';
-    public const TRANSITION_MOVE_TO_TRASH      = 'moveToTrash';
-    public const TRANSITION_RESTORE_FROM_TRASH = 'restoreFromTrash';
+    public const APPROVE            = 'approve';
+    public const REJECT             = 'reject';
+    public const MARK_AS_SPAM       = 'markAsSpam';
+    public const MOVE_TO_TRASH      = 'moveToTrash';
+    public const RESTORE_FROM_TRASH = 'restoreFromTrash';
 
     /**
      * @var \BetaKiller\Helper\NotificationHelper
@@ -33,20 +34,28 @@ class ContentCommentWorkflow
     private $status;
 
     /**
+     * @var \BetaKiller\Repository\ContentCommentStateRepository
+     */
+    private $stateRepo;
+
+    /**
      * ContentCommentWorkflow constructor.
      *
-     * @param \BetaKiller\Helper\NotificationHelper        $notificationHelper
-     * @param \BetaKiller\Helper\UrlHelper                 $urlHelper
-     * @param \BetaKiller\Workflow\StatusWorkflowInterface $statusWorkflow
+     * @param \BetaKiller\Helper\NotificationHelper                $notificationHelper
+     * @param \BetaKiller\Helper\UrlHelper                         $urlHelper
+     * @param \BetaKiller\Workflow\StatusWorkflowInterface         $statusWorkflow
+     * @param \BetaKiller\Repository\ContentCommentStateRepository $stateRepo
      */
     public function __construct(
         NotificationHelper $notificationHelper,
         UrlHelper $urlHelper,
-        StatusWorkflowInterface $statusWorkflow
+        StatusWorkflowInterface $statusWorkflow,
+        ContentCommentStateRepository $stateRepo
     ) {
         $this->notification = $notificationHelper;
         $this->urlHelper    = $urlHelper;
         $this->status       = $statusWorkflow;
+        $this->stateRepo    = $stateRepo;
     }
 
     /**
@@ -60,6 +69,34 @@ class ContentCommentWorkflow
         $this->status->setStartState($comment);
     }
 
+    public function initAsPending(ContentCommentInterface $comment): void
+    {
+        $status = $this->stateRepo->getPendingStatus();
+
+        $comment->initWorkflowState($status);
+    }
+
+    public function initAsApproved(ContentCommentInterface $comment): void
+    {
+        $status = $this->stateRepo->getApprovedStatus();
+
+        $comment->initWorkflowState($status);
+    }
+
+    public function initAsSpam(ContentCommentInterface $comment): void
+    {
+        $status = $this->stateRepo->getSpamStatus();
+
+        $comment->initWorkflowState($status);
+    }
+
+    public function initAsTrash(ContentCommentInterface $comment): void
+    {
+        $status = $this->stateRepo->getTrashStatus();
+
+        $comment->initWorkflowState($status);
+    }
+
     /**
      * @param \BetaKiller\Model\ContentCommentInterface $comment
      * @param \BetaKiller\Model\UserInterface           $user
@@ -69,7 +106,7 @@ class ContentCommentWorkflow
      */
     public function approve(ContentCommentInterface $comment, UserInterface $user): void
     {
-        $this->status->doTransition($comment, self::TRANSITION_APPROVE, $user);
+        $this->status->doTransition($comment, self::APPROVE, $user);
 
         // Notify comment author
         $this->notifyCommentAuthorAboutApprove($comment);
@@ -147,7 +184,7 @@ class ContentCommentWorkflow
     public function reject(ContentCommentInterface $comment, UserInterface $user): void
     {
         // Simply change status
-        $this->status->doTransition($comment, self::TRANSITION_REJECT, $user);
+        $this->status->doTransition($comment, self::REJECT, $user);
     }
 
     /**
@@ -159,7 +196,7 @@ class ContentCommentWorkflow
     public function markAsSpam(ContentCommentInterface $comment, UserInterface $user): void
     {
         // Simply change status
-        $this->status->doTransition($comment, self::TRANSITION_MARK_AS_SPAM, $user);
+        $this->status->doTransition($comment, self::MARK_AS_SPAM, $user);
     }
 
     /**
@@ -171,7 +208,7 @@ class ContentCommentWorkflow
     public function moveToTrash(ContentCommentInterface $comment, UserInterface $user): void
     {
         // Simply change status
-        $this->status->doTransition($comment, self::TRANSITION_MOVE_TO_TRASH, $user);
+        $this->status->doTransition($comment, self::MOVE_TO_TRASH, $user);
     }
 
     /**
@@ -183,6 +220,6 @@ class ContentCommentWorkflow
     public function restoreFromTrash(ContentCommentInterface $comment, UserInterface $user): void
     {
         // Simply change status
-        $this->status->doTransition($comment, self::TRANSITION_RESTORE_FROM_TRASH, $user);
+        $this->status->doTransition($comment, self::RESTORE_FROM_TRASH, $user);
     }
 }

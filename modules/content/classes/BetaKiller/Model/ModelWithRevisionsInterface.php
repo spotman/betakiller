@@ -3,9 +3,6 @@ namespace BetaKiller\Model;
 
 interface ModelWithRevisionsInterface
 {
-    public const ALL_REVISIONS_KEY   = 'all_revisions';
-    public const ACTUAL_REVISION_KEY = 'actual_revision';
-
     /**
      * @return void
      */
@@ -29,6 +26,13 @@ interface ModelWithRevisionsInterface
     public function setLatestRevisionAsActual(): void;
 
     /**
+     * @param \BetaKiller\Model\RevisionModelInterface $revision
+     *
+     * @return bool
+     */
+    public function isActualRevision(RevisionModelInterface $revision): bool;
+
+    /**
      * @return \BetaKiller\Model\RevisionModelInterface[]
      * @deprecated Move to Repository
      */
@@ -39,11 +43,11 @@ interface ModelWithRevisionsInterface
      */
     public function hasActualRevision(): bool;
 
-    /**
-     * @return $this
-     * @deprecated Move to Repository
-     */
-    public function filterHavingActualRevision();
+//    /**
+//     * @return $this
+//     * @deprecated Move to Repository
+//     */
+//    public function filterHavingActualRevision();
 
     /**
      * @return bool

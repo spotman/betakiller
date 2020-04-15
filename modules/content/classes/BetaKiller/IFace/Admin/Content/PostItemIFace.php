@@ -6,18 +6,13 @@ use BetaKiller\Acl\Resource\ContentPostResource;
 use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Helper\ContentUrlContainerHelper;
-use BetaKiller\Model\UserInterface;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Repository\EntityRepository;
 use BetaKiller\Repository\ShortcodeRepository;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class PostItemIFace extends AbstractContentAdminIFace
 {
-    /**
-     * @var \BetaKiller\Model\UserInterface
-     */
-    private $user;
-
     /**
      * @var \BetaKiller\Helper\AssetsHelper
      */
@@ -41,20 +36,17 @@ final class PostItemIFace extends AbstractContentAdminIFace
     /**
      * PostItem constructor.
      *
-     * @param \BetaKiller\Model\UserInterface                   $user
      * @param \BetaKiller\Acl\EntityPermissionResolverInterface $entityPermissionResolver
      * @param \BetaKiller\Helper\AssetsHelper                   $assetsHelper
      * @param \BetaKiller\Repository\ShortcodeRepository        $shortcodeRepo
      * @param \BetaKiller\Repository\EntityRepository           $entityRepo
      */
     public function __construct(
-        UserInterface $user,
         EntityPermissionResolverInterface $entityPermissionResolver,
         AssetsHelper $assetsHelper,
         ShortcodeRepository $shortcodeRepo,
         EntityRepository $entityRepo
     ) {
-        $this->user                     = $user;
         $this->assetsHelper             = $assetsHelper;
         $this->shortcodeRepo            = $shortcodeRepo;
         $this->entityRepo               = $entityRepo;
@@ -77,6 +69,7 @@ final class PostItemIFace extends AbstractContentAdminIFace
      */
     public function getData(ServerRequestInterface $request): array
     {
+        $user = ServerRequestHelper::getUser($request);
         $post = ContentUrlContainerHelper::getContentPost($request);
 
         if (!$post) {
@@ -96,8 +89,7 @@ final class PostItemIFace extends AbstractContentAdminIFace
 
         $status = $post->getWorkflowState();
 
-        $updateAllowed = $this->entityPermissionResolver->isAllowed($this->user, $post,
-            ContentPostResource::ACTION_UPDATE);
+        $updateAllowed = $this->entityPermissionResolver->isAllowed($user, $post, ContentPostResource::ACTION_UPDATE);
 
         return [
             'post' => [
@@ -109,12 +101,14 @@ final class PostItemIFace extends AbstractContentAdminIFace
                 'description' => $post->getDescription(),
 
                 'needsCategory'   => $post->needsCategory(),
-                'isUpdateAllowed' => $updateAllowed,
+                'is_update_allowed' => $updateAllowed,
 
                 'status' => [
                     'id'          => $status->getID(),
                     'codename'    => $status->getCodename(),
-                    'transitions' => $status->getAllowedTargetTransitionsCodenameArray($this->user),
+                    'transitions' => [],
+                    // TODO Replace with list of "isTransitionAllowed" markers
+//                    'transitions' => $status->getAllowedTargetTransitionsCodenameArray($user),
                 ],
 
                 'thumbnails' => $thumbnails,
