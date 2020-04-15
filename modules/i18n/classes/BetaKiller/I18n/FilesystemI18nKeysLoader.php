@@ -90,17 +90,19 @@ class FilesystemI18nKeysLoader implements I18nKeysLoaderInterface
                     $values = Yaml::parseFile($file);
 
                     foreach ($values as $key => $value) {
+                        if (\is_array($value)) {
+                            // Plural forms are in array
+                            $bag = $this->bagFactory->create($value);
+                            // Compile with default formatter
+                            $value = $this->bagFormatter->compile($bag);
+                        }
+
                         // Use universal new-line separator
                         if (\strpos($value, "\n") !== false) {
                             $value = \str_replace("\n", "\r\n", $value);
                         }
 
-                        if (\is_array($value)) {
-                            // Plural forms are in array
-                            $bag = $this->bagFactory->create($value);
-                            // Compile with default formatter
-                            $values[$key] = $this->bagFormatter->compile($bag);
-                        }
+                        $values[$key] = $value;
                     }
 
                     // Merge the language strings into the sub table
