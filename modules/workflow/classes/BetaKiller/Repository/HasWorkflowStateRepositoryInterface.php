@@ -10,7 +10,6 @@ use BetaKiller\Workflow\HasWorkflowStateInterface;
  *
  * @package BetaKiller\Repository
  * @method HasWorkflowStateInterface[] getAll()
- * @method save(HasWorkflowStateInterface $entity)
  */
 interface HasWorkflowStateRepositoryInterface extends RepositoryInterface
 {

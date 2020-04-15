@@ -26,7 +26,7 @@ abstract class AbstractWorkflowStateRepository extends AbstractOrmBasedDispatcha
     /**
      * @param string $codename
      *
-     * @return \BetaKiller\Workflow\WorkflowStateInterface
+     * @return \BetaKiller\Workflow\WorkflowStateInterface|mixed
      */
     public function getByCodename(string $codename): WorkflowStateInterface
     {
@@ -40,7 +40,7 @@ abstract class AbstractWorkflowStateRepository extends AbstractOrmBasedDispatcha
     /**
      * @param string $codename
      *
-     * @return \BetaKiller\Workflow\WorkflowStateInterface|null
+     * @return \BetaKiller\Workflow\WorkflowStateInterface|mixed|null
      */
     public function findByCodename(string $codename): ?WorkflowStateInterface
     {
