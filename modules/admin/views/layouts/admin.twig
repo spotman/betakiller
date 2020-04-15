@@ -9,6 +9,9 @@
 {{ csp("style", "fonts.googleapis.com") }}
 {{ csp("font", "fonts.gstatic.com") }}
 
+{# For legacy UI #}
+{{ csp("style", "'unsafe-inline'") }}
+
 {{ js("require.js/admin.config.js") }}
 {{ js("layouts/admin.js") }}
 
