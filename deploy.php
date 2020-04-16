@@ -392,6 +392,10 @@ task('maintenance:on', static function () {
     runMinionTask('maintenance:on --for=deploy');
 })->desc('Enable maintenance mode');
 
+task('maintenance:prolong', static function () {
+    runMinionTask('maintenance:prolong --for=600');
+})->desc('Prolong maintenance mode for 10 minutes');
+
 task('maintenance:off', static function () {
     runMinionTask('maintenance:off');
 })->desc('Disable maintenance mode');
@@ -445,6 +449,11 @@ task('deploy:done', static function () use ($tz) {
     $dateTime = new \DateTimeImmutable();
     writeln('<info>Successfully deployed at '.$dateTime->setTimezone($tz)->format('H:i:s T').'!</info>');
 });
+
+/**
+ * Keep maintenance mode in case ofo failure
+ */
+after('deploy:failed', 'maintenance:prolong');
 
 task('migrate', [
     // Migrate DB
