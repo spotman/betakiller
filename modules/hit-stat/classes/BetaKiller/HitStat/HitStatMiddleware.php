@@ -87,23 +87,25 @@ class HitStatMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $i = RequestProfiler::begin($request, 'Hit stat (init)');
+
         // Remove UTM markers to simplify further UrlElement processing
         $request = ServerRequestHelper::removeQueryParams($request, HitMarkerInterface::UTM_QUERY_KEYS);
-
-        // Skip calls like "cache warmup" from CLI mode
-        if ($this->appEnv->isInternalWebServer()) {
-            return $handler->handle($request);
-        }
 
         $user = ServerRequestHelper::getUser($request);
 
         // Skip processing for admins
-        if ($user->hasAdminRole()) {
+        // Skip calls like "cache warmup" from CLI mode
+        if ($this->appEnv->isInternalWebServer() || $user->hasAdminRole()) {
+            RequestProfiler::end($i);
+
             return $handler->handle($request);
         }
 
+        RequestProfiler::end($i);
+
         try {
-            $p = RequestProfiler::begin($request, 'Hit stat (total processing)');
+            $p = RequestProfiler::begin($request, 'Hit stat (processing)');
 
             $this->processHit($request);
         } catch (HttpExceptionExpectedInterface $e) {
