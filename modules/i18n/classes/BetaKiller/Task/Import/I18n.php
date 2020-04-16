@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Import;
 
-use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
-use BetaKiller\Helper\UrlHelper;
 use BetaKiller\I18n\FilesystemI18nKeysLoader;
 use BetaKiller\I18n\PluralBagFormatterInterface;
 use BetaKiller\Model\I18nKeyInterface;
@@ -15,7 +13,6 @@ use BetaKiller\Model\TranslationKey;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Repository\TranslationKeyRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
-use BetaKiller\Url\ZoneInterface;
 use Psr\Log\LoggerInterface;
 
 class I18n extends AbstractTask
@@ -63,11 +60,6 @@ class I18n extends AbstractTask
     private $urlHelperFactory;
 
     /**
-     * @var \BetaKiller\Factory\EntityFactoryInterface
-     */
-    private $entityFactory;
-
-    /**
      * I18n constructor.
      *
      * @param \BetaKiller\Repository\LanguageRepositoryInterface       $langRepo
@@ -83,7 +75,6 @@ class I18n extends AbstractTask
         LanguageRepositoryInterface $langRepo,
         FilesystemI18nKeysLoader $filesystemLoader,
         TranslationKeyRepositoryInterface $keyRepo,
-        EntityFactoryInterface $entityFactory,
         PluralBagFormatterInterface $formatter,
         NotificationHelper $notificationHelper,
         UrlHelperFactory $urlHelperFactory,
@@ -95,7 +86,6 @@ class I18n extends AbstractTask
         $this->formatter        = $formatter;
         $this->logger           = $logger;
         $this->notification     = $notificationHelper;
-        $this->entityFactory    = $entityFactory;
         $this->urlHelperFactory = $urlHelperFactory;
 
         parent::__construct();
@@ -133,27 +123,27 @@ class I18n extends AbstractTask
         $total = \count($this->newKeys);
 
         if ($total > 0) {
-            $urlHelper = $this->urlHelperFactory->create();
+//            $urlHelper = $this->urlHelperFactory->create();
 
             $this->notification->broadcastMessage(self::NOTIFICATION_NEW_KEYS, [
-                'count'    => $total,
-                'keys'     => $this->getMissedKeysData($urlHelper),
-                'list_url' => $urlHelper->getListEntityUrl(
-                    TranslationKey::getUrlContainerKey(),
-                    ZoneInterface::ADMIN
-                ),
+                'count' => $total,
+                'keys'  => $this->getMissedKeysData(/* $urlHelper */),
+//                'list_url' => $urlHelper->getListEntityUrl(
+//                    TranslationKey::getUrlContainerKey(),
+//                    ZoneInterface::ADMIN
+//                ),
             ]);
         }
     }
 
-    private function getMissedKeysData(UrlHelper $urlHelper): array
+    private function getMissedKeysData(/* UrlHelper $urlHelper */): array
     {
         $data = [];
 
         foreach ($this->newKeys as $missedKey) {
             $data[] = [
                 'name' => $missedKey->getI18nKeyName(),
-                'url'  => $urlHelper->getReadEntityUrl($missedKey, ZoneInterface::ADMIN),
+//                'url'  => $urlHelper->getReadEntityUrl($missedKey, ZoneInterface::ADMIN),
             ];
         }
 

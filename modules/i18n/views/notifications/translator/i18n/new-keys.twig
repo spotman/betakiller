@@ -7,10 +7,12 @@
 
   <ul>
     {% for key in keys %}
-      <li><a href="{{ key.url }}">{{ key.name }}</a><br/></li>
+      {# DB updates are disabled temporarily #}
+      {#<li><a href="{{ key.url }}">{{ key.name }}</a><br/></li>#}
+      <li>{{ key.name }}<br/></li>
     {% endfor %}
   </ul>
   <br/>
 
-  <p>Check <a href="{{ list_url }}"><strong>all untranslated keys here</strong></a></p>
+  {#<p>Check <a href="{{ list_url }}"><strong>all untranslated keys here</strong></a></p>#}
 {% endblock %}
