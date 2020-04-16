@@ -83,14 +83,9 @@ class IFaceView
     public function render(IFaceInterface $iface, ServerRequestInterface $request): string
     {
         $codename = $iface->getCodename();
+        $model    = $iface->getModel();
 
         $dataPack = RequestProfiler::begin($request, $codename.' IFace data');
-
-        $i18n  = ServerRequestHelper::getI18n($request);
-        $lang  = $i18n->getLang();
-        $model = $iface->getModel();
-
-        // Hack for dropping original iface data on processing exception error page
 
         $viewPath  = $this->getViewPath($model);
         $ifaceView = $this->viewFactory->create($viewPath);
@@ -102,6 +97,10 @@ class IFaceView
 
         RequestProfiler::end($dataPack);
         $prepareRenderPack = RequestProfiler::begin($request, $codename.' IFace prepare render');
+
+        // Fetch current language (can be altered in IFace::getData())
+        $i18n = ServerRequestHelper::getI18n($request);
+        $lang = $i18n->getLang();
 
         // Send current request to widgets
         $ifaceView->set(self::REQUEST_KEY, $request);
