@@ -275,6 +275,6 @@ class WebApp
             UrlElementRenderMiddleware::class,
         ];
 
-        $app->any('/{path:.+}', $urlElementPipe, 'url-element');
+        $app->any('/{path:.*}', $urlElementPipe, 'url-element');
     }
 }
