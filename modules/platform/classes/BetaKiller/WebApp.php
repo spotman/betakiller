@@ -173,24 +173,6 @@ class WebApp
         // At this point, if no Response is returned by any middleware, the
         // NotFoundHandler kicks in; alternately, you can provide other fallback
         // middleware to execute.
-
-        // Heavy operation, defer
-        $this->app->pipe(UrlHelperMiddleware::class);
-
-        // Save stat (referrer, target, utm markers, etc) (depends on UrlContainer)
-        $this->app->pipe(HitStatMiddleware::class);
-
-        // Display custom 404 page for dispatched UrlElement
-        $this->app->pipe(CustomNotFoundPageMiddleware::class);
-
-        // Depends on UrlHelper
-        $this->app->pipe(UrlElementDispatchMiddleware::class);
-
-        // Prevent access for locked users
-        $this->app->pipe(UserStatusMiddleware::class);
-
-        // Render UrlElement
-        $this->app->pipe(UrlElementRenderMiddleware::class);
     }
 
     private function addRoutes(Application $app): void
@@ -271,5 +253,28 @@ class WebApp
         // I18n handlers
         $app->get('/i18n/{lang}', FetchTranslationRequestHandler::class, 'i18n-fetch');
         $app->post('/i18n/{lang}/add-missing', AddMissingTranslationRequestHandler::class, 'i18n-add-missing');
+
+        // UrlElement processing
+        $urlElementPipe = [
+            // Heavy operation, defer
+            UrlHelperMiddleware::class,
+
+            // Save stat (referrer, target, utm markers, etc) (depends on UrlContainer)
+            HitStatMiddleware::class,
+
+            // Display custom 404 page for dispatched UrlElement
+            CustomNotFoundPageMiddleware::class,
+
+            // Depends on UrlHelper
+            UrlElementDispatchMiddleware::class,
+
+            // Prevent access for locked users
+            UserStatusMiddleware::class,
+
+            // Render UrlElement
+            UrlElementRenderMiddleware::class,
+        ];
+
+        $app->any('/{path:.+}', $urlElementPipe, 'url-element');
     }
 }
