@@ -42,7 +42,15 @@ class UserMiddleware implements MiddlewareInterface
         $p = RequestProfiler::begin($request, 'User middleware');
 
         $session = ServerRequestHelper::getSession($request);
-        $user    = $this->auth->getSessionUser($session);
+
+        $u    = RequestProfiler::begin($request, 'Fetch User from Session');
+        $user = $this->auth->getSessionUser($session);
+        RequestProfiler::end($u);
+
+        // Prefetch all roles
+        $r = RequestProfiler::begin($request, 'Fetch User roles');
+        $user->getAllUserRolesNames();
+        RequestProfiler::end($r);
 
         RequestProfiler::end($p);
 
