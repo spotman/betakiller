@@ -179,6 +179,11 @@ class SupervisorDaemon implements DaemonInterface
             return;
         }
 
+        if (!$this->appEnv->inProductionMode()) {
+            // Prevent high CPU usage on local errors
+            sleep(3);
+        }
+
         // Warning for developers
         $this->logger->warning('Daemon ":name" had failed :times times and will be restarted immediately', [
             ':name'  => $name,
@@ -433,9 +438,6 @@ class SupervisorDaemon implements DaemonInterface
     {
         // Retry until it will be fixed in dev mode
         if ($this->appEnv->inDevelopmentMode()) {
-            // Prevent high CPU usage
-            sleep(1);
-
             return false;
         }
 
