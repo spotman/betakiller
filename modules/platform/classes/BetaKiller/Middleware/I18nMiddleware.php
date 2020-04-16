@@ -77,32 +77,8 @@ class I18nMiddleware implements MiddlewareInterface
 
     private function detectLangIsoCode(ServerRequestInterface $request): ?string
     {
-        // Check authorized user language
-        $userLang = $this->detectUserLang($request);
-
-        if ($userLang) {
-            return $userLang;
-        }
-
         // Detect language via cookie and content negotiation
-        $httpLang = $this->detectHttpLang($request);
-
-        if ($httpLang) {
-            return $httpLang;
-        }
-
-        return null;
-    }
-
-    private function detectUserLang(ServerRequestInterface $request): ?string
-    {
-        $user = ServerRequestHelper::getUser($request);
-
-        if ($user->isGuest()) {
-            return null;
-        }
-
-        return $user->getLanguageIsoCode();
+        return $this->detectHttpLang($request);
     }
 
     private function detectHttpLang(ServerRequestInterface $request): string

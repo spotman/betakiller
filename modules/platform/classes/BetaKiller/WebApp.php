@@ -30,6 +30,7 @@ use BetaKiller\Middleware\SitemapRequestHandler;
 use BetaKiller\Middleware\UrlElementDispatchMiddleware;
 use BetaKiller\Middleware\UrlElementRenderMiddleware;
 use BetaKiller\Middleware\UrlHelperMiddleware;
+use BetaKiller\Middleware\UserLanguageMiddleware;
 use BetaKiller\Middleware\UserMiddleware;
 use BetaKiller\Middleware\UserStatusMiddleware;
 use BetaKiller\Middleware\WampCookieMiddleware;
@@ -112,6 +113,11 @@ class WebApp
         $this->app->pipe(SecureHeadersMiddleware::class);
 //        $this->app->pipe(RequestIdMiddleware::class);
 
+        // I18n and content negotiation
+        $this->app->pipe(ContentNegotiationMiddleware::class);
+        $this->app->pipe(ContentType::class);
+        $this->app->pipe(I18nMiddleware::class);
+
         // Common processing
         $this->app->pipe(WampCookieMiddleware::class);
 
@@ -119,13 +125,11 @@ class WebApp
         $this->app->pipe(SessionMiddleware::class);
         $this->app->pipe(UserMiddleware::class);
 
+        // Depends on user and i18n
+        $this->app->pipe(UserLanguageMiddleware::class);
+
         // Debugging (depends on session and per-user debug mode)
         $this->app->pipe(DebugMiddleware::class);
-
-        // I18n and content negotiation
-        $this->app->pipe(ContentNegotiationMiddleware::class);
-        $this->app->pipe(ContentType::class);
-        $this->app->pipe(I18nMiddleware::class);
 
         // Exceptions handling (depends on i18n)
         $this->app->pipe(ErrorPageMiddleware::class);
