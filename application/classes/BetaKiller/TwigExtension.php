@@ -3,6 +3,7 @@ namespace BetaKiller;
 
 use Aidantwoods\SecureHeaders\SecureHeaders;
 use BetaKiller\Assets\StaticAssets;
+use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\LoggerHelper;
@@ -303,13 +304,17 @@ final class TwigExtension extends AbstractExtension
             new TwigFunction(
                 'widget',
                 function (array $context, string $name, array $data = null): string {
+                    $request = $this->getRequest($context);
+
+                    $t = RequestProfiler::begin($request, sprintf('%s widget: init', $name));
+
                     if ($data) {
                         $context = array_merge($context, $data);
                     }
 
-                    $request = $this->getRequest($context);
-
                     $widget = $this->widgetFacade->create($name);
+
+                    RequestProfiler::end($t);
 
                     return $this->widgetFacade->render($widget, $request, $context);
                 },
