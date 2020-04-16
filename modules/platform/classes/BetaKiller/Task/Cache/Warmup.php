@@ -5,7 +5,6 @@ namespace BetaKiller\Task\Cache;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Helper\TextHelper;
 use BetaKiller\Service\HttpClientService;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
@@ -135,6 +134,9 @@ class Warmup extends AbstractTask
             ]);
         }
 
+        $this->checkRequiredFiles();
+        $this->checkAuthRequired();
+
         $items   = $this->urlCollector->getPublicAvailableUrls();
         $counter = 0;
 
@@ -149,9 +151,6 @@ class Warmup extends AbstractTask
         }
 
         $this->logger->info(':count dynamic URLs processed', [':count' => $counter]);
-
-        $this->checkRequiredFiles();
-        $this->checkAuthRequired();
 
         $this->stopServer();
     }
@@ -310,8 +309,8 @@ class Warmup extends AbstractTask
             $url      = (string)$this->appConfig->getBaseUri()->withPath($url);
             $response = $this->makeHttpRequest($url);
 
-//            if ($response->getStatusCode() !== 401) {
-            if (!TextHelper::contains($response->getBody()->getContents(), 'Authorization required')) {
+            if ($response->getStatusCode() !== 401) {
+//            if (!TextHelper::contains($response->getBody()->getContents(), 'Authorization required')) {
                 throw new TaskException('Auth must be required in :url', [
                     ':url' => $url,
                 ]);
