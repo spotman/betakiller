@@ -18,7 +18,7 @@ class ContentNegotiationMiddleware implements MiddlewareInterface
     private $i18n;
 
     /**
-     * I18nMiddleware constructor.
+     * ContentNegotiationMiddleware constructor.
      *
      * @param \BetaKiller\I18n\I18nFacade $i18n
      */
