@@ -185,9 +185,9 @@ class SupervisorDaemon implements DaemonInterface
         }
 
         // Warning for developers
-        $this->logger->warning('Daemon ":name" had failed :times times and will be restarted immediately', [
+        $this->logger->warning('Daemon ":name" had failed and will be restarted immediately', [
             ':name'  => $name,
-            ':times' => $this->failureCounter[$name],
+//            ':times' => $this->failureCounter[$name],
         ]);
 
         // Restart failed task
