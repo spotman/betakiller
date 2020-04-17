@@ -104,7 +104,7 @@ class AssetsProviderFactory
         return $this->createFromCodename($codename);
     }
 
-    private function getModelCodenameByUrlKey($key)
+    private function getModelCodenameByUrlKey(string $key)
     {
         $providersConfig = $this->config->load([
             AssetsConfig::CONFIG_KEY,

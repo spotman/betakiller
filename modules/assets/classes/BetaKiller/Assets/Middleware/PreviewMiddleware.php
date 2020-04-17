@@ -35,6 +35,8 @@ class PreviewMiddleware extends AbstractAssetMiddleware
         $model  = $this->fromItemDeployUrl($request);
         $action = HasPreviewProviderInterface::ACTION_PREVIEW;
 
+        $this->checkProviderKey($model, $request);
+
         $this->checkAction($action, $user, $model);
 
         $this->checkExtension($model, $request);

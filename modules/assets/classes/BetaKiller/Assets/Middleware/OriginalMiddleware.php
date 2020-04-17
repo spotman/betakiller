@@ -26,6 +26,8 @@ class OriginalMiddleware extends AbstractAssetMiddleware
 
         $model = $this->fromItemDeployUrl($request);
 
+        $this->checkProviderKey($model, $request);
+
         $this->checkAction(AssetsProviderInterface::ACTION_ORIGINAL, $user, $model);
 
         $this->checkExtension($model, $request);

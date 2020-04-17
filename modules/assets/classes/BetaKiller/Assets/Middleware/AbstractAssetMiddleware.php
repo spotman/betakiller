@@ -13,6 +13,7 @@ use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\Model\HasPreviewAssetsModelInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\HasPreviewProviderInterface;
+use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Exception\NotFoundHttpException;
@@ -124,6 +125,8 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
      */
     protected function detectProvider(ServerRequestInterface $request): void
     {
+        $p = RequestProfiler::begin($request, 'Detect assets provider');
+
         $requestKey = $request->getAttribute('provider');
 
         if (!$requestKey) {
@@ -131,12 +134,13 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
         }
 
         $this->provider = $this->providerFactory->createFromUrlKey($requestKey);
-        $providerKey    = $this->provider->getUrlKey();
 
-        if ($requestKey !== $providerKey) {
-            // Redirect to canonical url
-            $model = $this->fromItemDeployUrl($request);
+        RequestProfiler::end($p);
+    }
 
+    protected function checkProviderKey(AssetsModelInterface $model, ServerRequestInterface $request): void
+    {
+        if ($request->getAttribute('provider') !== $this->provider->getUrlKey()) {
             $this->redirectToCanonicalUrl($model, $request);
         }
     }

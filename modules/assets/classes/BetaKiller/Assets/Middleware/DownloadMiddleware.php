@@ -26,6 +26,8 @@ class DownloadMiddleware extends AbstractAssetMiddleware
 
         $model = $this->fromItemDeployUrl($request);
 
+        $this->checkProviderKey($model, $request);
+
         $this->checkAction(AssetsProviderInterface::ACTION_DOWNLOAD, $user, $model);
 
         $this->checkExtension($model, $request);

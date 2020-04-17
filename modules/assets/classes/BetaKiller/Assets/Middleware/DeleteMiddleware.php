@@ -27,6 +27,8 @@ class DeleteMiddleware extends AbstractAssetMiddleware
         // Get file model by hash value
         $model = $this->fromItemDeployUrl($request);
 
+        $this->checkProviderKey($model, $request);
+
         $this->checkAction(AssetsProviderInterface::ACTION_DELETE, $user, $model);
 
         // Delete file through provider
