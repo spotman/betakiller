@@ -111,7 +111,8 @@ class DebugMiddleware implements MiddlewareInterface
             }
         }
 
-        if (!$debugEnabled) {
+        // Prevent displaying DebugBar in prod mode
+        if (!$debugEnabled || $this->appEnv->inProductionMode()) {
             // Forward call
             return $handler->handle($request);
         }
