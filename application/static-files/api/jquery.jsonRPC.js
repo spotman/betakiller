@@ -79,20 +79,24 @@
     var jqXHR = $.ajax({
       type: 'post',
       url: url,
-      contentType: 'application/json',
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      //contentType: 'application/json',
       data: JSON.stringify(request),
       dataType: 'json_rpc_response',
       converters: {
         "text json_rpc_response": function (textValue) {
           var retval = $.parseJSON(textValue);
 
-          if (typeof(retval) !== 'object') {
+          if (typeof (retval) !== 'object') {
             throw "Invalid JSON response";
           }
 
-          if (typeof(retval.error) === 'object') {
+          if (typeof (retval.error) === 'object') {
             throw new JSONRPCError(retval.error);
-          } else if (typeof(retval.result) !== 'undefined') {
+          } else if (typeof (retval.result) !== 'undefined') {
             return retval.result;
           } else {
             throw "Invalid JSON response";
