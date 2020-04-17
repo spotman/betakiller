@@ -7,7 +7,6 @@ use Aidantwoods\SecureHeaders\SecureHeaders;
 use BetaKiller\Dev\DebugBarCookiesDataCollector;
 use BetaKiller\Dev\DebugBarHttpDriver;
 use BetaKiller\Dev\DebugBarSessionDataCollector;
-use BetaKiller\Dev\DebugBarUserDataCollector;
 use BetaKiller\Dev\DebugServerRequestHelper;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Helper\AppEnvInterface;
@@ -132,18 +131,14 @@ class DebugMiddleware implements MiddlewareInterface
         // Fetch actual session
         $session = ServerRequestHelper::getSession($request);
 
-        // Fetch actual user
-        $user = ServerRequestHelper::getUser($request);
-
         // Initialize http driver
         $httpDriver = new DebugBarHttpDriver($session);
         $debugBar->setHttpDriver($httpDriver);
 
         $debugBar
             ->addCollector(new TimeDataCollector($startTime))
-            ->addCollector(new DebugBarUserDataCollector($user))
-            ->addCollector(new DebugBarSessionDataCollector($session))
             ->addCollector(new DebugBarCookiesDataCollector($this->cookieHelper, $request))
+            ->addCollector(new DebugBarSessionDataCollector($session))
             ->addCollector(new MemoryCollector());
 
 // Temp disable coz of error
@@ -171,7 +166,7 @@ class DebugMiddleware implements MiddlewareInterface
         $middleware = new PhpDebugBarMiddleware($renderer, $this->responseFactory, $this->streamFactory);
 
         // Inject DebugBar instance
-        $request = $request->withAttribute(DebugBar::class, $debugBar);
+        $request = DebugServerRequestHelper::withDebugBar($request, $debugBar);
 
         // Stop profiler before call forward
         RequestProfiler::end($ps);
@@ -192,9 +187,9 @@ class DebugMiddleware implements MiddlewareInterface
 
     private function addCspRules(JavascriptRenderer $renderer, SecureHeaders $csp): void
     {
-        $inlineJs  = $renderer->getAssets('inline_js');
+        $inlineJs = $renderer->getAssets('inline_js');
 //        $inlineCss = $renderer->getAssets('inline_css');
-        $initJs    = \str_replace(['<script type="text/javascript">', '</script>'], '', \trim($renderer->render()));
+        $initJs = \str_replace(['<script type="text/javascript">', '</script>'], '', \trim($renderer->render()));
 
         foreach ($inlineJs as $js) {
             $csp->cspHash('script', $js);

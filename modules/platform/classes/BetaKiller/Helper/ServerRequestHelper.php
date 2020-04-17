@@ -255,9 +255,9 @@ class ServerRequestHelper
         return $request->getAttribute(I18nHelper::class);
     }
 
-    public static function hasI18n(ServerRequestInterface $request): I18nHelper
+    public static function hasI18n(ServerRequestInterface $request): bool
     {
-        return $request->getAttribute(I18nHelper::class);
+        return (bool)$request->getAttribute(I18nHelper::class);
     }
 
     public static function hasCsp(ServerRequestInterface $request): bool

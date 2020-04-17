@@ -5,10 +5,8 @@ namespace BetaKiller\RequestHandler\App\I18next;
 
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Helper\ResponseHelper;
-use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\TextHelper;
 use BetaKiller\I18n\I18nFacade;
-use BetaKiller\Model\RoleInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -43,7 +41,7 @@ class FetchTranslationRequestHandler implements RequestHandlerInterface
     {
         $p = RequestProfiler::begin($request, 'Translation table');
 
-        $user = ServerRequestHelper::getUser($request);
+        $domain = $request->getHeader('X-I18n-Domain')[0] ?? null;
 
         $langIsoCode = $request->getAttribute('lang');
 
@@ -53,7 +51,7 @@ class FetchTranslationRequestHandler implements RequestHandlerInterface
             'frontend.',
         ];
 
-        if ($user->hasRoleName(RoleInterface::ADMIN_PANEL)) {
+        if ($domain === 'admin') {
             $keys[] = 'admin.frontend.';
         }
 

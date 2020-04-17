@@ -3,12 +3,9 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Dev\DebugServerRequestHelper;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception\NotAvailableHttpException;
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Service\MaintenanceModeDebugBarDataCollector;
 use BetaKiller\Service\MaintenanceModeService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -58,23 +55,23 @@ class MaintenanceModeMiddleware implements MiddlewareInterface
 
         $p = RequestProfiler::begin($request, 'Maintenance mode middleware');
 
-        $user = ServerRequestHelper::getUser($request);
+//        if (DebugServerRequestHelper::hasDebugBar($request)) {
+//            $model = $this->service->getModel();
+//
+//            DebugServerRequestHelper::getDebugBar($request)
+//                ->addCollector(new MaintenanceModeDebugBarDataCollector($model));
+//        }
 
-        if (DebugServerRequestHelper::hasDebugBar($request)) {
-            $model = $this->service->getModel();
+        if (!$this->service->isEnabled()) {
+            RequestProfiler::end($p);
 
-            DebugServerRequestHelper::getDebugBar($request)
-                ->addCollector(new MaintenanceModeDebugBarDataCollector($model));
+            return $handler->handle($request);
         }
 
-        if ($this->service->isEnabled() && $this->service->isDisplayedFor($user)) {
-            $endsAt = $this->service->getEndTime();
-
-            throw new NotAvailableHttpException($endsAt);
-        }
+        $endsAt = $this->service->getEndTime();
 
         RequestProfiler::end($p);
 
-        return $handler->handle($request);
+        throw new NotAvailableHttpException($endsAt);
     }
 }

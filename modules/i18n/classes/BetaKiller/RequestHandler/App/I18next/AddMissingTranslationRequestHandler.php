@@ -48,10 +48,8 @@ class AddMissingTranslationRequestHandler implements RequestHandlerInterface
             // PHP converts dots to underscores in POST key names
             $key = \str_replace('_', '.', $key);
 
-            if (I18nFacade::isI18nKey($key)) {
-                $this->facade->registerMissingKey($key, $lang);
-                $added[] = $key;
-            }
+            $this->facade->registerMissingKey($key, $lang);
+            $added[] = $key;
         }
 
         return ResponseHelper::successJson($added);

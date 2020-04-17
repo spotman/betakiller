@@ -13,6 +13,7 @@ use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 use BetaKiller\Assets\StaticFilesDeployHandler;
+use BetaKiller\Dev\UserDebugMiddleware;
 use BetaKiller\HitStat\HitStatMiddleware;
 use BetaKiller\Middleware\ContentNegotiationMiddleware;
 use BetaKiller\Middleware\CustomNotFoundPageMiddleware;
@@ -83,53 +84,30 @@ class WebApp
         // The error handler should be the first (most outer) middleware to catch all Exceptions.
         $this->app->pipe(FallbackErrorMiddleware::class);
 
-        // Generate and bind request ID
-        $this->app->pipe(RequestUuidMiddleware::class);
-
-        // Pipe more middleware here that you want to execute on every request:
-        // - bootstrapping
-        // - pre-conditions
-        // - modifications to outgoing responses
-        //
-        // Piped Middleware may be either callables or service names. Middleware may
-        // also be passed as an array; each item in the array must resolve to
-        // middleware eventually (i.e., callable or service name).
-        //
-        // Middleware can be attached to specific paths, allowing you to mix and match
-        // applications under a common domain.  The handlers in each middleware
-        // attached this way will see a URI with the matched path segment removed.
-        //
-        // i.e., path of "/api/member/profile" only passes "/member/profile" to $apiMiddleware
-        // - $app->pipe('/api', $apiMiddleware);
-        // - $app->pipe('/docs', $apiDocMiddleware);
-        // - $app->pipe('/files', $filesMiddleware);
-
         // Profiling
         $this->app->pipe(ProfilerMiddleware::class);
 
-        // Main processing pipe
+        // Generate and bind request ID
+        $this->app->pipe(RequestUuidMiddleware::class);
+
+        // Prepare request data
         $this->app->pipe(BodyParamsMiddleware::class);
         $this->app->pipe(SchemeMiddleware::class);
         $this->app->pipe(SecureHeadersMiddleware::class);
-//        $this->app->pipe(RequestIdMiddleware::class);
+
+        // WAMP cookie hack
+        $this->app->pipe(WampCookieMiddleware::class);
+
+        // Fetch Session
+        $this->app->pipe(SessionMiddleware::class);
+
+        // Debugging (depends on session)
+        $this->app->pipe(DebugMiddleware::class);
 
         // I18n and content negotiation
         $this->app->pipe(ContentNegotiationMiddleware::class);
         $this->app->pipe(ContentType::class);
         $this->app->pipe(I18nMiddleware::class);
-
-        // Common processing
-        $this->app->pipe(WampCookieMiddleware::class);
-
-        // Auth
-        $this->app->pipe(SessionMiddleware::class);
-        $this->app->pipe(UserMiddleware::class);
-
-        // Depends on user and i18n
-        $this->app->pipe(UserLanguageMiddleware::class);
-
-        // Debugging (depends on session and per-user debug mode)
-        $this->app->pipe(DebugMiddleware::class);
 
         // Exceptions handling (depends on i18n)
         $this->app->pipe(ErrorPageMiddleware::class);
@@ -138,16 +116,9 @@ class WebApp
         // Throws raw 501 exception, proceeded by ErrorPageMiddleware
         $this->app->pipe(MaintenanceModeMiddleware::class);
 
-        // Flash messages for Post-Redirect-Get flow (requires Session)
-        $this->app->pipe(FlashMessageMiddleware::class);
-
         // TODO Check If-Modified-Since and send 304 Not modified
 
-        // TODO Get middleware.pipe config
-        // TODO Add all global middleware here
-
         // Register the routing middleware in the middleware pipeline.
-        // This middleware registers the Zend\Expressive\Router\RouteResult request attribute.
         $this->app->pipe(RouteMiddleware::class);
 
         // The following handle routing failures for common conditions:
@@ -160,13 +131,6 @@ class WebApp
         $this->app->pipe(ImplicitOptionsMiddleware::class);
         $this->app->pipe(MethodNotAllowedMiddleware::class);
 
-        // Add more middleware here that needs to introspect the routing results; this
-        // might include:
-        //
-        // - route-based authentication
-        // - route-based validation
-        // - etc.
-
         // Register the dispatch middleware in the middleware pipeline
         $this->app->pipe(DispatchMiddleware::class);
 
@@ -177,7 +141,21 @@ class WebApp
 
     private function addRoutes(Application $app): void
     {
-        $app->post(CspReportHandler::URL, CspReportHandler::class, 'security-csp-handler');
+        $userPipe = [
+            // Fetch user from Session
+            UserMiddleware::class,
+
+            // Depends on user and i18n
+            UserLanguageMiddleware::class,
+
+            // Add debug info
+            UserDebugMiddleware::class,
+        ];
+
+        $app->post(CspReportHandler::URL, [
+            ...$userPipe,
+            CspReportHandler::class,
+        ], 'security-csp-handler');
 
         $app->get('/sitemap.xml', SitemapRequestHandler::class, 'sitemap');
         $app->get('/robots.txt', RobotsTxtHandler::class, 'robots.txt');
@@ -203,7 +181,10 @@ class WebApp
          */
         $app->get(
             $uploadUrl,
-            UploadInfoMiddleware::class,
+            [
+                ...$userPipe,
+                UploadInfoMiddleware::class,
+            ],
             'assets-upload-info'
         );
 
@@ -214,7 +195,10 @@ class WebApp
          */
         $app->post(
             $uploadUrl,
-            UploadMiddleware::class,
+            [
+                ...$userPipe,
+                UploadMiddleware::class,
+            ],
             'assets-upload'
         );
 
@@ -226,29 +210,60 @@ class WebApp
         /**
          * Download original file via concrete provider
          */
-        $app->get('/assets/{provider}/'.$itemPlace.'/'.$downloadAction.$extPlace, DownloadMiddleware::class,
-            'assets-download');
+        $app->get(
+            '/assets/{provider}/'.$itemPlace.'/'.$downloadAction.$extPlace,
+            [
+                ...$userPipe,
+                DownloadMiddleware::class,
+            ],
+            'assets-download'
+        );
 
         /**
          * Get original files via concrete provider
          */
-        $app->get('/assets/{provider}/'.$itemPlace.'/'.$originalAction.$extPlace, OriginalMiddleware::class,
-            'assets-original');
+        $app->get(
+            '/assets/{provider}/'.$itemPlace.'/'.$originalAction.$extPlace,
+            [
+                ...$userPipe,
+                OriginalMiddleware::class,
+            ],
+            'assets-original'
+        );
 
         /**
          * Preview files via concrete provider
          */
-        $app->get('/assets/{provider}/'.$itemPlace.'/'.$previewAction.$sizePlace.$extPlace, PreviewMiddleware::class,
-            'assets-preview');
+        $app->get(
+            '/assets/{provider}/'.$itemPlace.'/'.$previewAction.$sizePlace.$extPlace,
+            [
+                ...$userPipe,
+                PreviewMiddleware::class,
+            ],
+            'assets-preview'
+        );
 
         /**
          * Delete files via concrete provider
          */
-        $app->get('/assets/{provider}/'.$itemPlace.'/'.$deleteAction.$extPlace, DeleteMiddleware::class,
-            'assets-delete');
+        $app->get(
+            '/assets/{provider}/'.$itemPlace.'/'.$deleteAction.$extPlace,
+            [
+                ...$userPipe,
+                DeleteMiddleware::class,
+            ],
+            'assets-delete'
+        );
 
         // API HTTP gate
-        $app->post('/api/v{version:\d+}/{type:.+}', ApiRequestHandler::class, 'api-gate');
+        $app->post(
+            '/api/v{version:\d+}/{type:.+}',
+            [
+                ...$userPipe,
+                ApiRequestHandler::class,
+            ],
+            'api-gate'
+        );
 
         // I18n handlers
         $app->get('/i18n/{lang}', FetchTranslationRequestHandler::class, 'i18n-fetch');
@@ -256,7 +271,12 @@ class WebApp
 
         // UrlElement processing
         $urlElementPipe = [
-            // Heavy operation, defer
+            ...$userPipe,
+
+            // Flash messages for Post-Redirect-Get flow (requires Session)
+            FlashMessageMiddleware::class,
+
+            // Heavy operation
             UrlHelperMiddleware::class,
 
             // Save stat (referrer, target, utm markers, etc) (depends on UrlContainer)

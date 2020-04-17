@@ -8,12 +8,12 @@ use BetaKiller\Model\PhpException;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\PhpExceptionRepositoryInterface;
+use BetaKiller\Service\AuthService;
 use Debug;
 use Email;
 use ErrorException;
 use Monolog\Handler\AbstractProcessingHandler;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use Throwable;
 
@@ -57,29 +57,29 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      */
     private $notification;
 
-//    /**
-//     * @var \Psr\Log\LoggerInterface
-//     */
-//    private $logger;
+    /**
+     * @var \BetaKiller\Service\AuthService
+     */
+    private AuthService $auth;
 
     /**
      * PhpExceptionStorageHandler constructor.
      *
      * @param \BetaKiller\Repository\PhpExceptionRepositoryInterface $repo
+     * @param \BetaKiller\Service\AuthService                        $auth
      * @param \BetaKiller\Helper\NotificationHelper                  $notification
      */
-    public function __construct(PhpExceptionRepositoryInterface $repo, NotificationHelper $notification)
-    {
+    public function __construct(
+        AuthService $auth,
+        PhpExceptionRepositoryInterface $repo,
+        NotificationHelper $notification
+    ) {
+        $this->auth         = $auth;
         $this->repository   = $repo;
         $this->notification = $notification;
 
         parent::__construct(self::MIN_LEVEL);
     }
-
-//    public function setLogger(LoggerInterface $logger): void
-//    {
-//        $this->logger = $logger;
-//    }
 
     /**
      * Writes the record down to the log of the implementing handler
@@ -178,8 +178,10 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         $model = $this->repository->findByHash($hash);
 
         // Fetching user if exists
-        if (!$user && $request && ServerRequestHelper::hasUser($request)) {
-            $user = ServerRequestHelper::getUser($request);
+        if (!$user && $request) {
+            // Fetch User from session
+            $session = ServerRequestHelper::getSession($request);
+            $user    = $this->auth->getSessionUser($session);
         }
 
         if ($model) {
@@ -221,16 +223,12 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
         $isNotificationNeeded = $this->isNotificationNeededFor($model);
 
-//        $this->logger->debug('Notification needed is :value', [':value' => $isNotificationNeeded ? 'true' : 'false']);
-
         if ($isNotificationNeeded) {
             $model->notificationRequired();
         }
 
         // Saving
         $this->repository->save($model);
-
-//        $this->logger->debug('Exception stored with ID :id', [':id' => $model->getID()]);
     }
 
     protected function makeHashFor($message)
@@ -249,8 +247,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     {
         // Skip ignored exceptions
         if ($model->isIgnored()) {
-//            $this->logger->debug('Ignored exception :message', [':message' => $model->getMessage()]);
-
             return false;
         }
 

@@ -66,8 +66,8 @@ class StaticFilesDeployHandler implements RequestHandlerInterface
 
         symlink($orig, $deployPath);
 
-        $info = pathinfo($file);
-        $mime = $this->types->getExtensionMimeType($info['extension']);
+        $ext  = pathinfo($file, \PATHINFO_EXTENSION);
+        $mime = $this->types->getExtensionMimeType($ext);
 
         return ResponseHelper::file($orig, $mime);
     }

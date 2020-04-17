@@ -5,7 +5,6 @@ namespace BetaKiller\Service;
 
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Model\MaintenanceMode;
-use BetaKiller\Model\UserInterface;
 use DateTimeImmutable;
 
 final class MaintenanceModeService
@@ -23,11 +22,6 @@ final class MaintenanceModeService
     public function __construct(AppEnvInterface $appEnv)
     {
         $this->appEnv = $appEnv;
-    }
-
-    public function isDisplayedFor(UserInterface $user): bool
-    {
-        return !$user->hasDeveloperRole();
     }
 
     public function isEnabled(): bool
