@@ -86,7 +86,7 @@ class WampUserDb implements WampCraUserDbInterface
 
             return $this->makeData($authid, $authid);
         } catch (Throwable $e) {
-            LoggerHelper::logException($this->logger, $e);
+            LoggerHelper::logRawException($this->logger, $e);
 
             // Make random key string so auth will never be succeeded
             return $this->makeFakeData($authid);

@@ -16,7 +16,7 @@ final class UserDebugMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (DebugServerRequestHelper::hasDebugBar($request) && ServerRequestHelper::hasUser($request)) {
+        if (DebugServerRequestHelper::hasDebugBar($request) && !ServerRequestHelper::isGuest($request)) {
             $debugBar = DebugServerRequestHelper::getDebugBar($request);
 
             // Fetch actual user

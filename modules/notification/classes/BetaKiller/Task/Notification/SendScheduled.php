@@ -77,7 +77,7 @@ final class SendScheduled extends AbstractTask
             $messages = $this->notification->getGroupMessagesCodenames($group);
 
             if (count($messages) > 1) {
-                LoggerHelper::logException($this->logger, new TaskException(
+                LoggerHelper::logRawException($this->logger, new TaskException(
                     'Multiple messages in scheduled group ":name" are not allowed', [
                     ':name' => $group->getCodename(),
                 ]));

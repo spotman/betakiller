@@ -2,7 +2,6 @@
 namespace BetaKiller\Helper;
 
 use BetaKiller\Exception;
-use BetaKiller\Log\Logger;
 use BetaKiller\Model\UserInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -10,7 +9,34 @@ use Throwable;
 
 class LoggerHelper
 {
-    public static function logException(
+    public const CONTEXT_KEY_USER      = 'user';
+    public const CONTEXT_KEY_EXCEPTION = 'exception';
+    public const CONTEXT_KEY_REQUEST   = 'request';
+
+    public static function logUserException(
+        LoggerInterface $logger,
+        Throwable $e,
+        UserInterface $user
+    ): void {
+        self::addRecord($logger, $e, $user);
+    }
+
+    public static function logRequestException(
+        LoggerInterface $logger,
+        Throwable $e,
+        ServerRequestInterface $request
+    ): void {
+        self::addRecord($logger, $e, null, $request);
+    }
+
+    public static function logRawException(
+        LoggerInterface $logger,
+        Throwable $e
+    ): void {
+        self::addRecord($logger, $e);
+    }
+
+    private static function addRecord(
         LoggerInterface $logger,
         Throwable $e,
         UserInterface $user = null,
@@ -18,18 +44,18 @@ class LoggerHelper
     ): void {
         try {
             $data = [
-                ':message'                    => $e->getMessage(),
-                ':file'                       => $e->getFile(),
-                ':line'                       => $e->getLine(),
-                Logger::CONTEXT_KEY_EXCEPTION => $e,
+                ':message'                  => $e->getMessage(),
+                ':file'                     => $e->getFile(),
+                ':line'                     => $e->getLine(),
+                self::CONTEXT_KEY_EXCEPTION => $e,
             ];
 
             if ($user) {
-                $data[Logger::CONTEXT_KEY_USER] = $user;
+                $data[self::CONTEXT_KEY_USER] = $user;
             }
 
             if ($request) {
-                $data[Logger::CONTEXT_KEY_REQUEST] = $request;
+                $data[self::CONTEXT_KEY_REQUEST] = $request;
             }
 
             $logger->alert(':message at :file::line', $data);

@@ -283,7 +283,7 @@ final class NotificationFacade
                 $log->markAsSucceeded();
             }
         } catch (Throwable $e) {
-            LoggerHelper::logException($this->logger, $e);
+            LoggerHelper::logRawException($this->logger, $e);
 
             // Store exception as result
             $log->markAsFailed(Exception::oneLiner($e));
@@ -360,7 +360,7 @@ final class NotificationFacade
     /**
      * Returns key-value pairs "messageCodename" => ["dismissOnEventName1", "dismissOnEventName2"]
      *
-     * @return string[]
+     * @return string[][]
      */
     public function getDismissibleMessages(): array
     {

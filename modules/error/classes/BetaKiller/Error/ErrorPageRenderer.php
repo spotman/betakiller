@@ -142,7 +142,7 @@ class ErrorPageRenderer implements ErrorPageRendererInterface
 
             return new HtmlResponse($body, $httpCode);
         } catch (\Throwable $e) {
-            LoggerHelper::logException($this->logger, $e, null, $request);
+            LoggerHelper::logRequestException($this->logger, $e, $request);
 
             return $isDebug
                 ? $this->makeDebugResponse($e, $request)
@@ -205,7 +205,7 @@ class ErrorPageRenderer implements ErrorPageRendererInterface
                 }
             }
         } catch (\Throwable $e) {
-            LoggerHelper::logException($this->logger, $e);
+            LoggerHelper::logRawException($this->logger, $e);
         }
 
         return null;

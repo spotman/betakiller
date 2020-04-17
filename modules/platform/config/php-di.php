@@ -10,7 +10,7 @@ use BetaKiller\Factory\EntityFactory;
 use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
-use BetaKiller\Log\Logger;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Middleware\CspReportBodyParamsStrategy;
 use BetaKiller\Notification\MessageActionUrlGeneratorInterface;
 use BetaKiller\NotificationMessageActionUrlGenerator;
@@ -92,7 +92,7 @@ return [
                 static function (Throwable $e) use ($logger) {
                     // Log exception to developers
                     $logger->alert(Exception::oneLiner($e), [
-                        Logger::CONTEXT_KEY_EXCEPTION => $e,
+                        LoggerHelper::CONTEXT_KEY_EXCEPTION => $e,
                     ]);
 
                     // No exception info here for security reasons

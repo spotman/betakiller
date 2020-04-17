@@ -138,7 +138,7 @@ class ProcessHits extends AbstractTask
 
                 $this->processed[] = $hit;
             } catch (\Throwable $e) {
-                LoggerHelper::logException($this->logger, $e);
+                LoggerHelper::logRawException($this->logger, $e);
             }
         }
 

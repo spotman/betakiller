@@ -36,7 +36,7 @@ class PhpExceptionLoggerIFace extends AbstractErrorAdminIFace
     {
         $e = new ServerErrorHttpException();
 
-        LoggerHelper::logException($this->logger, $e);
+        LoggerHelper::logRequestException($this->logger, $e, $request);
 
         return [];
     }

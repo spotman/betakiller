@@ -17,10 +17,6 @@ class Logger implements LoggerInterface
 {
     use LoggerTrait;
 
-    public const CONTEXT_KEY_EXCEPTION = 'exception';
-    public const CONTEXT_KEY_REQUEST   = 'request';
-    public const CONTEXT_KEY_USER      = 'user';
-
     /**
      * @var \Monolog\Logger
      */
@@ -58,7 +54,7 @@ class Logger implements LoggerInterface
 
         // Do not register Monolog exception handler coz it calls exit()
         \set_exception_handler(function (\Throwable $e) {
-            LoggerHelper::logException($this, $e);
+            LoggerHelper::logRawException($this, $e);
 
             // Exit with error code in CLI mode
             if ($this->appEnv->isCli()) {

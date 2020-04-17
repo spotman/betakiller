@@ -96,7 +96,7 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
         try {
             $handler($message);
         } catch (\Throwable $e) {
-            LoggerHelper::logException($this->logger, $e);
+            LoggerHelper::logRawException($this->logger, $e);
         }
     }
 }

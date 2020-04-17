@@ -135,7 +135,7 @@ class CommandBusWorkerDaemon implements DaemonInterface
             // Local execute
             return $this->commandBus->handle($message);
         } catch (\Throwable $e) {
-            LoggerHelper::logException($this->logger, $e);
+            LoggerHelper::logRawException($this->logger, $e);
 
             // Temp fix for failing tasks
             return false;

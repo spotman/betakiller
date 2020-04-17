@@ -85,7 +85,7 @@ class CspReportHandler implements RequestHandlerInterface
 
         $uri = $this->uriFactory->createUri($documentUrl);
 
-        LoggerHelper::logException($this->logger, $e, null, $request->withUri($uri));
+        LoggerHelper::logRequestException($this->logger, $e, $request->withUri($uri));
 
         return ResponseHelper::text('OK');
     }

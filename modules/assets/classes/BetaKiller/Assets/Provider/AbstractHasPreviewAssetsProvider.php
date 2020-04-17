@@ -44,8 +44,9 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
         if (!in_array($size, $this->getAllowedPreviewSizes(), true)) {
             $size = $this->getPreferredPreviewSize();
 
-            LoggerHelper::logException(
-                $this->logger, new AssetsProviderException('Preview size ":size" is not allowed', [':size' => $size])
+            LoggerHelper::logRawException(
+                $this->logger,
+                new AssetsProviderException('Preview size ":size" is not allowed', [':size' => $size])
             );
         }
 

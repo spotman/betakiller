@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
+use BetaKiller\Auth\RequestUserProvider;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Service\AuthService;
@@ -11,7 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class UserMiddleware implements MiddlewareInterface
+class RequestUserMiddleware implements MiddlewareInterface
 {
     /**
      * @var \BetaKiller\Service\AuthService
@@ -19,7 +20,7 @@ class UserMiddleware implements MiddlewareInterface
     private $auth;
 
     /**
-     * UserMiddleware constructor.
+     * RequestUserMiddleware constructor.
      *
      * @param \BetaKiller\Service\AuthService $auth
      */
@@ -39,21 +40,13 @@ class UserMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $p = RequestProfiler::begin($request, 'User middleware');
+        $p = RequestProfiler::begin($request, 'User provider init');
 
-        $session = ServerRequestHelper::getSession($request);
-
-        $u    = RequestProfiler::begin($request, 'Fetch User from Session');
-        $user = $this->auth->getSessionUser($session);
-        RequestProfiler::end($u);
-
-        // Prefetch all roles
-        $r = RequestProfiler::begin($request, 'Fetch User roles');
-        $user->getAllUserRolesNames();
-        RequestProfiler::end($r);
+        // Inject User provider bound to current request
+        $request = ServerRequestHelper::setUserProvider($request, new RequestUserProvider($request, $this->auth));
 
         RequestProfiler::end($p);
 
-        return $handler->handle(ServerRequestHelper::setUser($request, $user));
+        return $handler->handle($request);
     }
 }

@@ -76,7 +76,7 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
         try {
             return $this->process($request);
         } catch (AssetsStorageException|AssetsModelException $e) {
-            LoggerHelper::logException($this->logger, $e, null, $request);
+            LoggerHelper::logRequestException($this->logger, $e, $request);
 
             throw new NotFoundHttpException();
         }
@@ -160,7 +160,7 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
             // Find asset model by url
             return $this->provider->getModelByPublicUrl($url);
         } catch (AssetsException $e) {
-            LoggerHelper::logException($this->logger, $e, null, $request);
+            LoggerHelper::logRequestException($this->logger, $e, $request);
             // File not found
             throw new NotFoundHttpException;
         }

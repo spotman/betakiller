@@ -102,7 +102,7 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
             // Emit event about successful url parsing
             $this->eventBus->emit(new UrlDispatchedEvent($request));
         } catch (MissingUrlElementException $e) {
-            LoggerHelper::logException($this->logger, $e, null, $request);
+            LoggerHelper::logRequestException($this->logger, $e, $request);
 
             $this->processMissingUrl($request, $e);
         } finally {

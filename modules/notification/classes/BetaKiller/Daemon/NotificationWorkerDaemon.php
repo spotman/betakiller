@@ -121,7 +121,7 @@ class NotificationWorkerDaemon implements DaemonInterface
             // Send through transports
             return $this->notification->send($message);
         } catch (\Throwable $e) {
-            LoggerHelper::logException($this->logger, $e);
+            LoggerHelper::logRawException($this->logger, $e);
 
             // Temp fix for failing tasks
             return false;

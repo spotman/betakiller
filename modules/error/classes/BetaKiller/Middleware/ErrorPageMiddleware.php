@@ -50,7 +50,7 @@ class ErrorPageMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         } catch (\Throwable $e) {
             // Logging exception
-            LoggerHelper::logException($this->logger, $e, null, $request);
+            LoggerHelper::logRequestException($this->logger, $e, $request);
 
             return $this->renderer->render($request, $e);
         }

@@ -24,6 +24,7 @@ use BetaKiller\Middleware\FallbackErrorMiddleware;
 use BetaKiller\Middleware\I18nMiddleware;
 use BetaKiller\Middleware\MaintenanceModeMiddleware;
 use BetaKiller\Middleware\ProfilerMiddleware;
+use BetaKiller\Middleware\RequestUserMiddleware;
 use BetaKiller\Middleware\RequestUuidMiddleware;
 use BetaKiller\Middleware\SchemeMiddleware;
 use BetaKiller\Middleware\SessionMiddleware;
@@ -32,7 +33,6 @@ use BetaKiller\Middleware\UrlElementDispatchMiddleware;
 use BetaKiller\Middleware\UrlElementRenderMiddleware;
 use BetaKiller\Middleware\UrlHelperMiddleware;
 use BetaKiller\Middleware\UserLanguageMiddleware;
-use BetaKiller\Middleware\UserMiddleware;
 use BetaKiller\Middleware\UserStatusMiddleware;
 use BetaKiller\Middleware\WampCookieMiddleware;
 use BetaKiller\RequestHandler\App\I18next\AddMissingTranslationRequestHandler;
@@ -101,6 +101,9 @@ class WebApp
         // Fetch Session
         $this->app->pipe(SessionMiddleware::class);
 
+        // Bind RequestUserProvider
+        $this->app->pipe(RequestUserMiddleware::class);
+
         // Debugging (depends on session)
         $this->app->pipe(DebugMiddleware::class);
 
@@ -142,9 +145,6 @@ class WebApp
     private function addRoutes(Application $app): void
     {
         $userPipe = [
-            // Fetch user from Session
-            UserMiddleware::class,
-
             // Depends on user and i18n
             UserLanguageMiddleware::class,
 

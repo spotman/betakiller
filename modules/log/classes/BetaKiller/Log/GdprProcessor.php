@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Log;
 
+use BetaKiller\Helper\LoggerHelper;
+
 class GdprProcessor
 {
     /**
@@ -31,9 +33,9 @@ class GdprProcessor
     public function __invoke(array $record)
     {
         // Preserve exception and request as is
-        $e = $record['context'][Logger::CONTEXT_KEY_EXCEPTION] ?? null;
-        $r = $record['context'][Logger::CONTEXT_KEY_REQUEST] ?? null;
-        $u = $record['context'][Logger::CONTEXT_KEY_USER] ?? null;
+        $e = $record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION] ?? null;
+        $r = $record['context'][LoggerHelper::CONTEXT_KEY_REQUEST] ?? null;
+        $u = $record['context'][LoggerHelper::CONTEXT_KEY_USER] ?? null;
 
         foreach ($this->processors as $proc) {
             $record = $proc($record);
@@ -41,15 +43,15 @@ class GdprProcessor
 
         // Restore exception, request and user
         if ($e) {
-            $record['context'][Logger::CONTEXT_KEY_EXCEPTION] = $e;
+            $record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION] = $e;
         }
 
         if ($r) {
-            $record['context'][Logger::CONTEXT_KEY_REQUEST] = $r;
+            $record['context'][LoggerHelper::CONTEXT_KEY_REQUEST] = $r;
         }
 
         if ($u) {
-            $record['context'][Logger::CONTEXT_KEY_USER] = $u;
+            $record['context'][LoggerHelper::CONTEXT_KEY_USER] = $u;
         }
 
         return $record;

@@ -208,7 +208,7 @@ class WampEsbBridgeDaemon implements DaemonInterface
                 });
             }
         } catch (Throwable $e) {
-            LoggerHelper::logException($this->logger, $e);
+            LoggerHelper::logRawException($this->logger, $e);
 
             return false;
         }

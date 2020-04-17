@@ -83,9 +83,10 @@ class CommandBus extends AbstractMessageBus implements CommandBusInterface
         // Wrap every message bus processing with try-catch block and log exceptions
         try {
             $handler($command);
+
             return true;
         } catch (\Throwable $e) {
-            LoggerHelper::logException($this->logger, $e);
+            LoggerHelper::logRawException($this->logger, $e);
         }
 
         return false;

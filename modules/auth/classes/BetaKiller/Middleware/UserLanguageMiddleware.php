@@ -25,9 +25,8 @@ final class UserLanguageMiddleware implements MiddlewareInterface
     {
         $p = RequestProfiler::begin($request, 'User lang middleware');
 
-        $user = ServerRequestHelper::getUser($request);
-
-        if (!$user->isGuest()) {
+        if (!ServerRequestHelper::isGuest($request)) {
+            $user = ServerRequestHelper::getUser($request);
             $i18n = ServerRequestHelper::getI18n($request);
 
             $i18n->setLang($user->getLanguage());

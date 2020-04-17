@@ -88,7 +88,7 @@ class ShortcodeFacade
             try {
                 return $this->render($s->getName(), $s->getParameters(), $request, $context);
             } catch (\Throwable $e) {
-                LoggerHelper::logException($this->logger, $e);
+                LoggerHelper::logRawException($this->logger, $e);
 
                 return null;
             }

@@ -112,7 +112,7 @@ class WidgetFacade
             $result = $view->render();
             RequestProfiler::end($rp);
         } catch (\Throwable $e) {
-            LoggerHelper::logException($this->logger, $e, null, $request);
+            LoggerHelper::logRequestException($this->logger, $e, $request);
         }
 
         return $result;

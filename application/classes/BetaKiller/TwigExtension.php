@@ -416,7 +416,7 @@ final class TwigExtension extends AbstractExtension
 
                     $params = Exception::addPlaceholderPrefixToKeys($params);
 
-                    LoggerHelper::logException($this->logger, new Exception($message, $params));
+                    LoggerHelper::logRawException($this->logger, new Exception($message, $params));
                 }
             ),
 

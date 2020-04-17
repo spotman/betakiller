@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Helper;
 
 use Aidantwoods\SecureHeaders\SecureHeaders;
+use BetaKiller\Auth\RequestUserProvider;
 use BetaKiller\Exception;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Model\UserInterface;
@@ -214,29 +215,36 @@ class ServerRequestHelper
         return $request->getAttribute(UrlHelper::class);
     }
 
-    public static function setUser(ServerRequestInterface $request, UserInterface $user): ServerRequestInterface
-    {
-        return $request->withAttribute(UserInterface::class, $user);
+    public static function setUserProvider(
+        ServerRequestInterface $request,
+        RequestUserProvider $provider
+    ): ServerRequestInterface {
+        return $request->withAttribute(RequestUserProvider::class, $provider);
     }
 
     public static function getUser(ServerRequestInterface $request): UserInterface
     {
-        return $request->getAttribute(UserInterface::class);
+        /** @var RequestUserProvider $provider */
+        $provider = $request->getAttribute(RequestUserProvider::class);
+
+        if (!$provider) {
+            throw new \LogicException('RequestUserProvider is missing');
+        }
+
+        return $provider->fetch();
     }
 
     public static function isGuest(ServerRequestInterface $request): bool
     {
-        if (!self::hasUser($request)) {
-            // No user => guest user
-            return true;
-        }
+        $session = self::getSession($request);
 
-        return self::getUser($request)->isGuest();
+        return !SessionHelper::hasUserID($session);
     }
 
-    public static function hasUser(ServerRequestInterface $request): bool
+    public static function hasUserProvider(ServerRequestInterface $request): bool
     {
-        return (bool)$request->getAttribute(UserInterface::class);
+        // Check RequestUserProvider is exists at this time
+        return (bool)$request->getAttribute(RequestUserProvider::class);
     }
 
     public static function getSession(ServerRequestInterface $request): SessionInterface

@@ -119,7 +119,7 @@ class UrlElementTreeLoader
             }
         } catch (\Throwable $e) {
             $this->cache->delete($key);
-            LoggerHelper::logException($this->logger, $e);
+            LoggerHelper::logRawException($this->logger, $e);
 
             return false;
         }

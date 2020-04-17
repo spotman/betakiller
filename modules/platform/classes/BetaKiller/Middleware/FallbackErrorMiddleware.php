@@ -45,7 +45,7 @@ final class FallbackErrorMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         } catch (\Throwable $e) {
             // Keep minimal data (no session at this point)
-            LoggerHelper::logException($this->logger, $e);
+            LoggerHelper::logRawException($this->logger, $e);
 
             if ($this->appEnv->inProductionMode()) {
                 return ResponseHelper::text('', 500);

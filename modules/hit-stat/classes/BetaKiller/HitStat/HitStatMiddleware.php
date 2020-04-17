@@ -112,7 +112,7 @@ class HitStatMiddleware implements MiddlewareInterface
             // Re-throw redirect
             throw $e;
         } catch (Throwable $e) {
-            LoggerHelper::logException($this->logger, $e);
+            LoggerHelper::logRequestException($this->logger, $e, $request);
         } finally {
             RequestProfiler::end($p);
         }

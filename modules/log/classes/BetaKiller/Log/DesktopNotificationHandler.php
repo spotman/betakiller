@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Log;
 
+use BetaKiller\Helper\LoggerHelper;
 use Joli\JoliNotif\Notification;
 use Joli\JoliNotif\Notifier;
 use Joli\JoliNotif\NotifierFactory;
@@ -43,7 +44,7 @@ final class DesktopNotificationHandler extends AbstractHandler
     public function handle(array $record): bool
     {
         /** @var \Throwable|null $exception */
-        $exception = $record['context'][Logger::CONTEXT_KEY_EXCEPTION] ?? null;
+        $exception = $record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION] ?? null;
 
         if ($exception) {
             // Find root exception

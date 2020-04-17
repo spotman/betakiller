@@ -1,14 +1,13 @@
 <?php
 namespace BetaKiller\Error;
 
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Log\Logger;
 use BetaKiller\Model\PhpException;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\PhpExceptionRepositoryInterface;
-use BetaKiller\Service\AuthService;
 use Debug;
 use Email;
 use ErrorException;
@@ -58,23 +57,15 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     private $notification;
 
     /**
-     * @var \BetaKiller\Service\AuthService
-     */
-    private AuthService $auth;
-
-    /**
      * PhpExceptionStorageHandler constructor.
      *
      * @param \BetaKiller\Repository\PhpExceptionRepositoryInterface $repo
-     * @param \BetaKiller\Service\AuthService                        $auth
      * @param \BetaKiller\Helper\NotificationHelper                  $notification
      */
     public function __construct(
-        AuthService $auth,
         PhpExceptionRepositoryInterface $repo,
         NotificationHelper $notification
     ) {
-        $this->auth         = $auth;
         $this->repository   = $repo;
         $this->notification = $notification;
 
@@ -97,10 +88,10 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         $exception = $this->detectException($record);
 
         /** @var ServerRequestInterface|null $request */
-        $request = $record['context'][Logger::CONTEXT_KEY_REQUEST] ?? null;
+        $request = $record['context'][LoggerHelper::CONTEXT_KEY_REQUEST] ?? null;
 
         /** @var UserInterface|null $user */
-        $user = $record['context'][Logger::CONTEXT_KEY_USER] ?? null;
+        $user = $record['context'][LoggerHelper::CONTEXT_KEY_USER] ?? null;
 
         try {
             $this->storeException($exception, $user, $request);
@@ -115,7 +106,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     private function detectException(array $record): Throwable
     {
         /** @var \Throwable|null $exception */
-        $exception = $record['context'][Logger::CONTEXT_KEY_EXCEPTION] ?? null;
+        $exception = $record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION] ?? null;
 
         if (!$exception) {
             $extra = $record['extra'] ?? [];
@@ -177,11 +168,9 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         // Searching for existing exception
         $model = $this->repository->findByHash($hash);
 
-        // Fetching user if exists
-        if (!$user && $request) {
-            // Fetch User from session
-            $session = ServerRequestHelper::getSession($request);
-            $user    = $this->auth->getSessionUser($session);
+        // Fetching user if User provider exists at this moment
+        if (!$user && $request && ServerRequestHelper::hasUserProvider($request)) {
+            $user = ServerRequestHelper::getUser($request);
         }
 
         if ($model) {

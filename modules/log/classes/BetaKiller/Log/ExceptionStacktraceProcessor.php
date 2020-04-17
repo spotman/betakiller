@@ -2,6 +2,7 @@
 namespace BetaKiller\Log;
 
 use BetaKiller\ExceptionInterface;
+use BetaKiller\Helper\LoggerHelper;
 
 class ExceptionStacktraceProcessor
 {
@@ -13,7 +14,7 @@ class ExceptionStacktraceProcessor
     public function __invoke(array $record)
     {
         /** @var \Throwable|null $exception */
-        $exception = $record['context'][Logger::CONTEXT_KEY_EXCEPTION] ?? null;
+        $exception = $record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION] ?? null;
 
         // Skip expected exceptions
         if ($exception && $exception instanceof ExceptionInterface && !$exception->isNotificationEnabled()) {

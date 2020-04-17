@@ -87,7 +87,7 @@ final class ForceLoginAction extends AbstractAction
 
         $session = ServerRequestHelper::getSession($request);
 
-        if (ServerRequestHelper::hasUser($request)) {
+        if (!ServerRequestHelper::isGuest($request)) {
             // Force logout before login
             $this->auth->logout($session);
         }

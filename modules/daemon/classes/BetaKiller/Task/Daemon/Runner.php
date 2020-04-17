@@ -223,7 +223,7 @@ class Runner extends AbstractTask
             $this->shutdown(0);
         } else {
             // Something wrong is going on here
-            LoggerHelper::logException($this->logger, $e);
+            LoggerHelper::logRawException($this->logger, $e);
             $this->shutdown(1);
         }
     }
@@ -270,7 +270,7 @@ class Runner extends AbstractTask
                 ]);
             }
         } catch (\Throwable $e) {
-            LoggerHelper::logException($this->logger, $e);
+            LoggerHelper::logRawException($this->logger, $e);
         }
     }
 

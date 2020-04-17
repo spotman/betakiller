@@ -415,7 +415,7 @@ final class I18nFacade
         ]);
 
         // Store exception with the original key as missing
-        LoggerHelper::logException($this->logger, $e);
+        LoggerHelper::logRawException($this->logger, $e);
     }
 
     /**

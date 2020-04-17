@@ -13,8 +13,10 @@ use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Log\FilterExceptionsHandler;
 use BetaKiller\Log\LoggerInterface;
+use BetaKiller\Model\RoleInterface;
 use DebugBar\DataCollector\MemoryCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DebugBar;
@@ -101,13 +103,13 @@ class DebugMiddleware implements MiddlewareInterface
     {
         $debugEnabled = $this->appEnv->isDebugEnabled();
 
-        // TODO Detect debug mode enabled for session
-        if (!$debugEnabled && ServerRequestHelper::hasUser($request)) {
-            $user = ServerRequestHelper::getUser($request);
+        // Fetch actual session
+        $session = ServerRequestHelper::getSession($request);
 
-            if ($user->hasDeveloperRole()) {
-                $debugEnabled = true;
-            }
+        // TODO Detect debug mode enabled for session
+        // Do not fetch User here to allow lazy loading
+        if (SessionHelper::hasRoleName($session, RoleInterface::DEVELOPER)) {
+            $debugEnabled = true;
         }
 
         // Prevent displaying DebugBar in prod mode
@@ -127,9 +129,6 @@ class DebugMiddleware implements MiddlewareInterface
 
         // Fresh instance for every request
         $debugBar = new DebugBar();
-
-        // Fetch actual session
-        $session = ServerRequestHelper::getSession($request);
 
         // Initialize http driver
         $httpDriver = new DebugBarHttpDriver($session);

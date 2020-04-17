@@ -57,7 +57,7 @@ class CustomNotFoundPageMiddleware implements MiddlewareInterface
         try {
             return $handler->handle($request);
         } catch (MissingUrlElementException $e) {
-            LoggerHelper::logException($this->logger, $e, null, $request);
+            LoggerHelper::logRequestException($this->logger, $e, $request);
 
             $page = $this->detectCustomPage($e);
 
