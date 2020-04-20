@@ -38,6 +38,11 @@ class WampClientHelper
     private $timer;
 
     /**
+     * @var bool
+     */
+    private bool $isCacheEnabled = false;
+
+    /**
      * @param \BetaKiller\Service\AuthService     $auth
      * @param \BetaKiller\Helper\CookieHelper     $cookieHelper
      * @param \BetaKiller\Wamp\WampSessionStorage $sessionStorage
@@ -55,11 +60,20 @@ class WampClientHelper
         $this->logger         = $logger;
     }
 
+    public function enableCaching(): void
+    {
+        $this->isCacheEnabled = true;
+    }
+
     /**
      * @param \React\EventLoop\LoopInterface $loop
      */
     public function bindSessionHandlers(LoopInterface $loop): void
     {
+        if (!$this->isCacheEnabled) {
+            throw new \LogicException('Binding session handlers is useless without caching enabled');
+        }
+
         if (!$this->timer) {
             $this->timer = $loop->addPeriodicTimer(300, function () {
                 // Remove old sessions without connections
@@ -94,14 +108,19 @@ class WampClientHelper
             throw new \LogicException('Anonymous is not allowed');
         }
 
-        $wampSession = $this->sessionStorage->findByAuthID($authID);
+        $wampSession = $this->isCacheEnabled
+            ? $this->sessionStorage->findByAuthID($authID)
+            : null;
 
         // Initialize WAMP session if not exists
         if (!$wampSession) {
             $sessionID   = $this->cookieHelper->decodeValue(DatabaseSessionStorage::COOKIE_NAME, $authID);
             $userSession = $this->auth->getSession($sessionID);
             $wampSession = new WampSession($authID, $userSession);
-            $this->sessionStorage->add($wampSession);
+
+            if ($this->isCacheEnabled) {
+                $this->sessionStorage->add($wampSession);
+            }
         }
 
         // Mark session as used

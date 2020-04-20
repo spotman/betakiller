@@ -16,6 +16,7 @@ use React\EventLoop\LoopInterface;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiResourceProxyInterface;
 use stdClass;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
 use Thruway\ClientSession;
 
@@ -110,7 +111,7 @@ class ApiWorkerDaemon implements DaemonInterface
             $this->clientBuilder->internalRealm()->create($loop),
         ];
 
-        $this->clientHelper->bindSessionHandlers($loop);
+//        $this->clientHelper->bindSessionHandlers($loop);
 
         // Bind events and start every client
         foreach ($this->wampClients as $wampClient) {
@@ -138,11 +139,13 @@ class ApiWorkerDaemon implements DaemonInterface
         $user = null;
 
         try {
+            $t = (new Stopwatch(true))->start('api');
+
             $wampSession = $this->clientHelper->getProcedureSession(func_get_args());
             $user        = $this->clientHelper->getSessionUser($wampSession);
 
-            $this->logger->debug('Indexed args are :value', [':value' => json_encode($indexedArgs)]);
-            $this->logger->debug('Named args are :value', [':value' => json_encode($namedArgs)]);
+//            $this->logger->debug('Indexed args are :value', [':value' => json_encode($indexedArgs)]);
+//            $this->logger->debug('Named args are :value', [':value' => json_encode($namedArgs)]);
 
             $arrayArgs = (array)$namedArgs;
 
@@ -151,16 +154,22 @@ class ApiWorkerDaemon implements DaemonInterface
             $arguments = (array)$arrayArgs[self::KEY_API_DATA];
 
             $this->logger->debug('User is ":name"', [':name' => $user->getID()]);
-            $this->logger->debug('Resource is ":name"', [':name' => $resource]);
-            $this->logger->debug('Method is ":name"', [':name' => $method]);
+            $this->logger->debug('Resource/method are :resource->:method', [
+                ':resource' => $resource,
+                ':method'   => $method,
+            ]);
             $this->logger->debug('Arguments are :value', [':value' => json_encode($arguments)]);
 
             $result = $this->callApiMethod($resource, $method, $arguments, $user);
+
+            $this->logger->debug('Executed in :time ms', [
+                ':time' => $t->stop()->getDuration(),
+            ]);
         } catch (Throwable $e) {
             return $this->makeApiError($e, $user);
         }
 
-        $this->logger->debug('Result is :value', [':value' => json_encode($result)]);
+//        $this->logger->debug('Result is :value', [':value' => json_encode($result)]);
 
         return $result;
     }
