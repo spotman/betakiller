@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Exception\NotFoundHttpException;
-use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\MissingUrlElementException;
 use BetaKiller\Url\UrlElementRendererInterface;
@@ -57,7 +56,8 @@ class CustomNotFoundPageMiddleware implements MiddlewareInterface
         try {
             return $handler->handle($request);
         } catch (MissingUrlElementException $e) {
-            LoggerHelper::logRequestException($this->logger, $e, $request);
+            // No logging of 404 pages, they will be fetched from hit-stat
+            // LoggerHelper::logRequestException($this->logger, $e, $request);
 
             $page = $this->detectCustomPage($e);
 
