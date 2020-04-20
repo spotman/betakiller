@@ -7,7 +7,6 @@ use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Event\MissingUrlEvent;
 use BetaKiller\Event\UrlDispatchedEvent;
 use BetaKiller\Exception\SeeOtherHttpException;
-use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Model\LanguageInterface;
@@ -20,7 +19,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Log\LoggerInterface;
 
 class UrlElementDispatchMiddleware implements MiddlewareInterface
 {
@@ -35,25 +33,17 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
     private $eventBus;
 
     /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
      * UrlElementDispatchMiddleware constructor.
      *
      * @param \BetaKiller\Url\UrlProcessor             $urlProcessor
      * @param \BetaKiller\MessageBus\EventBusInterface $eventBus
-     * @param \Psr\Log\LoggerInterface                 $logger
      */
     public function __construct(
         UrlProcessor $urlProcessor,
-        EventBusInterface $eventBus,
-        LoggerInterface $logger
+        EventBusInterface $eventBus
     ) {
         $this->urlProcessor = $urlProcessor;
         $this->eventBus     = $eventBus;
-        $this->logger       = $logger;
     }
 
     /**
@@ -102,7 +92,8 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
             // Emit event about successful url parsing
             $this->eventBus->emit(new UrlDispatchedEvent($request));
         } catch (MissingUrlElementException $e) {
-            LoggerHelper::logRequestException($this->logger, $e, $request);
+            // Do not log missing pages, they will be fetched by hit-stat module
+//            LoggerHelper::logRequestException($this->logger, $e, $request);
 
             $this->processMissingUrl($request, $e);
         } finally {
