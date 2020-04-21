@@ -213,7 +213,7 @@ final class TwigExtension extends AbstractExtension
                         ]);
                     }
 
-                    $fileData = \json_decode($fileContent, true);
+                    $fileData = \json_decode($fileContent, true, 20, JSON_THROW_ON_ERROR);
 
                     $config = $fileData['entrypoints'][$entryPoint] ?? null;
 
@@ -224,17 +224,35 @@ final class TwigExtension extends AbstractExtension
                         ]);
                     }
 
+                    $integrityHashes = $fileData['integrity'] ?? null;
+
                     $baseUrl = $assets->getBaseUrl();
 
                     if (isset($config['js'])) {
                         foreach ($config['js'] as $jsFileName) {
-                            $assets->addJs((string)$baseUrl->withPath($jsFileName));
+                            $attributes = [];
+
+                            // Add integrity hash
+                            if (isset($integrityHashes[$jsFileName])) {
+                                $attributes['integrity']   = $integrityHashes[$jsFileName];
+                                $attributes['crossorigin'] = 'anonymous';
+                            }
+
+                            $assets->addJs((string)$baseUrl->withPath($jsFileName), $attributes);
                         }
                     }
 
                     if (isset($config['css'])) {
                         foreach ($config['css'] as $cssFileName) {
-                            $assets->addCss((string)$baseUrl->withPath($cssFileName));
+                            $attributes = [];
+
+                            // Add integrity hash
+                            if (isset($integrityHashes[$cssFileName])) {
+                                $attributes['integrity']   = $integrityHashes[$cssFileName];
+                                $attributes['crossorigin'] = 'anonymous';
+                            }
+
+                            $assets->addCss((string)$baseUrl->withPath($cssFileName), $attributes);
                         }
                     }
                 },
