@@ -80,8 +80,7 @@ class Logger implements LoggerInterface
         if ($this->appEnv->isCli()) {
             $level = $isDebug ? \Monolog\Logger::DEBUG : \Monolog\Logger::INFO;
 
-            $cliHandler = new StdOutHandler($level, $isHuman);
-            $monolog->pushHandler($cliHandler);
+            $monolog->pushHandler(new StdOutHandler($level, $isHuman));
 
 //            if (DesktopNotificationHandler::isSupported()) {
 //                $monolog->pushHandler(new FilterExceptionsHandler(new DesktopNotificationHandler));
