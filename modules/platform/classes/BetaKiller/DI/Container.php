@@ -66,7 +66,7 @@ class Container implements ContainerInterface
         $cacheDefinitions = $config['cache_definitions'];
 
         if ($compile) {
-            $compileTo = implode(DIRECTORY_SEPARATOR, [$appEnv->getAppRootPath(), 'cache', 'php-di']);
+            $compileTo = $appEnv->getCachePath('php-di');
             $builder->enableCompilation($compileTo);
         }
 
@@ -89,7 +89,7 @@ class Container implements ContainerInterface
             ContainerInterface::class       => $this,
 
             // Use Invoker for calling methods and lambda functions with dependencies
-            InvokerInterface::class => $this,
+            InvokerInterface::class         => $this,
         ]);
 
         $this->container = $builder
@@ -103,10 +103,10 @@ class Container implements ContainerInterface
      *
      * @param string $id Identifier of the entry to look for.
      *
-     * @throws \Psr\Container\NotFoundExceptionInterface No entry was found for this identifier.
+     * @return mixed Entry.
      * @throws \Psr\Container\ContainerExceptionInterface Error while retrieving the entry.
      *
-     * @return mixed Entry.
+     * @throws \Psr\Container\NotFoundExceptionInterface No entry was found for this identifier.
      */
     public function get($id)
     {
@@ -134,10 +134,10 @@ class Container implements ContainerInterface
      *                           parameters to specific values. Parameters not defined in this array will
      *                           be automatically resolved.
      *
-     * @throws \InvalidArgumentException The name parameter must be of type string.
+     * @return mixed
      * @throws DependencyException       Error while resolving the entry.
      * @throws \DI\NotFoundException         No entry or class found for the given name.
-     * @return mixed
+     * @throws \InvalidArgumentException The name parameter must be of type string.
      */
     public function make($name, array $parameters = null)
     {

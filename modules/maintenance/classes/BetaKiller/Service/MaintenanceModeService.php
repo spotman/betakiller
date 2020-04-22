@@ -141,6 +141,6 @@ final class MaintenanceModeService
         ]);
 
         // Store file in a /tmp with prefix from project name and env
-        return $this->appEnv->getTempPath().\DIRECTORY_SEPARATOR.$name;
+        return $this->appEnv->getTempPath($name);
     }
 }

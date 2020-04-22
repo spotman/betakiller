@@ -108,6 +108,16 @@ interface AppEnvInterface
     public function getAppRootPath(): string;
 
     /**
+     * Returns full path for filesystem cache purpose
+     * Appends provided target to the path
+     *
+     * @param string $target
+     *
+     * @return string
+     */
+    public function getCachePath(string $target): string;
+
+    /**
      * Returns path marked as document root in web-server config
      *
      * @return string
@@ -127,21 +137,25 @@ interface AppEnvInterface
     public function isCoreRunning(): bool;
 
     /**
-     * Returns absolute path to the global temp directory (must be readable/writable between requests)
+     * Returns absolute path to a file inside the project`s temp directory
+     * (must be readable/writable between requests)
      *
      * @see https://serverfault.com/a/615054
+     *
+     * @param string $target
+     *
      * @return string
      */
-    public function getTempPath(): string;
+    public function getTempPath(string $target): string;
 
     /**
      * Returns path to directory used as a permanent storage
      *
-     * @param string|null $add Relative path to add
+     * @param string $target
      *
      * @return string
      */
-    public function getStoragePath(string $add = null): string;
+    public function getStoragePath(string $target): string;
 
     /**
      * Returns email which will receive all emails in debug mode

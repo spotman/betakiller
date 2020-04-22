@@ -275,34 +275,57 @@ class AppEnv implements AppEnvInterface
      * Returns absolute path to the global temp directory (must be readable/writable between requests)
      *
      * @see https://serverfault.com/a/615054
+     *
+     * @param string $target
+     *
      * @return string
      */
-    public function getTempPath(): string
+    public function getTempPath(string $target): string
     {
-        return \sys_get_temp_dir();
+        $path = implode(\DIRECTORY_SEPARATOR, [
+            \sys_get_temp_dir(),
+            'app',
+            $this->getModeName(),
+            $target,
+        ]);
+
+        $this->checkFileDirectoryExists($path);
+
+        return $path;
     }
 
     /**
      * Returns path to directory used as a permanent storage
      *
-     * @param string|null $add Relative path to add
+     * @param string $target Relative path to add
      *
      * @return string
      */
-    public function getStoragePath(string $add = null): string
+    public function getStoragePath(string $target): string
     {
-        $path = $this->getAppRootPath().\DIRECTORY_SEPARATOR.'storage';
+        $path = implode(\DIRECTORY_SEPARATOR, [
+            $this->getAppRootPath(),
+            'storage',
+            $target,
+        ]);
 
-        if ($add) {
-            $path .= \DIRECTORY_SEPARATOR.$add;
+        $this->checkFileDirectoryExists($path);
 
-            // Get base directory
-            $dir = \dirname($path);
+        return $path;
+    }
 
-            if (!file_exists($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $dir));
-            }
-        }
+    /**
+     * @inheritDoc
+     */
+    public function getCachePath(string $target): string
+    {
+        $path = implode(\DIRECTORY_SEPARATOR, [
+            $this->getAppRootPath(),
+            'storage',
+            $target,
+        ]);
+
+        $this->checkFileDirectoryExists($path);
 
         return $path;
     }
@@ -325,5 +348,15 @@ class AppEnv implements AppEnvInterface
     public function isInternalWebServer(): bool
     {
         return PHP_SAPI === 'cli-server';
+    }
+
+    private function checkFileDirectoryExists(string $filePath): void
+    {
+        // Get base directory
+        $dir = \dirname($filePath);
+
+        if (!file_exists($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $dir));
+        }
     }
 }

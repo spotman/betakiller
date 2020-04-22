@@ -64,8 +64,8 @@ abstract class AbstractTask extends Minion_Task
                 $fileNameArray[] = $optionName.'-'.$optionValue;
             }
 
-            $logFileName = implode('.', $fileNameArray).'.log';
-            $logPath = implode('/', [$appEnv->getTempPath(), $logFileName]);
+            $logFile = implode('.', $fileNameArray).'.log';
+            $logPath = $appEnv->getTempPath($logFile);
 
             // Redirect all output to log file (logger is still usable)
             $cmd .= " >> $logPath 2>&1";

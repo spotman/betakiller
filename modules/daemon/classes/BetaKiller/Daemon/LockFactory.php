@@ -42,7 +42,7 @@ class LockFactory
             'daemon.lock',
         ]);
 
-        $lock = new Lock($this->appEnv->getTempPath().\DIRECTORY_SEPARATOR.$fileName);
+        $lock = new Lock($this->appEnv->getTempPath($fileName));
         $lock->setLogger($this->logger);
 
         return $lock;
