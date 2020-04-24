@@ -45,7 +45,7 @@ class TextHelper
         $value = \preg_replace(
             [
                 // Replace whitespaces with underscore
-                '/[\s-\/]+/',
+                '/[\s\-\/]+/',
                 // Keep only alpha and underscore symbols
                 '/[^a-z0-9_]+/',
             ],
