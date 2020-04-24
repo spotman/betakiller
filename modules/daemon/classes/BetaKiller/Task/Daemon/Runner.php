@@ -11,6 +11,7 @@ use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Database;
 use Psr\Log\LoggerInterface;
+use React\EventLoop\Factory;
 
 class Runner extends AbstractTask
 {
@@ -119,7 +120,7 @@ class Runner extends AbstractTask
             ]);
         }
 
-        $this->loop = \React\EventLoop\Factory::create();
+        $this->loop = Factory::create();
 
         if (\gc_enabled()) {
             // Force GC to be called periodically
@@ -151,7 +152,7 @@ class Runner extends AbstractTask
         try {
             $this->daemon = $this->daemonFactory->create($this->codename);
 
-            $this->daemon->start($this->loop);
+            $this->daemon->startDaemon($this->loop);
 
             $this->logger->debug('Daemon ":name" is started', [
                 ':name' => $this->codename,
@@ -187,7 +188,7 @@ class Runner extends AbstractTask
         });
 
         try {
-            $this->daemon->stop();
+            $this->daemon->stopDaemon($this->loop);
 
             $this->loop->cancelTimer($timeoutTimer);
 

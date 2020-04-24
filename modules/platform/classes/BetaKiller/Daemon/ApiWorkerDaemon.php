@@ -19,6 +19,7 @@ use stdClass;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
 use Thruway\ClientSession;
+use Thruway\Logging\Logger;
 
 class ApiWorkerDaemon implements DaemonInterface
 {
@@ -89,14 +90,14 @@ class ApiWorkerDaemon implements DaemonInterface
         $this->logger           = $logger;
     }
 
-    public function start(LoopInterface $loop): void
+    public function startDaemon(LoopInterface $loop): void
     {
-        \Thruway\Logging\Logger::set($this->logger);
+        Logger::set($this->logger);
 
         // Restart every 24h coz of annoying memory leak
         $loop->addTimer(60 * 1440, function () use ($loop) {
             $this->logger->info('Stopping API worker to prevent memory leaks');
-            $this->stop();
+            $this->stopDaemon($loop);
             $loop->stop();
         });
 
@@ -107,8 +108,8 @@ class ApiWorkerDaemon implements DaemonInterface
             // For processing external API requests in 'external' realm (public clients)
             $this->clientBuilder->publicRealm()->create($loop),
 
-            // For processing internal API requests in 'internal' realm (workers, checkers, etc)
-            $this->clientBuilder->internalRealm()->create($loop),
+//            // For processing internal API requests in 'internal' realm (workers, checkers, etc)
+//            $this->clientBuilder->internalRealm()->create($loop),
         ];
 
 //        $this->clientHelper->bindSessionHandlers($loop);
@@ -117,16 +118,22 @@ class ApiWorkerDaemon implements DaemonInterface
         foreach ($this->wampClients as $wampClient) {
             $wampClient->on('open', function (ClientSession $session) {
                 // Register API handler
-                $session->register('api', [$this, 'apiCallProcedure'], [
-                    'disclose_caller' => true,
-                ]);
+                $session->register(
+                    'api',
+                    function () {
+                        return $this->apiCallProcedure(...\func_get_args());
+                    },
+                    [
+                        'disclose_caller' => true,
+                    ]
+                );
             });
 
             $wampClient->start(false);
         }
     }
 
-    public function stop(): void
+    public function stopDaemon(LoopInterface $loop): void
     {
         // Stop clients and disconnect
         foreach ($this->wampClients as $wampClient) {
@@ -134,7 +141,7 @@ class ApiWorkerDaemon implements DaemonInterface
         }
     }
 
-    public function apiCallProcedure(array $indexedArgs, stdClass $namedArgs)
+    private function apiCallProcedure(array $indexedArgs, stdClass $namedArgs)
     {
         $user = null;
 
@@ -154,7 +161,7 @@ class ApiWorkerDaemon implements DaemonInterface
             $arguments = (array)$arrayArgs[self::KEY_API_DATA];
 
             $this->logger->debug('User is ":name"', [':name' => $user->getID()]);
-            $this->logger->debug('Resource/method are :resource->:method', [
+            $this->logger->debug('Resource/method are :resource.:method', [
                 ':resource' => $resource,
                 ':method'   => $method,
             ]);

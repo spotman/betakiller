@@ -122,6 +122,10 @@ class WampClientBuilder
         return $this;
     }
 
+    /**
+     * @return $this
+     * @deprecated
+     */
     public function internalRealm(): WampClientBuilder
     {
         // Get internal realm

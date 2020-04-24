@@ -3,30 +3,41 @@ declare(strict_types=1);
 
 namespace BetaKiller\MessageBus;
 
-use BetaKiller\Exception;
 use BetaKiller\Helper\LoggerHelper;
 use Psr\Log\LoggerInterface;
 
 class EventBus extends AbstractMessageBus implements EventBusInterface
 {
     /**
-     * @var \BetaKiller\MessageBus\ExternalEventTransportInterface
+     * @var \BetaKiller\MessageBus\BoundedEventTransportInterface
      */
-    private $transport;
+    private BoundedEventTransportInterface $boundedTransport;
+
+    /**
+     * @var \BetaKiller\MessageBus\OutboundEventTransportInterface
+     */
+    private OutboundEventTransportInterface $outboundTransport;
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private LoggerInterface $logger;
 
     /**
      * EventBus constructor.
      *
-     * @param \BetaKiller\MessageBus\ExternalEventTransportInterface $transport
+     * @param \BetaKiller\MessageBus\BoundedEventTransportInterface  $boundedTransport
+     * @param \BetaKiller\MessageBus\OutboundEventTransportInterface $outboundTransport
      * @param \Psr\Log\LoggerInterface                               $logger
      */
     public function __construct(
-        ExternalEventTransportInterface $transport,
+        BoundedEventTransportInterface $boundedTransport,
+        OutboundEventTransportInterface $outboundTransport,
         LoggerInterface $logger
     ) {
-        parent::__construct($logger);
-
-        $this->transport = $transport;
+        $this->boundedTransport  = $boundedTransport;
+        $this->outboundTransport = $outboundTransport;
+        $this->logger            = $logger;
     }
 
     /**
@@ -36,36 +47,18 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
      */
     public function emit(EventMessageInterface $message): void
     {
-        switch (true) {
-            case $message instanceof OutboundEventMessageInterface:
-                $this->transport->emitOutbound($message);
-                break;
+        // Local processing
+        $this->handle($message);
 
-            case $message instanceof BoundedEventMessageInterface:
-                $this->transport->emitBounded($message);
-                break;
-
-            default:
-                $this->handle($message);
-        }
-    }
-
-    /**
-     * @param string   $messageClassName
-     * @param callable $handler
-     *
-     * @throws \BetaKiller\MessageBus\MessageBusException
-     */
-    public function on(string $messageClassName, callable $handler): void
-    {
-        if (is_a($messageClassName, ExternalEventMessageInterface::class, true)) {
-            throw new Exception('External event :name must be listened on external message queue', [
-                ':name' => $messageClassName
-            ]);
+        // Process event inside of ESB
+        if ($message instanceof BoundedEventMessageInterface) {
+            $this->boundedTransport->publishBounded($message);
         }
 
-        // Listen on internal events bus
-        parent::on($messageClassName, $handler);
+        // Forward event to other contexts
+        if ($message instanceof OutboundEventMessageInterface) {
+            $this->outboundTransport->publishOutbound($message);
+        }
     }
 
     protected function getMessageHandlersLimit(): int

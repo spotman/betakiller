@@ -25,6 +25,11 @@ class CommandBus extends AbstractMessageBus implements CommandBusInterface
     private $queue;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
      * CommandBus constructor.
      *
      * @param \Interop\Queue\Context   $context
@@ -32,10 +37,9 @@ class CommandBus extends AbstractMessageBus implements CommandBusInterface
      */
     public function __construct(Context $context, LoggerInterface $logger)
     {
-        parent::__construct($logger);
-
         $this->queueContext = $context;
         $this->queue        = $this->queueContext->createQueue(CommandBusWorkerDaemon::QUEUE_NAME);
+        $this->logger = $logger;
     }
 
     /**

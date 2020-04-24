@@ -10,7 +10,13 @@ interface DaemonInterface
     public const NAMESPACES = ['Daemon'];
     public const SUFFIX     = 'Daemon';
 
-    public function start(LoopInterface $loop): void;
+    /**
+     * @param \React\EventLoop\LoopInterface $loop
+     */
+    public function startDaemon(LoopInterface $loop): void;
 
-    public function stop(): void;
+    /**
+     * @param \React\EventLoop\LoopInterface $loop
+     */
+    public function stopDaemon(LoopInterface $loop): void;
 }

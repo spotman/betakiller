@@ -10,7 +10,7 @@ class DebugStopDelayDaemon implements DaemonInterface
 {
     public const CODENAME = 'DebugStopDelay';
 
-    public function start(LoopInterface $loop): void
+    public function startDaemon(LoopInterface $loop): void
     {
         // Test start
         echo 'Starting DebugStopDelay daemon...';
@@ -18,7 +18,7 @@ class DebugStopDelayDaemon implements DaemonInterface
         echo 'OK'.\PHP_EOL;
     }
 
-    public function stop(): void
+    public function stopDaemon(LoopInterface $loop): void
     {
         // Test stop
         echo 'Delaying daemon stop (timeout guard check)';

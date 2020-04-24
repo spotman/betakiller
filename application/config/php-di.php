@@ -9,12 +9,14 @@ use BetaKiller\Assets\StaticAssets;
 use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\ConfigProviderInterface;
-use BetaKiller\Event\EsbExternalEventTransport;
+use BetaKiller\MessageBus\BoundedEventTransportInterface;
 use BetaKiller\MessageBus\CommandBus;
 use BetaKiller\MessageBus\CommandBusInterface;
+use BetaKiller\MessageBus\EsbBoundedEventTransport;
 use BetaKiller\MessageBus\EventBus;
 use BetaKiller\MessageBus\EventBusInterface;
-use BetaKiller\MessageBus\ExternalEventTransportInterface;
+use BetaKiller\MessageBus\OutboundEventTransportInterface;
+use BetaKiller\MessageBus\EsbOutboundEventTransport;
 use BetaKiller\Notification\MessageRenderer;
 use BetaKiller\Notification\MessageRendererInterface;
 use BetaKiller\View\LayoutViewInterface;
@@ -84,7 +86,8 @@ return [
             throw new LogicException('DI injection of class StaticAssets is deprecated');
         }),
 
-        ExternalEventTransportInterface::class => DI\autowire(EsbExternalEventTransport::class),
+        BoundedEventTransportInterface::class  => DI\autowire(EsbBoundedEventTransport::class),
+        OutboundEventTransportInterface::class => DI\autowire(EsbOutboundEventTransport::class),
 
         EventBusInterface::class   => DI\factory(static function (
             ContainerInterface $container,

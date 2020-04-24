@@ -52,7 +52,7 @@ class WampRouterDaemon implements DaemonInterface
         $this->logger     = $logger;
     }
 
-    public function start(LoopInterface $loop): void
+    public function startDaemon(LoopInterface $loop): void
     {
         \Thruway\Logging\Logger::set($this->logger);
 
@@ -82,7 +82,7 @@ class WampRouterDaemon implements DaemonInterface
         // Restart every 24h coz of annoying memory leak
         $loop->addTimer(60 * 1440, function () use ($loop) {
             $this->logger->info('Stopping router to prevent memory leaks');
-            $this->stop();
+            $this->stopDaemon($loop);
             $loop->stop();
         });
 
@@ -90,7 +90,7 @@ class WampRouterDaemon implements DaemonInterface
         $this->router->start(false);
     }
 
-    public function stop(): void
+    public function stopDaemon(LoopInterface $loop): void
     {
         $this->router->stop(true);
     }

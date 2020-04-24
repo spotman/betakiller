@@ -7,28 +7,39 @@ use BetaKiller\IdentityConverterInterface;
 use BetaKiller\MessageBus\OutboundEventMessageInterface;
 use BetaKiller\Model\AbstractEntityInterface;
 
-class EntityChangedEvent implements OutboundEventMessageInterface
+final class EntityChangedEvent implements OutboundEventMessageInterface
 {
     /**
      * @var string
      */
-    private $name;
+    private string $name;
 
     /**
      * @var string
      */
-    private $id;
+    private string $id;
+
+    /**
+     * @var int
+     */
+    private int $ts;
+
+    public static function fromEntity(AbstractEntityInterface $entity, IdentityConverterInterface $converter): self
+    {
+        return new self($entity::getModelName(), $converter->encode($entity));
+    }
 
     /**
      * EntityChangedEvent constructor.
      *
-     * @param \BetaKiller\Model\AbstractEntityInterface $entity
-     * @param \BetaKiller\IdentityConverterInterface    $converter
+     * @param string $name
+     * @param string $id
      */
-    public function __construct(AbstractEntityInterface $entity, IdentityConverterInterface $converter)
+    public function __construct(string $name, string $id)
     {
-        $this->name = $entity::getModelName();
-        $this->id   = $converter->encode($entity);
+        $this->name = $name;
+        $this->id   = $id;
+        $this->ts   = \time();
     }
 
     /**
@@ -51,6 +62,8 @@ class EntityChangedEvent implements OutboundEventMessageInterface
      */
     public function getOutboundData(): ?array
     {
-        return null;
+        return [
+            'ts' => $this->ts,
+        ];
     }
 }

@@ -10,7 +10,7 @@ class DebugFailingDaemon implements DaemonInterface
 {
     public const CODENAME = 'DebugFailing';
 
-    public function start(LoopInterface $loop): void
+    public function startDaemon(LoopInterface $loop): void
     {
         // Test start
         echo 'Starting DebugFailing daemon...';
@@ -20,7 +20,7 @@ class DebugFailingDaemon implements DaemonInterface
         throw new TaskException('Failing daemon was obviously failed');
     }
 
-    public function stop(): void
+    public function stopDaemon(LoopInterface $loop): void
     {
         // Test stop
         echo 'Stopping DebugFailing daemon...';

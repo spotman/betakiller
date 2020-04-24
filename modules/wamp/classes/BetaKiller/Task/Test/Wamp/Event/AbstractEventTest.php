@@ -46,21 +46,21 @@ abstract class AbstractEventTest extends AbstractTask
     public function defineOptions(): array
     {
         return [
-            'public' => false,
-            'topic'  => null,
+//            'public' => false,
+            'topic' => null,
         ];
     }
 
     public function run(): void
     {
         $topicName = $this->getOption('topic', false) ?: 'test.event';
-        $isPublic  = $this->getOption('public', false) !== false;
+//        $isPublic  = $this->getOption('public', false) !== false;
 
-        if ($isPublic) {
-            $this->clientBuilder->publicRealm();
-        } else {
-            $this->clientBuilder->internalRealm();
-        }
+//        if ($isPublic) {
+        $this->clientBuilder->publicRealm();
+//        } else {
+//            $this->clientBuilder->internalRealm();
+//        }
 
         $client = $this->clientBuilder->internalAuth()->internalConnection()->create();
 

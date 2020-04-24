@@ -1,24 +1,12 @@
 <?php
 namespace BetaKiller\MessageBus;
 
-use Psr\Log\LoggerInterface;
-
 abstract class AbstractMessageBus implements AbstractMessageBusInterface
 {
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
     /**
      * @var callable[][]
      */
     private $bindings = [];
-
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
 
     /**
      * @return int

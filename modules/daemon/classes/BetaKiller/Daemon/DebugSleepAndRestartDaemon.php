@@ -9,7 +9,7 @@ class DebugSleepAndRestartDaemon implements DaemonInterface
 {
     public const CODENAME = 'DebugSleepAndRestart';
 
-    public function start(LoopInterface $loop): void
+    public function startDaemon(LoopInterface $loop): void
     {
         // Test start
         echo 'Starting Sleep daemon...';
@@ -20,7 +20,7 @@ class DebugSleepAndRestartDaemon implements DaemonInterface
         throw new ShutdownDaemonException;
     }
 
-    public function stop(): void
+    public function stopDaemon(LoopInterface $loop): void
     {
         // Test stop
         echo 'Stopping Sleep daemon...';

@@ -3,9 +3,15 @@ declare(strict_types=1);
 
 namespace BetaKiller\Notification;
 
-use BetaKiller\MessageBus\EventMessageInterface;
+use BetaKiller\MessageBus\BoundedEventMessageInterface;
 
-interface DismissDirectOnEventMessageInterface extends EventMessageInterface
+/**
+ * Interface DismissDirectOnEventMessageInterface
+ * These events are going through ESB and are subject to dismiss notification
+ *
+ * @package BetaKiller\Notification
+ */
+interface DismissDirectOnEventMessageInterface extends BoundedEventMessageInterface
 {
     public function getDismissibleTarget(): MessageTargetInterface;
 }

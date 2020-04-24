@@ -73,7 +73,7 @@ class CommandBusWorkerDaemon implements DaemonInterface
         $this->container    = $container;
     }
 
-    public function start(LoopInterface $loop): void
+    public function startDaemon(LoopInterface $loop): void
     {
         // Load all commands from config
         foreach ((array)$this->config->load(['commands']) as $commandClass => $handlerClass) {
@@ -114,7 +114,7 @@ class CommandBusWorkerDaemon implements DaemonInterface
         });
     }
 
-    public function stop(): void
+    public function stopDaemon(LoopInterface $loop): void
     {
         $this->queueContext->close();
     }

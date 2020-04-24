@@ -100,7 +100,7 @@ class SupervisorDaemon implements DaemonInterface
         $this->fsWatcher   = $fsWatcher;
     }
 
-    public function start(LoopInterface $loop): void
+    public function startDaemon(LoopInterface $loop): void
     {
         $this->loop    = $loop;
         $this->isHuman = $this->appEnv->isHuman();
@@ -124,7 +124,7 @@ class SupervisorDaemon implements DaemonInterface
         }
 
         foreach ($this->getDefinedDaemons() as $codename) {
-            $this->startDaemon($codename, true);
+            $this->startSupervisedDaemon($codename, true);
         }
 
         $this->isRunning = true;
@@ -157,7 +157,7 @@ class SupervisorDaemon implements DaemonInterface
         ]);
 
         // Restart finished task
-        $this->startDaemon($name);
+        $this->startSupervisedDaemon($name);
     }
 
     private function processFailedTask(string $name): void
@@ -186,15 +186,15 @@ class SupervisorDaemon implements DaemonInterface
 
         // Warning for developers
         $this->logger->warning('Daemon ":name" had failed and will be restarted immediately', [
-            ':name'  => $name,
+            ':name' => $name,
 //            ':times' => $this->failureCounter[$name],
         ]);
 
         // Restart failed task
-        $this->startDaemon($name);
+        $this->startSupervisedDaemon($name);
     }
 
-    public function restartStopped(): void
+    private function restartStopped(): void
     {
         if ($this->isStoppingDaemons) {
             return;
@@ -202,7 +202,7 @@ class SupervisorDaemon implements DaemonInterface
 
         // Trying to restart failed daemons
         foreach ($this->filterStatus(self::STATUS_STOPPED) as $name) {
-            $this->startDaemon($name, true);
+            $this->startSupervisedDaemon($name, true);
         }
     }
 
@@ -218,7 +218,7 @@ class SupervisorDaemon implements DaemonInterface
 
         // Trying to restart failed daemons
         foreach ($this->filterStatus(self::STATUS_RUNNING) as $name) {
-            $this->stopDaemon($name);
+            $this->stopSupervisedDaemon($name);
         }
 
         $this->logger->info('All daemons are stopped');
@@ -226,7 +226,7 @@ class SupervisorDaemon implements DaemonInterface
         $this->isStoppingDaemons = false;
     }
 
-    public function stop(): void
+    public function stopDaemon(LoopInterface $loop): void
     {
         // Prevent auto-restart
         $this->isRunning = false;
@@ -241,7 +241,7 @@ class SupervisorDaemon implements DaemonInterface
         $this->logger->info('Supervisor is shutting down');
     }
 
-    private function startDaemon(string $name, bool $clearCounter = null): void
+    private function startSupervisedDaemon(string $name, bool $clearCounter = null): void
     {
         $this->setStatus($name, self::STATUS_STARTING);
 
@@ -310,7 +310,7 @@ class SupervisorDaemon implements DaemonInterface
         $this->setProcess($name, $process);
     }
 
-    private function stopDaemon(string $name): void
+    private function stopSupervisedDaemon(string $name): void
     {
         $this->logger->debug('Stopping ":name" daemon', [
             ':name' => $name,

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Daemon;
 
 use BetaKiller\Helper\LoggerHelper;
-use BetaKiller\MessageBus\EventBusInterface;
+use BetaKiller\MessageBus\BoundedEventTransportInterface;
 use BetaKiller\MessageBus\EventMessageInterface;
 use BetaKiller\Notification\DismissBroadcastOnEventMessageInterface;
 use BetaKiller\Notification\DismissDirectOnEventMessageInterface;
@@ -42,43 +42,40 @@ class NotificationWorkerDaemon implements DaemonInterface
     private $logger;
 
     /**
-     * @var \BetaKiller\MessageBus\EventBusInterface
+     * @var \BetaKiller\MessageBus\BoundedEventTransportInterface
      */
-    private $eventBus;
+    private BoundedEventTransportInterface $eventTransport;
 
     /**
      * NotificationWorkerDaemon constructor.
      *
-     * @param \Interop\Queue\Context                      $context
-     * @param \BetaKiller\Notification\MessageSerializer  $serializer
-     * @param \BetaKiller\Notification\NotificationFacade $notification
-     * @param \BetaKiller\MessageBus\EventBusInterface    $eventBus
-     * @param \Psr\Log\LoggerInterface                    $logger
+     * @param \Interop\Queue\Context                                $context
+     * @param \BetaKiller\MessageBus\BoundedEventTransportInterface $eventTransport
+     * @param \BetaKiller\Notification\MessageSerializer            $serializer
+     * @param \BetaKiller\Notification\NotificationFacade           $notification
+     * @param \Psr\Log\LoggerInterface                              $logger
      */
     public function __construct(
         Context $context,
+        BoundedEventTransportInterface $eventTransport,
         MessageSerializer $serializer,
         NotificationFacade $notification,
-        EventBusInterface $eventBus,
         LoggerInterface $logger
     ) {
-        $this->context      = $context;
-        $this->serializer   = $serializer;
-        $this->notification = $notification;
-        $this->eventBus     = $eventBus;
-        $this->logger       = $logger;
+        $this->context        = $context;
+        $this->eventTransport = $eventTransport;
+        $this->serializer     = $serializer;
+        $this->notification   = $notification;
+        $this->logger         = $logger;
     }
 
-    public function start(LoopInterface $loop): void
+    public function startDaemon(LoopInterface $loop): void
     {
         $regularQueue  = $this->context->createQueue(NotificationFacade::QUEUE_NAME_REGULAR);
         $priorityQueue = $this->context->createQueue(NotificationFacade::QUEUE_NAME_PRIORITY);
 
         $regularConsumer  = $this->context->createConsumer($regularQueue);
         $priorityConsumer = $this->context->createConsumer($priorityQueue);
-
-        // TODO Deal with listening of bounded ESB events via eventBus->on()
-//        $this->listenForDismissibleEvents();
 
         $loop->addPeriodicTimer(0.5, function () use ($regularConsumer, $priorityConsumer) {
             // Process priority messages first
@@ -88,6 +85,8 @@ class NotificationWorkerDaemon implements DaemonInterface
 
             $this->processConsumer($regularConsumer);
         });
+
+        $this->subscribeForDismissibleEvents($loop);
     }
 
     private function processConsumer(Consumer $consumer): bool
@@ -128,7 +127,7 @@ class NotificationWorkerDaemon implements DaemonInterface
         }
     }
 
-    private function listenForDismissibleEvents(): void
+    private function subscribeForDismissibleEvents(LoopInterface $loop): void
     {
         // For each dismissible message
         foreach ($this->notification->getDismissibleMessages() as $messageCodename => $eventsNames) {
@@ -139,21 +138,23 @@ class NotificationWorkerDaemon implements DaemonInterface
                     ':message' => $messageCodename,
                 ]);
 
-                // Listen to provided event
-                $this->eventBus->on(
+                // Subscribe for provided event
+                $this->eventTransport->subscribeBounded(
                     $eventName,
-                    function (EventMessageInterface $event) use ($eventName, $messageCodename) {
-                        $this->onDismissibleEvent($event, $eventName, $messageCodename);
+                    function (EventMessageInterface $event) use ($messageCodename) {
+                        $this->onDismissibleEvent($event, $messageCodename);
                     }
                 );
             }
         }
+
+        $this->eventTransport->startConsuming($loop);
     }
 
-    private function onDismissibleEvent(EventMessageInterface $event, string $eventName, string $messageCodename): void
+    private function onDismissibleEvent(EventMessageInterface $event, string $messageCodename): void
     {
         $this->logger->debug('Dismissible event :event fired', [
-            ':event'   => $eventName,
+            ':event'   => \get_class($event),
             ':message' => $messageCodename,
         ]);
 
@@ -162,7 +163,7 @@ class NotificationWorkerDaemon implements DaemonInterface
             // Check event type
             if (!$event instanceof DismissBroadcastOnEventMessageInterface) {
                 throw new NotificationException('Event ":event" must implement :must to dismiss broadcast', [
-                    ':event' => $eventName,
+                    ':event' => \get_class($event),
                     ':must'  => DismissBroadcastOnEventMessageInterface::class,
                 ]);
             }
@@ -172,7 +173,7 @@ class NotificationWorkerDaemon implements DaemonInterface
             // Check event type
             if (!$event instanceof DismissDirectOnEventMessageInterface) {
                 throw new NotificationException('Event ":event" must implement :must to dismiss direct', [
-                    ':event' => $eventName,
+                    ':event' => \get_class($event),
                     ':must'  => DismissDirectOnEventMessageInterface::class,
                 ]);
             }
@@ -181,8 +182,10 @@ class NotificationWorkerDaemon implements DaemonInterface
         }
     }
 
-    public function stop(): void
+    public function stopDaemon(LoopInterface $loop): void
     {
         $this->context->close();
+
+        $this->eventTransport->stopConsuming($loop);
     }
 }

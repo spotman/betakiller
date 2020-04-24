@@ -11,6 +11,8 @@ use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\LoggerHelper;
+use BetaKiller\MessageBus\EventSerializerInterface;
+use BetaKiller\MessageBus\NativeEventSerializer;
 use BetaKiller\Middleware\CspReportBodyParamsStrategy;
 use BetaKiller\Notification\MessageActionUrlGeneratorInterface;
 use BetaKiller\NotificationMessageActionUrlGenerator;
@@ -210,11 +212,13 @@ return [
 
         MessageActionUrlGeneratorInterface::class => autowire(NotificationMessageActionUrlGenerator::class),
 
-        UuidFactoryInterface::class => autowire(UuidFactory::class),
+        UuidFactoryInterface::class              => autowire(UuidFactory::class),
 
         // Basic implementation
         UrlElementAccessResolverInterface::class => autowire(UrlElementAccessResolver::class),
         EntityPermissionResolverInterface::class => autowire(EntityPermissionResolver::class),
+
+        EventSerializerInterface::class => autowire(NativeEventSerializer::class),
     ],
 
 ];
