@@ -104,7 +104,9 @@ final class EsbOutboundEventTransport implements OutboundEventTransportInterface
      */
     public function stopConsuming(LoopInterface $loop): void
     {
-        $loop->cancelTimer($this->timer);
+        if ($this->timer) {
+            $loop->cancelTimer($this->timer);
+        }
 
         $this->timer = null;
     }
