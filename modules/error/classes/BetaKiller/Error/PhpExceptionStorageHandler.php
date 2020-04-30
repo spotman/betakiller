@@ -85,8 +85,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             return;
         }
 
-        $exception = $this->detectException($record);
-
         /** @var ServerRequestInterface|null $request */
         $request = $record['context'][LoggerHelper::CONTEXT_KEY_REQUEST] ?? null;
 
@@ -94,6 +92,8 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         $user = $record['context'][LoggerHelper::CONTEXT_KEY_USER] ?? null;
 
         try {
+            $exception = $this->detectException($record);
+
             $this->storeException($exception, $user, $request);
         } catch (Throwable $subsystemException) {
             // Prevent logging recursion

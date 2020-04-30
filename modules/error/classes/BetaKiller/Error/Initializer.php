@@ -3,10 +3,8 @@ namespace BetaKiller\Error;
 
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Log\FilterExceptionsHandler;
-use BetaKiller\Log\LazyLoadProxyHandler;
 use BetaKiller\Log\LoggerInterface;
 use BetaKiller\ModuleInitializerInterface;
-use Psr\Container\ContainerInterface;
 
 class Initializer implements ModuleInitializerInterface
 {
@@ -16,30 +14,30 @@ class Initializer implements ModuleInitializerInterface
     private $logger;
 
     /**
-     * @var \Psr\Container\ContainerInterface
-     */
-    private $container;
-
-    /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
 
     /**
+     * @var \BetaKiller\Error\PhpExceptionStorageHandler
+     */
+    private PhpExceptionStorageHandler $handler;
+
+    /**
      * Initializer constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
-     * @param \Psr\Container\ContainerInterface  $container
-     * @param \BetaKiller\Log\LoggerInterface    $logger
+     * @param \BetaKiller\Helper\AppEnvInterface           $appEnv
+     * @param \BetaKiller\Error\PhpExceptionStorageHandler $handler
+     * @param \BetaKiller\Log\LoggerInterface              $logger
      */
     public function __construct(
         AppEnvInterface $appEnv,
-        ContainerInterface $container,
+        PhpExceptionStorageHandler $handler,
         LoggerInterface $logger
     ) {
-        $this->logger    = $logger;
-        $this->container = $container;
-        $this->appEnv    = $appEnv;
+        $this->logger  = $logger;
+        $this->appEnv  = $appEnv;
+        $this->handler = $handler;
     }
 
     /**
@@ -64,14 +62,15 @@ class Initializer implements ModuleInitializerInterface
      */
     private function initPhpExceptionStorage(): void
     {
-        $factory = function () {
-            return $this->container->get(PhpExceptionStorageHandler::class);
-        };
+//        $factory = function () {
+//            return $this->container->get(PhpExceptionStorageHandler::class);
+//        };
 
         // PhpExceptionStorage handler
         $this->logger->pushHandler(
             new FilterExceptionsHandler(
-                new LazyLoadProxyHandler($factory, PhpExceptionStorageHandler::MIN_LEVEL)
+                $this->handler
+//                new LazyLoadProxyHandler($factory, PhpExceptionStorageHandler::MIN_LEVEL)
             )
         );
     }
