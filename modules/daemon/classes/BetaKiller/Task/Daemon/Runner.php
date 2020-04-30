@@ -190,15 +190,13 @@ class Runner extends AbstractTask
         try {
             $this->daemon->stopDaemon($this->loop);
 
-            $this->loop->cancelTimer($timeoutTimer);
-
             $this->logger->debug('Daemon ":name" was stopped', [
                 ':name' => $this->codename,
             ]);
         } catch (\Throwable $e) {
-            $this->loop->cancelTimer($timeoutTimer);
-
             $this->processException($e);
+        } finally {
+            $this->loop->cancelTimer($timeoutTimer);
         }
 
         // Simply exit with OK status and daemon would be restarted by supervisor
