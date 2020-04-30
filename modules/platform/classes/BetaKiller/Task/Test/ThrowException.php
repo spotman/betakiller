@@ -19,6 +19,11 @@ class ThrowException extends AbstractTask
     {
         $message = $this->getOption('message', false);
 
-        throw new ServerErrorHttpException( $message ?: 'Test CLI exceptions handling');
+        $this->throwException($message ?: 'Test CLI exceptions handling');
+    }
+
+    private function throwException(string $message): void
+    {
+        throw new ServerErrorHttpException($message);
     }
 }
