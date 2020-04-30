@@ -17,7 +17,7 @@ use Spotman\Acl\AclUserInterface;
  * @method UserStateInterface getWorkflowState()
  */
 interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWorkflowStateInterface,
-    MessageTargetInterface, AclUserInterface
+    MessageTargetInterface, AclUserInterface, EntityWithAclSpecInterface
 {
     public function completeLogin(): void;
 
