@@ -76,6 +76,17 @@ final class ForceLoginAction extends AbstractAction
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $session   = ServerRequestHelper::getSession($request);
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+
+        // Logout first and redirect to the same action to reset session
+        if (!ServerRequestHelper::isGuest($request)) {
+            // Force logout before login
+            $this->auth->logout($session);
+
+            return ResponseHelper::redirect($urlHelper->makeCodenameUrl(self::codename()));
+        }
+
         // Fetch User name from request URL (no direct User model binding via ID coz ID is obfuscated in stage)
         $userName = ServerRequestHelper::getParameter($request, UserNameUrlParameter::class);
 
@@ -83,13 +94,6 @@ final class ForceLoginAction extends AbstractAction
 
         if (!$user) {
             throw new IncorrectCredentialsException;
-        }
-
-        $session = ServerRequestHelper::getSession($request);
-
-        if (!ServerRequestHelper::isGuest($request)) {
-            // Force logout before login
-            $this->auth->logout($session);
         }
 
         $this->auth->login($session, $user);
