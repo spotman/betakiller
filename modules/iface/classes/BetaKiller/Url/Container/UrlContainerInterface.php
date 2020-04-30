@@ -86,6 +86,13 @@ interface UrlContainerInterface
     public function hasParameterInstance(UrlParameterInterface $instance): bool;
 
     /**
+     * @param string $className
+     *
+     * @return bool
+     */
+    public function hasParameterWithClassName(string $className): bool;
+
+    /**
      * @param \BetaKiller\Url\Parameter\UrlParameterInterface $param
      * @param string                                          $key
      *

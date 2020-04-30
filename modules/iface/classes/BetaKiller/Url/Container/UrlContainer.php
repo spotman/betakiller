@@ -210,6 +210,14 @@ class UrlContainer implements UrlContainerInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function hasParameterWithClassName(string $className): bool
+    {
+        return (bool)$this->findParameterByClassName($className, UrlParameterInterface::class);
+    }
+
+    /**
      * @param \BetaKiller\Url\Parameter\UrlParameterInterface $instance
      *
      * @return bool
