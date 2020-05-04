@@ -39,7 +39,7 @@ class WampEsbBridgeDaemon implements DaemonInterface
     /**
      * @var ClientSession|null
      */
-    private ?ClientSession $clientSession;
+    private ?ClientSession $clientSession = null;
 
     /**
      * @var \BetaKiller\MessageBus\OutboundEventTransportInterface
@@ -77,6 +77,11 @@ class WampEsbBridgeDaemon implements DaemonInterface
             $loop->stop();
         });
 
+        // Bind ESB event listener
+        $this->transport->subscribeAnyOutbound(function (OutboundEventMessageInterface $event) {
+            return $this->forwardEvent($event);
+        });
+
         // Use internal auth and connection coz it is an internal worker
         $this->clientBuilder->internalConnection()->internalAuth();
 
@@ -85,7 +90,7 @@ class WampEsbBridgeDaemon implements DaemonInterface
 //        $this->clientHelper->bindSessionHandlers($loop);
 
         // Register new session
-        $this->wampClient->on('open', function (ClientSession $session) {
+        $this->wampClient->on('open', function (ClientSession $session) use ($loop) {
             // Store session for future use
             $this->clientSession = $session;
 
@@ -93,21 +98,18 @@ class WampEsbBridgeDaemon implements DaemonInterface
                 ':id'    => $session->getSessionId(),
                 ':realm' => $session->getRealm(),
             ]);
+
+            $this->transport->startConsuming($loop);
         });
 
-        // Remove unused session
-        $this->wampClient->onSessionClose(function () {
+        // Remove stale session
+        $this->wampClient->on('close', function () use ($loop) {
+            $this->transport->stopConsuming($loop);
+
             $this->clientSession = null;
         });
 
         $this->wampClient->start(false);
-
-        // Bind ESB event listener
-        $this->transport->subscribeAnyOutbound(function (OutboundEventMessageInterface $event) {
-            return $this->forwardEvent($event);
-        });
-
-        $this->transport->startConsuming($loop);
 
         $loop->run();
     }
