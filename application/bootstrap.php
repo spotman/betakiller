@@ -19,7 +19,7 @@ if (is_file(APPPATH.'classes/Kohana'.EXT)) {
  * @link http://kohanaframework.org/guide/using.configuration
  * @link http://www.php.net/manual/timezones
  */
-date_default_timezone_set('Europe/Moscow');
+date_default_timezone_set('UTC');
 
 /**
  * Set the default locale.
@@ -27,7 +27,7 @@ date_default_timezone_set('Europe/Moscow');
  * @link http://kohanaframework.org/guide/using.configuration
  * @link http://www.php.net/manual/function.setlocale
  */
-setlocale(LC_ALL, 'ru_RU.utf-8', 'ru');
+setlocale(LC_ALL, 'en_UK.UTF-8', 'en');
 
 /**
  * Enable the Kohana auto-loader.
