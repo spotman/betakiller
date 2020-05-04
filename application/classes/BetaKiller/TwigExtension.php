@@ -385,6 +385,16 @@ final class TwigExtension extends AbstractExtension
             ),
 
             new TwigFunction(
+                'is_guest',
+                function (array $context): bool {
+                    $request = $this->getRequest($context);
+
+                    return ServerRequestHelper::isGuest($request);
+                },
+                ['needs_context' => true]
+            ),
+
+            new TwigFunction(
                 'is_admin',
                 function (array $context): bool {
                     $request = $this->getRequest($context);
