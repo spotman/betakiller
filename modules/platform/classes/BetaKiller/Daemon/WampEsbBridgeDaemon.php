@@ -90,7 +90,7 @@ class WampEsbBridgeDaemon implements DaemonInterface
 //        $this->clientHelper->bindSessionHandlers($loop);
 
         // Register new session
-        $this->wampClient->on('open', function (ClientSession $session) use ($loop) {
+        $this->wampClient->onSessionOpen(function (ClientSession $session) use ($loop) {
             // Store session for future use
             $this->clientSession = $session;
 
@@ -103,7 +103,7 @@ class WampEsbBridgeDaemon implements DaemonInterface
         });
 
         // Remove stale session
-        $this->wampClient->on('close', function () use ($loop) {
+        $this->wampClient->onSessionClose(function () use ($loop) {
             $this->transport->stopConsuming($loop);
 
             $this->clientSession = null;

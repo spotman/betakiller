@@ -24,6 +24,11 @@ class WampClient extends \Thruway\Peer\Client
         }
     }
 
+    public function onSessionOpen(callable $callback): void
+    {
+        $this->on('open', $callback);
+    }
+
     public function onSessionClose(callable $callback): void
     {
         $this->onCloseHandlers[] = $callback;

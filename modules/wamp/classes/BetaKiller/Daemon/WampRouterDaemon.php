@@ -71,12 +71,12 @@ class WampRouterDaemon implements DaemonInterface
         $this->router->registerModule($authMgr);
 
         // External auth
-        $extAuth = new WampCraAuthProvider(['*']);
+        $extAuth = new WampCraAuthProvider(['*'], $loop);
         $extAuth->setUserDb($this->wampUserDb);
         $this->router->addInternalClient($extAuth);
 
         // Internal auth
-        $intAuth = new InternalAuthProviderClient(['*']);
+        $intAuth = new InternalAuthProviderClient(['*'], $loop);
         $this->router->addInternalClient($intAuth);
 
         // Restart every 24h coz of annoying memory leak
@@ -86,7 +86,7 @@ class WampRouterDaemon implements DaemonInterface
             $loop->stop();
         });
 
-        // Prepare to start (loop would be launched by the Run task)
+        // Prepare to start (loop would be launched by the Runner task)
         $this->router->start(false);
     }
 
