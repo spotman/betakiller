@@ -116,7 +116,7 @@ class ApiWorkerDaemon implements DaemonInterface
 
         // Bind events and start every client
         foreach ($this->wampClients as $wampClient) {
-            $wampClient->on('open', function (ClientSession $session) {
+            $wampClient->onSessionOpen(function (ClientSession $session) {
                 // Register API handler
                 $session->register(
                     'api',
