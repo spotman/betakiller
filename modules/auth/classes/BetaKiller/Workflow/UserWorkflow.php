@@ -6,6 +6,7 @@ namespace BetaKiller\Workflow;
 use BetaKiller\Event\UserBlockedEvent;
 use BetaKiller\Event\UserConfirmationEmailRequestedEvent;
 use BetaKiller\Event\UserEmailChangedEvent;
+use BetaKiller\Event\UserEmailConfirmedEvent;
 use BetaKiller\Event\UserResumedEvent;
 use BetaKiller\Event\UserSuspendedEvent;
 use BetaKiller\Event\UserUnlockedEvent;
@@ -72,6 +73,8 @@ final class UserWorkflow
         $this->state->doTransition($user, self::TRANSITION_EMAIL_CONFIRMED, $user);
 
         $this->userRepo->save($user);
+
+        $this->eventBus->emit(new UserEmailConfirmedEvent($user));
     }
 
     public function changeEmail(UserInterface $user, string $email): void
