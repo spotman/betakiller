@@ -7,8 +7,8 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class Debug extends Kohana_Debug
 {
-    private const CSP_SCRIPT = "'sha256-R2qmT032WZ40VlK6RCmpqrN1FA9gPQWSPRf20chwAo0='";
-    private const CSP_STYLE  = "'sha256-9rVpVA6gIB/WMJ0yNaDAuF8Wo0ScZQPhHQCQVIbsqWE='";
+    private const CSP_SCRIPT = "'sha256-hpWlm9GZYX03IbtbGSnSyCu7X5O09yaWXkWeH4uBsQY='";
+    private const CSP_STYLE  = "'sha256-5s3aYV/2O0uyfXhVtKm6S506HBIzJJCp7Mt/DQQlx8c='";
 
     /**
      * @var  array  PHP error code => human readable name
