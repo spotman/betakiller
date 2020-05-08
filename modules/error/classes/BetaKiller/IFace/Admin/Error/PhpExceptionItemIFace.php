@@ -53,11 +53,7 @@ class PhpExceptionItemIFace extends AbstractErrorAdminIFace
             $history[] = $this->getHistoricalRecordData($record);
         }
 
-        $paths = array_map(function ($path) {
-            return \Debug::path($path);
-        }, $model->getPaths());
-
-        \Debug::injectStackTraceCsp($request);
+//        \Debug::injectStackTraceCsp($request);
 
         $trace = $model->getTraceSize() > 0 ? $model->getTrace() : null;
 
@@ -65,7 +61,7 @@ class PhpExceptionItemIFace extends AbstractErrorAdminIFace
             'backUrl'    => $this->getBackIFaceUrl($model, $urlHelper),
             'hash'       => $model->getHash(),
             'urls'       => $model->getUrls(),
-            'paths'      => $paths,
+            'paths'      => $model->getPaths(),
             'modules'    => $model->getModules(),
             'message'    => $model->getMessage(),
             'lastSeenAt' => $model->getLastSeenAt()->format('d.m.Y H:i:s'),
