@@ -89,18 +89,18 @@ final class UserWorkflow
         $this->eventBus->emit(new UserEmailChangedEvent($user));
     }
 
-    public function block(UserInterface $user): void
+    public function block(UserInterface $user, UserInterface $adminUser): void
     {
-        $this->state->doTransition($user, self::TRANSITION_BLOCK, $user);
+        $this->state->doTransition($user, self::TRANSITION_BLOCK, $adminUser);
 
         $this->userRepo->save($user);
 
         $this->eventBus->emit(new UserBlockedEvent($user));
     }
 
-    public function unlock(UserInterface $user): void
+    public function unlock(UserInterface $user, UserInterface $adminUser): void
     {
-        $this->state->doTransition($user, self::TRANSITION_UNLOCK, $user);
+        $this->state->doTransition($user, self::TRANSITION_UNLOCK, $adminUser);
 
         $this->userRepo->save($user);
 
