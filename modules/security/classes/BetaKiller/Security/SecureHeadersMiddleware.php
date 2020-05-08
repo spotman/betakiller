@@ -6,7 +6,6 @@ namespace BetaKiller\Security;
 use Aidantwoods\SecureHeaders\Http\Psr7Adapter;
 use Aidantwoods\SecureHeaders\SecureHeaders;
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Helper\LoggerHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -37,11 +36,14 @@ class SecureHeadersMiddleware implements MiddlewareInterface
      * @param \BetaKiller\Security\SecurityConfigInterface $securityConfig
      * @param \Psr\Log\LoggerInterface                     $logger
      */
-    public function __construct(AppConfigInterface $appConfig, SecurityConfigInterface $securityConfig, LoggerInterface $logger)
-    {
+    public function __construct(
+        AppConfigInterface $appConfig,
+        SecurityConfigInterface $securityConfig,
+        LoggerInterface $logger
+    ) {
         $this->appConfig      = $appConfig;
         $this->securityConfig = $securityConfig;
-        $this->logger = $logger;
+        $this->logger         = $logger;
     }
 
     /**
@@ -60,17 +62,19 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         }
 
         $baseUri = $this->appConfig->getBaseUri();
-        $baseUrl = (string)$baseUri;
+//        $baseUrl = (string)$baseUri;
 
         $headers = new SecureHeaders();
 
         // Do not add headers
         $headers->auto(SecureHeaders::AUTO_ALL);
 
-        // Report URI first
-        $reportUri = (string)$baseUri->withPath(CspReportHandler::URL);
-        $headers->csp('report', $reportUri);
-        $headers->csp('report', $reportUri, true);
+        if ($this->securityConfig->isCspReportEnabled()) {
+            // Report URI first
+            $reportUri = (string)$baseUri->withPath(CspReportHandler::URL);
+            $headers->csp('report', $reportUri);
+            $headers->cspro('report', $reportUri);
+        }
 
         if ($this->securityConfig->isCspSafeModeEnabled()) {
             $headers->safeMode(true);
@@ -88,21 +92,14 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         // Enable/disable errors logging
         $headers->errorReporting($this->securityConfig->isErrorLogEnabled());
 
-        $headers->csp('default', $baseUrl);
-        $headers->csp('image', $baseUrl);
-        $headers->csp('style', $baseUrl);
-        $headers->csp('script', $baseUrl);
-        $headers->csp('font', $baseUrl);
-
-        // @see https://www.w3.org/TR/CSP3/#grammardef-report-sample
-        $headers->csp('script', "'report-sample'");
-        $headers->csp('style', "'report-sample'");
-        $headers->csp('font', "'report-sample'");
-        $headers->csp('image', "'report-sample'");
-        $headers->csp('connect', "'report-sample'");
-
-        $headers->csp('connect', $baseUrl);
-        $headers->csp('connect', 'wss://'.$baseUri->getHost()); // For secure Websocket
+//        $headers->csp('default', $baseUrl);
+//        $headers->csp('image', $baseUrl);
+//        $headers->csp('style', $baseUrl);
+//        $headers->csp('script', $baseUrl);
+//        $headers->csp('font', $baseUrl);
+//
+//        $headers->csp('connect', $baseUrl);
+//        $headers->csp('connect', 'wss://'.$baseUri->getHost());
 
         foreach ($this->securityConfig->getCspRules() as $ruleName => $ruleValues) {
             foreach ($ruleValues as $value) {
@@ -117,7 +114,7 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         }
 
         foreach ($this->securityConfig->getHeadersToAdd() as $headerName => $headerValue) {
-            if ($response->hasHeader($headerName)){
+            if ($response->hasHeader($headerName)) {
                 $this->logger->warning('Duplicate HTTP header ":name"', [
                     ':name' => $headerName,
                 ]);

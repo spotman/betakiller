@@ -8,6 +8,7 @@ use BetaKiller\Config\AbstractConfig;
 class SecurityConfig extends AbstractConfig implements SecurityConfigInterface
 {
     private const PATH_CSP_ENABLED   = ['csp', 'enabled'];
+    private const PATH_CSP_REPORT    = ['csp', 'report'];
     private const PATH_CSP_SAFE_MODE = ['csp', 'safe_mode'];
     private const PATH_CSP_ERRORS    = ['csp', 'errors'];
     private const PATH_CSP_RULES     = ['csp', 'rules'];
@@ -31,6 +32,15 @@ class SecurityConfig extends AbstractConfig implements SecurityConfigInterface
     public function isCspEnabled(): bool
     {
         return (bool)$this->get(self::PATH_CSP_ENABLED);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isCspReportEnabled(): bool
+    {
+        return (bool)$this->get(self::PATH_CSP_REPORT);
     }
 
     /**

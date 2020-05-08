@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 return [
     'csp' => [
+        'report'    => true,
         'safe_mode' => true,
         'errors'    => true,
 

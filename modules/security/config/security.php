@@ -4,6 +4,7 @@ declare(strict_types=1);
 return [
     'csp' => [
         'enabled'   => true,
+        'report'    => false,
         'safe_mode' => false,
         'errors'    => false,
         'rules'     => [],

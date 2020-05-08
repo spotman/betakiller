@@ -11,6 +11,13 @@ interface SecurityConfigInterface
     public function isCspEnabled(): bool;
 
     /**
+     * Enable reports about CSP violations
+     * 
+     * @return bool
+     */
+    public function isCspReportEnabled(): bool;
+
+    /**
      * @return bool
      */
     public function isCspSafeModeEnabled(): bool;
