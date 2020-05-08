@@ -82,9 +82,9 @@ class Logger implements LoggerInterface
 
             $monolog->pushHandler(new StdOutHandler($level, $isHuman));
 
-//            if (DesktopNotificationHandler::isSupported()) {
-//                $monolog->pushHandler(new FilterExceptionsHandler(new DesktopNotificationHandler));
-//            }
+            if (DesktopNotificationHandler::isSupported()) {
+                $monolog->pushHandler(new FilterExceptionsHandler(new DesktopNotificationHandler));
+            }
 
             $monolog->pushProcessor(new CliProcessor);
         } else {
