@@ -11,6 +11,7 @@
 
 {# For legacy UI #}
 {{ csp("style", "'unsafe-inline'") }}
+{{ csp("script", "'unsafe-inline'") }}
 
 {{ js("require.js/admin.config.js") }}
 {{ js("layouts/admin.js") }}
@@ -48,3 +49,5 @@
   {#<div class="col s12">no footer yet</div>#}
   {#</footer>#}
 </div>
+
+{% block before_end "" %}
