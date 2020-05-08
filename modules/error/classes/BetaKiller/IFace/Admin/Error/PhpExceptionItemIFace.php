@@ -53,6 +53,7 @@ class PhpExceptionItemIFace extends AbstractErrorAdminIFace
             $history[] = $this->getHistoricalRecordData($record);
         }
 
+        // Using unsafe-inline for the whole admin coz of DebugBar CSP issues
 //        \Debug::injectStackTraceCsp($request);
 
         $trace = $model->getTraceSize() > 0 ? $model->getTrace() : null;
