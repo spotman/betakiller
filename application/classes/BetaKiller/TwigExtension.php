@@ -3,6 +3,7 @@ namespace BetaKiller;
 
 use Aidantwoods\SecureHeaders\SecureHeaders;
 use BetaKiller\Assets\StaticAssets;
+use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
@@ -48,20 +49,28 @@ final class TwigExtension extends AbstractExtension
     private $identityConverter;
 
     /**
+     * @var \BetaKiller\Config\AppConfigInterface
+     */
+    private AppConfigInterface $appConfig;
+
+    /**
      * TwigExtension constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface     $appEnv
+     * @param \BetaKiller\Config\AppConfigInterface  $appConfig
      * @param \BetaKiller\Widget\WidgetFacade        $widgetFacade
      * @param \BetaKiller\IdentityConverterInterface $identityConverter
      * @param \Psr\Log\LoggerInterface               $logger
      */
     public function __construct(
         AppEnvInterface $appEnv,
+        AppConfigInterface $appConfig,
         WidgetFacade $widgetFacade,
         IdentityConverterInterface $identityConverter,
         LoggerInterface $logger
     ) {
         $this->appEnv            = $appEnv;
+        $this->appConfig         = $appConfig;
         $this->widgetFacade      = $widgetFacade;
         $this->logger            = $logger;
         $this->identityConverter = $identityConverter;
@@ -153,6 +162,20 @@ final class TwigExtension extends AbstractExtension
                     }
                 },
                 ['needs_context' => true]
+            ),
+
+            new TwigFunction(
+                'base_url',
+                function (): string {
+                    return (string)$this->appConfig->getBaseUri();
+                }
+            ),
+
+            new TwigFunction(
+                'base_host',
+                function (): string {
+                    return $this->appConfig->getBaseUri()->getHost();
+                }
             ),
 
             new TwigFunction(
