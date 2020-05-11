@@ -22,6 +22,7 @@ class SessionHelper
     public const ORIGIN_UUID  = 'origin_uuid';
     public const TOKEN_HASH   = 'token';
     public const ROLES_NAMES  = 'roles';
+    public const DEBUG        = 'debug';
 
     public static function transferData(SessionInterface $from, SessionInterface $to): void
     {
@@ -157,5 +158,20 @@ class SessionHelper
         if (!$tokenHash) {
             throw new AccessDeniedException('Session token is required for further processing');
         }
+    }
+
+    public static function enableDebug(SessionInterface $session): void
+    {
+        $session->set(self::DEBUG, true);
+    }
+
+    public static function disableDebug(SessionInterface $session): void
+    {
+        $session->set(self::DEBUG, false);
+    }
+
+    public static function isDebugEnabled(SessionInterface $session): bool
+    {
+        return (bool)$session->get(self::DEBUG);
     }
 }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+    <dummy uri="debug" name="DebugDummy" label="Session debug hooks" zone="developer" hideInSiteMap="true">
+        <action uri="enable" name="EnableDebug"/>
+        <action uri="disable" name="DisableDebug"/>
+    </dummy>
+</root>

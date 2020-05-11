@@ -16,7 +16,6 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Log\FilterExceptionsHandler;
 use BetaKiller\Log\LoggerInterface;
-use BetaKiller\Model\RoleInterface;
 use DebugBar\DataCollector\MemoryCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DebugBar;
@@ -106,9 +105,9 @@ class DebugMiddleware implements MiddlewareInterface
         // Fetch actual session
         $session = ServerRequestHelper::getSession($request);
 
-        // TODO Detect debug mode enabled for session
+        // Detect debug mode enabled for session
         // Do not fetch User here to allow lazy loading
-        if (SessionHelper::hasRoleName($session, RoleInterface::DEVELOPER)) {
+        if (SessionHelper::isDebugEnabled($session)) {
             $debugEnabled = true;
         }
 
