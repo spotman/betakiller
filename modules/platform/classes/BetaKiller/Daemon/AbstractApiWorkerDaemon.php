@@ -20,8 +20,9 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
 use Thruway\ClientSession;
 use Thruway\Logging\Logger;
+use Thruway\Registration;
 
-class ApiWorkerDaemon implements DaemonInterface
+abstract class AbstractApiWorkerDaemon implements DaemonInterface
 {
     public const CODENAME = 'ApiWorker';
 
@@ -125,6 +126,7 @@ class ApiWorkerDaemon implements DaemonInterface
                     },
                     [
                         'disclose_caller' => true,
+                        'invoke'          => Registration::ROUNDROBIN_REGISTRATION,
                     ]
                 );
             });
