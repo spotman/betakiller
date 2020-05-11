@@ -54,7 +54,7 @@ class WampClient extends \Thruway\Peer\Client
         $this->onSessionOpen(function (ClientSession $session) use ($loop) {
             $id = $session->getSessionId();
 
-            if ($this->pingTimers[$id]) {
+            if (isset($this->pingTimers[$id])) {
                 throw new Exception('WAMP session ":id" ping timer already set', [
                     ':id' => $id,
                 ]);
@@ -82,7 +82,7 @@ class WampClient extends \Thruway\Peer\Client
         $this->onSessionClose(function (ClientSession $session) {
             $id = $session->getSessionId();
 
-            if (!$this->pingTimers[$id]) {
+            if (!isset($this->pingTimers[$id])) {
                 throw new Exception('WAMP session ":id" ping timer is missing', [
                     ':id' => $id,
                 ]);
