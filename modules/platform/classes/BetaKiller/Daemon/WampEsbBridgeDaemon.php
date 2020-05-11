@@ -109,6 +109,9 @@ class WampEsbBridgeDaemon implements DaemonInterface
             $this->clientSession = null;
         });
 
+        // Keep alive
+        $this->wampClient->bindPingHandlers();
+
         $this->wampClient->start(false);
 
         $loop->run();
