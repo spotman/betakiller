@@ -143,7 +143,7 @@ abstract class AbstractApiWorkerDaemon implements DaemonInterface
         }
     }
 
-    private function apiCallProcedure(array $indexedArgs, stdClass $namedArgs)
+    private function apiCallProcedure(array $indexedArgs, stdClass $namedArgs): array
     {
         $user = null;
 
@@ -169,9 +169,11 @@ abstract class AbstractApiWorkerDaemon implements DaemonInterface
             ]);
             $this->logger->debug('Arguments are :value', [':value' => json_encode($arguments)]);
 
-            $result = $this->callApiMethod($resource, $method, $arguments, $user);
+            $result = $this->callApiMethod($resource, $method, $arguments, $user)->jsonSerialize();
 
-            $this->logger->debug('Executed in :time ms', [
+            $this->logger->debug(':resource.:method executed in :time ms', [
+                ':resource' => $resource,
+                ':method'   => $method,
                 ':time' => $t->stop()->getDuration(),
             ]);
         } catch (Throwable $e) {
