@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Wamp;
 
 use BetaKiller\Api\Method\WampTest\DataApiMethod;
-use BetaKiller\Daemon\ApiWorkerDaemon;
+use BetaKiller\Daemon\AbstractApiWorkerDaemon;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\SessionHelper;
@@ -134,9 +134,9 @@ class IsAlive extends AbstractTask
             $this->logger->debug('WAMP connection opened');
 
             $namedArgs = [
-                ApiWorkerDaemon::KEY_API_RESOURCE => 'WampTest',
-                ApiWorkerDaemon::KEY_API_METHOD   => 'data',
-                ApiWorkerDaemon::KEY_API_DATA     => [
+                AbstractApiWorkerDaemon::KEY_API_RESOURCE => 'WampTest',
+                AbstractApiWorkerDaemon::KEY_API_METHOD   => 'data',
+                AbstractApiWorkerDaemon::KEY_API_DATA     => [
                     DataApiMethod::ARG_CASE => DataApiMethod::CASE_STRING,
                 ],
             ];
@@ -159,7 +159,7 @@ class IsAlive extends AbstractTask
                 }
             });
 
-            $promise = $session->call(ApiWorkerDaemon::PROCEDURE_API, [], $namedArgs);
+            $promise = $session->call(AbstractApiWorkerDaemon::PROCEDURE_API, [], $namedArgs);
 
             $promise->then(function (CallResult $result) {
                 $args = (array)$result->getResultMessage()->getArguments()[0];
