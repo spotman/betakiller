@@ -163,10 +163,10 @@ class WampClientBuilder
         $this->useAuth($client);
 
         $client->setReconnectOptions([
-            'max_retries'         => 3,
-            'initial_retry_delay' => 3,
-            'max_retry_delay'     => 10,
-            'retry_delay_growth'  => 2,
+            'max_retries'         => 100,
+            'initial_retry_delay' => 1,
+            'max_retry_delay'     => 100,
+            'retry_delay_growth'  => 0,
         ]);
 
         return $client;
