@@ -28,6 +28,20 @@ class UserRepository extends AbstractHasWorkflowStateRepository implements UserR
     }
 
     /**
+     * @param string $relName
+     *
+     * @return \Database_Expression
+     */
+    public static function makeFullNameExpression(string $relName): \Database_Expression
+    {
+        return \DB::expr(sprintf(
+            'CONCAT(%s, " ", %s)',
+            $relName.'.'.User::COL_FIRST_NAME,
+            $relName.'.'.User::COL_LAST_NAME
+        ));
+    }
+
+    /**
      * Search for user by username or e-mail
      *
      * @param string $loginOrEmail
