@@ -31,7 +31,7 @@ final class UrlHelperFactory
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      * @param \BetaKiller\Url\UrlElementStack|null                 $stack
      *
-     * @return \BetaKiller\Helper\UrlHelper
+     * @return \BetaKiller\Helper\UrlHelperInterface
      */
     public function create(UrlContainerInterface $params = null, UrlElementStack $stack = null): UrlHelperInterface
     {
