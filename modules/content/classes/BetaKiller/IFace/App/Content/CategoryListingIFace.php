@@ -2,7 +2,7 @@
 namespace BetaKiller\IFace\App\Content;
 
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Repository\ContentCategoryRepository;
 use BetaKiller\Url\ZoneInterface;
@@ -43,7 +43,7 @@ final class CategoryListingIFace extends AbstractAppBase
         ];
     }
 
-    private function getCategoriesData(UrlHelper $urlHelper, ContentCategoryInterface $parent = null): array
+    private function getCategoriesData(UrlHelperInterface $urlHelper, ContentCategoryInterface $parent = null): array
     {
         $data = [];
 
@@ -60,7 +60,7 @@ final class CategoryListingIFace extends AbstractAppBase
         return $data;
     }
 
-    private function getCategoryData(ContentCategoryInterface $category, UrlHelper $urlHelper): array
+    private function getCategoryData(ContentCategoryInterface $category, UrlHelperInterface $urlHelper): array
     {
         return [
             'label'    => $category->getLabel(),

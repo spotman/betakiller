@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Behaviour;
 
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Url\UrlElementInterface;
@@ -21,10 +21,10 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
     /**
      * MultipleUrlBehaviour constructor.
      *
-     * @param \BetaKiller\Helper\UrlHelper        $urlHelper
-     * @param \BetaKiller\Url\UrlPrototypeService $urlPrototypeService
+     * @param \BetaKiller\Helper\UrlHelperInterface $urlHelper
+     * @param \BetaKiller\Url\UrlPrototypeService   $urlPrototypeService
      */
-    public function __construct(UrlHelper $urlHelper, UrlPrototypeService $urlPrototypeService)
+    public function __construct(UrlHelperInterface $urlHelper, UrlPrototypeService $urlPrototypeService)
     {
         $this->prototypeService = $urlPrototypeService;
 

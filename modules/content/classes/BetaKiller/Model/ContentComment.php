@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\Workflow\HasWorkflowStateModelOrmTrait;
 use DateTimeImmutable;
@@ -112,18 +112,18 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
         return $rules;
     }
 
-    public function getPublicReadUrl(UrlHelper $helper): string
+    public function getPublicReadUrl(\BetaKiller\Helper\UrlHelperInterface $helper): string
     {
         return $this->getRelatedEntityPublicUrl($helper).'#'.$this->getHtmlDomID();
     }
 
     /**
-     * @param \BetaKiller\Helper\UrlHelper $helper
+     * @param \BetaKiller\Helper\UrlHelperInterface $helper
      *
      * @return string
      * @throws \BetaKiller\Url\UrlElementException
      */
-    private function getRelatedEntityPublicUrl(UrlHelper $helper): string
+    private function getRelatedEntityPublicUrl(UrlHelperInterface $helper): string
     {
         $relatedEntity = $this->getRelatedEntityInstance();
 

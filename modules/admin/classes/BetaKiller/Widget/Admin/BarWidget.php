@@ -6,14 +6,12 @@ use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\EntityLinkedUrlElementInterface;
-use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementException;
-use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\ZoneInterface;
@@ -102,7 +100,7 @@ class BarWidget extends AbstractAdminWidget
     protected function getPrimaryEntityData(
         UrlElementStack $stack,
         UrlContainerInterface $params,
-        UrlHelper $helper
+        UrlHelperInterface $helper
     ): array {
         $currentUrlElement = UrlElementHelper::getCurrentIFaceModel($stack);
 
@@ -140,7 +138,7 @@ class BarWidget extends AbstractAdminWidget
 
     /**
      * @param \BetaKiller\Model\UserInterface                 $user
-     * @param \BetaKiller\Helper\UrlHelper                    $urlHelper
+     * @param \BetaKiller\Helper\UrlHelperInterface           $urlHelper
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      * @param \BetaKiller\Helper\I18nHelper                   $i18n
      *
@@ -152,7 +150,7 @@ class BarWidget extends AbstractAdminWidget
      */
     protected function getCreateButtonItems(
         UserInterface $user,
-        UrlHelper $urlHelper,
+        UrlHelperInterface $urlHelper,
         UrlContainerInterface $params,
         I18nHelper $i18n
     ): array {
@@ -204,25 +202,25 @@ class BarWidget extends AbstractAdminWidget
 //    }
 
 //    /**
-//     * @param \BetaKiller\Helper\UrlHelper $helper
+//     * @param \BetaKiller\Helper\UrlHelperInterface $helper
 //     *
 //     * @return IFaceModelInterface
 //     * @throws \BetaKiller\Url\UrlElementException
 //     * @uses \BetaKiller\IFace\Admin\Content\CommentListByStatusIFace
 //     */
-//    private function getCommentsListByStatusIface(UrlHelper $helper): UrlElementInterface
+//    private function getCommentsListByStatusIface(UrlHelperInterface $helper): UrlElementInterface
 //    {
 //        return $helper->getUrlElementByCodename('Admin_Content_CommentListByStatus');
 //    }
 //
 //    /**
-//     * @param \BetaKiller\Helper\UrlHelper $helper
+//     * @param \BetaKiller\Helper\UrlHelperInterface $helper
 //     *
 //     * @return \BetaKiller\Url\UrlElementInterface
 //     * @throws \BetaKiller\Url\UrlElementException
 //     * @uses \BetaKiller\IFace\Admin\Content\CommentIndexIFace
 //     */
-//    private function getCommentsRootIface(UrlHelper $helper): UrlElementInterface
+//    private function getCommentsRootIface(UrlHelperInterface $helper): UrlElementInterface
 //    {
 //        return $helper->getUrlElementByCodename('Admin_Content_CommentIndex');
 //    }
@@ -230,7 +228,7 @@ class BarWidget extends AbstractAdminWidget
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
      * @param \BetaKiller\Url\UrlElementStack                    $stack
-     * @param \BetaKiller\Helper\UrlHelper                       $helper
+     * @param \BetaKiller\Helper\UrlHelperInterface              $helper
      *
      * @return null|string
      * @throws \BetaKiller\Url\UrlElementException
@@ -238,7 +236,7 @@ class BarWidget extends AbstractAdminWidget
     private function getAdminEditButtonUrl(
         ?DispatchableEntityInterface $entity,
         UrlElementStack $stack,
-        UrlHelper $helper
+        UrlHelperInterface $helper
     ): ?string {
         return $this->getPrimaryEntityActionUrl(
             $stack,
@@ -252,7 +250,7 @@ class BarWidget extends AbstractAdminWidget
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
      * @param \BetaKiller\Url\UrlElementStack                    $stack
-     * @param \BetaKiller\Helper\UrlHelper                       $helper
+     * @param \BetaKiller\Helper\UrlHelperInterface              $helper
      *
      * @return null|string
      * @throws \BetaKiller\Url\UrlElementException
@@ -260,7 +258,7 @@ class BarWidget extends AbstractAdminWidget
     private function getPublicReadButtonUrl(
         ?DispatchableEntityInterface $entity,
         UrlElementStack $stack,
-        UrlHelper $helper
+        UrlHelperInterface $helper
     ): ?string {
         return $this->getPrimaryEntityActionUrl(
             $stack,
@@ -275,7 +273,7 @@ class BarWidget extends AbstractAdminWidget
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
      * @param \BetaKiller\Url\UrlElementStack                    $stack
      *
-     * @param \BetaKiller\Helper\UrlHelper                       $helper
+     * @param \BetaKiller\Helper\UrlHelperInterface              $helper
      *
      * @return null|string
      * @throws \BetaKiller\Url\UrlElementException
@@ -283,7 +281,7 @@ class BarWidget extends AbstractAdminWidget
     private function getPreviewButtonUrl(
         ?DispatchableEntityInterface $entity,
         UrlElementStack $stack,
-        UrlHelper $helper
+        UrlHelperInterface $helper
     ): ?string {
         return $this->getPrimaryEntityActionUrl(
             $stack,
@@ -296,7 +294,7 @@ class BarWidget extends AbstractAdminWidget
 
     /**
      * @param \BetaKiller\Url\UrlElementStack                    $stack
-     * @param \BetaKiller\Helper\UrlHelper                       $helper
+     * @param \BetaKiller\Helper\UrlHelperInterface              $helper
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
      * @param string                                             $targetZone
      * @param string                                             $targetAction
@@ -306,7 +304,7 @@ class BarWidget extends AbstractAdminWidget
      */
     private function getPrimaryEntityActionUrl(
         UrlElementStack $stack,
-        UrlHelper $helper,
+        UrlHelperInterface $helper,
         ?DispatchableEntityInterface $entity,
         string $targetZone,
         string $targetAction

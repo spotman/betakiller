@@ -2,7 +2,7 @@
 namespace BetaKiller\IFace\Admin\Error;
 
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Model\PhpExceptionHistoryModelInterface;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
@@ -75,7 +75,7 @@ class PhpExceptionItemIFace extends AbstractErrorAdminIFace
         ];
     }
 
-    private function getBackIFaceUrl(PhpExceptionModelInterface $model, UrlHelper $helper): string
+    private function getBackIFaceUrl(PhpExceptionModelInterface $model, UrlHelperInterface $helper): string
     {
         if ($model->isIgnored()) {
             return $helper->makeCodenameUrl(IgnoredPhpExceptionIndexIFace::codename());

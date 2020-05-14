@@ -2,7 +2,7 @@
 namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\ContentCommentRepository;
@@ -61,8 +61,11 @@ abstract class AbstractCommentList extends AbstractContentAdminIFace
      */
     abstract protected function getCommentsList(ServerRequestInterface $request, ContentCommentRepository $repo): array;
 
-    protected function getCommentData(ContentCommentInterface $comment, UrlHelper $helper, UserInterface $user): array
-    {
+    protected function getCommentData(
+        ContentCommentInterface $comment,
+        UrlHelperInterface $helper,
+        UserInterface $user
+    ): array {
         $status = $comment->getWorkflowState();
 
         return [

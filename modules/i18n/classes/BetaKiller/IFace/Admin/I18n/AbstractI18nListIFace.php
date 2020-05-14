@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\IFace\Admin\I18n;
 
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Model\I18nKeyModelInterface;
 use BetaKiller\Model\LanguageInterface;
@@ -84,7 +84,7 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
         return $langList;
     }
 
-    private function getItems(UrlHelper $helper, ?LanguageInterface $filterLang): array
+    private function getItems(UrlHelperInterface $helper, ?LanguageInterface $filterLang): array
     {
         $data = [];
 
@@ -99,7 +99,7 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
         return $data;
     }
 
-    private function formatItem(I18nKeyModelInterface $model, UrlHelper $helper): array
+    private function formatItem(I18nKeyModelInterface $model, UrlHelperInterface $helper): array
     {
         return [
             'key'   => $model->getI18nKeyName(),

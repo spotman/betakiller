@@ -1,11 +1,11 @@
 <?php
 namespace BetaKiller\Workflow;
 
+use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
-use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Repository\ContentCommentStateRepository;
+use BetaKiller\Repository\ContentCommentStateRepositoryInterface;
 
 class ContentCommentWorkflow
 {
@@ -24,7 +24,7 @@ class ContentCommentWorkflow
     private $notification;
 
     /**
-     * @var \BetaKiller\Helper\UrlHelper
+     * @var \BetaKiller\Helper\UrlHelperInterface
      */
     private $urlHelper;
 
@@ -41,19 +41,19 @@ class ContentCommentWorkflow
     /**
      * ContentCommentWorkflow constructor.
      *
-     * @param \BetaKiller\Helper\NotificationHelper                $notificationHelper
-     * @param \BetaKiller\Helper\UrlHelper                         $urlHelper
-     * @param \BetaKiller\Workflow\StatusWorkflowInterface         $statusWorkflow
-     * @param \BetaKiller\Repository\ContentCommentStateRepository $stateRepo
+     * @param \BetaKiller\Helper\NotificationHelper                         $notificationHelper
+     * @param \BetaKiller\Factory\UrlHelperFactory                          $urlHelperFactory
+     * @param \BetaKiller\Workflow\StatusWorkflowInterface                  $statusWorkflow
+     * @param \BetaKiller\Repository\ContentCommentStateRepositoryInterface $stateRepo
      */
     public function __construct(
         NotificationHelper $notificationHelper,
-        UrlHelper $urlHelper,
+        UrlHelperFactory $urlHelperFactory,
         StatusWorkflowInterface $statusWorkflow,
-        ContentCommentStateRepository $stateRepo
+        ContentCommentStateRepositoryInterface $stateRepo
     ) {
         $this->notification = $notificationHelper;
-        $this->urlHelper    = $urlHelper;
+        $this->urlHelper    = $urlHelperFactory->create();
         $this->status       = $statusWorkflow;
         $this->stateRepo    = $stateRepo;
     }

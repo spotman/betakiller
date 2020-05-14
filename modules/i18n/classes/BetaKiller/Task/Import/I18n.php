@@ -136,7 +136,7 @@ class I18n extends AbstractTask
         }
     }
 
-    private function getMissedKeysData(/* UrlHelper $urlHelper */): array
+    private function getMissedKeysData(/* UrlHelperInterface $urlHelper */): array
     {
         $data = [];
 

@@ -23,7 +23,7 @@ final class NotificationMessageActionUrlGenerator implements MessageActionUrlGen
     private $config;
 
     /**
-     * @var \BetaKiller\Helper\UrlHelper
+     * @var \BetaKiller\Helper\UrlHelperInterface
      */
     private $urlHelper;
 

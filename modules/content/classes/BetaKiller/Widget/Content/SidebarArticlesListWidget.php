@@ -3,7 +3,7 @@ namespace BetaKiller\Widget\Content;
 
 use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Model\ContentPostInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\ZoneInterface;
@@ -22,7 +22,8 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
      *
      * @param \BetaKiller\Helper\AssetsHelper $assetsHelper
      */
-    public function __construct(AssetsHelper $assetsHelper) {
+    public function __construct(AssetsHelper $assetsHelper)
+    {
         $this->assetsHelper = $assetsHelper;
     }
 
@@ -40,7 +41,7 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
      */
     public function getData(ServerRequestInterface $request, array $context): array
     {
-        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+        $urlHelper    = ServerRequestHelper::getUrlHelper($request);
         $urlContainer = ServerRequestHelper::getUrlContainer($request);
 
         $limit     = (int)$context['limit'] ?: 5;
@@ -75,7 +76,7 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
         return $currentArticle ? $currentArticle->getID() : null;
     }
 
-    protected function getArticleData(ContentPostInterface $article, UrlHelper $urlHelper): array
+    protected function getArticleData(ContentPostInterface $article, UrlHelperInterface $urlHelper): array
     {
         $thumbnail = $article->getFirstThumbnail();
         $createdAt = $article->getCreatedAt();

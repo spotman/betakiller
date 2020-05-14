@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Behaviour;
 
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Url\AvailableUri;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
@@ -13,16 +13,16 @@ use BetaKiller\Url\UrlElementInterface;
 abstract class AbstractUrlBehaviour implements UrlBehaviourInterface
 {
     /**
-     * @var \BetaKiller\Helper\UrlHelper
+     * @var \BetaKiller\Helper\UrlHelperInterface
      */
     protected $urlHelper;
 
     /**
      * AbstractUrlBehaviour constructor.
      *
-     * @param \BetaKiller\Helper\UrlHelper $urlHelper
+     * @param \BetaKiller\Helper\UrlHelperInterface $urlHelper
      */
-    public function __construct(UrlHelper $urlHelper)
+    public function __construct(UrlHelperInterface $urlHelper)
     {
         $this->urlHelper = $urlHelper;
     }

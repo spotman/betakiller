@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 
 /**
  * Interface HasPublicReadUrlInterface
@@ -11,9 +11,9 @@ use BetaKiller\Helper\UrlHelper;
 interface HasPublicReadUrlInterface
 {
     /**
-     * @param \BetaKiller\Helper\UrlHelper $helper
+     * @param \BetaKiller\Helper\UrlHelperInterface $helper
      *
      * @return string
      */
-    public function getPublicReadUrl(UrlHelper $helper): string;
+    public function getPublicReadUrl(UrlHelperInterface $helper): string;
 }

@@ -14,7 +14,7 @@ final class UserConfirmationEmailHandler
     public const EMAIL_VERIFICATION = 'email/user/verification';
 
     /**
-     * @var \BetaKiller\Helper\UrlHelper
+     * @var \BetaKiller\Helper\UrlHelperInterface
      */
     private $urlHelper;
 

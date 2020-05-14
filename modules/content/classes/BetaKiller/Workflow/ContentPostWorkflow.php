@@ -1,8 +1,9 @@
 <?php
 namespace BetaKiller\Workflow;
 
+use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Model\ContentPostInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\ZoneInterface;
@@ -10,10 +11,10 @@ use URL;
 
 class ContentPostWorkflow
 {
-    public const COMPLETE         = 'complete';
-    public const PUBLISH = 'publish';
-    public const PAUSE   = 'pause';
-    public const FIX     = 'fix';
+    public const COMPLETE = 'complete';
+    public const PUBLISH  = 'publish';
+    public const PAUSE    = 'pause';
+    public const FIX      = 'fix';
 
     public const NOTIFICATION_POST_COMPLETE = 'moderator/post/complete';
 
@@ -23,7 +24,7 @@ class ContentPostWorkflow
     private $notification;
 
     /**
-     * @var \BetaKiller\Helper\UrlHelper
+     * @var \BetaKiller\Helper\UrlHelperInterface
      */
     private $urlHelper;
 
@@ -35,17 +36,17 @@ class ContentPostWorkflow
     /**
      * ContentPostWorkflow constructor.
      *
-     * @param \BetaKiller\Workflow\StatusWorkflowInterface   $workflow
-     * @param \BetaKiller\Helper\NotificationHelper $notificationHelper
-     * @param \BetaKiller\Helper\UrlHelper          $urlHelper
+     * @param \BetaKiller\Workflow\StatusWorkflowInterface $workflow
+     * @param \BetaKiller\Helper\NotificationHelper        $notificationHelper
+     * @param \BetaKiller\Factory\UrlHelperFactory         $urlHelperFactory
      */
     public function __construct(
         StatusWorkflowInterface $workflow,
         NotificationHelper $notificationHelper,
-        UrlHelper $urlHelper
+        UrlHelperFactory $urlHelperFactory
     ) {
         $this->notification = $notificationHelper;
-        $this->urlHelper    = $urlHelper;
+        $this->urlHelper    = $urlHelperFactory->create();
         $this->status       = $workflow;
     }
 

@@ -5,6 +5,7 @@ namespace BetaKiller\Factory;
 
 use BetaKiller\DI\ContainerInterface;
 use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
@@ -14,7 +15,7 @@ final class UrlHelperFactory
     /**
      * @var \BetaKiller\DI\ContainerInterface
      */
-    private $container;
+    private ContainerInterface $container;
 
     /**
      * UrlHelperFactory constructor.
@@ -32,7 +33,7 @@ final class UrlHelperFactory
      *
      * @return \BetaKiller\Helper\UrlHelper
      */
-    public function create(UrlContainerInterface $params = null, UrlElementStack $stack = null): UrlHelper
+    public function create(UrlContainerInterface $params = null, UrlElementStack $stack = null): UrlHelperInterface
     {
         $params = $params ?? ResolvingUrlContainer::create();
         $stack  = $stack ?? new UrlElementStack($params);

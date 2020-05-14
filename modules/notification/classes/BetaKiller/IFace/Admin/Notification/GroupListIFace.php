@@ -5,7 +5,7 @@ namespace BetaKiller\IFace\Admin\Notification;
 
 use BetaKiller\Config\NotificationConfigInterface;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Notification\MessageRendererInterface;
@@ -74,7 +74,7 @@ class GroupListIFace extends AbstractAdminIFace
         ];
     }
 
-    private function getEnabledGroupsData(UrlHelper $urlHelper): array
+    private function getEnabledGroupsData(UrlHelperInterface $urlHelper): array
     {
         $data = [];
 
@@ -85,7 +85,7 @@ class GroupListIFace extends AbstractAdminIFace
         return $data;
     }
 
-    private function getDisabledGroupsData(UrlHelper $urlHelper): array
+    private function getDisabledGroupsData(UrlHelperInterface $urlHelper): array
     {
         $data = [];
 
@@ -96,7 +96,7 @@ class GroupListIFace extends AbstractAdminIFace
         return $data;
     }
 
-    private function makeGroupData(NotificationGroupInterface $group, UrlHelper $urlHelper): array
+    private function makeGroupData(NotificationGroupInterface $group, UrlHelperInterface $urlHelper): array
     {
         $messages = [];
 

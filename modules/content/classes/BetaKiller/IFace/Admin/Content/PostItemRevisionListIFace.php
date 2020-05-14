@@ -2,23 +2,23 @@
 namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\ContentUrlContainerHelper;
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class PostItemRevisionListIFace extends AbstractContentAdminIFace
 {
     /**
-     * @var \BetaKiller\Helper\UrlHelper
+     * @var \BetaKiller\Helper\UrlHelperInterface
      */
     private $urlHelper;
 
     /**
      * PostItemRevisionList constructor.
      *
-     * @param \BetaKiller\Helper\UrlHelper $urlHelper
+     * @param \BetaKiller\Helper\UrlHelperInterface $urlHelper
      */
-    public function __construct(UrlHelper $urlHelper)
+    public function __construct(UrlHelperInterface $urlHelper)
     {
         $this->urlHelper = $urlHelper;
     }

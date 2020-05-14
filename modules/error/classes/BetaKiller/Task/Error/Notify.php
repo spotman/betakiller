@@ -27,7 +27,7 @@ class Notify extends AbstractTask
     private $notification;
 
     /**
-     * @var \BetaKiller\Helper\UrlHelper
+     * @var \BetaKiller\Helper\UrlHelperInterface
      */
     private $urlHelper;
 

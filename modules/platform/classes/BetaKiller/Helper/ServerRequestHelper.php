@@ -207,12 +207,12 @@ class ServerRequestHelper
 
     public static function hasUrlHelper(ServerRequestInterface $request): bool
     {
-        return (bool)$request->getAttribute(UrlHelper::class);
+        return (bool)$request->getAttribute(UrlHelperInterface::class);
     }
 
-    public static function getUrlHelper(ServerRequestInterface $request): UrlHelper
+    public static function getUrlHelper(ServerRequestInterface $request): UrlHelperInterface
     {
-        return $request->getAttribute(UrlHelper::class);
+        return $request->getAttribute(UrlHelperInterface::class);
     }
 
     public static function setUserProvider(

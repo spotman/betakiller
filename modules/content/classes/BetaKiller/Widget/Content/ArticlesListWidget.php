@@ -5,7 +5,7 @@ use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Helper\ContentHelper;
 use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Repository\ContentCategoryRepository;
@@ -115,7 +115,7 @@ final class ArticlesListWidget extends AbstractPublicWidget
     }
 
     /**
-     * @param \BetaKiller\Helper\UrlHelper               $helper
+     * @param \BetaKiller\Helper\UrlHelperInterface      $helper
      * @param \BetaKiller\Model\ContentCategoryInterface $category
      * @param int|null                                   $page
      * @param null|string                                $term
@@ -129,7 +129,7 @@ final class ArticlesListWidget extends AbstractPublicWidget
      * @throws \Kohana_Exception
      */
     protected function getArticlesData(
-        UrlHelper $helper,
+        UrlHelperInterface $helper,
         ?ContentCategoryInterface $category,
         ?int $page = null,
         ?string $term = null
@@ -178,14 +178,17 @@ final class ArticlesListWidget extends AbstractPublicWidget
     }
 
     /**
-     * @param                                        $page
+     * @param                                                 $page
      * @param \BetaKiller\Model\ContentCategoryInterface|null $category
-     * @param null                                   $term
+     * @param null                                            $term
      *
      * @return \BetaKiller\Search\SearchResultsInterface
      */
-    protected function getArticles($page, ContentCategoryInterface $category = null, $term = null): SearchResultsInterface
-    {
+    protected function getArticles(
+        $page,
+        ContentCategoryInterface $category = null,
+        $term = null
+    ): SearchResultsInterface {
         return $this->postRepo->searchArticles($page, $this->itemsPerPage, $category, $term);
     }
 }

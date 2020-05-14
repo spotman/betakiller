@@ -4,6 +4,7 @@ namespace BetaKiller\Widget\Auth;
 use BetaKiller\Action\Auth\RegularLoginAction;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\IFace\Auth\AccessRecoveryRequestIFace;
 use BetaKiller\Security\CsrfService;
 use BetaKiller\Widget\AbstractPublicWidget;
@@ -12,9 +13,9 @@ use Psr\Http\Message\ServerRequestInterface;
 class RegularWidget extends AbstractPublicWidget
 {
     /**
-     * @var \BetaKiller\Helper\UrlHelper
+     * @var \BetaKiller\Helper\UrlHelperInterface
      */
-    private $urlHelper;
+    private UrlHelperInterface $urlHelper;
 
     /**
      * @var \BetaKiller\Security\CsrfService

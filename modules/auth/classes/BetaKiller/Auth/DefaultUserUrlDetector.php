@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Auth;
 
 use BetaKiller\Factory\UrlHelperFactory;
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\IFace\Auth\BlockedIFace;
 use BetaKiller\IFace\Auth\SuspendedIFace;
 use BetaKiller\Model\UserInterface;
@@ -12,9 +12,9 @@ use BetaKiller\Model\UserInterface;
 class DefaultUserUrlDetector implements UserUrlDetectorInterface
 {
     /**
-     * @var UrlHelper
+     * @var \BetaKiller\Helper\UrlHelperInterface
      */
-    protected $urlHelper;
+    protected UrlHelperInterface $urlHelper;
 
     /**
      * DefaultUserUrlDetector constructor.

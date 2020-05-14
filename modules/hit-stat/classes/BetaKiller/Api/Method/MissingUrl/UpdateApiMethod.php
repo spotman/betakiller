@@ -20,7 +20,7 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     private $targetRepo;
 
     /**
-     * @var \BetaKiller\Helper\UrlHelper
+     * @var \BetaKiller\Helper\UrlHelperInterface
      */
     private $urlHelper;
 

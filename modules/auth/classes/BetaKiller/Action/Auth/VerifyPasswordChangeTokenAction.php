@@ -3,19 +3,19 @@ declare(strict_types=1);
 
 namespace BetaKiller\Action\Auth;
 
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\IFace\Auth\PasswordChangeIFace;
 use BetaKiller\Model\UserInterface;
 
 class VerifyPasswordChangeTokenAction extends AbstractTokenVerificationAction
 {
     /**
-     * @param \BetaKiller\Helper\UrlHelper    $urlHelper
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \BetaKiller\Helper\UrlHelperInterface $urlHelper
+     * @param \BetaKiller\Model\UserInterface       $user
      *
      * @return string
      */
-    protected function getSuccessUrl(UrlHelper $urlHelper, UserInterface $user): string
+    protected function getSuccessUrl(UrlHelperInterface $urlHelper, UserInterface $user): string
     {
         $params = $urlHelper->createUrlContainer()
             ->setEntity($user);

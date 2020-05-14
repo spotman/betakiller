@@ -14,7 +14,7 @@ final class UserPasswordChangeRequestedEmailHandler
     public const REQUEST_PASSWORD_CHANGE = 'email/user/password-change-request';
 
     /**
-     * @var \BetaKiller\Helper\UrlHelper
+     * @var \BetaKiller\Helper\UrlHelperInterface
      */
     private $urlHelper;
 

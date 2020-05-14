@@ -19,7 +19,7 @@ use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlPrototypeService;
 use BetaKiller\Url\ZoneInterface;
 
-class UrlHelper
+class UrlHelper implements UrlHelperInterface
 {
     /**
      * @var \BetaKiller\Url\Behaviour\UrlBehaviourFactory

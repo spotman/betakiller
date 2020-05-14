@@ -9,7 +9,7 @@ use BetaKiller\Auth\UserUrlDetectorInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\IFace\Auth\PasswordChangeIFace;
 use BetaKiller\Model\TokenInterface;
 use BetaKiller\Model\UserInterface;
@@ -92,12 +92,13 @@ abstract class AbstractTokenVerificationAction extends AbstractAction
     }
 
     /**
-     * @param \BetaKiller\Helper\UrlHelper    $urlHelper
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \BetaKiller\Helper\UrlHelperInterface $urlHelper
+     * @param \BetaKiller\Model\UserInterface       $user
      *
      * @return string
+     * @throws \BetaKiller\Url\UrlElementException
      */
-    protected function getSuccessUrl(UrlHelper $urlHelper, UserInterface $user): string
+    protected function getSuccessUrl(UrlHelperInterface $urlHelper, UserInterface $user): string
     {
         // Redirect to password change IFace in case of empty password (initial password setting)
         if (!$user->hasPassword()) {

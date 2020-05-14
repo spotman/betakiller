@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\IFace\Admin\Notification;
 
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Repository\NotificationLogRepositoryInterface;
@@ -81,7 +81,7 @@ class LogIndexIFace extends AbstractAdminIFace
         ];
     }
 
-    private function getItemData(NotificationLogInterface $item, UrlHelper $urlHelper): array
+    private function getItemData(NotificationLogInterface $item, UrlHelperInterface $urlHelper): array
     {
         return [
             'processed_at' => $item->getProcessedAt(),
