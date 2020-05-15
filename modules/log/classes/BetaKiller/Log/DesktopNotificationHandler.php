@@ -56,7 +56,7 @@ final class DesktopNotificationHandler extends AbstractHandler
                 ->setTitle($exception->getMessage())
                 ->setBody($exception->getTraceAsString());
 
-            return $this->notifier->send($notification);
+            $this->notifier->send($notification);
         }
 
         return false;
