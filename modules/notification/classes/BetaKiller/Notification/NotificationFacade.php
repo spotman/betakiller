@@ -402,6 +402,11 @@ final class NotificationFacade
 
         // Get Users with provided roles (pre-fetch)
         foreach ($this->userRepo->getUsersWithRoles($roles, true) as $user) {
+            // Exclude blocked users and users without confirmed email
+            if ($user->isBlocked() || !$user->isEmailConfirmed()) {
+                continue;
+            }
+
             // Check user disabled this group
             if (!$group->isEnabledForUser($user)) {
                 continue;
