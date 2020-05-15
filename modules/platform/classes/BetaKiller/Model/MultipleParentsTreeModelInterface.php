@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-interface MultipleParentsTreeModelInterface
+interface MultipleParentsTreeModelInterface extends AbstractEntityInterface
 {
     /**
      * Return direct parents
@@ -51,4 +51,11 @@ interface MultipleParentsTreeModelInterface
      * @return bool
      */
     public function hasParent(MultipleParentsTreeModelInterface $parent): bool;
+
+    /**
+     * @param \BetaKiller\Model\MultipleParentsTreeModelInterface $parent
+     *
+     * @return bool
+     */
+    public function isInherits(MultipleParentsTreeModelInterface $parent): bool;
 }

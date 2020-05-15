@@ -178,4 +178,18 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
     {
         return $this->has('parents', $parent);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function isInherits(MultipleParentsTreeModelInterface $parent): bool
+    {
+        foreach ($this->getAllParentsRecursively($this) as $item) {
+            if ($item->getID() === $parent->getID()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

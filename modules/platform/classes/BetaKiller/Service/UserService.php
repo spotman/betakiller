@@ -91,10 +91,16 @@ class UserService
         string $createdFromIp,
         string $username = null
     ): UserInterface {
+        if ($this->userRepository->searchBy($email)) {
+            throw new DomainException('User ":email" already exists', [
+                ':email' => $email,
+            ]);
+        }
+
         $loginRole   = $this->roleRepository->getLoginRole();
         $primaryRole = $this->roleRepository->getByName($primaryRoleName);
 
-        if (!$primaryRole->hasParent($loginRole)) {
+        if (!$primaryRole->isInherits($loginRole)) {
             throw new DomainException('Role ":name" must inherit ":login" role', [
                 ':name'  => $primaryRole->getName(),
                 ':login' => $loginRole->getName(),
