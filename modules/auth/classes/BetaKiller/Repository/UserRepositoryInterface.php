@@ -22,6 +22,13 @@ interface UserRepositoryInterface extends RepositoryInterface
     public static function makeFullNameExpression(string $relName): \Database_Expression;
 
     /**
+     * @param string $relName
+     *
+     * @return \Database_Expression[]
+     */
+    public static function makeSearchExpressions(string $relName): array;
+
+    /**
      * Search for user by username or e-mail
      *
      * @param string $loginOrEmail

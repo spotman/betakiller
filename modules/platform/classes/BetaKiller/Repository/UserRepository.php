@@ -43,6 +43,22 @@ class UserRepository extends AbstractHasWorkflowStateRepository implements UserR
     }
 
     /**
+     * @param string $relName
+     *
+     * @return \Database_Expression[]
+     */
+    public static function makeSearchExpressions(string $relName): array
+    {
+        return [
+            $relName.'.'.User::COL_FIRST_NAME,
+            $relName.'.'.User::COL_LAST_NAME,
+            $relName.'.'.User::COL_MIDDLE_NAME,
+            $relName.'.'.User::COL_EMAIL,
+            $relName.'.'.User::COL_PHONE,
+//            \DB::expr(sprintf('REGEXP_REPLACE(`%s`, "[^0-9]+", "")', $relName.'.'.User::COL_PHONE)),
+        ];
+    }
+    /**
      * Search for user by username or e-mail
      *
      * @param string $loginOrEmail
