@@ -284,8 +284,7 @@ class AppEnv implements AppEnvInterface
     {
         $path = implode(\DIRECTORY_SEPARATOR, [
             \sys_get_temp_dir(),
-            'app',
-            $this->getModeName(),
+            $this->getAppCodename().'.'.$this->getModeName(),
             $target,
         ]);
 
