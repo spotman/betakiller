@@ -6,6 +6,7 @@ use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\UserState;
+use BetaKiller\Utils\Kohana\ORM;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 /**
@@ -36,8 +37,8 @@ class UserRepository extends AbstractHasWorkflowStateRepository implements UserR
     {
         return \DB::expr(sprintf(
             'CONCAT(%s, " ", %s)',
-            $relName.'.'.User::COL_FIRST_NAME,
-            $relName.'.'.User::COL_LAST_NAME
+            $relName.ORM::COL_SEP.User::COL_FIRST_NAME,
+            $relName.ORM::COL_SEP.User::COL_LAST_NAME
         ));
     }
 
