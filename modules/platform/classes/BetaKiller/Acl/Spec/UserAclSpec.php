@@ -13,7 +13,7 @@ final class UserAclSpec implements EntityAclSpecInterface
     /**
      * @inheritDoc
      */
-    public function isAllowedTo(AbstractEntityInterface $entity, AclUserInterface $user): bool
+    public function isAllowedTo(\BetaKiller\Model\EntityWithAclSpecInterface $entity, AclUserInterface $user): bool
     {
         if (!$entity instanceof UserInterface) {
             throw new \LogicException();

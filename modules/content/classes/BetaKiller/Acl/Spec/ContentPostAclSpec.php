@@ -12,7 +12,7 @@ final class ContentPostAclSpec implements EntityAclSpecInterface
     /**
      * @inheritDoc
      */
-    public function isAllowedTo(AbstractEntityInterface $entity, AclUserInterface $user): bool
+    public function isAllowedTo(\BetaKiller\Model\EntityWithAclSpecInterface $entity, AclUserInterface $user): bool
     {
         if (!$entity instanceof ContentPostInterface) {
             throw new \LogicException();
