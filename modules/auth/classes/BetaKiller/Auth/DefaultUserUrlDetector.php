@@ -33,6 +33,10 @@ class DefaultUserUrlDetector implements UserUrlDetectorInterface
      */
     public function detect(UserInterface $user): string
     {
+        if ($user->isGuest()) {
+            return '/';
+        }
+
         $commonUrl = $this->commonChecks($user);
 
         if ($commonUrl) {
@@ -50,10 +54,6 @@ class DefaultUserUrlDetector implements UserUrlDetectorInterface
      */
     protected function commonChecks(UserInterface $user): ?string
     {
-        if ($user->isGuest()) {
-            return null;
-        }
-
         if ($user->isBlocked()) {
             return $this->urlHelper->makeCodenameUrl(BlockedIFace::codename());
         }
