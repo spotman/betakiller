@@ -69,6 +69,11 @@ final class UrlElementAccessResolver implements UrlElementAccessResolverInterfac
                 // Default is READ, everything else can be defined in "aclRules" section of UrlElement config
                 $actionName = CrudlsActionsInterface::ACTION_READ;
 
+                // Use bound action name if UrlElement Entity is used in URL prototype
+                if ($urlElement instanceof EntityLinkedUrlElementInterface && $urlElement->getEntityModelName() === $entityName) {
+                    $actionName = $urlElement->getEntityActionName();
+                }
+
                 if (!$this->checkUrlElementEntityPermissions($urlElement, $params, $entityName, $actionName, $user)) {
                     return false;
                 }
