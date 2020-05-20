@@ -122,23 +122,25 @@ class UrlProcessor
         // Force authorization for non-public zones before security check
         $this->forceAuthorizationIfNeeded($urlElement, $user);
 
-        if (!$this->elementAccessResolver->isAllowed($user, $urlElement, $urlParameters)) {
-            $params = [];
-
-            foreach ($urlParameters->getAllParameters() as $item) {
-                $id = $item instanceof AbstractEntityInterface
-                    ? $item->getID()
-                    : null;
-
-                $params[] = sprintf('%s (%s)', $item::getUrlContainerKey(), $id);
-            }
-
-            throw new AccessDeniedException('UrlElement ":name" is not allowed to User ":who" with :params', [
-                ':name'   => $urlElement->getCodename(),
-                ':who'    => $user->isGuest() ? 'Guest' : $user->getID(),
-                ':params' => implode(', ', $params),
-            ]);
+        if ($this->elementAccessResolver->isAllowed($user, $urlElement, $urlParameters)) {
+            return;
         }
+
+        $params = [];
+
+        foreach ($urlParameters->getAllParameters() as $item) {
+            $id = $item instanceof AbstractEntityInterface
+                ? $item->getID()
+                : null;
+
+            $params[] = sprintf('%s (%s)', $item::getUrlContainerKey(), $id);
+        }
+
+        throw new AccessDeniedException('UrlElement ":name" is not allowed to User ":who" with :params', [
+            ':name'   => $urlElement->getCodename(),
+            ':who'    => $user->isGuest() ? 'Guest' : $user->getID(),
+            ':params' => implode(', ', $params),
+        ]);
     }
 
     private function checkUrlParameterAccess(
