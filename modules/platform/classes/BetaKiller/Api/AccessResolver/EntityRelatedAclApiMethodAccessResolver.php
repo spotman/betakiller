@@ -64,22 +64,18 @@ class EntityRelatedAclApiMethodAccessResolver extends AclApiMethodAccessResolver
         if ($resource->isEntityRequiredForAction($method->getName())) {
             $entity = $method->getEntity($arguments);
 
-            if (!$entity instanceof EntityWithAclSpecInterface) {
-                throw new ApiMethodException('Entity ":entity" must implement :interface and provide AclSpec', [
-                    ':entity'    => $entity::getModelName(),
-                    ':interface' => EntityWithAclSpecInterface::class,
-                ]);
-            }
+            if ($entity instanceof EntityWithAclSpecInterface) {
+                $spec = $this->aclSpecFactory->createFor($entity);
 
-            $spec = $this->aclSpecFactory->createFor($entity);
-
-            // Check entity is allowed to user via EntityAclSpec
-            if (!$spec->isAllowedTo($entity, $user)) {
-                throw new ApiAccessViolationException('Entity ":entity" with ID ":id" is not allowed to User ":who"', [
-                    ':entity' => $entity::getModelName(),
-                    ':id'     => $entity->getID(),
-                    ':who'    => $user->getID(),
-                ]);
+                // Check entity is allowed to user via EntityAclSpec
+                if (!$spec->isAllowedTo($entity, $user)) {
+                    throw new ApiAccessViolationException(
+                        'Entity ":entity" with ID ":id" is not allowed to User ":who"', [
+                        ':entity' => $entity::getModelName(),
+                        ':id'     => $entity->getID(),
+                        ':who'    => $user->getID(),
+                    ]);
+                }
             }
 
             // Store model for processing status and transition permissions
