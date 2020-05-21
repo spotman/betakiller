@@ -6,6 +6,13 @@ use BetaKiller\Url\Parameter\UrlParameterInterface;
 interface DispatchableEntityInterface extends AbstractEntityInterface, UrlParameterInterface
 {
     /**
+     * Returns null for default action name (read)
+     *
+     * @return string|null
+     */
+    public function getUrlParameterAccessAction(): ?string;
+
+    /**
      * Returns value of the $key property
      *
      * @param string $key

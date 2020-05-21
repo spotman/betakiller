@@ -9,6 +9,7 @@ use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Factory\UrlElementInstanceFactory;
 use BetaKiller\Model\AbstractEntityInterface;
+use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
@@ -147,12 +148,14 @@ class UrlProcessor
         UrlParameterInterface $param,
         UserInterface $user
     ): void {
-        if (!$param instanceof AbstractEntityInterface) {
+        if (!$param instanceof DispatchableEntityInterface) {
             return;
         }
 
+        $action = $param->getUrlParameterAccessAction() ?? CrudlsActionsInterface::ACTION_READ;
+
         // Perform Entity check
-        if (!$this->entityPermissionResolver->isAllowed($user, $param, CrudlsActionsInterface::ACTION_READ)) {
+        if (!$this->entityPermissionResolver->isAllowed($user, $param, $action)) {
             throw new AccessDeniedException('Entity ":name" is not allowed to User ":who"', [
                 ':name' => $param::getModelName(),
                 ':who'  => $user->isGuest() ? 'Guest' : $user->getID(),

@@ -302,6 +302,15 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getUrlParameterAccessAction(): ?string
+    {
+        // Use default one
+        return null;
+    }
+
+    /**
      * Returns value of the $key property
      *
      * @param string $key
