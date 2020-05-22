@@ -134,7 +134,7 @@ class SupervisorDaemon implements DaemonInterface
 
     private function processFinishedTask(string $name): void
     {
-        $this->logger->notice('Daemon ":name" had finished, restarting', [
+        $this->logger->debug('Daemon ":name" had finished, restarting', [
             ':name' => $name,
         ]);
 
