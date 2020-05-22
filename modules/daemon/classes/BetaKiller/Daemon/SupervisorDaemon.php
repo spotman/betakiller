@@ -31,51 +31,41 @@ class SupervisorDaemon implements DaemonInterface
     /**
      * @var \BetaKiller\Config\ConfigProviderInterface
      */
-    private $config;
+    private ConfigProviderInterface $config;
 
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
-    private $appEnv;
-
-    /**
-     * @var bool
-     */
-    private $isHuman;
+    private AppEnvInterface $appEnv;
 
     /**
      * @var LoopInterface
      */
-    private $loop;
+    private LoopInterface $loop;
 
     /**
      * @var int[]
      */
-    private $failureCounter = [];
+    private array $failureCounter = [];
 
     /**
      * @var mixed[][]
      */
-    private $statuses = [];
+    private array $statuses = [];
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var \BetaKiller\Daemon\LockFactory
      */
-    private $lockFactory;
+    private LockFactory $lockFactory;
 
-    /**
-     * @var \BetaKiller\Daemon\FsWatcher
-     */
-    private $fsWatcher;
+    private bool $isRunning = false;
 
-    private $isRunning = false;
-
-    private $isStoppingDaemons = false;
+    private bool $isStoppingDaemons = false;
 
     /**
      * Supervisor constructor.
@@ -83,27 +73,23 @@ class SupervisorDaemon implements DaemonInterface
      * @param \BetaKiller\Config\ConfigProviderInterface $config
      * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
      * @param \BetaKiller\Daemon\LockFactory             $lockFactory
-     * @param \BetaKiller\Daemon\FsWatcher               $fsWatcher
      * @param \Psr\Log\LoggerInterface                   $logger
      */
     public function __construct(
         ConfigProviderInterface $config,
         AppEnvInterface $appEnv,
         LockFactory $lockFactory,
-        FsWatcher $fsWatcher,
         LoggerInterface $logger
     ) {
         $this->config      = $config;
         $this->appEnv      = $appEnv;
         $this->logger      = $logger;
         $this->lockFactory = $lockFactory;
-        $this->fsWatcher   = $fsWatcher;
     }
 
     public function startDaemon(LoopInterface $loop): void
     {
-        $this->loop    = $loop;
-        $this->isHuman = $this->appEnv->isHuman();
+        $this->loop = $loop;
 
         // Reload signal => hot restart
         $loop->addSignal(self::RELOAD_SIGNAL, function () {
@@ -118,10 +104,6 @@ class SupervisorDaemon implements DaemonInterface
         });
 
         $this->addSupervisorTimer();
-
-        if ($this->appEnv->inDevelopmentMode()) {
-            $this->addFsWatcher($loop);
-        }
 
         foreach ($this->getDefinedDaemons() as $codename) {
             $this->startSupervisedDaemon($codename, true);
@@ -230,11 +212,6 @@ class SupervisorDaemon implements DaemonInterface
     {
         // Prevent auto-restart
         $this->isRunning = false;
-
-        // Stop FS watcher if enabled
-        if ($this->fsWatcher) {
-            $this->fsWatcher->stop();
-        }
 
         $this->stopAll();
 
@@ -457,15 +434,5 @@ class SupervisorDaemon implements DaemonInterface
         }
 
         return $count > self::RETRY_LIMIT;
-    }
-
-    private function addFsWatcher(LoopInterface $loop): void
-    {
-        $this->fsWatcher->start($loop, function () {
-            $this->logger->info('Restarting daemons after FS changes');
-
-            // Restart all daemons (auto-restart after stop)
-            $this->stopAll();
-        });
     }
 }

@@ -117,11 +117,8 @@ final class FsWatcher
                 }
 
                 // Throttling for 1 second
-                $this->watchTimer = $loop->addTimer(1, function () use ($onChange /*, $monitor */) {
-                    // Prevent repeated events
-//                    $monitor->stop();
-
-                    $onChange();
+                $this->watchTimer = $loop->addTimer(1, static function () use ($path, $onChange) {
+                    $onChange($path);
                 });
             });
 

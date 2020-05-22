@@ -4,20 +4,24 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Daemon;
 
 use BetaKiller\Daemon\DaemonFactory;
+use BetaKiller\Daemon\FsWatcher;
 use BetaKiller\Daemon\LockFactory;
 use BetaKiller\Daemon\ShutdownDaemonException;
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Database;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\Factory;
+use React\EventLoop\LoopInterface;
 
 class Runner extends AbstractTask
 {
     public const START_TIMEOUT = 5;
     public const STOP_TIMEOUT  = 15;
 
+    private const STATUS_LOADING  = 'loading';
     private const STATUS_STARTING = 'starting';
     private const STATUS_STARTED  = 'started';
     private const STATUS_STOPPING = 'stopping';
@@ -31,6 +35,16 @@ class Runner extends AbstractTask
      * @var \BetaKiller\Daemon\LockFactory
      */
     private $lockFactory;
+
+    /**
+     * @var \BetaKiller\Helper\AppEnvInterface
+     */
+    private AppEnvInterface $appEnv;
+
+    /**
+     * @var \BetaKiller\Daemon\FsWatcher
+     */
+    private FsWatcher $fsWatcher;
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -60,23 +74,29 @@ class Runner extends AbstractTask
     /**
      * @var string
      */
-    private $status;
+    private string $status = self::STATUS_LOADING;
 
     /**
      * Run constructor.
      *
-     * @param \BetaKiller\Daemon\DaemonFactory $daemonFactory
-     * @param \BetaKiller\Daemon\LockFactory   $lockFactory
-     * @param \Psr\Log\LoggerInterface         $logger
+     * @param \BetaKiller\Daemon\DaemonFactory   $daemonFactory
+     * @param \BetaKiller\Daemon\LockFactory     $lockFactory
+     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \BetaKiller\Daemon\FsWatcher       $fsWatcher
+     * @param \Psr\Log\LoggerInterface           $logger
      */
     public function __construct(
         DaemonFactory $daemonFactory,
         LockFactory $lockFactory,
+        AppEnvInterface $appEnv,
+        FsWatcher $fsWatcher,
         LoggerInterface $logger
     ) {
         $this->daemonFactory = $daemonFactory;
-        $this->logger        = $logger;
         $this->lockFactory   = $lockFactory;
+        $this->appEnv        = $appEnv;
+        $this->fsWatcher     = $fsWatcher;
+        $this->logger        = $logger;
 
         parent::__construct();
     }
@@ -137,6 +157,10 @@ class Runner extends AbstractTask
         $this->pingDB();
 
         $this->start();
+
+        if ($this->appEnv->inDevelopmentMode()) {
+            $this->startFsWatcher($this->loop);
+        }
 
         // Endless loop waiting for signals or exit()
         $this->loop->run();
@@ -206,6 +230,9 @@ class Runner extends AbstractTask
     private function shutdown(int $exitCode): void
     {
         $this->unlock();
+
+        // Stop FS watcher if enabled
+        $this->fsWatcher->stop();
 
         $this->logger->debug('Daemon ":name" has exited with exit code :code', [
             ':name' => $this->codename,
@@ -291,5 +318,32 @@ class Runner extends AbstractTask
     private function isStopping(): bool
     {
         return $this->status === self::STATUS_STOPPING;
+    }
+
+    private function startFsWatcher(LoopInterface $loop): void
+    {
+        $this->fsWatcher->start($loop, function (string $path) {
+            $ext = pathinfo($path, PATHINFO_EXTENSION);
+
+            $isLoaded = in_array($path, \get_included_files(), true);
+
+            $this->logger->debug('path = :path, isLoaded = :loaded, ext = :ext', [
+                ':path'   => $path,
+                ':ext'    => $ext,
+                ':loaded' => $isLoaded ? 'true' : 'false',
+            ]);
+
+            // Skip changes for files which are not loaded yet
+            if ($ext === 'php' && !$isLoaded) {
+                return;
+            }
+
+            $this->logger->info('Restarting daemon ":name" after FS changes', [
+                ':name' => $this->codename,
+            ]);
+
+            // Restart daemon (auto-restart after stop)
+            $this->stop();
+        });
     }
 }
