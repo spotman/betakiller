@@ -249,7 +249,7 @@ class SupervisorDaemon implements DaemonInterface
         ];
 
         // Prevent duplicates
-        if (in_array($this->getStatus($name), $ignoreStatuses, true)) {
+        if ($this->hasStatus($name) && in_array($this->getStatus($name), $ignoreStatuses, true)) {
             return;
         }
 
@@ -421,6 +421,11 @@ class SupervisorDaemon implements DaemonInterface
     private function getStatus(string $name): string
     {
         return $this->statuses[$name]['status'];
+    }
+
+    private function hasStatus(string $name): bool
+    {
+        return isset($this->statuses[$name]['status']);
     }
 
     private function setProcess(string $name, Process $proc): void
