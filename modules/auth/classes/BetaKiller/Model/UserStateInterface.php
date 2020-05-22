@@ -20,6 +20,11 @@ interface UserStateInterface extends WorkflowStateInterface
     /**
      * @return bool
      */
+    public function isEmailChanged(): bool;
+
+    /**
+     * @return bool
+     */
     public function isBlocked(): bool;
 
     /**

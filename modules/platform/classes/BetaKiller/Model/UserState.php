@@ -9,13 +9,13 @@ final class UserState extends AbstractWorkflowStateOrm implements UserStateInter
 {
     public const TABLE_NAME = 'user_statuses';
 
-    public const CREATED         = 'created';      // Just created
-    public const EMAIL_CONFIRMED = 'confirmed';    // Email confirmed
-    public const EMAIL_CHANGED   = 'email-changed';    // Email changed
-    public const BLOCKED         = 'blocked';      // Blocked coz of hacking, spam, or app rules violation
-    public const CLAIMED         = 'claimed';      // User claimed about registration
-    public const SUSPENDED       = 'suspended';    // Account removal requested so it will be suspended for 6 months
-    public const RESUMED         = 'resumed';    // Resumed from suspend, requires additional confirmation (potential fraud)
+    public const CREATED         = 'created';       // Just created
+    public const EMAIL_CONFIRMED = 'confirmed';     // Email confirmed
+    public const EMAIL_CHANGED   = 'email-changed'; // Email changed
+    public const BLOCKED         = 'blocked';       // Blocked coz of hacking, spam, or app rules violation
+    public const CLAIMED         = 'claimed';       // User claimed about registration
+    public const SUSPENDED       = 'suspended';     // Account removal requested so it will be suspended for 6 months
+    public const RESUMED         = 'resumed';       // Resumed from suspend, requires additional confirmation (potential fraud)
 
     protected function configure(): void
     {
@@ -59,6 +59,14 @@ final class UserState extends AbstractWorkflowStateOrm implements UserStateInter
     public function isConfirmed(): bool
     {
         return $this->isWorkflowStateCodename(self::EMAIL_CONFIRMED);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isEmailChanged(): bool
+    {
+        return $this->isWorkflowStateCodename(self::EMAIL_CHANGED);
     }
 
     /**

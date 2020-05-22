@@ -453,7 +453,7 @@ class User extends \ORM implements UserInterface
 
         $state = $this->getWorkflowState();
 
-        return !($state->isBlocked() || $state->isClaimed());
+        return $state->isCreated() || $state->isConfirmed() || $state->isEmailChanged() || $state->isResumed();
     }
 
     /**
