@@ -17,6 +17,7 @@
     "ext-sqlite3": "*",
     "ext-xml": "*",
     "ext-zlib": "*",
+    "ext-pcntl": "*",
     "aidantwoods/secureheaders": "^2.0",
     "asm89/twig-cache-extension": "^1.2",
     "bramus/monolog-colored-line-formatter": "~3.0",
