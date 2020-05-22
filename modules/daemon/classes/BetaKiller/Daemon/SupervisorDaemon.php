@@ -243,6 +243,16 @@ class SupervisorDaemon implements DaemonInterface
 
     private function startSupervisedDaemon(string $name, bool $clearCounter = null): void
     {
+        $ignoreStatuses = [
+            self::STATUS_STARTING,
+            self::STATUS_RUNNING,
+        ];
+
+        // Prevent duplicates
+        if (in_array($this->getStatus($name), $ignoreStatuses, true)) {
+            return;
+        }
+
         $this->setStatus($name, self::STATUS_STARTING);
 
         $this->logger->debug('Starting ":name" daemon', [
@@ -279,7 +289,7 @@ class SupervisorDaemon implements DaemonInterface
                 $this->setStatus($name, self::STATUS_RUNNING);
                 $this->loop->cancelTimer($timer);
 
-                $this->logger->notice('Daemon ":name" started', [
+                $this->logger->debug('Daemon ":name" started', [
                     ':name' => $name,
                 ]);
             }
@@ -373,7 +383,7 @@ class SupervisorDaemon implements DaemonInterface
 
         $this->setStatus($name, self::STATUS_STOPPED);
 
-        $this->logger->notice('Daemon ":name" stopped', [
+        $this->logger->debug('Daemon ":name" stopped', [
             ':name' => $name,
         ]);
     }
