@@ -15,32 +15,32 @@ class UrlElementTreeLoader
     /**
      * @var \BetaKiller\Url\ModelProvider\UrlElementProviderDatabase
      */
-    private $databaseProvider;
+    private UrlElementProviderDatabase $databaseProvider;
 
     /**
      * @var \BetaKiller\Url\ModelProvider\UrlElementProviderXmlConfig
      */
-    private $xmlProvider;
+    private UrlElementProviderXmlConfig $xmlProvider;
 
     /**
      * @var \BetaKiller\Url\UrlElementTreeInterface
      */
-    private $tree;
+    private UrlElementTreeInterface $tree;
 
     /**
      * @var \Psr\SimpleCache\CacheInterface
      */
-    private $cache;
+    private CacheInterface $cache;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
-    private $appEnv;
+    private AppEnvInterface $appEnv;
 
     /**
      * Initializer constructor.
@@ -102,8 +102,8 @@ class UrlElementTreeLoader
             return false;
         }
 
-        $this->logger->debug('Loading URL elements tree from cache');
-        $counter = 0;
+//        $this->logger->debug('Loading URL elements tree from cache');
+//        $counter = 0;
 
         try {
             $data = unserialize($serializedModels, [UrlElementInterface::class]);
@@ -115,7 +115,7 @@ class UrlElementTreeLoader
             // Simply add all models, validation already done upon inserting data into cache
             foreach ($data as $urlElement) {
                 $this->tree->add($urlElement, true); // No duplication is allowed here
-                $counter++;
+//                $counter++;
             }
         } catch (\Throwable $e) {
             $this->cache->delete($key);
@@ -124,7 +124,7 @@ class UrlElementTreeLoader
             return false;
         }
 
-        $this->logger->debug('Added :count URL elements to tree from cache', [':count' => $counter]);
+//        $this->logger->debug('Added :count URL elements to tree from cache', [':count' => $counter]);
 
         return true;
     }
@@ -144,7 +144,7 @@ class UrlElementTreeLoader
             $data[] = $model;
         }
 
-        $this->logger->debug('Storing :count URL elements in cache', [':count' => \count($data)]);
+//        $this->logger->debug('Storing :count URL elements in cache', [':count' => \count($data)]);
 
         $this->cache->set($key, serialize($data), 86400); // 1 day
     }
@@ -154,7 +154,7 @@ class UrlElementTreeLoader
      */
     private function loadTreeFromProviders(): void
     {
-        $this->logger->debug('Loading URL elements tree from providers');
+//        $this->logger->debug('Loading URL elements tree from providers');
 
         /** @var \BetaKiller\Url\ModelProvider\UrlElementProviderInterface[] $sources */
         $sources = [
