@@ -15,6 +15,8 @@ use BetaKiller\MessageBus\EventSerializerInterface;
 use BetaKiller\MessageBus\NativeEventSerializer;
 use BetaKiller\Middleware\CspReportBodyParamsStrategy;
 use BetaKiller\Notification\MessageActionUrlGeneratorInterface;
+use BetaKiller\Notification\ScheduleTargetSpecInterface;
+use BetaKiller\Notification\UserScheduleTargetSpec;
 use BetaKiller\NotificationMessageActionUrlGenerator;
 use BetaKiller\Repository\RoleRepository;
 use BetaKiller\Repository\RoleRepositoryInterface;
@@ -219,6 +221,9 @@ return [
         EntityPermissionResolverInterface::class => autowire(EntityPermissionResolver::class),
 
         EventSerializerInterface::class => autowire(NativeEventSerializer::class),
+
+        ScheduleTargetSpecInterface::class => autowire(UserScheduleTargetSpec::class),
+
     ],
 
 ];

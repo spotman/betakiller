@@ -8,6 +8,7 @@ use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\ScheduleProcessor\ScheduleProcessorInterface;
 use BetaKiller\Notification\ScheduleProcessorFactory;
+use BetaKiller\Notification\ScheduleTargetSpecInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Psr\Log\LoggerInterface;
@@ -30,15 +31,22 @@ final class SendScheduled extends AbstractTask
     private $processorFactory;
 
     /**
+     * @var \BetaKiller\Notification\ScheduleTargetSpecInterface
+     */
+    private ScheduleTargetSpecInterface $targetSpec;
+
+    /**
      * SendScheduled constructor.
      *
-     * @param \BetaKiller\Notification\NotificationFacade       $notification
-     * @param \BetaKiller\Notification\ScheduleProcessorFactory $processorFactory
-     * @param \Psr\Log\LoggerInterface                          $logger
+     * @param \BetaKiller\Notification\NotificationFacade          $notification
+     * @param \BetaKiller\Notification\ScheduleProcessorFactory    $processorFactory
+     * @param \BetaKiller\Notification\ScheduleTargetSpecInterface $targetSpec
+     * @param \Psr\Log\LoggerInterface                             $logger
      */
     public function __construct(
         NotificationFacade $notification,
         ScheduleProcessorFactory $processorFactory,
+        ScheduleTargetSpecInterface $targetSpec,
         LoggerInterface $logger
     ) {
         parent::__construct();
@@ -46,6 +54,7 @@ final class SendScheduled extends AbstractTask
         $this->notification     = $notification;
         $this->processorFactory = $processorFactory;
         $this->logger           = $logger;
+        $this->targetSpec       = $targetSpec;
     }
 
     /**
@@ -103,7 +112,9 @@ final class SendScheduled extends AbstractTask
 
             // Proceed message for each target
             foreach ($targets as $target) {
-                $this->processMessage($processor, $messageCodename, $target);
+                if ($this->targetSpec->isAllowedTo($target)) {
+                    $this->processMessage($processor, $messageCodename, $target);
+                }
             }
         }
     }
