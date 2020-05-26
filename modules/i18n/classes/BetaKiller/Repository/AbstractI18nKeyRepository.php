@@ -86,7 +86,7 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
         string $term,
         ?LanguageInterface $lang = null,
         string $mode = null
-    ) {
+    ): self {
         $mode = $mode ?? self::SEARCH_STARTING;
 
         $column = $this->getI18nValuesColumnName($orm);
@@ -131,7 +131,7 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
         }
     }
 
-    protected function filterLang(ExtendedOrmInterface $orm, LanguageInterface $lang, bool $inverse = null)
+    protected function filterLang(ExtendedOrmInterface $orm, LanguageInterface $lang, bool $inverse = null): self
     {
         $column = $this->getI18nValuesColumnName($orm);
 
@@ -144,7 +144,7 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
         return $this;
     }
 
-    protected function filterEmptyI18n(ExtendedOrmInterface $orm)
+    protected function filterEmptyI18n(ExtendedOrmInterface $orm): self
     {
         $column = $this->getI18nValuesColumnName($orm);
 
