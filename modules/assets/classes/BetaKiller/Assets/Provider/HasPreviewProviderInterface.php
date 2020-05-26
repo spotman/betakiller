@@ -12,6 +12,7 @@ interface HasPreviewProviderInterface extends AssetsProviderInterface
     public const CONFIG_MODEL_PREVIEW_KEY         = 'preview';
     public const CONFIG_MODEL_PREVIEW_SIZES_KEY   = 'sizes';
     public const CONFIG_MODEL_PREVIEW_QUALITY_KEY = 'quality';
+    public const CONFIG_MODEL_PREVIEW_CROP_KEY    = 'crop';
 
     /**
      * @param \BetaKiller\Assets\Model\HasPreviewAssetsModelInterface $model
@@ -48,4 +49,9 @@ interface HasPreviewProviderInterface extends AssetsProviderInterface
      * @return int
      */
     public function getPreviewQuality(): int;
+
+    /**
+     * @return bool
+     */
+    public function isCroppedPreview(): bool;
 }

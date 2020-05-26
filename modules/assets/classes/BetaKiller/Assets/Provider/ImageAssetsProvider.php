@@ -103,7 +103,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
 
         $content = $this->getContent($model);
 
-        list($width, $height) = $this->parseSizeDimensions($size);
+        [$width, $height] = $this->parseSizeDimensions($size);
 
         if (!$width && !$height) {
             throw new AssetsProviderException('Preview size must have width or height defined');
@@ -170,14 +170,16 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
             $originalHeight = $image->height;
             $originalRatio  = $this->calculateDimensionsRatio($originalWidth, $originalHeight);
 
-            list($width, $height) = $this->restoreOmittedDimensions($width, $height, $originalRatio);
+            [$width, $height] = $this->restoreOmittedDimensions($width, $height, $originalRatio);
 
             $resizeRatio = $this->calculateDimensionsRatio($width, $height);
 
             if ($originalRatio === $resizeRatio) {
                 $image->resize($width, $height);
-            } else {
+            } elseif ($this->isCroppedPreview()) {
                 $image->resize($width, $height, Image::INVERSE)->crop($width, $height);
+            } else {
+                $image->resize($width, $height, Image::AUTO);
             }
 
             return $image->render(null /* auto */, $quality);
@@ -213,9 +215,9 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
 
             $size       = $this->determinePreviewSize($size);
             $dimensions = $this->parseSizeDimensions($size);
+            $modelRatio = $this->getModelRatio($model);
 
-            list($width, $height) = $this->restoreOmittedDimensions($dimensions[0], $dimensions[1],
-                $this->getModelRatio($model));
+            [$width, $height] = $this->restoreOmittedDimensions($dimensions[0], $dimensions[1], $modelRatio);
 
             $src = $this->getPreviewUrl($model, $size);
         }
@@ -227,7 +229,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
 
         // Recalculate dimensions if $attributes['width'] or 'height' exists
         if ($targetWidth || $targetHeight) {
-            list($width, $height) = $this->restoreOmittedDimensions($targetWidth, $targetHeight, $targetRatio);
+            [$width, $height] = $this->restoreOmittedDimensions($targetWidth, $targetHeight, $targetRatio);
         }
 
         $attrs = array_merge([

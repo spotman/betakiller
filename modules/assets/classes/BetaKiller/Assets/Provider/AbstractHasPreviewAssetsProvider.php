@@ -98,6 +98,17 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
     }
 
     /**
+     * @inheritDoc
+     */
+    public function isCroppedPreview(): bool
+    {
+        return (bool)$this->config->getProviderConfigValue($this, [
+            self::CONFIG_MODEL_PREVIEW_KEY,
+            self::CONFIG_MODEL_PREVIEW_CROP_KEY,
+        ], true);
+    }
+
+    /**
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
      * @return string[]
