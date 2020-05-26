@@ -113,7 +113,8 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
             $content,
             $width,
             $height,
-            $this->getPreviewQuality()
+            $this->getPreviewQuality(),
+            true
         );
     }
 
@@ -146,7 +147,8 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
             $content,
             $maxWidth,
             $maxHeight,
-            100 // 100% quality for original image
+            100, // 100% quality for original image
+            false,
         );
     }
 
@@ -160,7 +162,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      * @return string
      * @throws AssetsProviderException
      */
-    private function resize(string $originalContent, ?int $width, ?int $height, int $quality): string
+    private function resize(string $originalContent, ?int $width, ?int $height, int $quality, bool $isPreview): string
     {
         try {
             $image = Image::fromContent($originalContent);
@@ -176,10 +178,13 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
 
             if ($originalRatio === $resizeRatio) {
                 $image->resize($width, $height);
-            } elseif ($this->isCroppedPreview()) {
-                $image->resize($width, $height, Image::INVERSE)->crop($width, $height);
+            } elseif ($isPreview && $this->isCroppedPreview()) {
+                $image
+                    ->resize($width, $height, Image::INVERSE)
+                    ->crop($width, $height);
             } else {
-                $image->resize($width, $height, Image::AUTO);
+                $image
+                    ->resize($width, $height, Image::AUTO);
             }
 
             return $image->render(null /* auto */, $quality);
