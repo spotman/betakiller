@@ -102,6 +102,26 @@ class UrlHelper implements UrlHelperInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function withUrlContainer(UrlContainerInterface $params): UrlHelperInterface
+    {
+        $this->urlContainer = $params;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function importUrlContainer(UrlContainerInterface $params): UrlHelperInterface
+    {
+        $this->urlContainer->import($params, true);
+
+        return $this;
+    }
+
+    /**
      * @param string                                               $codename
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *

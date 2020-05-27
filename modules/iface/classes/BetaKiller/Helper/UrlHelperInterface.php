@@ -3,21 +3,10 @@ declare(strict_types=1);
 
 namespace BetaKiller\Helper;
 
-use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\CrudlsActionsInterface;
-use BetaKiller\Factory\FactoryException;
 use BetaKiller\Model\DispatchableEntityInterface;
-use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
-use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\DummyModelInterface;
-use BetaKiller\Url\IFaceModelInterface;
-use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementInterface;
-use BetaKiller\Url\UrlElementStack;
-use BetaKiller\Url\UrlElementTreeInterface;
-use BetaKiller\Url\UrlPrototypeService;
-use BetaKiller\Url\ZoneInterface;
 
 interface UrlHelperInterface
 {
@@ -35,6 +24,20 @@ interface UrlHelperInterface
     public function getDefaultUrlElement(): UrlElementInterface;
 
     public function createUrlContainer(): UrlContainerInterface;
+
+    /**
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     *
+     * @return \BetaKiller\Helper\UrlHelperInterface
+     */
+    public function withUrlContainer(UrlContainerInterface $params): UrlHelperInterface;
+
+    /**
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     *
+     * @return \BetaKiller\Helper\UrlHelperInterface
+     */
+    public function importUrlContainer(UrlContainerInterface $params): UrlHelperInterface;
 
     /**
      * @param string                                               $codename

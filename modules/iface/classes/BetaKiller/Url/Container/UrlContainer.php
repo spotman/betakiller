@@ -319,7 +319,7 @@ class UrlContainer implements UrlContainerInterface
                 continue;
             }
 
-            $this->setParameter($param);
+            $this->setParameter($param, true);
         }
 
         return $this;

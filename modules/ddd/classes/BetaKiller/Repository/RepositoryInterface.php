@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Repository;
 
+use BetaKiller\Model\AbstractEntityInterface;
+
 interface RepositoryInterface
 {
     public const CLASS_PREFIX = 'Repository';
@@ -11,7 +13,8 @@ interface RepositoryInterface
     /**
      * @param string $id
      *
-     * @return mixed
+     * @return AbstractEntityInterface|mixed
+
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function findById(string $id);
@@ -19,7 +22,7 @@ interface RepositoryInterface
     /**
      * @param string $id
      *
-     * @return mixed
+     * @return AbstractEntityInterface|mixed
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getById(string $id);
