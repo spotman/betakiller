@@ -7,4 +7,9 @@ class IncorrectCredentialsException extends AbstractAuthException
     {
         return 'error.auth.incorrect-credentials';
     }
+
+    public function isNotificationEnabled(): bool
+    {
+        return false;
+    }
 }
