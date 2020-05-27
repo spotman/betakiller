@@ -11,8 +11,8 @@ interface EntityPermissionResolverInterface
     /**
      * @param \Spotman\Acl\AclUserInterface             $user
      * @param \BetaKiller\Model\AbstractEntityInterface $entity
-     * @param string                                    $action
      *
+     * @param string|null                               $action
      * @param bool|null                                 $skipSpecCheck
      *
      * @return bool
@@ -20,7 +20,7 @@ interface EntityPermissionResolverInterface
     public function isAllowed(
         AclUserInterface $user,
         AbstractEntityInterface $entity,
-        string $action,
+        ?string $action = null,
         bool $skipSpecCheck = null
     ): bool;
 }

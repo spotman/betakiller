@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Acl;
 
 use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
+use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\EntityWithAclSpecInterface;
 use Spotman\Acl\AclException;
@@ -15,12 +16,12 @@ final class EntityPermissionResolver implements EntityPermissionResolverInterfac
     /**
      * @var \Spotman\Acl\AclInterface
      */
-    private $acl;
+    private AclInterface $acl;
 
     /**
      * @var \BetaKiller\Acl\EntityAclSpecFactory
      */
-    private $aclSpecFactory;
+    private EntityAclSpecFactory $aclSpecFactory;
 
     /**
      * EntityPermissionResolver constructor.
@@ -40,9 +41,11 @@ final class EntityPermissionResolver implements EntityPermissionResolverInterfac
     public function isAllowed(
         AclUserInterface $user,
         AbstractEntityInterface $entity,
-        string $action,
+        ?string $action = null,
         bool $skipSpecCheck = null
     ): bool {
+        $action = $action ?? CrudlsActionsInterface::ACTION_READ;
+
         $resource = $this->getEntityAclResource($entity);
 
         $this->acl->injectUserResolver($user, $resource);
