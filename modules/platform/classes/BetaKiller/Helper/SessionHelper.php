@@ -46,11 +46,23 @@ class SessionHelper
         return DateTimeHelper::createDateTimeFromTimestamp($ts);
     }
 
+    /**
+     * Mark session as saved in persistent storage
+     *
+     * @param \Zend\Expressive\Session\SessionInterface $session
+     */
     public static function markAsPersistent(SessionInterface $session): void
     {
         $session->set(self::PERSISTENT, true);
     }
 
+    /**
+     * Check session was saved in persistent storage
+     *
+     * @param \Zend\Expressive\Session\SessionInterface $session
+     *
+     * @return bool
+     */
     public static function isPersistent(SessionInterface $session): bool
     {
         return (bool)$session->get(self::PERSISTENT);

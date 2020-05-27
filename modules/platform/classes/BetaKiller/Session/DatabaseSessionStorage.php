@@ -132,7 +132,6 @@ class DatabaseSessionStorage implements SessionStorageInterface
         $session = $this->sessionFactory($model->getToken(), $data);
 
         SessionHelper::setCreatedAt($session, $model->getCreatedAt());
-        SessionHelper::markAsPersistent($session);
 
         // Restore user in session if exists
         $user = $model->getUser();
@@ -251,6 +250,8 @@ class DatabaseSessionStorage implements SessionStorageInterface
             $model->setOrigin($origin);
         }
 
+        SessionHelper::markAsPersistent($session);
+
         // Encode and encrypt session data
         $content = $this->encodeData($session->toArray());
 
@@ -260,8 +261,6 @@ class DatabaseSessionStorage implements SessionStorageInterface
             ->setLastActiveAt(new DateTimeImmutable);
 
         $this->sessionRepo->save($model);
-
-        SessionHelper::markAsPersistent($session);
 
         // Set cookie
         return $this->cookies->set(

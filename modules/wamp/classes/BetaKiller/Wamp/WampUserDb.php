@@ -69,7 +69,10 @@ class WampUserDb implements WampCraUserDbInterface
             $session = $this->auth->getSession($sessionId);
 
             if (!SessionHelper::isPersistent($session)) {
-                throw new LogicException('Using non-persistent session '.$sessionId);
+                LoggerHelper::logRawException(
+                    $this->logger,
+                    new LogicException('Using non-persistent session '.$sessionId)
+                );
             }
 
 // No user agent checks anymore (inconsistent behaviour)
