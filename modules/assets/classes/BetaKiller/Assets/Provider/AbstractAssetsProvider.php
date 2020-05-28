@@ -23,7 +23,6 @@ use BetaKiller\Assets\Model\HashBasedAssetsModelInterface;
 use BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface;
 use BetaKiller\Assets\Storage\AssetsStorageInterface;
 use BetaKiller\Factory\EntityFactoryInterface;
-use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\IdentityConverterInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\HashStrategyAssetsRepositoryInterface;
@@ -453,7 +452,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
             // Calculate hash for processed content
             $hash = $this->config->isDuplicateAllowed($this->getCodename())
                 // Use random hash and allow files to be uploaded multiple times
-                ? $this->calculateContentHash(\microtime())
+                ? $this->calculateContentHash(\random_int(1, \PHP_INT_MAX).\microtime())
                 : $this->calculateContentHash($content);
 
             // Check for duplicates
