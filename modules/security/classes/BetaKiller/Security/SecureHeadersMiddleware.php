@@ -101,17 +101,15 @@ class SecureHeadersMiddleware implements MiddlewareInterface
 //        $headers->csp('connect', $baseUrl);
 //        $headers->csp('connect', 'wss://'.$baseUri->getHost());
 
-        foreach ($this->securityConfig->getCspRules() as $ruleName => $ruleValues) {
-            foreach ($ruleValues as $value) {
-                $headers->csp($ruleName, $value);
+        if ($this->securityConfig->isCspEnabled()) {
+            foreach ($this->securityConfig->getCspRules() as $ruleName => $ruleValues) {
+                foreach ($ruleValues as $value) {
+                    $headers->csp($ruleName, $value);
+                }
             }
         }
 
         $response = $handler->handle($request->withAttribute(SecureHeaders::class, $headers));
-
-        if (!$this->securityConfig->isCspEnabled()) {
-            return $response;
-        }
 
         foreach ($this->securityConfig->getHeadersToAdd() as $headerName => $headerValue) {
             if ($response->hasHeader($headerName)) {

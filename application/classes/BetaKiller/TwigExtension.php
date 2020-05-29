@@ -10,6 +10,7 @@ use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\I18n\I18nFacade;
+use BetaKiller\Security\SecurityConfigInterface;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;
 use BetaKiller\Widget\WidgetFacade;
@@ -54,23 +55,31 @@ final class TwigExtension extends AbstractExtension
     private AppConfigInterface $appConfig;
 
     /**
+     * @var \BetaKiller\Security\SecurityConfigInterface
+     */
+    private SecurityConfigInterface $securityConfig;
+
+    /**
      * TwigExtension constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface     $appEnv
-     * @param \BetaKiller\Config\AppConfigInterface  $appConfig
-     * @param \BetaKiller\Widget\WidgetFacade        $widgetFacade
-     * @param \BetaKiller\IdentityConverterInterface $identityConverter
-     * @param \Psr\Log\LoggerInterface               $logger
+     * @param \BetaKiller\Helper\AppEnvInterface           $appEnv
+     * @param \BetaKiller\Config\AppConfigInterface        $appConfig
+     * @param \BetaKiller\Security\SecurityConfigInterface $securityConfig
+     * @param \BetaKiller\Widget\WidgetFacade              $widgetFacade
+     * @param \BetaKiller\IdentityConverterInterface       $identityConverter
+     * @param \Psr\Log\LoggerInterface                     $logger
      */
     public function __construct(
         AppEnvInterface $appEnv,
         AppConfigInterface $appConfig,
+        SecurityConfigInterface $securityConfig,
         WidgetFacade $widgetFacade,
         IdentityConverterInterface $identityConverter,
         LoggerInterface $logger
     ) {
         $this->appEnv            = $appEnv;
         $this->appConfig         = $appConfig;
+        $this->securityConfig = $securityConfig;
         $this->widgetFacade      = $widgetFacade;
         $this->logger            = $logger;
         $this->identityConverter = $identityConverter;
@@ -152,6 +161,10 @@ final class TwigExtension extends AbstractExtension
             new TwigFunction(
                 'csp',
                 function (array $context, string $name, string $value, bool $reportOnly = null): void {
+                    if (!$this->securityConfig->isCspEnabled()) {
+                        return;
+                    }
+
                     $request = $this->getRequest($context);
                     $csp     = ServerRequestHelper::getCsp($request);
 
@@ -180,7 +193,11 @@ final class TwigExtension extends AbstractExtension
 
             new TwigFunction(
                 'js_nonce',
-                function (array $context): string {
+                function (array $context): ?string {
+                    if (!$this->securityConfig->isCspEnabled()) {
+                        return null;
+                    }
+
                     $request = $this->getRequest($context);
 
                     return ServerRequestHelper::getCsp($request)->cspNonce('script');
@@ -190,7 +207,11 @@ final class TwigExtension extends AbstractExtension
 
             new TwigFunction(
                 'css_nonce',
-                function (array $context): string {
+                function (array $context): ?string {
+                    if (!$this->securityConfig->isCspEnabled()) {
+                        return null;
+                    }
+
                     $request = $this->getRequest($context);
 
                     return ServerRequestHelper::getCsp($request)->cspNonce('style');
@@ -644,6 +665,10 @@ final class TwigExtension extends AbstractExtension
 
     private function processHashesForScriptTags(string $text, SecureHeaders $csp): void
     {
+        if (!$this->securityConfig->isCspEnabled()) {
+            return;
+        }
+
         foreach ($this->findTagsContents('script', $text) as $content) {
             $csp->cspHash('script', $content);
         }
@@ -651,6 +676,10 @@ final class TwigExtension extends AbstractExtension
 
     private function processHashesForStyleTags(string $text, SecureHeaders $csp): void
     {
+        if (!$this->securityConfig->isCspEnabled()) {
+            return;
+        }
+
         foreach ($this->findTagsContents('style', $text) as $content) {
             $csp->cspHash('style', $content);
         }
