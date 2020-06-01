@@ -107,7 +107,7 @@ class Logger implements LoggerInterface
         $fileHandler->pushProcessor(new ExceptionStacktraceProcessor);
         $monolog->pushHandler(new FilterExceptionsHandler(new FingersCrossedHandler($fileHandler, $logsLevel)));
 
-        if (!$this->appEnv->inDevelopmentMode()) {
+        if ($this->appEnv->inStagingMode() || $this->appEnv->inProductionMode()) {
             $slackUrl     = $this->appEnv->getEnvVariable('SLACK_ERROR_WEBHOOK');
             $slackHandler = new SlackWebhookHandler(
                 $slackUrl,
