@@ -2,7 +2,6 @@
 namespace BetaKiller\Error;
 
 use BetaKiller\Helper\LoggerHelper;
-use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\PhpException;
 use BetaKiller\Model\PhpExceptionModelInterface;
@@ -12,6 +11,7 @@ use Debug;
 use Email;
 use ErrorException;
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Logger;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionClass;
 use Throwable;
@@ -23,9 +23,7 @@ use Throwable;
  */
 class PhpExceptionStorageHandler extends AbstractProcessingHandler
 {
-    public const MIN_LEVEL = \Monolog\Logger::WARNING;
-
-    public const NOTIFICATION_SUBSYSTEM_FAILURE = 'developer/error/subsystem-failure';
+    public const MIN_LEVEL = Logger::WARNING;
 
     private const REWRITE_KEYS = [
         'MySQL server has gone away',
@@ -44,7 +42,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     /**
      * @var bool
      */
-    private $enabled = true;
+    private bool $enabled = true;
 
     /**
      * @var \BetaKiller\Repository\PhpExceptionRepository
@@ -52,22 +50,13 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     private $repository;
 
     /**
-     * @var \BetaKiller\Helper\NotificationHelper
-     */
-    private $notification;
-
-    /**
      * PhpExceptionStorageHandler constructor.
      *
      * @param \BetaKiller\Repository\PhpExceptionRepositoryInterface $repo
-     * @param \BetaKiller\Helper\NotificationHelper                  $notification
      */
-    public function __construct(
-        PhpExceptionRepositoryInterface $repo,
-        NotificationHelper $notification
-    ) {
-        $this->repository   = $repo;
-        $this->notification = $notification;
+    public function __construct(PhpExceptionRepositoryInterface $repo)
+    {
+        $this->repository = $repo;
 
         parent::__construct(self::MIN_LEVEL);
     }
@@ -90,6 +79,8 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
         /** @var UserInterface|null $user */
         $user = $record['context'][LoggerHelper::CONTEXT_KEY_USER] ?? null;
+
+        $exception = null;
 
         try {
             $exception = $this->detectException($record);
@@ -249,37 +240,10 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         return !$lastNotifiedAtTimestamp || $timeDiffInSeconds > static::REPEAT_DELAY;
     }
 
-    private function notifyDevelopersAboutFailure(Throwable $subsystemException, Throwable $originalException): void
+    private function notifyDevelopersAboutFailure(Throwable $subsystemException, ?Throwable $originalException): void
     {
         // Try to send notification to developers about logging subsystem failure
-        try {
-            $this->sendNotification($subsystemException, $originalException);
-        } catch (Throwable $notificationException) {
-            $this->sendPlainEmail($notificationException, $subsystemException, $originalException);
-        }
-    }
-
-    /**
-     * @param \Throwable $subsystemException
-     * @param \Throwable $originalException
-     *
-     * @throws \BetaKiller\Notification\NotificationException
-     */
-    private function sendNotification(Throwable $subsystemException, Throwable $originalException): void
-    {
-        $target = $this->notification->debugEmailTarget('Bug Hunters');
-
-        $this->notification->directMessage(self::NOTIFICATION_SUBSYSTEM_FAILURE, $target, [
-            'url'       => getenv('APP_URL'),
-            'subsystem' => [
-                'message'    => $this->getExceptionText($subsystemException),
-                'stacktrace' => $subsystemException->getTraceAsString(),
-            ],
-            'original'  => [
-                'message'    => $this->getExceptionText($originalException),
-                'stacktrace' => $originalException->getTraceAsString(),
-            ],
-        ]);
+        $this->sendPlainEmail($subsystemException, $originalException);
     }
 
     private function getExceptionText(Throwable $e): string
@@ -288,13 +252,15 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             get_class($e), $e->getCode(), strip_tags($e->getMessage()), Debug::path($e->getFile()), $e->getLine());
     }
 
-    private function sendPlainEmail(Throwable $notificationX, Throwable $subsystemX, Throwable $originalX): void
+    private function sendPlainEmail(Throwable $subsystemX, ?Throwable $originalX): void
     {
         try {
             $message = '';
 
-            foreach ([$notificationX, $subsystemX, $originalX] as $e) {
-                $message .= $this->getExceptionText($e).PHP_EOL.$e->getTraceAsString().PHP_EOL.PHP_EOL;
+            foreach ([$subsystemX, $originalX] as $e) {
+                if ($e) {
+                    $message .= $this->getExceptionText($e).PHP_EOL.$e->getTraceAsString().PHP_EOL.PHP_EOL;
+                }
             }
 
             // Send plain message
@@ -305,12 +271,14 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
                 nl2br($message),
                 true
             );
-        } catch (Throwable $ignored) {
+        } catch (Throwable $emailX) {
             // Nothing we can do here, store exceptions in a system log as a last resort
-            $this->writeToErrorLog($originalX);
+            if ($originalX) {
+                $this->writeToErrorLog($originalX);
+            }
+
             $this->writeToErrorLog($subsystemX);
-            $this->writeToErrorLog($notificationX);
-            $this->writeToErrorLog($ignored);
+            $this->writeToErrorLog($emailX);
         }
     }
 
