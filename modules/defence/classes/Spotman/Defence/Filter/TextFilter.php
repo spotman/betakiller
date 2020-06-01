@@ -12,7 +12,7 @@ class TextFilter extends AbstractFilterVarFilter
      */
     public function getName(): string
     {
-        return 'string';
+        return 'text';
     }
 
     /**
