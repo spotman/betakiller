@@ -152,7 +152,7 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             // String
             'text'       => [
                 $this->def()->text('a'),
-                ['a' => "qwerty\r\nasdfgh\r\n\zxcvbn"],
+                ['a' => "qwerty\r\nasdfgh\nzxcvbn\rpoiuytre"],
             ],
 
             'text + nullable' => [
