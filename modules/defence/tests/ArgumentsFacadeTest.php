@@ -145,8 +145,19 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             ],
 
             'string + nullable' => [
-                $this->def()->string('a'),
-                ['a' => 'qwerty'],
+                $this->def()->string('a')->nullable(),
+                ['a' => null],
+            ],
+
+            // String
+            'text'       => [
+                $this->def()->text('a'),
+                ['a' => "qwerty\r\nasdfgh\r\n\zxcvbn"],
+            ],
+
+            'text + nullable' => [
+                $this->def()->text('a')->nullable(),
+                ['a' => null],
             ],
 
             // Int array
