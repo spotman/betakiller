@@ -6,6 +6,7 @@ use BetaKiller\Acl\AclRolesCollector;
 use BetaKiller\Acl\AclRulesCollector;
 use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
 use BetaKiller\Assets\StaticAssets;
+use BetaKiller\Cache\DoctrineCacheProvider;
 use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\ConfigProviderInterface;
@@ -13,10 +14,10 @@ use BetaKiller\MessageBus\BoundedEventTransportInterface;
 use BetaKiller\MessageBus\CommandBus;
 use BetaKiller\MessageBus\CommandBusInterface;
 use BetaKiller\MessageBus\EsbBoundedEventTransport;
+use BetaKiller\MessageBus\EsbOutboundEventTransport;
 use BetaKiller\MessageBus\EventBus;
 use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\MessageBus\OutboundEventTransportInterface;
-use BetaKiller\MessageBus\EsbOutboundEventTransport;
 use BetaKiller\Notification\MessageRenderer;
 use BetaKiller\Notification\MessageRendererInterface;
 use BetaKiller\View\LayoutViewInterface;
@@ -24,6 +25,7 @@ use BetaKiller\View\TwigLayoutView;
 use BetaKiller\View\TwigViewFactory;
 use BetaKiller\View\ViewFactoryInterface;
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\CacheProvider;
 use Psr\Container\ContainerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
@@ -49,15 +51,15 @@ return [
     'definitions' => [
 
         // PSR-16 adapter for system-wide Doctrine Cache
-        CacheInterface::class                       => DI\factory(function (Cache $doctrineCache) {
+        CacheInterface::class => DI\factory(function (Cache $doctrineCache) {
             return new SimpleCacheAdapter($doctrineCache);
         }),
 
         // Bind Doctrine cache interface to abstract cache provider
-        Cache::class                                => DI\get(Doctrine\Common\Cache\CacheProvider::class),
+        Cache::class          => DI\get(CacheProvider::class),
 
         // Common cache instance for all
-        \Doctrine\Common\Cache\CacheProvider::class => DI\get(\BetaKiller\Cache\DoctrineCacheProvider::class),
+        CacheProvider::class  => DI\get(DoctrineCacheProvider::class),
 
         AppConfigInterface::class                       => DI\autowire(AppConfig::class),
 
