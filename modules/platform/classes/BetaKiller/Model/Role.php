@@ -34,7 +34,7 @@ class Role extends AbstractOrmBasedMultipleParentsTreeModel implements RoleInter
         return [
             self::TABLE_FIELD_NAME        => [
                 ['not_empty'],
-                ['min_length', [':value', 4]],
+                ['min_length', [':value', 3]],
                 ['max_length', [':value', 32]],
             ],
             self::TABLE_FIELD_DESCRIPTION => [

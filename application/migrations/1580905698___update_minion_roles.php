@@ -44,7 +44,7 @@ class Migration1580905698_Update_Minion_Roles extends Migration
         $this->runSql('DELETE ru FROM `roles_users` AS ru LEFT JOIN `users` AS u ON u.id = ru.user_id WHERE u.username = "minion";');
 
         // Add "cli" role
-        $this->runSql('INSERT INTO `roles` SET `name` = "cli", `description` = "Console task runner"');
+//        $this->runSql('INSERT INTO `roles` SET `name` = "cli", `description` = "Console task runner"');
 
         // Bind "cli" role
         $this->runSql('INSERT INTO `roles_users` SET `user_id` = (SELECT id FROM `users` WHERE `username` = "minion"), `role_id` = (SELECT id FROM `roles` WHERE `name` = "cli");');
