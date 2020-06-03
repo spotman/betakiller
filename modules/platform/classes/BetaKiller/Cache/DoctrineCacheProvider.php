@@ -4,9 +4,8 @@ namespace BetaKiller\Cache;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Exception;
 use BetaKiller\Helper\AppEnvInterface;
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\ChainCache;
-use Pcelta\Doctrine\Cache\Factory as CacheFactory;
+use Pcelta\Doctrine\Cache\Factory;
 
 class DoctrineCacheProvider extends ChainCache
 {
@@ -48,14 +47,14 @@ class DoctrineCacheProvider extends ChainCache
 
         $providers = [];
 
-        if ($settings['adapter'] !== 'Array') {
-            // Basic per-request in-memory implementation for better performance
-            $providers[] = new ArrayCache();
-        }
+// Prevent memory leaks in daemons
+//        if ($settings['adapter'] !== 'Array') {
+//            // Basic per-request in-memory implementation for better performance
+//            $providers[] = new ArrayCache();
+//        }
 
         // Add app-related cache adapter
-        $factory     = new CacheFactory();
-        $providers[] = $factory->create($settings);
+        $providers[] = (new Factory())->create($settings);
 
         parent::__construct($providers);
 
