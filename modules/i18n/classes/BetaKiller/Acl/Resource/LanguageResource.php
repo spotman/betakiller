@@ -38,7 +38,7 @@ class LanguageResource extends AbstractEntityRelatedAclResource
             ],
 
             self::ACTION_LIST => [
-                I18nFacade::ROLE_TRANSLATOR,
+                RoleInterface::LOGIN,
             ],
 
             self::ACTION_SEARCH => [
