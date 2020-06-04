@@ -4,12 +4,9 @@ declare(strict_types=1);
 namespace BetaKiller\Security;
 
 use BetaKiller\Exception\BadRequestHttpException;
-use BetaKiller\Exception\SecurityException;
-use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ResponseHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -33,20 +30,13 @@ class CspReportHandler implements RequestHandlerInterface
     private $logger;
 
     /**
-     * @var \Psr\Http\Message\UriFactoryInterface
-     */
-    private $uriFactory;
-
-    /**
      * CspReportHandler constructor.
      *
-     * @param \Psr\Http\Message\UriFactoryInterface $uriFactory
-     * @param \Psr\Log\LoggerInterface              $logger
+     * @param \Psr\Log\LoggerInterface $logger
      */
-    public function __construct(UriFactoryInterface $uriFactory, LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger)
     {
-        $this->logger     = $logger;
-        $this->uriFactory = $uriFactory;
+        $this->logger = $logger;
     }
 
     /**
@@ -78,14 +68,11 @@ class CspReportHandler implements RequestHandlerInterface
             return ResponseHelper::text('Ignored');
         }
 
-        $e = new SecurityException('CSP: ":directive" blocked ":blocked"', [
+        $this->logger->alert('CSP ":directive" blocked ":blocked" at :url', [
             ':blocked'   => $blockedUri,
             ':directive' => $data['effective-directive'] ?? ($data['violated-directive'] ?? 'unknown'),
+            ':url'       => $documentUrl,
         ]);
-
-        $uri = $this->uriFactory->createUri($documentUrl);
-
-        LoggerHelper::logRequestException($this->logger, $e, $request->withUri($uri));
 
         return ResponseHelper::text('OK');
     }
