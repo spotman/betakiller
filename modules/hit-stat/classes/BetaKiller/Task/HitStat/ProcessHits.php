@@ -159,19 +159,6 @@ class ProcessHits extends AbstractTask
             ]);
         }
 
-        if (count($this->newSources) > 0) {
-            // Notify moderators about new referrers
-            $this->notification->broadcastMessage(self::NEW_SOURCES, [
-                'sources' => \array_map(static function (HitPage $page) {
-                    return $page->getFullUrl();
-                }, $this->newSources),
-            ]);
-
-            $this->logger->debug(':count new sources processed', [
-                ':count' => \count($this->newSources),
-            ]);
-        }
-
         // Mark all records as "processed"
         foreach ($this->processed as $hit) {
             if ($hit->isProcessed()) {
@@ -191,6 +178,20 @@ class ProcessHits extends AbstractTask
             $hit->markAsProcessed();
 
             $this->hitsRepository->save($hit);
+        }
+
+
+        if (count($this->newSources) > 0) {
+            // Notify moderators about new referrers
+            $this->notification->broadcastMessage(self::NEW_SOURCES, [
+                'sources' => \array_map(static function (HitPage $page) {
+                    return $page->getFullUrl();
+                }, $this->newSources),
+            ]);
+
+            $this->logger->debug(':count new sources processed', [
+                ':count' => \count($this->newSources),
+            ]);
         }
     }
 
