@@ -5,6 +5,7 @@ namespace BetaKiller\Action\Auth;
 
 use BetaKiller\Action\AbstractAction;
 use BetaKiller\Action\PostRequestActionInterface;
+use BetaKiller\Exception\PublicException;
 use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -19,6 +20,7 @@ use Spotman\Defence\DefinitionBuilderInterface;
 class ChangePasswordAction extends AbstractAction implements PostRequestActionInterface
 {
     private const ARG_PASS = 'password';
+    private const ARG_PASS_CONFIRM = 'password_confirm';
 
     /**
      * @var \BetaKiller\Service\AuthService
@@ -52,6 +54,9 @@ class ChangePasswordAction extends AbstractAction implements PostRequestActionIn
             ->string(self::ARG_PASS)
             ->lengthBetween(AuthService::PASSWORD_MIN_LENGTH, AuthService::PASSWORD_MAX_LENGTH)
             //
+            ->string(self::ARG_PASS_CONFIRM)
+            ->lengthBetween(AuthService::PASSWORD_MIN_LENGTH, AuthService::PASSWORD_MAX_LENGTH)
+            //
             ->import($this->csrf);
     }
 
@@ -75,8 +80,15 @@ class ChangePasswordAction extends AbstractAction implements PostRequestActionIn
 
         $this->csrf->checkActionToken($request);
 
+        $post = ActionRequestHelper::postArguments($request);
+
         // Update password
-        $password = ActionRequestHelper::postArguments($request)->getString(self::ARG_PASS);
+        $password = $post->getString(self::ARG_PASS);
+        $confirm = $post->getString(self::ARG_PASS_CONFIRM);
+
+        if ($password !== $confirm) {
+            throw new PublicException('Passwords are not equal');
+        }
 
         $this->auth->updateUserPassword($user, $password);
 
