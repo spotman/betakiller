@@ -76,7 +76,11 @@ class WidgetFacade
                 return '';
             }
 
-            throw new AccessDeniedException();
+            throw new AccessDeniedException('Widget ":name" is not allowed to User ":id", roles required: ":roles"', [
+                ':name'  => $widget->getName(),
+                ':id'    => $user->getID(),
+                ':roles' => implode('", "', $widget->getAclRoles()),
+            ]);
         }
 
         $result = '';
