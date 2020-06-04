@@ -132,6 +132,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         $session = $this->sessionFactory($model->getToken(), $data);
 
         SessionHelper::setCreatedAt($session, $model->getCreatedAt());
+        SessionHelper::markAsPersistent($session);
 
         // Restore user in session if exists
         $user = $model->getUser();
