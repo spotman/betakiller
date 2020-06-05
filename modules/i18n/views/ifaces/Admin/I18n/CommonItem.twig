@@ -4,7 +4,8 @@
 
   <h1>{{ key }}</h1>
 
-  <form id="i18n-common-edit-form" action="{{ action }}" method="post">
+  {#<form id="i18n-common-edit-form" action="{{ action }}" method="post">#}
+  <form id="i18n-common-edit-form" method="post">
 
     {% for data in values %}
       {% set prefix = "values[" ~ loop.index0 ~ "]" %}
@@ -27,7 +28,7 @@
       {% endif %}
     {% endfor %}
 
-    <button type="submit" class="btn green">Save</button>
+    {#<button type="submit" class="btn green">Save</button>#}
   </form>
 
 

@@ -57,7 +57,7 @@ abstract class AbstractItemIFace extends AbstractAdminIFace
      */
     public function getData(ServerRequestInterface $request): array
     {
-        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+//        $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
         /** @var I18nKeyModelInterface $key */
         $key = ServerRequestHelper::getEntity($request, I18nKeyModelInterface::class);
@@ -69,7 +69,7 @@ abstract class AbstractItemIFace extends AbstractAdminIFace
             'key'       => $key->getI18nKeyName(),
             'is_plural' => $isPlural,
             'values'    => $this->getValues($key, $languages),
-            'action'    => $urlHelper->getUpdateEntityUrl($key, ZoneInterface::ADMIN),
+//            'action'    => $urlHelper->getUpdateEntityUrl($key, ZoneInterface::ADMIN),
         ];
     }
 
