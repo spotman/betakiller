@@ -460,6 +460,13 @@ final class TwigExtension extends AbstractExtension
             ),
 
             new TwigFunction(
+                'revision_key',
+                function (): string {
+                    return $this->appEnv->getRevisionKey();
+                }
+            ),
+
+            new TwigFunction(
                 'user_id',
                 function (array $context): string {
                     $request = $this->getRequest($context);
