@@ -3,7 +3,7 @@
   <form action="{{ login_url }}" method="POST" name="regular-login-form">
 
     <div class="form-row justify-content-center">
-      <div class="col-10 col-sm-8 col-md-6 col-lg-4">
+      <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4">
 
         <div class="alert alert-danger d-none" role="alert" data-hidden-class="d-none"></div>
 
@@ -27,13 +27,15 @@
 
         <input type="hidden" name="csrf" value="{{ token }}">
 
-        <button type="submit" class="btn btn-primary">
-          {{ 'auth.regular.sign-in'|i18n }}
-        </button>
+        <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between">
+          <button type="submit" class="btn btn-primary">
+            {{ 'auth.regular.sign-in'|i18n }}
+          </button>
 
-        <a href="{{ access_recovery_url }}" class="btn btn-link mt-3 d-block">
-          {{ 'auth.regular.access-recovery'|i18n }}
-        </a>
+          <a href="{{ access_recovery_url }}" class="btn btn-link mt-3 mt-sm-0">
+            {{ 'auth.regular.access-recovery'|i18n }}
+          </a>
+        </div>
       </div>
     </div>
 
