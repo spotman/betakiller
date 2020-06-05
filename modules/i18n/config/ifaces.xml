@@ -4,14 +4,13 @@
 
     <iface uri="i18n" name="Admin\I18n\Index" parent="Admin\Index" zone="admin" menu="admin" label="Localization"
            entity="TranslationKey" entityAction="list">
-        <!-- No DB configuration
-            <iface uri="common" name="Admin\I18n\CommonList" menu="admin" label="Common" entity="TranslationKey"
-                   entityAction="list">
-                <iface uri="{TranslationKey.id}" name="Admin\I18n\CommonItem" label="{TranslationKey.id}"
-                       entity="TranslationKey" entityAction="read" title="{TranslationKey.key}">
-                    <action uri="save" name="Admin\I18n\UpdateCommonItem" entity="TranslationKey" entityAction="update"/>
-                </iface>
+        <iface uri="common" name="Admin\I18n\CommonList" menu="admin" label="Common" env="development"
+               entity="TranslationKey" entityAction="list">
+            <iface uri="{TranslationKey.id}" name="Admin\I18n\CommonItem" label="{TranslationKey.id}"
+                   entity="TranslationKey" entityAction="read" title="{TranslationKey.key}">
+                <!-- Disable updates from UI for now (readonly mode) -->
+                <!--<action uri="save" name="Admin\I18n\UpdateCommonItem" entity="TranslationKey" entityAction="update"/>-->
             </iface>
-        -->
+        </iface>
     </iface>
 </root>
