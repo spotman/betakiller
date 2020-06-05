@@ -142,22 +142,22 @@ class ProcessHits extends AbstractTask
             }
         }
 
-        if (count($this->newMissingTargets) > 0 || count($this->newMissingSources) > 0) {
-            // Notify moderators about new missed URL
-            $this->notification->broadcastMessage(self::MISSING_TARGETS, [
-                'targets' => \array_map(static function (HitPage $page) {
-                    return (string)$page->getFullUrl();
-                }, $this->newMissingTargets),
-
-                'sources' => \array_map(static function (HitPage $page) {
-                    return (string)$page->getFullUrl();
-                }, $this->newMissingSources),
-            ]);
-
-            $this->logger->debug(':count missing targets processed', [
-                ':count' => \count($this->newMissingTargets),
-            ]);
-        }
+//        if (count($this->newMissingTargets) > 0 || count($this->newMissingSources) > 0) {
+//            // Notify moderators about new missed URL
+//            $this->notification->broadcastMessage(self::MISSING_TARGETS, [
+//                'targets' => \array_map(static function (HitPage $page) {
+//                    return (string)$page->getFullUrl();
+//                }, $this->newMissingTargets),
+//
+//                'sources' => \array_map(static function (HitPage $page) {
+//                    return (string)$page->getFullUrl();
+//                }, $this->newMissingSources),
+//            ]);
+//
+//            $this->logger->debug(':count missing targets processed', [
+//                ':count' => \count($this->newMissingTargets),
+//            ]);
+//        }
 
         // Mark all records as "processed"
         foreach ($this->processed as $hit) {
@@ -181,18 +181,18 @@ class ProcessHits extends AbstractTask
         }
 
 
-        if (count($this->newSources) > 0) {
-            // Notify moderators about new referrers
-            $this->notification->broadcastMessage(self::NEW_SOURCES, [
-                'sources' => \array_map(static function (HitPage $page) {
-                    return (string)$page->getFullUrl();
-                }, $this->newSources),
-            ]);
-
-            $this->logger->debug(':count new sources processed', [
-                ':count' => \count($this->newSources),
-            ]);
-        }
+//        if (count($this->newSources) > 0) {
+//            // Notify moderators about new referrers
+//            $this->notification->broadcastMessage(self::NEW_SOURCES, [
+//                'sources' => \array_map(static function (HitPage $page) {
+//                    return (string)$page->getFullUrl();
+//                }, $this->newSources),
+//            ]);
+//
+//            $this->logger->debug(':count new sources processed', [
+//                ':count' => \count($this->newSources),
+//            ]);
+//        }
     }
 
     private function processCounters(HitInterface $hit): void
