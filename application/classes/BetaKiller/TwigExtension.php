@@ -587,6 +587,14 @@ final class TwigExtension extends AbstractExtension
                 },
                 ['needs_context' => true,]
             ),
+
+            new TwigFunction(
+                'current_url',
+                function (array $context) {
+                    return (string)$this->getRequest($context)->getUri();
+                },
+                ['needs_context' => true,]
+            ),
         ];
     }
 
