@@ -160,6 +160,11 @@ class DatabaseSessionStorage implements SessionStorageInterface
             return $this->createSession();
         }
 
+        if ($model->isRegenerated()) {
+            // Session exists, but was regenerated => create empty (for security purpose)
+            return $this->createSession();
+        }
+
         if ($this->isExpired($model)) {
             // Session exists, but expired => create empty
             return $this->createSession();
@@ -226,42 +231,14 @@ class DatabaseSessionStorage implements SessionStorageInterface
         }
 
         if ($session->isRegenerated()) {
+            // Keep old session
+            $this->storeSession($session);
+
             // Generate new token and create fresh session with original user agent and IP address
             $session = $this->regenerateSession($session);
         }
 
-        // Fetch session model if exists
-        $model = $this->getSessionModel($session);
-
-        if (!$model) {
-            // Create new model for provided token
-            $model = $this->createSessionModel($session);
-        }
-
-        $origin = SessionHelper::getOriginUrl($session);
-
-        // Import user ID from Session only once
-        if (SessionHelper::hasUserID($session) && !$model->hasUser()) {
-            $userID = SessionHelper::getUserID($session);
-            $model->setUserID($userID);
-        }
-
-        // Import origin URL if exists
-        if ($origin) {
-            $model->setOrigin($origin);
-        }
-
-        SessionHelper::markAsPersistent($session);
-
-        // Encode and encrypt session data
-        $content = $this->encodeData($session->toArray());
-
-        // Update model data from session
-        $model
-            ->setContents($content)
-            ->setLastActiveAt(new DateTimeImmutable);
-
-        $this->sessionRepo->save($model);
+        $this->storeSession($session);
 
         // Set cookie
         return $this->cookies->set(
@@ -288,6 +265,46 @@ class DatabaseSessionStorage implements SessionStorageInterface
     private function sessionFactory(string $token, array $data): SessionInterface
     {
         return new Session($data, $token);
+    }
+
+    private function storeSession(SessionInterface $session): void
+    {
+        // Fetch session model if exists
+        $model = $this->getSessionModel($session);
+
+        if (!$model) {
+            // Create new model for provided token
+            $model = $this->createSessionModel($session);
+        }
+
+        $origin = SessionHelper::getOriginUrl($session);
+
+        // Import user ID from Session only once
+        if (SessionHelper::hasUserID($session) && !$model->hasUser()) {
+            $userID = SessionHelper::getUserID($session);
+            $model->setUserID($userID);
+        }
+
+        // Import origin URL if exists
+        if ($origin) {
+            $model->setOrigin($origin);
+        }
+
+        if ($session->isRegenerated()) {
+            $model->markAsRegenerated();
+        }
+
+        SessionHelper::markAsPersistent($session);
+
+        // Encode and encrypt session data
+        $content = $this->encodeData($session->toArray());
+
+        // Update model data from session
+        $model
+            ->setContents($content)
+            ->setLastActiveAt(new DateTimeImmutable);
+
+        $this->sessionRepo->save($model);
     }
 
     private function regenerateSession(SessionInterface $oldSession): SessionInterface

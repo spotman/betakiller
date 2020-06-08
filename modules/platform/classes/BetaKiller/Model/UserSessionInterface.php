@@ -37,4 +37,11 @@ interface UserSessionInterface extends AbstractEntityInterface
     public function setOrigin(string $url): UserSessionInterface;
 
     public function getOrigin(): string;
+
+    public function markAsRegenerated(): void;
+
+    /**
+     * @return bool
+     */
+    public function isRegenerated(): bool;
 }

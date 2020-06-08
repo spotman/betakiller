@@ -11,6 +11,8 @@ class UserSession extends \ORM implements UserSessionInterface
 {
     public const TOKEN_LENGTH = 32;
 
+    public const COL_IS_REGENERATED = 'is_regenerated';
+
     /**
      * Custom configuration (set table name, configure relations, load_with(), etc)
      */
@@ -21,7 +23,7 @@ class UserSession extends \ORM implements UserSessionInterface
 
         $this->belongs_to([
             'user' => [
-                'model'       => 'User',
+                'model'       => User::getModelName(),
                 'foreign_key' => 'user_id',
             ],
         ]);
@@ -120,5 +122,18 @@ class UserSession extends \ORM implements UserSessionInterface
     public function getOrigin(): string
     {
         return (string)$this->get('origin');
+    }
+
+    public function markAsRegenerated(): void
+    {
+        $this->set(self::COL_IS_REGENERATED, true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isRegenerated(): bool
+    {
+        return (bool)$this->get(self::COL_IS_REGENERATED);
     }
 }
