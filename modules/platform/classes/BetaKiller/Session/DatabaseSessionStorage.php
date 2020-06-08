@@ -306,8 +306,6 @@ class DatabaseSessionStorage implements SessionStorageInterface
             SessionHelper::transferData($oldSession, $newSession);
         }
 
-        $this->destroySession($oldSession);
-
         return $newSession;
     }
 
