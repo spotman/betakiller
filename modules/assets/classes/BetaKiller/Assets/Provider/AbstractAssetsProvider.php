@@ -23,6 +23,7 @@ use BetaKiller\Assets\Model\HashBasedAssetsModelInterface;
 use BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface;
 use BetaKiller\Assets\Storage\AssetsStorageInterface;
 use BetaKiller\Factory\EntityFactoryInterface;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\IdentityConverterInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\HashStrategyAssetsRepositoryInterface;
@@ -540,7 +541,6 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      *
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
-     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function delete(AssetsModelInterface $model, UserInterface $user): void
@@ -550,16 +550,20 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
             throw new AssetsProviderException('Delete is not allowed');
         }
 
-        $path = $this->getOriginalPath($model);
+        try {
+            $path = $this->getOriginalPath($model);
 
-        // Remove file from storage
-        $this->storage->deleteFile($path);
+            // Remove file from storage
+            $this->storage->deleteFile($path);
 
-        // Drop cached files
-        $this->dropStorageCache($model, false);
+            // Drop cached files
+            $this->dropStorageCache($model, false);
 
-        // Drop deployed public files
-        $this->deploymentService->clear($this, $model);
+            // Drop deployed public files
+            $this->deploymentService->clear($this, $model);
+        } catch (\Throwable  $e) {
+            LoggerHelper::logUserException($this->logger, $e, $user);
+        }
 
         // Remove model from repository
         $this->repository->delete($model);
@@ -963,10 +967,11 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
 
         $originalPath = $this->getOriginalPath($model);
 
-        $path             = dirname($originalPath);
-        $originalFileName = basename($originalPath);
+        $path     = dirname($originalPath);
+        $fileName = basename($originalPath);
+
         foreach ($this->storage->getFiles($path) as $file) {
-            if ($keepOriginal && basename($file) === $originalFileName) {
+            if ($keepOriginal && basename($file) === $fileName) {
                 continue;
             }
 

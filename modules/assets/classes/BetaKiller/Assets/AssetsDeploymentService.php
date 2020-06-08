@@ -13,7 +13,7 @@ class AssetsDeploymentService
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
-    private $appEnv;
+    private AppEnvInterface $appEnv;
 
     /**
      * AssetsDeploymentService constructor.
@@ -84,7 +84,7 @@ class AssetsDeploymentService
         }
 
         // Remove all versions of file
-        foreach (glob($path.DIRECTORY_SEPARATOR.'*') as $file) {
+        foreach (glob($path.DIRECTORY_SEPARATOR.'*', GLOB_NOSORT) as $file) {
             unlink($file);
         }
 
