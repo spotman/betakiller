@@ -61,24 +61,12 @@ class SecureHeadersMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        $baseUri = $this->appConfig->getBaseUri();
-//        $baseUrl = (string)$baseUri;
-
         $headers = new SecureHeaders();
 
         // Do not add headers
         $headers->auto(SecureHeaders::AUTO_ALL);
 
-        if ($this->securityConfig->isCspReportEnabled()) {
-            // Report URI first
-            $reportUri = (string)$baseUri->withPath(CspReportHandler::URL);
-            $headers->csp('report', $reportUri);
-            $headers->cspro('report', $reportUri);
-        }
-
-        if ($this->securityConfig->isCspSafeModeEnabled()) {
-            $headers->safeMode(true);
-        }
+        $this->configureCsp($headers);
 
         if ($this->securityConfig->isHstsEnabled()) {
             // Basic STS headers with safe mode enabled to prevent long-lasting effects of incorrect configuration
@@ -101,14 +89,6 @@ class SecureHeadersMiddleware implements MiddlewareInterface
 //        $headers->csp('connect', $baseUrl);
 //        $headers->csp('connect', 'wss://'.$baseUri->getHost());
 
-        if ($this->securityConfig->isCspEnabled()) {
-            foreach ($this->securityConfig->getCspRules() as $ruleName => $ruleValues) {
-                foreach ($ruleValues as $value) {
-                    $headers->csp($ruleName, $value);
-                }
-            }
-        }
-
         $response = $handler->handle($request->withAttribute(SecureHeaders::class, $headers));
 
         foreach ($this->securityConfig->getHeadersToAdd() as $headerName => $headerValue) {
@@ -129,5 +109,31 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->apply($httpAdapter);
 
         return $httpAdapter->getFinalResponse();
+    }
+
+    private function configureCsp(SecureHeaders $headers): void
+    {
+        if (!$this->securityConfig->isCspEnabled()) {
+            return;
+        }
+
+        $baseUri = $this->appConfig->getBaseUri();
+
+        if ($this->securityConfig->isCspSafeModeEnabled()) {
+            $headers->safeMode(true);
+        }
+
+        if ($this->securityConfig->isCspReportEnabled()) {
+            // Report URI first
+            $reportUri = (string)$baseUri->withPath(CspReportHandler::URL);
+            $headers->csp('report', $reportUri);
+            $headers->cspro('report', $reportUri);
+        }
+
+        foreach ($this->securityConfig->getCspRules() as $ruleName => $ruleValues) {
+            foreach ($ruleValues as $value) {
+                $headers->csp($ruleName, $value);
+            }
+        }
     }
 }
