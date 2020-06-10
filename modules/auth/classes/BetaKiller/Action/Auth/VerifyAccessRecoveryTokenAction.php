@@ -63,4 +63,12 @@ class VerifyAccessRecoveryTokenAction extends AbstractTokenVerificationAction
 
         return $urlHelper->makeCodenameUrl(PasswordChangeIFace::codename(), $params);
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected function isTokenReuseAllowed(): bool
+    {
+        return false;
+    }
 }

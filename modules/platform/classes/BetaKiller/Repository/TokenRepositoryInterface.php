@@ -1,8 +1,8 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\TokenInterface;
+use BetaKiller\Model\UserInterface;
 
 /**
  * @method TokenInterface findById(string $id)
@@ -32,4 +32,11 @@ interface TokenRepositoryInterface extends DispatchableRepositoryInterface
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function findAllNotActive(): array;
+
+    /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return TokenInterface[]
+     */
+    public function getUserTokens(UserInterface $user): array;
 }

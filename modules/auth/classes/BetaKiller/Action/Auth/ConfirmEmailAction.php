@@ -42,4 +42,12 @@ class ConfirmEmailAction extends AbstractTokenVerificationAction
     {
         $this->userWorkflow->confirmEmail($user);
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected function isTokenReuseAllowed(): bool
+    {
+        return false;
+    }
 }

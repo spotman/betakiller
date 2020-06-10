@@ -3,6 +3,7 @@ namespace BetaKiller\Repository;
 
 use BetaKiller\Model\Token;
 use BetaKiller\Model\TokenInterface;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
@@ -66,6 +67,18 @@ class TokenRepository extends AbstractOrmBasedDispatchableRepository implements 
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getUserTokens(UserInterface $user): array
+    {
+        $orm = $this->getOrmInstance();
+
+        return $this
+            ->filterUser($orm, $user)
+            ->findAll($orm);
+    }
+
+    /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      * @param string                                    $value
      *
@@ -105,10 +118,15 @@ class TokenRepository extends AbstractOrmBasedDispatchableRepository implements 
         return $this;
     }
 
+    private function filterUser(OrmInterface $orm, UserInterface $user): self
+    {
+        return $this->filterRelated($orm, Token::REL_USER, $user);
+    }
+
     protected function customFilterForUrlDispatching(OrmInterface $orm, UrlContainerInterface $params): void
     {
         $this
-            ->filterNotUsed($orm)
+//            ->filterNotUsed($orm)
             ->filterActive($orm, true);
     }
 }

@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace BetaKiller\Service;
 
 use BetaKiller\Auth\AccessDeniedException;
-use BetaKiller\Auth\UserBlockedException;
 use BetaKiller\Auth\SessionConfig;
+use BetaKiller\Auth\UserBlockedException;
+use BetaKiller\Event\UserPasswordChangedEvent;
 use BetaKiller\Event\UserPasswordChangeRequestedEvent;
 use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\Helper\SessionHelper;
@@ -200,6 +201,8 @@ class AuthService
         $user->setPassword($hash);
 
         $this->userRepo->save($user);
+
+        $this->eventBus->emit(new UserPasswordChangedEvent($user));
     }
 
     /**

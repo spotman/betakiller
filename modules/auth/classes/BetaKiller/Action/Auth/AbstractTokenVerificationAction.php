@@ -70,6 +70,10 @@ abstract class AbstractTokenVerificationAction extends AbstractAction
             throw new AccessDeniedException('Blocked user is trying to verify OTP token');
         }
 
+        if ($token->isUsed() && !$this->isTokenReuseAllowed()) {
+            throw new AccessDeniedException('OTP tokens reuse is not allowed');
+        }
+
         // Process user action
         $this->processValid($user);
 
@@ -114,4 +118,9 @@ abstract class AbstractTokenVerificationAction extends AbstractAction
      * @return void
      */
     abstract protected function processValid(UserInterface $user): void;
+
+    /**
+     * @return bool
+     */
+    abstract protected function isTokenReuseAllowed(): bool;
 }

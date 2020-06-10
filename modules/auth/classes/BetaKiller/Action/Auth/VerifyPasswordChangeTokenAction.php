@@ -32,4 +32,12 @@ class VerifyPasswordChangeTokenAction extends AbstractTokenVerificationAction
     {
         // Nothing to do here, all processing is done on redirected URL
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected function isTokenReuseAllowed(): bool
+    {
+        return false;
+    }
 }

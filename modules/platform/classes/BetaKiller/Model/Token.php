@@ -12,7 +12,7 @@ class Token extends \ORM implements TokenInterface
     public const COL_CREATED_AT = 'created_at';
     public const COL_USED_AT    = 'used_at';
 
-    private const REL_USER = 'user';
+    public const REL_USER = 'user';
 
     protected function configure(): void
     {
