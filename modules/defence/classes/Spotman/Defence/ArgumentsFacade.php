@@ -93,7 +93,7 @@ class ArgumentsFacade
 
             if (\array_key_exists($name, $data)) {
                 // Value exists => preprocess it
-                $filtered[$targetKey] = $this->processValue($argument, $data[$name]);
+                $filtered[$targetKey] = $this->processValue($argument, $data[$name], $parent);
             } elseif (!$argument->isOptional()) {
                 $msg = $parent
                     ? sprintf('Key "%s.%s" is required', $parent->getName(), $name)
@@ -111,21 +111,28 @@ class ArgumentsFacade
     }
 
     /**
-     * @param \Spotman\Defence\ArgumentDefinitionInterface $argument
-     * @param mixed                                        $value
+     * @param \Spotman\Defence\ArgumentDefinitionInterface      $argument
+     * @param mixed                                             $value
+     *
+     * @param \Spotman\Defence\ArgumentDefinitionInterface|null $parent
      *
      * @return array|mixed|mixed[]|null
      */
-    private function processValue(ArgumentDefinitionInterface $argument, $value)
-    {
+    private function processValue(
+        ArgumentDefinitionInterface $argument,
+        $value,
+        ArgumentDefinitionInterface $parent = null
+    ) {
         if ($value === null) {
             if ($argument->isNullable()) {
                 return null;
             }
 
-            throw new \InvalidArgumentException(
-                sprintf('NULL value is provided for non-nullable argument "%s"', $argument->getName())
-            );
+            $key = $parent
+                ? $parent->getName().'.'.$argument->getName()
+                : $argument->getName();
+
+            throw new \InvalidArgumentException(sprintf('NULL value is provided for non-nullable argument "%s"', $key));
         }
 
         switch (true) {
