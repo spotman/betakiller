@@ -48,6 +48,6 @@ class ConfirmEmailAction extends AbstractTokenVerificationAction
      */
     protected function isTokenReuseAllowed(): bool
     {
-        return false;
+        return true;
     }
 }
