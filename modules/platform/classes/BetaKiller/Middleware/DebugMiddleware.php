@@ -31,7 +31,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class DebugMiddleware implements MiddlewareInterface
+final class DebugMiddleware implements MiddlewareInterface
 {
     /**
      * @var \Psr\Http\Message\ResponseFactoryInterface
