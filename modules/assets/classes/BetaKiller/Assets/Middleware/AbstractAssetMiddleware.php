@@ -210,7 +210,7 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
             throw new SecurityException('Assets provider ":prov" action ":act" is not allowed to ":who"', [
                 ':prov' => $this->provider->getCodename(),
                 ':act'  => $action,
-                ':who'  => $user->getID(),
+                ':who'  => !$user->isGuest() ? $user->getID() : 'Guest',
             ]);
         }
     }
