@@ -75,7 +75,7 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
     protected function orderItemsByI18nValue(array $items, LanguageInterface $lang): array
     {
         usort($items, static function (I18nKeyModelInterface $left, I18nKeyModelInterface $right) use ($lang) {
-            return $left->getI18nValue($lang) <=> $right->getI18nValue($lang);
+            return $left->getI18nValueOrAny($lang) <=> $right->getI18nValueOrAny($lang);
         });
 
         return $items;
