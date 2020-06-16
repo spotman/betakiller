@@ -99,7 +99,7 @@ class HitService
             throw new ServiceException('Can not detect domain name in URL :url', [':url' => (string)$uri]);
         }
 
-        $relativeUrl = explode($domainName, (string)$uri, 2)[1];
+        $relativeUrl = $uri->getPath();
 
         // Find domain first
         $domain = $this->domainRepo->getByName($domainName);

@@ -128,6 +128,11 @@ class HitStatMiddleware implements MiddlewareInterface
         $targetUri = $request->getUri();
 
         try {
+            // Prevent wrong URLs
+            if (\mb_strpos($sourceUrl, '/') === false) {
+                throw new InvalidArgumentException;
+            }
+
             $sourceUri = $sourceUrl ? $this->uriFactory->createUri($sourceUrl) : null;
         } catch (InvalidArgumentException $e) {
             // Malformed source => ignore it
