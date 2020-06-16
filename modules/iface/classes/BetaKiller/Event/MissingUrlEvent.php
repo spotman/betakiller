@@ -2,11 +2,12 @@
 namespace BetaKiller\Event;
 
 use BetaKiller\MessageBus\EventMessageInterface;
+use BetaKiller\MessageBus\MessageWithHandlersInterface;
 use BetaKiller\Url\UrlElementInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
-final class MissingUrlEvent implements EventMessageInterface
+final class MissingUrlEvent implements EventMessageInterface, MessageWithHandlersInterface
 {
     /**
      * @var UrlElementInterface|null
@@ -107,15 +108,5 @@ final class MissingUrlEvent implements EventMessageInterface
     public function getIpAddress(): string
     {
         return $this->ip;
-    }
-
-    /**
-     * Must return true if message requires at least one handler to be processed
-     *
-     * @return bool
-     */
-    public function handlersRequired(): bool
-    {
-        return true;
     }
 }

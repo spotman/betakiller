@@ -3,13 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Event;
 
-final class UserResumedEvent extends AbstractUserWorkflowEvent
+use BetaKiller\MessageBus\MessageWithHandlersInterface;
+
+final class UserResumedEvent extends AbstractUserWorkflowEvent implements MessageWithHandlersInterface
 {
-    /**
-     * @inheritDoc
-     */
-    public function handlersRequired(): bool
-    {
-        return true;
-    }
 }

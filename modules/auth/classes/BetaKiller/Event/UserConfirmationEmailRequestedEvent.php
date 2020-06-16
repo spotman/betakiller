@@ -3,13 +3,9 @@ declare(strict_types=1);
 
 namespace BetaKiller\Event;
 
-final class UserConfirmationEmailRequestedEvent extends AbstractUserWorkflowEvent
+use BetaKiller\MessageBus\MessageWithHandlersInterface;
+
+final class UserConfirmationEmailRequestedEvent extends AbstractUserWorkflowEvent implements
+    MessageWithHandlersInterface
 {
-    /**
-     * @inheritDoc
-     */
-    public function handlersRequired(): bool
-    {
-        return true;
-    }
 }

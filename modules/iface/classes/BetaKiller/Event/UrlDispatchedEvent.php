@@ -56,16 +56,6 @@ class UrlDispatchedEvent implements EventMessageInterface
     }
 
     /**
-     * Must return true if message requires at least one handler to be processed
-     *
-     * @return bool
-     */
-    public function handlersRequired(): bool
-    {
-        return false;
-    }
-
-    /**
      * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
     public function getUrlContainer(): UrlContainerInterface

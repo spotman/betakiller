@@ -42,16 +42,6 @@ final class EntityChangedEvent implements OutboundEventMessageInterface
         $this->ts   = \time();
     }
 
-    /**
-     * Must return true if message requires at least one handler to be processed
-     *
-     * @return bool
-     */
-    public function handlersRequired(): bool
-    {
-        return false;
-    }
-
     public function getOutboundName(): string
     {
         return sprintf('entity.changed.%s.%s', \mb_strtolower($this->name), $this->id);
