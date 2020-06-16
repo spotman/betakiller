@@ -166,6 +166,13 @@ interface DefinitionBuilderInterface
      */
 
     /**
+     * @param string $pattern
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function regex(string $pattern): DefinitionBuilderInterface;
+
+    /**
      * @param int $min
      *
      * @return \Spotman\Defence\DefinitionBuilderInterface

@@ -23,6 +23,7 @@ use Spotman\Defence\Rule\LengthBetweenRule;
 use Spotman\Defence\Rule\MaxLengthRule;
 use Spotman\Defence\Rule\MinLengthRule;
 use Spotman\Defence\Rule\PositiveIntegerRule;
+use Spotman\Defence\Rule\RegexRule;
 use Spotman\Defence\Rule\WhitelistRule;
 
 class DefinitionBuilder implements DefinitionBuilderInterface
@@ -392,6 +393,14 @@ class DefinitionBuilder implements DefinitionBuilderInterface
     /**
      * Rules helpers
      */
+
+    /**
+     * @inheritDoc
+     */
+    public function regex(string $pattern): DefinitionBuilderInterface
+    {
+        return $this->addRule(new RegexRule($pattern));
+    }
 
     /**
      * @param int $min
