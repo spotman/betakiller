@@ -19,6 +19,7 @@ class RegexRuleTest extends AbstractRuleTest
             '7',
             '6.0',
             '2.3',
+            '2.5.7',
         ];
     }
 
