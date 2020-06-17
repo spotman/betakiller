@@ -129,7 +129,7 @@ class HitStatMiddleware implements MiddlewareInterface
 
         try {
             // Prevent wrong URLs
-            if (\mb_strpos($sourceUrl, '/') === false) {
+            if ($sourceUrl && \mb_strpos($sourceUrl, '/') === false) {
                 throw new InvalidArgumentException;
             }
 
