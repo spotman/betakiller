@@ -30,14 +30,20 @@ class TextHelper
         $value = \mb_strtolower(self::utf8ToAscii($value));
 
         $replace = [
-            '@' => 'dog',
-            '#' => 'hash',
-            '$' => 'dollar',
-            '%' => 'percent',
-            '^' => 'up',
-            '&' => 'amp',
-            '*' => 'snow',
-            '+' => 'plus',
+            '!' => '_bang_',
+            '@' => '_dog_',
+            '#' => '_hash_',
+            '$' => '_dollar_',
+            '%' => '_percent_',
+            '^' => '_up_',
+            '&' => '_amp_',
+            '*' => '_snow_',
+            '+' => '_plus_',
+            '-' => '_',
+            '=' => '_eq_',
+            '/' => '_slash_',
+            ':' => '_colon_',
+            ';' => '_semicolon_',
         ];
 
         $value = \strtr($value, $replace);
@@ -45,7 +51,7 @@ class TextHelper
         $value = \preg_replace(
             [
                 // Replace whitespaces with underscore
-                '/[\s\-\/]+/',
+                '/[\s]+/',
                 // Keep only alpha and underscore symbols
                 '/[^a-z0-9_]+/',
             ],
@@ -55,6 +61,9 @@ class TextHelper
             ],
             $value
         );
+
+        // Remove excessive underscores
+        $value = trim($value, '_');
 
         if ($limit) {
             $value = \Text::limit_chars($value, $limit, '', false);
