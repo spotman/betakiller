@@ -69,13 +69,16 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
 
     /**
      * @param \BetaKiller\MessageBus\EventMessageInterface $message
-     *
-     * @throws \BetaKiller\MessageBus\MessageBusException
      */
     private function handle(EventMessageInterface $message): void
     {
-        foreach ($this->getMessageHandlers($message) as $handler) {
-            $this->process($message, $handler);
+        // Wrap event processing with try-catch block to prevent client code crash on missing handlers
+        try {
+            foreach ($this->getMessageHandlers($message) as $handler) {
+                $this->process($message, $handler);
+            }
+        } catch (\Throwable $e) {
+            LoggerHelper::logRawException($this->logger, $e);
         }
     }
 
