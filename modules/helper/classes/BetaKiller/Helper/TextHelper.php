@@ -52,10 +52,13 @@ class TextHelper
             [
                 // Replace whitespaces with underscore
                 '/[\s]+/',
+                // Remove duplicate underscores
+                '/[_]{2,}/',
                 // Keep only alpha and underscore symbols
                 '/[^a-z0-9_]+/',
             ],
             [
+                '_',
                 '_',
                 '',
             ],
