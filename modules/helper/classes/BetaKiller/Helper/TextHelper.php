@@ -42,6 +42,7 @@ class TextHelper
             '-' => '_',
             '=' => '_eq_',
             '/' => '_slash_',
+            '.' => '_dot_',
             ':' => '_colon_',
             ';' => '_semicolon_',
         ];
