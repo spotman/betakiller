@@ -17,6 +17,7 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\TimerInterface;
 use Thruway\CallResult;
 use Thruway\ClientSession;
+use Thruway\Logging\Logger;
 
 class IsAlive extends AbstractTask
 {
@@ -95,15 +96,17 @@ class IsAlive extends AbstractTask
     {
         $this->createSession();
 
+        Logger::set($this->logger);
+
         // Use session auth for all connections
         $this->clientBuilder->sessionAuth($this->session);
 
         // Internal client for raw socket connection check
-        $this->runTest($this->clientBuilder->internalConnection()->publicRealm()->create());
+        $this->runTest($this->clientBuilder->internalConnection()->publicRealm()->create(), 'internal');
 
         if ($this->appEnv->inProductionMode()) {
             // External client for nginx proxy connection check
-            $this->runTest($this->clientBuilder->externalConnection()->publicRealm()->create());
+            $this->runTest($this->clientBuilder->externalConnection()->publicRealm()->create(), 'external');
         }
 
         $this->destroySession();
@@ -125,7 +128,7 @@ class IsAlive extends AbstractTask
         $this->sessionStorage->destroySession($this->session);
     }
 
-    private function runTest(WampClient $client): void
+    private function runTest(WampClient $client, string $connection): void
     {
         // Reset marker
         $this->isAlive = null;
@@ -192,8 +195,8 @@ class IsAlive extends AbstractTask
         $client->start();
 
         if (!$this->isAlive) {
-            $this->logger->emergency('WAMP router is not responding (:realm)', [
-                ':realm' => $client->getRealm(),
+            $this->logger->emergency('WAMP router is not responding (:conn connection)', [
+                ':conn' => $connection,
             ]);
         }
     }
