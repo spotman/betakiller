@@ -63,9 +63,9 @@ class WampPingDaemon implements DaemonInterface
             });
         });
 
-        $this->wampClient->onSessionClose(static function (ClientSession $session) {
+//        $this->wampClient->onSessionClose(static function () {
 //            $session->unregister(WampClient::RPC_PING);
-        });
+//        });
 
         $this->wampClient->start(false);
     }

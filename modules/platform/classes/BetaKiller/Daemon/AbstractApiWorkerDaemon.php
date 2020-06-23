@@ -5,7 +5,6 @@ namespace BetaKiller\Daemon;
 
 use BetaKiller\Api\ApiFacade;
 use BetaKiller\Error\ExceptionService;
-use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Wamp\WampClient;
@@ -35,44 +34,38 @@ abstract class AbstractApiWorkerDaemon implements DaemonInterface
     /**
      * @var \BetaKiller\Wamp\WampClientBuilder
      */
-    private $clientBuilder;
+    private WampClientBuilder $clientBuilder;
 
     /**
-     * @var WampClient[]
+     * @var WampClient
      */
-    private $wampClients;
+    private WampClient $wampClient;
 
     /**
      * @var \BetaKiller\Wamp\WampClientHelper
      */
-    private $clientHelper;
+    private WampClientHelper $clientHelper;
 
     /**
      * @var \BetaKiller\Api\ApiFacade
      */
-    private $apiFacade;
+    private ApiFacade $apiFacade;
 
     /**
      * @var \BetaKiller\Error\ExceptionService
      */
-    private $exceptionService;
-
-    /**
-     * @var \BetaKiller\Helper\AppEnvInterface
-     */
-    private $appEnv;
+    private ExceptionService $exceptionService;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @param \BetaKiller\Wamp\WampClientBuilder $clientFactory
      * @param \BetaKiller\Api\ApiFacade          $apiFacade
      * @param \BetaKiller\Error\ExceptionService $exceptionService
      * @param \BetaKiller\Wamp\WampClientHelper  $clientHelper
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
      * @param \Psr\Log\LoggerInterface           $logger
      */
     public function __construct(
@@ -80,14 +73,12 @@ abstract class AbstractApiWorkerDaemon implements DaemonInterface
         ApiFacade $apiFacade,
         ExceptionService $exceptionService,
         WampClientHelper $clientHelper,
-        AppEnvInterface $appEnv,
         LoggerInterface $logger
     ) {
         $this->clientBuilder    = $clientFactory;
         $this->apiFacade        = $apiFacade;
         $this->exceptionService = $exceptionService;
         $this->clientHelper     = $clientHelper;
-        $this->appEnv           = $appEnv;
         $this->logger           = $logger;
     }
 
@@ -103,44 +94,35 @@ abstract class AbstractApiWorkerDaemon implements DaemonInterface
         });
 
         // Use internal auth and connection coz it is an internal worker
-        $this->clientBuilder->internalConnection()->internalAuth();
+        $this->wampClient = $this->clientBuilder
+            ->internalConnection()
+            ->internalAuth()
+            ->publicRealm()
+            ->create($loop);
 
-        $this->wampClients = [
-            // For processing external API requests in 'external' realm (public clients)
-            $this->clientBuilder->publicRealm()->create($loop),
+        $this->wampClient->onSessionOpen(function (ClientSession $session) {
+            // Register API handler
+            $session->register(
+                'api',
+                function () {
+                    return $this->apiCallProcedure(...\func_get_args());
+                },
+                [
+                    'disclose_caller' => true,
+                    'invoke'          => Registration::ROUNDROBIN_REGISTRATION,
+                ]
+            );
+        });
 
-//            // For processing internal API requests in 'internal' realm (workers, checkers, etc)
-//            $this->clientBuilder->internalRealm()->create($loop),
-        ];
+        $this->wampClient->bindPingHandlers();
 
-//        $this->clientHelper->bindSessionHandlers($loop);
-
-        // Bind events and start every client
-        foreach ($this->wampClients as $wampClient) {
-            $wampClient->onSessionOpen(function (ClientSession $session) {
-                // Register API handler
-                $session->register(
-                    'api',
-                    function () {
-                        return $this->apiCallProcedure(...\func_get_args());
-                    },
-                    [
-                        'disclose_caller' => true,
-                        'invoke'          => Registration::ROUNDROBIN_REGISTRATION,
-                    ]
-                );
-            });
-
-            $wampClient->start(false);
-        }
+        $this->wampClient->start(false);
     }
 
     public function stopDaemon(LoopInterface $loop): void
     {
-        // Stop clients and disconnect
-        foreach ($this->wampClients as $wampClient) {
-            $wampClient->onClose('Stopped');
-        }
+        // Stop client and disconnect
+        $this->wampClient->onClose('Stopped');
     }
 
     private function apiCallProcedure(array $indexedArgs, stdClass $namedArgs): array
@@ -174,7 +156,7 @@ abstract class AbstractApiWorkerDaemon implements DaemonInterface
             $this->logger->debug(':resource.:method executed in :time ms', [
                 ':resource' => $resource,
                 ':method'   => $method,
-                ':time' => $t->stop()->getDuration(),
+                ':time'     => $t->stop()->getDuration(),
             ]);
         } catch (Throwable $e) {
             return $this->makeApiError($e, $user);
