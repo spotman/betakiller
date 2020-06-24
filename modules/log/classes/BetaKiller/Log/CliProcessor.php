@@ -10,8 +10,11 @@ class CliProcessor
      */
     public function __invoke(array $record)
     {
+        global $argv;
+
         $record['context']['pid'] = \getmypid();
         $record['context']['uid'] = \getmyuid();
+        $record['context']['cwd'] = implode(' ', $argv ?: []);
 
         return $record;
     }
