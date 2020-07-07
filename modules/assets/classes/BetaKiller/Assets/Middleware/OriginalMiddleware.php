@@ -40,7 +40,7 @@ class OriginalMiddleware extends AbstractAssetMiddleware
         // Send file content + headers
         $response = ResponseHelper::fileContent($content, $model->getMime(), $model->getOriginalName());
 
-        // Send last modified date
-        return ResponseHelper::setLastModified($response, $model->getLastModifiedAt());
+        // Enable caching for 1 month
+        return ResponseHelper::enableCaching($response, $model->getLastModifiedAt(), new \DateInterval('P1M'));
     }
 }

@@ -666,6 +666,33 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getCachedContent(
+        AssetsModelInterface $model,
+        string $action,
+        ?string $suffix = null
+    ): ?string {
+        if (!$this->isCachingEnabled()) {
+            return null;
+        }
+
+        if ($action === self::ACTION_ORIGINAL) {
+            // No caching of original action
+            return null;
+        }
+
+        // Skip unknown actions
+        if (!$this->hasAction($action)) {
+            return null;
+        }
+
+        $path = $this->getModelActionPath($model, $action, $suffix);
+
+        return $this->storage->getFile($path);
+    }
+
+    /**
      * Returns true if provider action is allowed
      *
      * @param string $action

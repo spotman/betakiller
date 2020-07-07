@@ -46,10 +46,14 @@ class PreviewMiddleware extends AbstractAssetMiddleware
             $this->redirectToCanonicalUrl($model, $request);
         }
 
-        $previewContent = $this->provider->makePreviewContent($model, $size);
+        $previewContent = $this->provider->getCachedContent($model, $action, $size);
 
-        // Cache preview to storage
-        $this->provider->cacheContent($model, $previewContent, $action, $size);
+        if ($previewContent) {
+            $previewContent = $this->provider->makePreviewContent($model, $size);
+
+            // Cache preview to storage
+            $this->provider->cacheContent($model, $previewContent, $action, $size);
+        }
 
         // Deploy to cache if needed
         $this->deploy($model, $previewContent, $action, $size);
@@ -57,7 +61,6 @@ class PreviewMiddleware extends AbstractAssetMiddleware
         // Send file content + headers
         $response = ResponseHelper::fileContent($previewContent, $model->getMime());
 
-        // Send last modified date
-        return ResponseHelper::setLastModified($response, $model->getLastModifiedAt());
+        return ResponseHelper::enableCaching($response, $model->getLastModifiedAt(), new \DateInterval('P1D'));
     }
 }

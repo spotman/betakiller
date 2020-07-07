@@ -39,6 +39,6 @@ class DownloadMiddleware extends AbstractAssetMiddleware
         $response = ResponseHelper::fileContent($content, $model->getMime(), $model->getOriginalName());
 
         // Send last modified date
-        return ResponseHelper::setLastModified($response, $model->getLastModifiedAt());
+        return ResponseHelper::enableCaching($response, $model->getLastModifiedAt(), new \DateInterval('P1M'));
     }
 }

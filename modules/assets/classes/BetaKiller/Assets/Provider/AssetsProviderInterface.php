@@ -207,6 +207,21 @@ interface AssetsProviderInterface
     ): void;
 
     /**
+     * Fetch cached action content from storage
+     *
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     * @param string                                        $action
+     * @param null|string                                   $suffix
+     *
+     * @return string|null
+     */
+    public function getCachedContent(
+        AssetsModelInterface $model,
+        string $action,
+        ?string $suffix = null
+    ): ?string;
+
+    /**
      * Returns assets model repository linked to current provider
      *
      * @return \BetaKiller\Repository\RepositoryInterface
