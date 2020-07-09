@@ -92,7 +92,7 @@ class WampEsbBridgeDaemon implements DaemonInterface
         // Register new session
         $this->wampClient->onSessionOpen(function (ClientSession $session) use ($loop) {
             // Close previous session (stale)
-            if ($this->clientSession) {
+            if ($this->clientSession && !$this->clientSession->isGoodbyeSent()) {
                 $this->clientSession->close();
             }
 

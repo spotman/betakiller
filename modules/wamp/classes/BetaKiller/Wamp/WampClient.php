@@ -62,17 +62,19 @@ class WampClient extends \Thruway\Peer\Client
 
             // Ping every 30 seconds to keep session opened
             $this->pingTimers[$id] = $loop->addPeriodicTimer(30, static function () use ($loop, $session) {
-                $onPingFailure = static function () use ($session) {
-                    throw new Exception('WAMP session ":id" ping failed', [
+                $timeoutTimer = $loop->addTimer(10, static function () use ($session) {
+                    throw new Exception('WAMP session ":id" ping timed out', [
                         ':id' => $session->getSessionId(),
                     ]);
-                };
-
-                $timeoutTimer = $loop->addTimer(10, $onPingFailure);
+                });
 
                 // No ping implementation in PawlTransport, so using a custom ping RPC method here
                 $session->call(self::RPC_PING)
-                    ->otherwise($onPingFailure)
+                    ->otherwise(static function () use ($session) {
+                        throw new Exception('WAMP session ":id" ping failed', [
+                            ':id' => $session->getSessionId(),
+                        ]);
+                    })
                     ->always(static function () use ($timeoutTimer, $loop) {
                         $loop->cancelTimer($timeoutTimer);
                     });
