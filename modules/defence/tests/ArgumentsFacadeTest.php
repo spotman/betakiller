@@ -173,19 +173,19 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             ],
 
             // Composite
-            'composite'       => [
-                $this->def()->composite('a')->int('b')->string('c')->endComposite(),
+            'compositeStart'       => [
+                $this->def()->compositeStart('a')->int('b')->string('c')->compositeEnd(),
                 ['a' => ['b' => 123, 'c' => 'qwe']],
             ],
 
-            'composite + nullable' => [
-                $this->def()->composite('a')->nullable()->int('b')->endComposite(),
+            'compositeStart + nullable' => [
+                $this->def()->compositeStart('a')->nullable()->int('b')->compositeEnd(),
                 ['a' => null],
             ],
 
             // Composite array
-            'composite array'    => [
-                $this->def()->compositeArray('a')->int('b')->string('c'),
+            'compositeStart array'    => [
+                $this->def()->compositeArrayStart('a')->int('b')->string('c'),
                 [
                     'a' => [
                         ['b' => 123, 'c' => 'qwe'],
@@ -269,13 +269,13 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
                 ['a' => ['asd', 'qwe']],
             ],
 
-            'composite' => [
-                $this->def()->composite('a')->optional()->int('b')->string('c'),
+            'compositeStart' => [
+                $this->def()->compositeStart('a')->optional()->int('b')->string('c'),
                 [],
             ],
 
             'compositeArray' => [
-                $this->def()->compositeArray('a')->optional()->int('b')->string('c'),
+                $this->def()->compositeArrayStart('a')->optional()->int('b')->string('c'),
                 [],
             ],
         ];
@@ -310,8 +310,8 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             [$this->def()->stringArray('a'), [true, false, null]],
             [$this->def()->stringArray('a'), [null]],
             // Composite
-            [$this->def()->composite('a')->int('b')->endComposite(), [123, 456]],
-            [$this->def()->composite('a')->int('b')->endComposite(), [false, true]],
+            [$this->def()->compositeStart('a')->int('b')->compositeEnd(), [123, 456]],
+            [$this->def()->compositeStart('a')->int('b')->compositeEnd(), [false, true]],
         ];
     }
 
@@ -325,7 +325,7 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             // String
             [$this->def()->string('a')->whitelist(['asd', 'qwe']), 'zxc'],
             // Composite
-            [$this->def()->composite('a')->int('b')->positive(), ['b' => -123]],
+            [$this->def()->compositeStart('a')->int('b')->positive(), ['b' => -123]],
             // Int array
             [$this->def()->intArray('a')->lengthBetween(2, 5), [1]],
             [$this->def()->intArray('a')->lengthBetween(1, 3), [1, 2, 3, 4]],

@@ -25,7 +25,7 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     {
         $builder
             ->identity()
-            ->composite(self::ARG_DATA)
+            ->compositeStart(self::ARG_DATA)
             //
             ->string(self::ARG_LABEL)->optional()
             ->string(self::ARG_URI)->optional()
@@ -33,7 +33,7 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
             ->string(self::ARG_DESC)->optional()
             ->string(self::ARG_CONTENT)->optional()
             //
-            ->endComposite();
+            ->compositeEnd();
     }
 
     /**

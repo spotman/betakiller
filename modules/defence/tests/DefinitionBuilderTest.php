@@ -113,8 +113,8 @@ class DefinitionBuilderTest extends AbstractDefenceTest
     public function testComposite(): void
     {
         $def = $this->definitionBuilder()
-            ->composite('a')->endComposite()
-            ->composite('b')->optional()->endComposite();
+            ->compositeStart('a')->compositeEnd()
+            ->compositeStart('b')->optional()->compositeEnd();
 
         $this->checkCompositeDefinition($def);
     }
@@ -122,8 +122,8 @@ class DefinitionBuilderTest extends AbstractDefenceTest
     public function testCompositeArray(): void
     {
         $def = $this->definitionBuilder()
-            ->compositeArray('a')->endComposite()
-            ->compositeArray('b')->optional()->endComposite();
+            ->compositeArrayStart('a')->compositeEnd()
+            ->compositeArrayStart('b')->optional()->compositeEnd();
 
         $this->checkCompositeDefinition($def);
     }
@@ -163,9 +163,9 @@ class DefinitionBuilderTest extends AbstractDefenceTest
     public function testCompositeNullable(): void
     {
         $this->definitionBuilder()
-            ->composite('a')->nullable()
+            ->compositeStart('a')->nullable()
             ->int('b')
-            ->endComposite();
+            ->compositeEnd();
 
         self::assertTrue(true);
     }
@@ -199,14 +199,14 @@ class DefinitionBuilderTest extends AbstractDefenceTest
         $this->expectException(\DomainException::class);
 
         $this->definitionBuilder()
-            ->compositeArray('a')->nullable()
+            ->compositeArrayStart('a')->nullable()
             ->int('a')
-            ->endComposite();
+            ->compositeEnd();
     }
 
     private function checkSingleDefinition(DefinitionBuilderInterface $def, $default = null): void
     {
-        list($required, $optional, $optionalDefault) = $def->getArguments();
+        [$required, $optional, $optionalDefault] = $def->getArguments();
 
         $this->assertEquals('a', $required->getName());
         $this->assertEquals('b', $optional->getName());
@@ -223,7 +223,7 @@ class DefinitionBuilderTest extends AbstractDefenceTest
 
     private function checkCompositeDefinition(DefinitionBuilderInterface $def): void
     {
-        list($required, $optional) = $def->getArguments();
+        [$required, $optional] = $def->getArguments();
 
         $this->assertEquals('a', $required->getName());
         $this->assertEquals('b', $optional->getName());

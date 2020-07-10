@@ -120,7 +120,7 @@ interface DefinitionBuilderInterface
      *
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function compositeArray(string $name): DefinitionBuilderInterface;
+    public function compositeArrayStart(string $name): DefinitionBuilderInterface;
 
     /**
      * Define named collection of arguments like {"name": {}}
@@ -129,14 +129,14 @@ interface DefinitionBuilderInterface
      *
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function composite(string $name): DefinitionBuilderInterface;
+    public function compositeStart(string $name): DefinitionBuilderInterface;
 
     /**
      * End nested definition
      *
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function endComposite(): DefinitionBuilderInterface;
+    public function compositeEnd(): DefinitionBuilderInterface;
 
     /**
      * Mark last argument as nullable

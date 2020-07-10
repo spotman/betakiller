@@ -21,7 +21,7 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     public function defineArguments(DefinitionBuilderInterface $builder): void
     {
         $builder
-            ->composite(self::ARG_DATA)
+            ->compositeStart(self::ARG_DATA)
             ->string(self::ARG_AUTHOR_NAME)->optional()
             ->string(self::ARG_MESSAGE)->optional();
     }

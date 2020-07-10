@@ -20,7 +20,7 @@ class UpdateProfileApiMethod extends AbstractEntityBasedApiMethod
     public function defineArguments(DefinitionBuilderInterface $builder): void
     {
         $builder
-            ->composite(self::ARG_DATA);
+            ->compositeStart(self::ARG_DATA);
     }
 
     /**

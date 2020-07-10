@@ -226,7 +226,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      *
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function compositeArray(string $name): DefinitionBuilderInterface
+    public function compositeArrayStart(string $name): DefinitionBuilderInterface
     {
         $composite      = new CompositeArgumentDefinition($name.'-composite');
         $compositeArray = new CompositeArrayArgumentDefinition($name, $composite);
@@ -247,7 +247,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      *
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function composite(string $name): DefinitionBuilderInterface
+    public function compositeStart(string $name): DefinitionBuilderInterface
     {
         // Create composite
         $argument = new CompositeArgumentDefinition($name);
@@ -264,12 +264,12 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      *
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function endComposite(): DefinitionBuilderInterface
+    public function compositeEnd(): DefinitionBuilderInterface
     {
         $top = \array_pop($this->stack);
 
         if (!$top) {
-            throw new \LogicException('No nested definition found, define it with composite() method');
+            throw new \LogicException('No nested definition found, define it with compositeStart() method');
         }
 
         $this->last = $top;

@@ -34,7 +34,7 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
     public function defineArguments(DefinitionBuilderInterface $builder): void
     {
         $builder
-            ->composite(self::ARG_DATA)
+            ->compositeStart(self::ARG_DATA)
             ->string(self::ARG_LABEL)->optional()
             ->string(self::ARG_TYPE)->optional()->whitelist(['article', 'page']);
     }

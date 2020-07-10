@@ -77,7 +77,7 @@ class AbstractUpdateItemAction extends AbstractAction implements PostRequestActi
     public function definePostArguments(DefinitionBuilderInterface $builder): void
     {
         $builder
-            ->compositeArray(self::ARG_I18N_VALUES)
+            ->compositeArrayStart(self::ARG_I18N_VALUES)
             ->string(self::ARG_LANG_NAME)->lowercase()
             ->string(self::ARG_TRANSLATED_VALUE);
     }
