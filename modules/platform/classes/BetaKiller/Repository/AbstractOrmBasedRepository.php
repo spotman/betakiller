@@ -47,7 +47,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
      * @return AbstractEntityInterface|mixed
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getByID(string $id)
+    public function getById(string $id)
     {
         $model = $this->findById($id);
 
