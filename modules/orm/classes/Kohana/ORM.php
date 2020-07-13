@@ -622,7 +622,7 @@ class Kohana_ORM extends Model implements Serializable {
 	 *
 	 * @param   string $column Column name
 	 * @throws Kohana_Exception
-	 * @return mixed
+	 * @return mixed|null
 	 */
 	public function get($column)
 	{
