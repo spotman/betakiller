@@ -46,7 +46,7 @@ class SupervisorDaemon implements DaemonInterface
     /**
      * @var int[]
      */
-    private array $failureCounter = [];
+    private array $failureCounters = [];
 
     /**
      * @var mixed[][]
@@ -114,6 +114,7 @@ class SupervisorDaemon implements DaemonInterface
 
     private function addSupervisorTimer(): void
     {
+        // Watch status changes
         $this->loop->addPeriodicTimer(0.1, function () {
             // Prevent auto-restart
             if (!$this->isRunning || $this->isStoppingDaemons) {
@@ -130,6 +131,11 @@ class SupervisorDaemon implements DaemonInterface
                 }
             }
         });
+
+        // Reset failure counters
+        $this->loop->addPeriodicTimer(60, function () {
+            $this->failureCounters = [];
+        });
     }
 
     private function processFinishedTask(string $name): void
@@ -145,16 +151,16 @@ class SupervisorDaemon implements DaemonInterface
     private function processFailedTask(string $name): void
     {
         // Increment failed attempts counter
-        $this->failureCounter[$name]++;
+        $this->failureCounters[$name]++;
 
-        if ($this->isRetryLimitReached($this->failureCounter[$name])) {
+        if ($this->isRetryLimitReached($this->failureCounters[$name])) {
             // Do not try to restart this failing task
             $this->setStatus($name, self::STATUS_STOPPED);
 
             // Warning for developers
             $this->logger->emergency('Daemon ":name" had failed :times times and was stopped', [
                 ':name'  => $name,
-                ':times' => $this->failureCounter[$name],
+                ':times' => $this->failureCounters[$name],
             ]);
 
             // No further processing
@@ -169,7 +175,7 @@ class SupervisorDaemon implements DaemonInterface
         // Warning for developers
         $this->logger->warning('Daemon ":name" had failed and will be restarted immediately', [
             ':name' => $name,
-//            ':times' => $this->failureCounter[$name],
+//            ':times' => $this->failureCounters[$name],
         ]);
 
         // Restart failed task
@@ -289,7 +295,7 @@ class SupervisorDaemon implements DaemonInterface
 
         if ($clearCounter) {
             // Clear failure counter
-            $this->failureCounter[$name] = 0;
+            $this->failureCounters[$name] = 0;
         }
 
         $process->start($this->loop);
