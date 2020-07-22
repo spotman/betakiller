@@ -10,7 +10,7 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
     /**
      * @var string
      */
-    private $basePath;
+    private string $basePath;
 
     /**
      * @param string $basePath
@@ -47,6 +47,16 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
         $path = $this->makeFullPath($path);
 
         return $this->doGetFile($path);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasFile(string $path): bool
+    {
+        $path = $this->makeFullPath($path);
+
+        return $this->doHasFile($path);
     }
 
     /**
@@ -121,6 +131,15 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * @return string
      */
     abstract protected function getDirectorySeparator(): string;
+
+    /**
+     * Returns true if file exists
+     *
+     * @param string $path Local path in storage
+     *
+     * @return bool
+     */
+    abstract protected function doHasFile(string $path): bool;
 
     /**
      * Returns content of the file

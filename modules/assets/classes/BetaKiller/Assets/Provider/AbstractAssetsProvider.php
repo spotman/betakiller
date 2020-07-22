@@ -689,7 +689,9 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
 
         $path = $this->getModelActionPath($model, $action, $suffix);
 
-        return $this->storage->getFile($path);
+        return $this->storage->hasFile($path)
+            ? $this->storage->getFile($path)
+            : null;
     }
 
     /**

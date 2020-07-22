@@ -22,6 +22,13 @@ interface AssetsStorageInterface
     /**
      * @param string $path
      *
+     * @return bool
+     */
+    public function hasFile(string $path): bool;
+
+    /**
+     * @param string $path
+     *
      * @return string
      * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */

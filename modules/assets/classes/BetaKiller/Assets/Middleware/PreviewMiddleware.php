@@ -48,7 +48,7 @@ class PreviewMiddleware extends AbstractAssetMiddleware
 
         $previewContent = $this->provider->getCachedContent($model, $action, $size);
 
-        if ($previewContent) {
+        if (!$previewContent) {
             $previewContent = $this->provider->makePreviewContent($model, $size);
 
             // Cache preview to storage

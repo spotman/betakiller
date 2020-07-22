@@ -10,14 +10,14 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
      *
      * @var int
      */
-    private $dirMode = 0777;
+    private int $dirMode = 0777;
 
     /**
      * Prevent executing (groups/other security must be done via server umask config)
      *
      * @var int
      */
-    private $fileMode = 0666;
+    private int $fileMode = 0666;
 
     /**
      * @param string $basePath
@@ -28,7 +28,7 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
     {
         $realPath = realpath($basePath);
 
-        if (!$realPath || !file_exists($realPath) || !is_dir($realPath)) {
+        if (!$realPath || !is_dir($realPath)) {
             throw new AssetsStorageException('Incorrect path provided :value', [':value' => $basePath]);
         }
 
@@ -50,9 +50,17 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
      */
     private function checkFileExists(string $path): void
     {
-        if (!file_exists($path)) {
+        if (!$this->doHasFile($path)) {
             throw new AssetsStorageException('File :path does not exists', [':path' => $path]);
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function doHasFile(string $path): bool
+    {
+        return file_exists($path);
     }
 
     /**
@@ -98,7 +106,7 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
      */
     private function createDirectory(string $path): bool
     {
-        if (file_exists($path) && is_dir($path)) {
+        if (is_dir($path)) {
             return true;
         }
 
