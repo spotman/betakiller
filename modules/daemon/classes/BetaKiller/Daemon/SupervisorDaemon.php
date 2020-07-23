@@ -134,7 +134,9 @@ class SupervisorDaemon implements DaemonInterface
 
         // Reset failure counters
         $this->loop->addPeriodicTimer(60, function () {
-            $this->failureCounters = [];
+            foreach ($this->failureCounters as $name => $counter) {
+                $this->failureCounters[$name] = 0;
+            }
         });
     }
 
