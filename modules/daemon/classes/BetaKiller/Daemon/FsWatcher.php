@@ -7,12 +7,12 @@ use BetaKiller\Helper\AppEnvInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use ReactFilesystemMonitor\FilesystemMonitorFactory;
-// use ReactFilesystemMonitor\FilesystemMonitorInterface;
 
 final class FsWatcher
 {
     private const WATCH_EXTENSIONS = [
         'php', // All
+        'twig', // Compiled templates
         'xml', // Configs
         'yml',
     ];
