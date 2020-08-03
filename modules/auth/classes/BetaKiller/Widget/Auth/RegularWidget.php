@@ -4,23 +4,22 @@ namespace BetaKiller\Widget\Auth;
 use BetaKiller\Action\Auth\RegularLoginAction;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\IFace\Auth\AccessRecoveryRequestIFace;
 use BetaKiller\Security\CsrfService;
 use BetaKiller\Widget\AbstractPublicWidget;
 use Psr\Http\Message\ServerRequestInterface;
 
-class RegularWidget extends AbstractPublicWidget
+final class RegularWidget extends AbstractPublicWidget
 {
-    /**
-     * @var \BetaKiller\Helper\UrlHelperInterface
-     */
-    private UrlHelperInterface $urlHelper;
-
     /**
      * @var \BetaKiller\Security\CsrfService
      */
     private $csrf;
+
+    /**
+     * @var \BetaKiller\Factory\UrlHelperFactory
+     */
+    private UrlHelperFactory $urlHelperFactory;
 
     /**
      * RegularWidget constructor.
@@ -28,15 +27,11 @@ class RegularWidget extends AbstractPublicWidget
      * @param \BetaKiller\Factory\UrlHelperFactory $urlHelperFactory
      *
      * @param \BetaKiller\Security\CsrfService     $csrf
-     *
-     * @throws \DI\DependencyException
-     * @throws \DI\NotFoundException
      */
     public function __construct(UrlHelperFactory $urlHelperFactory, CsrfService $csrf)
     {
-        // Use separate instance coz error pages processing can be done before UrlHelper initialized in middleware
-        $this->urlHelper = $urlHelperFactory->create();
-        $this->csrf      = $csrf;
+        $this->csrf             = $csrf;
+        $this->urlHelperFactory = $urlHelperFactory;
     }
 
     /**
@@ -50,12 +45,17 @@ class RegularWidget extends AbstractPublicWidget
     {
         $lang = ServerRequestHelper::getI18n($request)->getLang();
 
-        $params = $this->urlHelper->createUrlContainer()
-            ->setEntity($lang);
+        // Use separate instance coz error pages processing can be done before UrlHelper initialized in middleware
+        $urlHelper = ServerRequestHelper::hasUrlHelper($request)
+            ? ServerRequestHelper::getUrlHelper($request)
+            : $this->urlHelperFactory->create();
+
+        $params = $urlHelper->createUrlContainer(true)
+            ->setEntity($lang, true);
 
         return [
-            'login_url'           => $this->urlHelper->makeCodenameUrl(RegularLoginAction::codename(), $params),
-            'access_recovery_url' => $this->urlHelper->makeCodenameUrl(AccessRecoveryRequestIFace::codename(), $params),
+            'login_url'           => $urlHelper->makeCodenameUrl(RegularLoginAction::codename(), $params),
+            'access_recovery_url' => $urlHelper->makeCodenameUrl(AccessRecoveryRequestIFace::codename(), $params),
             'token'               => $this->csrf->createRequestToken($request),
         ];
     }

@@ -23,7 +23,7 @@ interface UrlHelperInterface
      */
     public function getDefaultUrlElement(): UrlElementInterface;
 
-    public function createUrlContainer(): UrlContainerInterface;
+    public function createUrlContainer(bool $importCurrent = null): UrlContainerInterface;
 
     /**
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params

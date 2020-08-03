@@ -96,9 +96,15 @@ class UrlHelper implements UrlHelperInterface
         return $this->tree->getDefault();
     }
 
-    public function createUrlContainer(): UrlContainerInterface
+    public function createUrlContainer(bool $importCurrent = null): UrlContainerInterface
     {
-        return ResolvingUrlContainer::create();
+        $container = ResolvingUrlContainer::create();
+
+        if ($importCurrent) {
+            $container->import($this->urlContainer);
+        }
+
+        return $container;
     }
 
     /**
