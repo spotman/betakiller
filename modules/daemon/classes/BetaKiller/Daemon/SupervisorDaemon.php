@@ -17,7 +17,7 @@ class SupervisorDaemon implements DaemonInterface
 {
     public const CODENAME = 'Supervisor';
 
-    public const RETRY_LIMIT    = 3;
+    public const RETRY_LIMIT    = 60;
     public const RELOAD_SIGNAL  = \SIGUSR1;
     public const RESTART_SIGNAL = \SIGUSR2;
 
