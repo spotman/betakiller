@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace BetaKiller\HitStat;
 
-use BetaKiller\Command\HitStatStoreCommand;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception\HttpExceptionExpectedInterface;
 use BetaKiller\Exception\SeeOtherHttpException;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\MessageBus\CommandBusInterface;
+use BetaKiller\Model\Hit;
 use BetaKiller\Model\HitMarkerInterface;
+use BetaKiller\Repository\HitRepository;
 use BetaKiller\Service\HitService;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
@@ -28,49 +28,49 @@ class HitStatMiddleware implements MiddlewareInterface
     /**
      * @var \BetaKiller\Service\HitService
      */
-    private $service;
+    private HitService $service;
 
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
-    private $appEnv;
+    private AppEnvInterface $appEnv;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var \Psr\Http\Message\UriFactoryInterface
      */
-    private $uriFactory;
+    private UriFactoryInterface $uriFactory;
 
     /**
-     * @var \BetaKiller\MessageBus\CommandBusInterface
+     * @var \BetaKiller\Repository\HitRepository
      */
-    private $commandBus;
+    private HitRepository $hitRepo;
 
     /**
      * HitStatMiddleware constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
-     * @param \BetaKiller\Service\HitService             $service
-     * @param \Psr\Http\Message\UriFactoryInterface      $uriFactory
-     * @param \BetaKiller\MessageBus\CommandBusInterface $commandBus
-     * @param \Psr\Log\LoggerInterface                   $logger
+     * @param \BetaKiller\Helper\AppEnvInterface    $appEnv
+     * @param \BetaKiller\Service\HitService        $service
+     * @param \Psr\Http\Message\UriFactoryInterface $uriFactory
+     * @param \BetaKiller\Repository\HitRepository  $hitRepo
+     * @param \Psr\Log\LoggerInterface              $logger
      */
     public function __construct(
         AppEnvInterface $appEnv,
         HitService $service,
         UriFactoryInterface $uriFactory,
-        CommandBusInterface $commandBus,
+        HitRepository $hitRepo,
         LoggerInterface $logger
     ) {
         $this->appEnv     = $appEnv;
         $this->service    = $service;
         $this->logger     = $logger;
         $this->uriFactory = $uriFactory;
-        $this->commandBus = $commandBus;
+        $this->hitRepo    = $hitRepo;
     }
 
     /**
@@ -185,10 +185,25 @@ class HitStatMiddleware implements MiddlewareInterface
             throw new \LogicException();
         }
 
-        // Call command
-        $this->commandBus->enqueue(
-            new HitStatStoreCommand($requestId, $session->getId(), $ip, $sourcePage, $targetPage, $marker)
-        );
+        // Create new Hit object with source/target pages, marker, ip and other info
+        $hit = new Hit;
+
+        $hit
+            ->setTimestamp(new \DateTimeImmutable())
+            ->setIP($ip)
+            ->setUuid($requestId)
+            ->setSessionToken($session->getId())
+            ->setTargetPage($targetPage);
+
+        if ($sourcePage) {
+            $hit->setSourcePage($sourcePage);
+        }
+
+        if ($marker) {
+            $hit->setTargetMarker($marker);
+        }
+
+        $this->hitRepo->save($hit);
 
         RequestProfiler::end($p3);
     }
