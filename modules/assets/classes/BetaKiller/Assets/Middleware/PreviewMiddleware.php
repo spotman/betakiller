@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Assets\Middleware;
 
 use BetaKiller\Assets\Exception\AssetsException;
+use BetaKiller\Assets\Exception\PreviewIsNotAvailableException;
 use BetaKiller\Assets\Provider\HasPreviewProviderInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -49,7 +50,13 @@ class PreviewMiddleware extends AbstractAssetMiddleware
         $previewContent = $this->provider->getCachedContent($model, $action, $size);
 
         if (!$previewContent) {
-            $previewContent = $this->provider->makePreviewContent($model, $size);
+            try {
+                $previewContent = $this->provider->makePreviewContent($model, $size);
+            }
+            /** @noinspection BadExceptionsProcessingInspection */
+            catch (PreviewIsNotAvailableException $e) {
+                return ResponseHelper::text('NOT AVAILABLE', 404);
+            }
 
             // Cache preview to storage
             $this->provider->cacheContent($model, $previewContent, $action, $size);

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Assets\Provider;
 
+use BetaKiller\Assets\Exception\PreviewIsNotAvailableException;
 use BetaKiller\Assets\Model\HasPreviewAssetsModelInterface;
 
 interface HasPreviewProviderInterface extends AssetsProviderInterface
@@ -27,6 +28,7 @@ interface HasPreviewProviderInterface extends AssetsProviderInterface
      * @param string                                                  $size
      *
      * @return string
+     * @throws \BetaKiller\Assets\Exception\PreviewIsNotAvailableException
      */
     public function makePreviewContent(HasPreviewAssetsModelInterface $model, string $size): string;
 

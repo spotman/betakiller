@@ -1,9 +1,6 @@
 <?php
 namespace BetaKiller\Assets\Provider;
 
-use BetaKiller\Assets\Model\HasPreviewAssetsModelInterface;
-use BetaKiller\Exception\NotImplementedHttpException;
-
 /**
  * Class AttachmentAssetsProvider
  * Common attachment provider
@@ -27,17 +24,5 @@ final class AttachmentAssetsProvider extends AbstractHasPreviewAssetsProvider im
             self::ACTION_DOWNLOAD,
             self::ACTION_DELETE,
         ];
-    }
-
-    /**
-     * @param \BetaKiller\Assets\Model\HasPreviewAssetsModelInterface $model
-     * @param string                                                  $size
-     *
-     * @return string
-     */
-    public function makePreviewContent(HasPreviewAssetsModelInterface $model, string $size): string
-    {
-        // TODO Detect preview image by mime-type and return its contents
-        throw new NotImplementedHttpException('Attachments has no preview logic yet');
     }
 }

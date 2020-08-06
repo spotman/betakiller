@@ -2,12 +2,11 @@
 namespace BetaKiller\Assets\Provider;
 
 use BetaKiller\Assets\Exception\AssetsProviderException;
+use BetaKiller\Assets\ImageProcessor;
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
-use BetaKiller\Assets\Model\HasPreviewAssetsModelInterface;
 use BetaKiller\Model\UserInterface;
 use Image;
-use Throwable;
 
 /**
  * Class ImageAssetsProvider
@@ -34,89 +33,6 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
         ];
     }
 
-    private function makeSizeString(int $width = null, int $height = null): string
-    {
-        return $width.AssetsModelImageInterface::SIZE_DELIMITER.$height;
-    }
-
-    /**
-     * @param string $size
-     *
-     * @return int[]
-     */
-    private function parseSizeDimensions(string $size): array
-    {
-        $dimensions = explode(AssetsModelImageInterface::SIZE_DELIMITER, $size);
-        $width      = $dimensions[0] ? (int)$dimensions[0] : null;
-        $height     = $dimensions[1] ? (int)$dimensions[1] : null;
-
-        return $this->packDimensions($width, $height);
-    }
-
-    private function packDimensions(?int $width, ?int $height): array
-    {
-        return [$width, $height];
-    }
-
-    /**
-     * @param $width
-     * @param $height
-     *
-     * @return float
-     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
-     */
-    private function calculateDimensionsRatio(int $width, int $height): float
-    {
-        if (!$height || !$width) {
-            throw new AssetsProviderException('Can not calculate ratio for incomplete dimensions :size', [
-                ':size' => $this->makeSizeString($width, $height),
-            ]);
-        }
-
-        return $width / $height;
-    }
-
-    private function restoreOmittedDimensions(?int $width, ?int $height, float $originalRatio): array
-    {
-        // Fill omitted dimensions
-        if (!$width) {
-            $width = (int)($height * $originalRatio);
-        } elseif (!$height) {
-            $height = (int)($width / $originalRatio);
-        }
-
-        return $this->packDimensions($width, $height);
-    }
-
-    /**
-     * @param \BetaKiller\Assets\Model\HasPreviewAssetsModelInterface $model
-     * @param string                                                  $size
-     *
-     * @return string
-     * @throws \BetaKiller\Assets\Exception\AssetsException
-     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
-     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
-     */
-    public function makePreviewContent(HasPreviewAssetsModelInterface $model, string $size): string
-    {
-        $size = $this->determinePreviewSize($size);
-
-        $content = $this->getContent($model);
-
-        [$width, $height] = $this->parseSizeDimensions($size);
-
-        if (!$width && !$height) {
-            throw new AssetsProviderException('Preview size must have width or height defined');
-        }
-
-        return $this->resize(
-            $content,
-            $width,
-            $height,
-            $this->getPreviewQuality(),
-            true
-        );
-    }
 
     /**
      * @param string                    $content
@@ -153,46 +69,19 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
     }
 
     /**
-     * @param string  $originalContent
-     * @param integer $width
-     * @param integer $height
-     * @param integer $quality
+     * @param string       $originalContent
+     * @param integer|null $width
+     * @param integer|null $height
+     * @param integer      $quality
+     * @param bool         $isPreview
      *
-     * @returns string Processed content
-     * @return string
-     * @throws AssetsProviderException
+     * @return string Processed content
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     private function resize(string $originalContent, ?int $width, ?int $height, int $quality, bool $isPreview): string
     {
-        try {
-            $image = Image::fromContent($originalContent);
-
-            // Detect original dimensions and ratio
-            $originalWidth  = $image->width;
-            $originalHeight = $image->height;
-            $originalRatio  = $this->calculateDimensionsRatio($originalWidth, $originalHeight);
-
-            [$width, $height] = $this->restoreOmittedDimensions($width, $height, $originalRatio);
-
-            $resizeRatio = $this->calculateDimensionsRatio($width, $height);
-
-            if ($originalRatio === $resizeRatio) {
-                $image->resize($width, $height);
-            } elseif ($isPreview && $this->isCroppedPreview()) {
-                $image
-                    ->resize($width, $height, Image::INVERSE)
-                    ->crop($width, $height);
-            } else {
-                $image
-                    ->resize($width, $height, Image::AUTO);
-            }
-
-            return $image->render(null /* auto */, $quality);
-        } catch (Throwable $e) {
-            throw new AssetsProviderException('Can not resize image, reason: :message', [
-                ':message' => $e->getMessage(),
-            ]);
-        }
+        return ImageProcessor::resize($originalContent, $width, $height, $quality, $isPreview,
+            $this->isCroppedPreview());
     }
 
     /**
@@ -219,22 +108,22 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
             $size = ($size !== AssetsModelImageInterface::SIZE_PREVIEW) ? $size : null;
 
             $size       = $this->determinePreviewSize($size);
-            $dimensions = $this->parseSizeDimensions($size);
+            $dimensions = ImageProcessor::parseSizeDimensions($size);
             $modelRatio = $this->getModelRatio($model);
 
-            [$width, $height] = $this->restoreOmittedDimensions($dimensions[0], $dimensions[1], $modelRatio);
+            [$width, $height] = ImageProcessor::restoreOmittedDimensions($dimensions[0], $dimensions[1], $modelRatio);
 
             $src = $this->getPreviewUrl($model, $size);
         }
 
-        $targetRatio = $this->calculateDimensionsRatio($width, $height);
+        $targetRatio = ImageProcessor::calculateDimensionsRatio($width, $height);
 
         $targetWidth  = $attrs['width'] ?? null;
         $targetHeight = $attrs['height'] ?? null;
 
         // Recalculate dimensions if $attributes['width'] or 'height' exists
         if ($targetWidth || $targetHeight) {
-            [$width, $height] = $this->restoreOmittedDimensions($targetWidth, $targetHeight, $targetRatio);
+            [$width, $height] = ImageProcessor::restoreOmittedDimensions($targetWidth, $targetHeight, $targetRatio);
         }
 
         $attrs = array_merge([
@@ -333,13 +222,13 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      */
     private function getSizeRatio(string $size, float $originalRatio = null): float
     {
-        $dimensions = $this->parseSizeDimensions($size);
+        $dimensions = ImageProcessor::parseSizeDimensions($size);
 
         if ($originalRatio) {
-            $dimensions = $this->restoreOmittedDimensions($dimensions[0], $dimensions[1], $originalRatio);
+            $dimensions = ImageProcessor::restoreOmittedDimensions($dimensions[0], $dimensions[1], $originalRatio);
         }
 
-        return $this->calculateDimensionsRatio($dimensions[0], $dimensions[1]);
+        return ImageProcessor::calculateDimensionsRatio($dimensions[0], $dimensions[1]);
     }
 
     /**
@@ -350,7 +239,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      */
     private function getModelRatio(AssetsModelImageInterface $image): float
     {
-        return $this->calculateDimensionsRatio($image->getWidth(), $image->getHeight());
+        return ImageProcessor::calculateDimensionsRatio($image->getWidth(), $image->getHeight());
     }
 
     private function makeSrcsetWidthOption(string $url, int $width): string

@@ -5,9 +5,12 @@ namespace BetaKiller\Assets\Provider;
 
 use BetaKiller\Assets\Exception\AssetsModelException;
 use BetaKiller\Assets\Exception\AssetsProviderException;
+use BetaKiller\Assets\Exception\PreviewIsNotAvailableException;
+use BetaKiller\Assets\ImageProcessor;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\Model\HasPreviewAssetsModelInterface;
 use BetaKiller\Helper\LoggerHelper;
+use BetaKiller\Helper\TextHelper;
 use function count;
 use function in_array;
 
@@ -15,7 +18,7 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
 {
     /**
      * @param \BetaKiller\Assets\Model\HasPreviewAssetsModelInterface $model
-     * @param string                                                  $size 300x200
+     * @param string|null                                             $size 300x200
      *
      * @return string
      * @throws \BetaKiller\Assets\Exception\AssetsException
@@ -30,7 +33,7 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
     }
 
     /**
-     * @param string $size
+     * @param string|null $size
      *
      * @return string
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
@@ -122,6 +125,57 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
             ]);
         }
 
+        $info = parent::getInfo($model);
+
+        if ($this->isPreviewAvailable($model)) {
+            $info = array_merge($info, $this->getPreviewsInfo($model));
+        }
+
+        return $info;
+    }
+
+    /**
+     * @param \BetaKiller\Assets\Model\HasPreviewAssetsModelInterface $model
+     * @param string                                                  $size
+     *
+     * @return string
+     * @throws \BetaKiller\Assets\Exception\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
+     */
+    public function makePreviewContent(HasPreviewAssetsModelInterface $model, string $size): string
+    {
+        if (!$this->isPreviewAvailable($model)) {
+            throw new PreviewIsNotAvailableException();
+        }
+
+        $size = $this->determinePreviewSize($size);
+
+        $content = $this->getContent($model);
+
+        [$width, $height] = ImageProcessor::parseSizeDimensions($size);
+
+        if (!$width && !$height) {
+            throw new AssetsProviderException('Preview size must have width or height defined');
+        }
+
+        return ImageProcessor::resize(
+            $content,
+            $width,
+            $height,
+            $this->getPreviewQuality(),
+            true,
+            $this->isCroppedPreview()
+        );
+    }
+
+    private function isPreviewAvailable(HasPreviewAssetsModelInterface $model): bool
+    {
+        return TextHelper::startsWith($model->getMime(), 'image/');
+    }
+
+    private function getPreviewsInfo(HasPreviewAssetsModelInterface $model): array
+    {
         $previews = [];
 
         foreach ($this->getAllowedPreviewSizes() as $previewSize) {
@@ -130,9 +184,9 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
 
         $preferredSize = $this->getPreferredPreviewSize();
 
-        return array_merge(parent::getInfo($model), [
+        return [
             HasPreviewAssetsModelInterface::API_KEY_PREVIEW_URL      => $previews[$preferredSize],
             HasPreviewAssetsModelInterface::API_KEY_ALL_PREVIEWS_URL => $previews,
-        ]);
+        ];
     }
 }
