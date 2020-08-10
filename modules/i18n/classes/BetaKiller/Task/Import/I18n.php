@@ -106,11 +106,13 @@ class I18n extends AbstractTask
 
     public function run(): void
     {
-        $force = $this->getOption('force', false) !== false;
+        // No DB editing for now => force update
+        $force = true;
+//        $force = $this->getOption('force', false) !== false;
 
-        if ($force && !$this->confirm('Force update requested. Proceed?')) {
-            return;
-        }
+//        if ($force && !$this->confirm('Force update requested. Proceed?')) {
+//            return;
+//        }
 
         // Get all system languages
         foreach ($this->langRepo->getAppLanguages(true) as $language) {
