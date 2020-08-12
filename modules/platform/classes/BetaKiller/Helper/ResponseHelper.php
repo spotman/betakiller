@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Helper;
 
-use DateTimeImmutable;
 use DateInterval;
+use DateTimeImmutable;
 use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\HtmlResponse;
@@ -62,14 +62,17 @@ class ResponseHelper
     /**
      * Sends file to STDOUT for viewing or downloading
      *
-     * @param string $content String content of the file
-     * @param string $mime    MIME-type
-     * @param string $alias   File name for browser`s "Save as" dialog
+     * @param string      $content       String content of the file
+     * @param string|null $mime          MIME-type
+     * @param string|null $downloadAlias File name for browser`s "Save as" dialog
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public static function fileContent(string $content, string $mime = null, string $alias = null): ResponseInterface
-    {
+    public static function fileContent(
+        string $content,
+        string $mime = null,
+        string $downloadAlias = null
+    ): ResponseInterface {
         if (!$content) {
             throw new \LogicException('Content is empty');
         }
@@ -78,8 +81,8 @@ class ResponseHelper
 
         $response = self::text($content);
 
-        if ($alias) {
-            $response = $response->withHeader('Content-Disposition', 'attachment; filename='.$alias);
+        if ($downloadAlias) {
+            $response = $response->withHeader('Content-Disposition', 'attachment; filename='.$downloadAlias);
         }
 
         return $response

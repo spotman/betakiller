@@ -35,7 +35,7 @@ class DownloadMiddleware extends AbstractAssetMiddleware
         // Get file content
         $content = $this->provider->getContent($model);
 
-        // Send file content + headers
+        // Send file content + force download + headers
         $response = ResponseHelper::fileContent($content, $model->getMime(), $model->getOriginalName());
 
         // Send last modified date
