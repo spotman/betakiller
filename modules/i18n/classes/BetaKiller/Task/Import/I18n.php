@@ -166,7 +166,7 @@ class I18n extends AbstractTask
             $keyModel = new TranslationKey;
             $keyModel->setI18nKey($keyName);
 
-            $this->logger->info('I18n key ":key" added', [
+            $this->logger->debug('I18n key ":key" added', [
                 ':key' => $keyName,
             ]);
         }
@@ -192,19 +192,19 @@ class I18n extends AbstractTask
             if ($isFormatted) {
                 // Mark key as plural
                 $keyModel->markAsPlural();
-                $this->logger->info('I18n key ":key" marked as plural', [
+                $this->logger->debug('I18n key ":key" marked as plural', [
                     ':key' => $keyName,
                 ]);
             } else {
                 // Mark key as regular
                 $keyModel->markAsRegular();
-                $this->logger->info('I18n key ":key" marked as regular', [
+                $this->logger->debug('I18n key ":key" marked as regular', [
                     ':key' => $keyName,
                 ]);
             }
         }
 
-        $this->logger->info('I18n key ":key" value for locale ":locale" added', [
+        $this->logger->debug('I18n key ":key" value for locale ":locale" added', [
             ':key'    => $keyName,
             ':locale' => $lang->getLocale(),
         ]);
