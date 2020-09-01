@@ -93,10 +93,12 @@ class WampEsbBridgeDaemon implements DaemonInterface
         $this->wampClient->onSessionOpen(function (ClientSession $session) use ($loop) {
             // Close previous session (stale)
             if ($this->clientSession) {
-                $this->logger->warning('Session ":prev" is replaced with ":next"', [
+                $this->logger->notice('Session ":prev" is replaced with ":next"', [
                     ':prev' => $this->clientSession->getSessionId(),
                     ':next' => $session->getSessionId(),
                 ]);
+
+                $this->transport->stopConsuming($loop);
             }
 
             // Store session for future use
