@@ -5,6 +5,7 @@ namespace BetaKiller\Wamp;
 
 use BetaKiller\Exception;
 use Thruway\ClientSession;
+use Thruway\Logging\Logger;
 
 /**
  * https://github.com/voryx/Thruway#php-client-example
@@ -61,19 +62,16 @@ class WampClient extends \Thruway\Peer\Client
             }
 
             // Ping every 30 seconds to keep session opened
-            $this->pingTimers[$id] = $loop->addPeriodicTimer(30, static function () use ($loop, $session) {
-                $timeoutTimer = $loop->addTimer(10, static function () use ($session) {
-                    throw new Exception('WAMP session ":id" ping timed out', [
-                        ':id' => $session->getSessionId(),
-                    ]);
+            $this->pingTimers[$id] = $loop->addPeriodicTimer(30, static function ($pingTimer) use ($loop, $session) {
+                $timeoutTimer = $loop->addTimer(10, static function () use ($pingTimer, $loop, $session) {
+                    $loop->cancelTimer($pingTimer);
+                    Logger::notice(null, sprintf('WAMP session "%s" ping timed out', $session->getSessionId()));
                 });
 
                 // No ping implementation in PawlTransport, so using a custom ping RPC method here
                 $session->call(self::RPC_PING)
                     ->otherwise(static function () use ($session) {
-                        throw new Exception('WAMP session ":id" ping failed', [
-                            ':id' => $session->getSessionId(),
-                        ]);
+                        Logger::notice(null, sprintf('WAMP session "%s" ping failed', $session->getSessionId()));
                     })
                     ->always(static function () use ($timeoutTimer, $loop) {
                         $loop->cancelTimer($timeoutTimer);
