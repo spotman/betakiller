@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Model;
 
 use BetaKiller\Exception\NotImplementedHttpException;
+use DateTimeImmutable;
 
 class GuestUser extends User implements GuestUserInterface
 {
@@ -65,6 +66,14 @@ class GuestUser extends User implements GuestUserInterface
      * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
     public function setCreatedFromIP(string $ip): UserInterface
+    {
+        throw new NotImplementedHttpException();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLastLoggedIn(): ?DateTimeImmutable
     {
         throw new NotImplementedHttpException();
     }

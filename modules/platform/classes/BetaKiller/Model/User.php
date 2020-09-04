@@ -666,4 +666,16 @@ class User extends \ORM implements UserInterface
 
         return $this;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLastLoggedIn(): ?DateTimeImmutable
+    {
+        $ts = (int)$this->get(self::COL_LAST_LOGIN);
+
+        return $ts
+            ? (new DateTimeImmutable())->setTimestamp($ts)
+            : null;
+    }
 }

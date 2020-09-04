@@ -19,6 +19,11 @@ use Spotman\Acl\AclUserInterface;
 interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWorkflowStateInterface,
     MessageTargetInterface, AclUserInterface, EntityWithAclSpecInterface
 {
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getLastLoggedIn(): ?DateTimeImmutable;
+
     public function completeLogin(): void;
 
     /**
