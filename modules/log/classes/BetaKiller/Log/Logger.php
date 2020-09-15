@@ -102,10 +102,10 @@ class Logger implements LoggerInterface
 
         $logsLevel = $isDebug ? $monolog::DEBUG : $monolog::NOTICE;
 
-        $fileHandler = new StreamHandler($logFilePath, $monolog::DEBUG);
+        $fileHandler = new StreamHandler($logFilePath, $logsLevel);
         $fileHandler->pushProcessor(new ContextCleanupProcessor);
         $fileHandler->pushProcessor(new ExceptionStacktraceProcessor);
-        $monolog->pushHandler(new FilterExceptionsHandler(new FingersCrossedHandler($fileHandler, $logsLevel)));
+        $monolog->pushHandler(new FilterExceptionsHandler(new FingersCrossedHandler($fileHandler, $monolog::WARNING)));
 
         if ($this->appEnv->inStagingMode() || $this->appEnv->inProductionMode()) {
             $slackUrl     = $this->appEnv->getEnvVariable('SLACK_ERROR_WEBHOOK');
