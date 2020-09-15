@@ -100,12 +100,13 @@ class Logger implements LoggerInterface
             date('d').'.log',
         ]);
 
-        $logsLevel = $isDebug ? $monolog::DEBUG : $monolog::NOTICE;
+        $logsLevel    = $isDebug ? $monolog::DEBUG : $monolog::NOTICE;
+        $triggerLevel = $isDebug ? $monolog::DEBUG : $monolog::WARNING;
 
         $fileHandler = new StreamHandler($logFilePath, $logsLevel);
         $fileHandler->pushProcessor(new ContextCleanupProcessor);
         $fileHandler->pushProcessor(new ExceptionStacktraceProcessor);
-        $monolog->pushHandler(new FilterExceptionsHandler(new FingersCrossedHandler($fileHandler, $monolog::WARNING)));
+        $monolog->pushHandler(new FilterExceptionsHandler(new FingersCrossedHandler($fileHandler, $triggerLevel)));
 
         if ($this->appEnv->inStagingMode() || $this->appEnv->inProductionMode()) {
             $slackUrl     = $this->appEnv->getEnvVariable('SLACK_ERROR_WEBHOOK');
