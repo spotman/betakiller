@@ -17,6 +17,12 @@ final class UserState extends AbstractWorkflowStateOrm implements UserStateInter
     public const SUSPENDED       = 'suspended';     // Account removal requested so it will be suspended for 6 months
     public const RESUMED         = 'resumed';       // Resumed from suspend, requires additional confirmation (potential fraud)
 
+    public const ACTIVE_STATES = [
+        self::CREATED,
+        self::EMAIL_CONFIRMED,
+        self::EMAIL_CHANGED,
+    ];
+
     protected function configure(): void
     {
         $this->_table_name = self::TABLE_NAME;
