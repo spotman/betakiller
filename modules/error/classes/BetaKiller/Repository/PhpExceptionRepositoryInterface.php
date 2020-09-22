@@ -37,7 +37,7 @@ interface PhpExceptionRepositoryInterface extends DispatchableRepositoryInterfac
      *
      * @return PhpExceptionModelInterface[]
      */
-    public function getLastSeenBefore(\DateTimeImmutable $before): array;
+    public function getReadyForCleanup(\DateTimeImmutable $before): array;
 
     /**
      * @param string $hash

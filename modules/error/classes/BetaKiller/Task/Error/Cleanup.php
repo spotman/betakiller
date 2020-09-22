@@ -42,7 +42,7 @@ final class Cleanup extends AbstractTask
     {
         $before = new DateTimeImmutable('- 2 weeks');
 
-        foreach ($this->repo->getLastSeenBefore($before) as $item) {
+        foreach ($this->repo->getReadyForCleanup($before) as $item) {
             $this->repo->delete($item);
         }
     }
