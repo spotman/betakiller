@@ -68,10 +68,7 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository impl
 
         return $this
             ->filterNotificationRequired($orm)
-            ->filterStatuses($orm, [
-                PhpExceptionModelInterface::STATE_NEW,
-                PhpExceptionModelInterface::STATE_REPEATED,
-            ])
+            ->filterUnresolved($orm)
             ->orderByLastSeenAt($orm)
             ->findAll($orm);
     }
@@ -85,6 +82,7 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository impl
 
         return $this
             ->filterLastSeenBefore($orm, $before)
+            ->filterUnresolved($orm)
             ->findAll($orm);
     }
 
