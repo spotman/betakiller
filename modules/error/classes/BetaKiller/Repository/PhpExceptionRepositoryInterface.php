@@ -8,6 +8,7 @@ use BetaKiller\Model\PhpExceptionModelInterface;
  *
  * @package BetaKiller\Error
  * @method PhpExceptionModelInterface getById(int $id)
+ * @method void delete(PhpExceptionModelInterface $entity)
  */
 interface PhpExceptionRepositoryInterface extends DispatchableRepositoryInterface
 {
@@ -30,6 +31,13 @@ interface PhpExceptionRepositoryInterface extends DispatchableRepositoryInterfac
      * @return PhpExceptionModelInterface[]
      */
     public function getRequiredNotification(): array;
+
+    /**
+     * @param \DateTimeImmutable $before
+     *
+     * @return PhpExceptionModelInterface[]
+     */
+    public function getLastSeenBefore(\DateTimeImmutable $before): array;
 
     /**
      * @param string $hash

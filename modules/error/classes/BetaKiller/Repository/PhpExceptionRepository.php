@@ -77,6 +77,18 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository impl
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getLastSeenBefore(\DateTimeImmutable $before): array
+    {
+        $orm = $this->getOrmInstance();
+
+        return $this
+            ->filterLastSeenBefore($orm, $before)
+            ->findAll($orm);
+    }
+
+    /**
      * @param string $hash
      *
      * @return PhpExceptionModelInterface|null
@@ -169,6 +181,13 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository impl
     private function orderByLastSeenAt(OrmInterface $orm, ?bool $asc = null): PhpExceptionRepository
     {
         $orm->order_by('last_seen_at', $asc ? 'asc' : 'desc');
+
+        return $this;
+    }
+
+    private function filterLastSeenBefore(OrmInterface $orm, \DateTimeImmutable $before): PhpExceptionRepository
+    {
+        $orm->filter_datetime_column_value('last_seen_at', $before, '<');
 
         return $this;
     }
