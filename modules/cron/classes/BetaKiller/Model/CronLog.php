@@ -5,8 +5,10 @@ namespace BetaKiller\Model;
 
 use DateTimeImmutable;
 
-class CronLog extends \ORM implements CronLogInterface
+final class CronLog extends \ORM implements CronLogInterface
 {
+    private const RESULT_QUEUED    = 'queued';
+    private const RESULT_STARTED   = 'started';
     private const RESULT_SUCCEEDED = 'succeeded';
     private const RESULT_FAILED    = 'failed';
 
@@ -16,16 +18,49 @@ class CronLog extends \ORM implements CronLogInterface
     public const COL_STARTED_AT = 'started_at';
     public const COL_STOPPED_AT = 'stopped_at';
 
+    private static bool $tablesChecked = false;
+
     /**
      * Custom configuration (set table name, configure relations, load_with(), etc)
      */
     protected function configure(): void
     {
+        $this->_db_group   = 'cron';
         $this->_table_name = 'cron_log';
+
+        $this->createTablesIfNotExists();
 
         $this->serialize_columns([
             self::COL_PARAMS,
         ]);
+    }
+
+    private function createTablesIfNotExists(): void
+    {
+        if (!static::$tablesChecked) {
+            $this->enableAutoVacuum();
+            $this->createCronLogTableIfNotExists();
+            static::$tablesChecked = true;
+        }
+    }
+
+    private function createCronLogTableIfNotExists(): void
+    {
+        \DB::query(\Database::SELECT, 'CREATE TABLE IF NOT EXISTS `cron_log` (
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            name VARCHAR(32) NOT NULL,
+            params VARCHAR(255) NOT NULL,
+            cmd VARCHAR(255) NOT NULL,
+            result VARCHAR(10) CHECK( result IN ("started","queued","succeeded","failed") ) NOT NULL,
+            queued_at DATETIME NOT NULL,
+            started_at DATETIME DEFAULT NULL,
+            stopped_at DATETIME DEFAULT NULL
+        );')->execute($this->_db_group);
+    }
+
+    private function enableAutoVacuum(): void
+    {
+        \DB::query(\Database::SELECT, 'PRAGMA auto_vacuum = FULL')->execute($this->_db_group);
     }
 
     /**
@@ -93,7 +128,9 @@ class CronLog extends \ORM implements CronLogInterface
      */
     public function markAsQueued(): CronLogInterface
     {
-        $this->set_datetime_column_value(self::COL_QUEUED_AT, new DateTimeImmutable);
+        $this
+            ->set_datetime_column_value(self::COL_QUEUED_AT, new DateTimeImmutable)
+            ->setResult(self::RESULT_QUEUED);
 
         return $this;
     }
@@ -103,7 +140,9 @@ class CronLog extends \ORM implements CronLogInterface
      */
     public function markAsStarted(): CronLogInterface
     {
-        $this->set_datetime_column_value(self::COL_STARTED_AT, new DateTimeImmutable);
+        $this
+            ->set_datetime_column_value(self::COL_STARTED_AT, new DateTimeImmutable)
+            ->setResult(self::RESULT_STARTED);
 
         return $this;
     }
@@ -114,7 +153,7 @@ class CronLog extends \ORM implements CronLogInterface
     public function markAsSucceeded(): CronLogInterface
     {
         return $this
-            ->setResult(true)
+            ->setResult(self::RESULT_SUCCEEDED)
             ->setStoppedAt(new DateTimeImmutable);
     }
 
@@ -124,7 +163,7 @@ class CronLog extends \ORM implements CronLogInterface
     public function markAsFailed(): CronLogInterface
     {
         return $this
-            ->setResult(false)
+            ->setResult(self::RESULT_FAILED)
             ->setStoppedAt(new DateTimeImmutable);
     }
 
@@ -159,11 +198,9 @@ class CronLog extends \ORM implements CronLogInterface
         return $this;
     }
 
-    private function setResult(bool $value): self
+    private function setResult(string $value): self
     {
-        $result = $value ? self::RESULT_SUCCEEDED : self::RESULT_FAILED;
-
-        $this->set('result', $result);
+        $this->set('result', $value);
 
         return $this;
     }
