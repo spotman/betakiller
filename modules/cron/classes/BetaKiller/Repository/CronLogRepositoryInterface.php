@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
+use BetaKiller\Model\CronCommandInterface;
 use BetaKiller\Model\CronLogInterface;
 
 /**
@@ -19,11 +20,10 @@ interface CronLogRepositoryInterface extends RepositoryInterface
     public function removeRecordsOlderThan(\DateTimeImmutable $beforeDate): void;
 
     /**
-     * @param string             $taskName
-     * @param array              $params
-     * @param \DateTimeImmutable $afterDate
+     * @param \BetaKiller\Model\CronCommandInterface $cmd
+     * @param \DateTimeImmutable                     $afterDate
      *
      * @return bool
      */
-    public function hasTaskRecordAfter(string $taskName, array $params, \DateTimeImmutable $afterDate): bool;
+    public function hasTaskRecordAfter(CronCommandInterface $cmd, \DateTimeImmutable $afterDate): bool;
 }

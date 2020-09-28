@@ -12,11 +12,13 @@ final class CronLog extends \ORM implements CronLogInterface
     private const RESULT_SUCCEEDED = 'succeeded';
     private const RESULT_FAILED    = 'failed';
 
-    public const COL_NAME       = 'name';
-    public const COL_PARAMS     = 'params';
+    public const COL_COMMAND_ID = 'command_id';
     public const COL_QUEUED_AT  = 'queued_at';
     public const COL_STARTED_AT = 'started_at';
     public const COL_STOPPED_AT = 'stopped_at';
+    public const COL_RESULT     = 'result';
+
+    public const REL_COMMAND = 'command';
 
     private static bool $tablesChecked = false;
 
@@ -30,15 +32,24 @@ final class CronLog extends \ORM implements CronLogInterface
 
         $this->createTablesIfNotExists();
 
-        $this->serialize_columns([
-            self::COL_PARAMS,
+        $this->belongs_to([
+            self::REL_COMMAND => [
+                'model'       => CronCommand::getModelName(),
+                'foreign_key' => self::COL_COMMAND_ID,
+            ],
         ]);
+
+        // PDO exceptions are raised when this block is enabled
+//        $this->load_with([
+//            self::REL_COMMAND,
+//        ]);
     }
 
     private function createTablesIfNotExists(): void
     {
         if (!static::$tablesChecked) {
             $this->enableAutoVacuum();
+            $this->enableForeignKeys();
             $this->createCronLogTableIfNotExists();
             static::$tablesChecked = true;
         }
@@ -48,14 +59,18 @@ final class CronLog extends \ORM implements CronLogInterface
     {
         \DB::query(\Database::SELECT, 'CREATE TABLE IF NOT EXISTS `cron_log` (
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            name VARCHAR(32) NOT NULL,
-            params VARCHAR(255) NOT NULL,
-            cmd VARCHAR(255) NOT NULL,
+            command_id INTEGER NOT NULL,
             result VARCHAR(10) CHECK( result IN ("started","queued","succeeded","failed") ) NOT NULL,
             queued_at DATETIME NOT NULL,
             started_at DATETIME DEFAULT NULL,
-            stopped_at DATETIME DEFAULT NULL
+            stopped_at DATETIME DEFAULT NULL,
+            FOREIGN KEY(command_id) REFERENCES cron_commands(id)
         );')->execute($this->_db_group);
+    }
+
+    private function enableForeignKeys(): void
+    {
+        \DB::query(\Database::SELECT, 'PRAGMA foreign_keys=ON;')->execute($this->_db_group);
     }
 
     private function enableAutoVacuum(): void
@@ -64,63 +79,21 @@ final class CronLog extends \ORM implements CronLogInterface
     }
 
     /**
-     * @param string $value
-     *
-     * @return \BetaKiller\Model\CronLogInterface
+     * @inheritDoc
      */
-    public function setName(string $value): CronLogInterface
+    public function setCommand(CronCommandInterface $cmd): CronLogInterface
     {
-        $this->set(self::COL_NAME, $value);
+        $this->setOnce(self::REL_COMMAND, $cmd);
 
         return $this;
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
-    public function getName(): string
+    public function getCommand(): CronCommandInterface
     {
-        return (string)$this->get(self::COL_NAME);
-    }
-
-    /**
-     * @param array $value
-     *
-     * @return \BetaKiller\Model\CronLogInterface
-     */
-    public function setParams(array $value): CronLogInterface
-    {
-        $this->set(self::COL_PARAMS, $value);
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getParams(): array
-    {
-        return (array)$this->get(self::COL_PARAMS);
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return \BetaKiller\Model\CronLogInterface
-     */
-    public function setCmd(string $value): CronLogInterface
-    {
-        $this->set('cmd', $value);
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCmd(): string
-    {
-        return (string)$this->get('cmd');
+        return $this->getRelatedEntity(self::REL_COMMAND);
     }
 
     /**
@@ -200,7 +173,7 @@ final class CronLog extends \ORM implements CronLogInterface
 
     private function setResult(string $value): self
     {
-        $this->set('result', $value);
+        $this->set(self::COL_RESULT, $value);
 
         return $this;
     }

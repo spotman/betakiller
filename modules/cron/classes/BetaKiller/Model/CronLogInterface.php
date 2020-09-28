@@ -8,40 +8,16 @@ use DateTimeImmutable;
 interface CronLogInterface extends AbstractEntityInterface
 {
     /**
-     * @param string $value
+     * @param \BetaKiller\Model\CronCommandInterface $cmd
      *
      * @return \BetaKiller\Model\CronLogInterface
      */
-    public function setName(string $value): CronLogInterface;
+    public function setCommand(CronCommandInterface $cmd): CronLogInterface;
 
     /**
-     * @return string
+     * @return CronCommandInterface
      */
-    public function getName(): string;
-
-    /**
-     * @param array $value
-     *
-     * @return \BetaKiller\Model\CronLogInterface
-     */
-    public function setParams(array $value): CronLogInterface;
-
-    /**
-     * @return array
-     */
-    public function getParams(): array;
-
-    /**
-     * @param string $value
-     *
-     * @return \BetaKiller\Model\CronLogInterface
-     */
-    public function setCmd(string $value): CronLogInterface;
-
-    /**
-     * @return string
-     */
-    public function getCmd(): string;
+    public function getCommand(): CronCommandInterface;
 
     /**
      * @return \BetaKiller\Model\CronLogInterface

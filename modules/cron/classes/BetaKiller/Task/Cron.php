@@ -8,8 +8,10 @@ use BetaKiller\Cron\CronException;
 use BetaKiller\Cron\Task;
 use BetaKiller\Cron\TaskQueue;
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Model\CronCommand;
 use BetaKiller\Model\CronLog;
 use BetaKiller\Model\CronLogInterface;
+use BetaKiller\Repository\CronCommandRepositoryInterface;
 use BetaKiller\Repository\CronLogRepositoryInterface;
 use BetaKiller\Service\MaintenanceModeService;
 use Graze\ParallelProcess\Display\Table;
@@ -30,51 +32,58 @@ class Cron extends AbstractTask
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
-    private $env;
+    private AppEnvInterface $env;
 
     /**
      * @var \BetaKiller\Cron\TaskQueue
      */
-    private $queue;
+    private TaskQueue $queue;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var string
      */
-    private $currentStage;
+    private string $currentStage;
 
     /**
      * @var bool
      */
-    private $isHuman;
+    private bool $isHuman;
 
     /**
      * @var \BetaKiller\Repository\CronLogRepositoryInterface
      */
-    private $repo;
+    private CronLogRepositoryInterface $logRepo;
+
+    /**
+     * @var \BetaKiller\Repository\CronCommandRepositoryInterface
+     */
+    private CronCommandRepositoryInterface $cmdRepo;
 
     /**
      * @var \BetaKiller\Service\MaintenanceModeService
      */
-    private $maintenanceMode;
+    private MaintenanceModeService $maintenanceMode;
 
     /**
      * Cron constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface                $env
-     * @param \BetaKiller\Cron\TaskQueue                        $queue
-     * @param \BetaKiller\Repository\CronLogRepositoryInterface $repo
-     * @param \BetaKiller\Service\MaintenanceModeService        $maintenanceMode
-     * @param \Psr\Log\LoggerInterface                          $logger
+     * @param \BetaKiller\Helper\AppEnvInterface                    $env
+     * @param \BetaKiller\Cron\TaskQueue                            $queue
+     * @param \BetaKiller\Repository\CronLogRepositoryInterface     $logRepo
+     * @param \BetaKiller\Repository\CronCommandRepositoryInterface $cmdRepo
+     * @param \BetaKiller\Service\MaintenanceModeService            $maintenanceMode
+     * @param \Psr\Log\LoggerInterface                              $logger
      */
     public function __construct(
         AppEnvInterface $env,
         TaskQueue $queue,
-        CronLogRepositoryInterface $repo,
+        CronLogRepositoryInterface $logRepo,
+        CronCommandRepositoryInterface $cmdRepo,
         MaintenanceModeService $maintenanceMode,
         LoggerInterface $logger
     ) {
@@ -82,9 +91,11 @@ class Cron extends AbstractTask
         $this->queue  = $queue;
         $this->logger = $logger;
 
-        parent::__construct();
-        $this->repo            = $repo;
+        $this->logRepo         = $logRepo;
+        $this->cmdRepo         = $cmdRepo;
         $this->maintenanceMode = $maintenanceMode;
+
+        parent::__construct();
     }
 
     public function defineOptions(): array
@@ -171,7 +182,9 @@ class Cron extends AbstractTask
                 ':date' => $previousRun->format(\DateTimeImmutable::ATOM),
             ]);
 
-            if (!$this->repo->hasTaskRecordAfter($name, $params, $previousRun)) {
+            $cmd = $this->cmdRepo->findByNameAndParams($name, $params);
+
+            if (!$cmd || !$this->logRepo->hasTaskRecordAfter($cmd, $previousRun)) {
                 $this->logDebug('Task [:task] is missing previous run', [':task' => $name]);
 
                 $this->enqueueTask($name, $params);
@@ -203,7 +216,7 @@ class Cron extends AbstractTask
 
         // Skip task if already queued
         if ($this->queue->isQueued($task)) {
-            $this->logger->info('Task [:task] is already queued, skipping', [':task' => $name]);
+            $this->logDebug('Task [:task] is already queued, skipping', [':task' => $name]);
 
             return;
         }
@@ -262,15 +275,26 @@ class Cron extends AbstractTask
         $cmd     = self::getTaskCmd($this->env, $name, $params);
         $docRoot = $this->env->getDocRootPath();
 
+        $command = $this->cmdRepo->findByCmd($cmd);
+
+        if (!$command) {
+            $command = new CronCommand;
+
+            $command
+                ->setName($name)
+                ->setParams($params)
+                ->setCmd($cmd);
+
+            $this->cmdRepo->save($command);
+        }
+
         $log = new CronLog();
 
         $log
-            ->setName($name)
-            ->setParams($params)
-            ->setCmd($cmd)
+            ->setCommand($command)
             ->markAsQueued();
 
-        $this->repo->save($log);
+        $this->logRepo->save($log);
 
         // Store fingerprint for simpler task identification upon start
         $tags = [
@@ -292,7 +316,7 @@ class Cron extends AbstractTask
 
             $log = $this->getLogFromRunEvent($event);
             $log->markAsStarted();
-            $this->repo->save($log);
+            $this->logRepo->save($log);
         });
 
         $run->addListener(RunEvent::SUCCESSFUL, function (RunEvent $event) {
@@ -307,7 +331,7 @@ class Cron extends AbstractTask
 
             $log = $this->getLogFromRunEvent($event);
             $log->markAsSucceeded();
-            $this->repo->save($log);
+            $this->logRepo->save($log);
         });
 
         $run->addListener(RunEvent::FAILED, function (RunEvent $event) {
@@ -326,7 +350,7 @@ class Cron extends AbstractTask
             // TODO Real enqueue and postpone (use ESB command queue)
             $log = $this->getLogFromRunEvent($event);
             $log->markAsFailed();
-            $this->repo->save($log);
+            $this->logRepo->save($log);
         });
 
         return $run;
@@ -345,7 +369,7 @@ class Cron extends AbstractTask
 
         if (!$fingerprint) {
             throw new CronException('Missing process fingerprint, tags are :values', [
-                ':values' => \json_encode($tags),
+                ':values' => \json_encode($tags, JSON_THROW_ON_ERROR),
             ]);
         }
 
@@ -359,11 +383,11 @@ class Cron extends AbstractTask
 
         if (!$logID) {
             throw new CronException('Missing process log ID, tags are :values', [
-                ':values' => \json_encode($tags),
+                ':values' => \json_encode($tags, JSON_THROW_ON_ERROR),
             ]);
         }
 
-        return $this->repo->getById($logID);
+        return $this->logRepo->getById($logID);
     }
 
     private function logDebug(string $message, array $params = null): void
