@@ -353,17 +353,19 @@ class UrlHelper implements UrlHelperInterface
 
     public function detectDummyTarget(DummyModelInterface $element): UrlElementInterface
     {
-        // Keep current element if forward target defined
-        if ($element->getForwardTarget()) {
-            return $element;
-        }
-
         $redirectElement = $element;
 
         $counter = 0;
 
+        $searchPath = [];
+
         // Process chained dummies to prevent multiple redirects in browser
         do {
+            // Keep current element if forward target defined
+            if ($redirectElement->getForwardTarget()) {
+                return $redirectElement;
+            }
+
             $redirectTarget = $redirectElement->getRedirectTarget();
 
             // Fallback to parent if redirect is not defined
@@ -376,11 +378,16 @@ class UrlHelper implements UrlHelperInterface
                 $redirectElement = $this->tree->getDefault();
             }
             $counter++;
-        } while ($redirectElement instanceof DummyModelInterface && $counter < 20);
+
+            $searchPath[] = $redirectElement;
+        } while ($redirectElement instanceof DummyModelInterface && !$redirectElement->isDefault() && $counter < 20);
 
         if ($counter > 10) {
-            throw new UrlElementException('Possible circular reference for ":name" UrlElement', [
+            throw new UrlElementException('Possible circular reference for ":name" UrlElement: :path', [
                 ':name' => $element->getRedirectTarget(),
+                ':path' => implode(', ', array_map(static function(UrlElementInterface $el) {
+                    return $el->getCodename();
+                }, $searchPath)),
             ]);
         }
 
