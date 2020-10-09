@@ -241,6 +241,14 @@ class DefinitionBuilder implements DefinitionBuilderInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function compositeArrayEnd(): DefinitionBuilderInterface
+    {
+        return $this->compositeEnd();
+    }
+
+    /**
      * Define named collection of arguments like {"name": {}}
      *
      * @param string $name

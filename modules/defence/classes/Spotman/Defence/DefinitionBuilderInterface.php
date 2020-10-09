@@ -123,6 +123,13 @@ interface DefinitionBuilderInterface
     public function compositeArrayStart(string $name): DefinitionBuilderInterface;
 
     /**
+     * End nested collection definition
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function compositeArrayEnd(): DefinitionBuilderInterface;
+
+    /**
      * Define named collection of arguments like {"name": {}}
      *
      * @param string $name
