@@ -7,7 +7,7 @@ use BetaKiller\ExceptionInterface;
 use BetaKiller\Helper\LoggerHelper;
 use Monolog\Handler\HandlerWrapper;
 
-class FilterExceptionsHandler extends HandlerWrapper
+final class SkipExpectedExceptionsHandler extends HandlerWrapper
 {
     /**
      * {@inheritdoc}

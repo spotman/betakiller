@@ -14,7 +14,7 @@ use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
-use BetaKiller\Log\FilterExceptionsHandler;
+use BetaKiller\Log\SkipExpectedExceptionsHandler;
 use BetaKiller\Log\LoggerInterface;
 use DebugBar\DataCollector\MemoryCollector;
 use DebugBar\DataCollector\TimeDataCollector;
@@ -233,7 +233,7 @@ final class DebugMiddleware implements MiddlewareInterface
 
 //        $phpConsoleHandler->pushProcessor(new ContextCleanupProcessor);
 
-        $this->logger->pushHandler(new FilterExceptionsHandler($phpConsoleHandler));
+        $this->logger->pushHandler(new SkipExpectedExceptionsHandler($phpConsoleHandler));
     }
 
     private function getFakeHandler(RequestHandlerInterface $handler): RequestHandlerInterface

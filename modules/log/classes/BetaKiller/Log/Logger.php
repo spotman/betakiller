@@ -4,7 +4,6 @@ namespace BetaKiller\Log;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use Monolog\ErrorHandler;
-use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\SlackWebhookHandler;
 use Monolog\Handler\StreamHandler;
@@ -20,12 +19,12 @@ class Logger implements LoggerInterface
     /**
      * @var \Monolog\Logger
      */
-    private $monolog;
+    private \Monolog\Logger $monolog;
 
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
-    private $appEnv;
+    private AppEnvInterface $appEnv;
 
     /**
      * Logger constructor.
@@ -83,7 +82,7 @@ class Logger implements LoggerInterface
             $monolog->pushHandler(new StdOutHandler($level, $isHuman));
 
             if (DesktopNotificationHandler::isSupported()) {
-                $monolog->pushHandler(new FilterExceptionsHandler(new DesktopNotificationHandler));
+                $monolog->pushHandler(new SkipExpectedExceptionsHandler(new DesktopNotificationHandler));
             }
 
             $monolog->pushProcessor(new CliProcessor);
@@ -100,13 +99,14 @@ class Logger implements LoggerInterface
             date('d').'.log',
         ]);
 
-        $logsLevel    = $isDebug ? $monolog::DEBUG : $monolog::NOTICE;
-        $triggerLevel = $isDebug ? $monolog::DEBUG : $monolog::WARNING;
+        $logsLevel = $isDebug ? $monolog::DEBUG : $monolog::NOTICE;
+//        $triggerLevel = $isDebug ? $monolog::DEBUG : $monolog::WARNING;
 
         $fileHandler = new StreamHandler($logFilePath, $logsLevel);
         $fileHandler->pushProcessor(new ContextCleanupProcessor);
         $fileHandler->pushProcessor(new ExceptionStacktraceProcessor);
-        $monolog->pushHandler(new FilterExceptionsHandler(new FingersCrossedHandler($fileHandler, $triggerLevel)));
+        $monolog->pushHandler(new SkipExpectedExceptionsHandler($fileHandler));
+//        $monolog->pushHandler(new SkipExpectedExceptionsHandler(new FingersCrossedHandler($fileHandler, $triggerLevel)));
 
         if ($this->appEnv->inStagingMode() || $this->appEnv->inProductionMode()) {
             $slackUrl     = $this->appEnv->getEnvVariable('SLACK_ERROR_WEBHOOK');
@@ -131,7 +131,7 @@ class Logger implements LoggerInterface
 //
 //            $slackStorage = $this->appEnv->getStoragePath($slackStorage);
 
-            $monolog->pushHandler(new FilterExceptionsHandler($slackHandler
+            $monolog->pushHandler(new SkipExpectedExceptionsHandler($slackHandler
 //                $slackStorage,
 //                \Monolog\Logger::ERROR,
 //                30 // Repeat notification in 30 seconds
@@ -144,9 +144,9 @@ class Logger implements LoggerInterface
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed  $level
-     * @param string $message
-     * @param array  $context
+     * @param mixed      $level
+     * @param string     $message
+     * @param array|null $context
      *
      * @return void
      */
