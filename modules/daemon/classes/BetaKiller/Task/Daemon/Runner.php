@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Daemon;
 
 use BetaKiller\Daemon\DaemonFactory;
+use BetaKiller\Daemon\DaemonInterface;
 use BetaKiller\Daemon\FsWatcher;
+use BetaKiller\Daemon\Lock;
 use BetaKiller\Daemon\LockFactory;
 use BetaKiller\Daemon\ShutdownDaemonException;
 use BetaKiller\Helper\AppEnvInterface;
@@ -15,6 +17,7 @@ use Database;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
+use React\EventLoop\TimerInterface;
 
 class Runner extends AbstractTask
 {
@@ -29,12 +32,12 @@ class Runner extends AbstractTask
     /**
      * @var \BetaKiller\Daemon\DaemonFactory
      */
-    private $daemonFactory;
+    private DaemonFactory $daemonFactory;
 
     /**
      * @var \BetaKiller\Daemon\LockFactory
      */
-    private $lockFactory;
+    private LockFactory $lockFactory;
 
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
@@ -49,32 +52,37 @@ class Runner extends AbstractTask
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var string
      */
-    private $codename;
+    private string $codename;
 
     /**
      * @var \BetaKiller\Daemon\DaemonInterface
      */
-    private $daemon;
+    private DaemonInterface $daemon;
 
     /**
      * @var \React\EventLoop\LoopInterface
      */
-    private $loop;
+    private LoopInterface $loop;
 
     /**
      * @var \BetaKiller\Daemon\Lock
      */
-    private $lock;
+    private Lock $lock;
 
     /**
      * @var string
      */
     private string $status = self::STATUS_LOADING;
+
+    /**
+     * @var \React\EventLoop\TimerInterface|null
+     */
+    private ?TimerInterface $memoryConsumptionTimer = null;
 
     /**
      * Run constructor.
@@ -97,6 +105,8 @@ class Runner extends AbstractTask
         $this->appEnv        = $appEnv;
         $this->fsWatcher     = $fsWatcher;
         $this->logger        = $logger;
+
+        $this->loop = Factory::create();
 
         parent::__construct();
     }
@@ -140,8 +150,6 @@ class Runner extends AbstractTask
             ]);
         }
 
-        $this->loop = Factory::create();
-
         if (\gc_enabled()) {
             // Force GC to be called periodically
             // @see https://github.com/ratchetphp/Ratchet/issues/662
@@ -161,6 +169,8 @@ class Runner extends AbstractTask
         if ($this->appEnv->inDevelopmentMode()) {
             $this->startFsWatcher($this->loop);
         }
+
+        $this->startMemoryConsumptionGuard();
 
         // Endless loop waiting for signals or exit()
         $this->loop->run();
@@ -213,6 +223,10 @@ class Runner extends AbstractTask
 
         try {
             $this->daemon->stopDaemon($this->loop);
+
+            if ($this->memoryConsumptionTimer) {
+                $this->loop->cancelTimer($this->memoryConsumptionTimer);
+            }
 
             $this->logger->debug('Daemon ":name" was stopped', [
                 ':name' => $this->codename,
@@ -280,6 +294,21 @@ class Runner extends AbstractTask
     {
         $this->loop->addPeriodicTimer(60, static function () {
             Database::pingAll();
+        });
+    }
+
+    private function startMemoryConsumptionGuard(): void
+    {
+        $usageOnStart = \memory_get_usage(true);
+
+        $this->memoryConsumptionTimer = $this->loop->addPeriodicTimer(1, function() use ($usageOnStart) {
+            if (\memory_get_usage(true) > $usageOnStart * 5) {
+                $this->logger->notice('Daemon ":name" consumes too much memory, restarting', [
+                    ':name' => $this->codename,
+                ]);
+
+                $this->stop();
+            }
         });
     }
 
