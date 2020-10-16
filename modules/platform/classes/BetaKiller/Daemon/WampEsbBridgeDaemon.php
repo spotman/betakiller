@@ -125,8 +125,6 @@ class WampEsbBridgeDaemon implements DaemonInterface
         $this->wampClient->bindPingHandlers();
 
         $this->wampClient->start(false);
-
-        $loop->run();
     }
 
     public function stopDaemon(LoopInterface $loop): void
