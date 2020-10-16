@@ -13,25 +13,26 @@ use DB;
 
 class NotificationLog extends \ORM implements NotificationLogInterface
 {
-    public const TABLE_COLUMN_ID           = 'id';
-    public const TABLE_COLUMN_HASH         = 'hash';
-    public const TABLE_COLUMN_USER_ID      = 'user_id';
-    public const TABLE_COLUMN_MESSAGE_NAME = 'name';
-    public const TABLE_COLUMN_TARGET       = 'target';
-    public const TABLE_COLUMN_PROCESSED_AT = 'processed_at';
-    public const TABLE_COLUMN_STATUS       = 'status';
-    public const TABLE_COLUMN_TRANSPORT    = 'transport';
-    public const TABLE_COLUMN_LANG         = 'lang';
-    public const TABLE_COLUMN_SUBJ         = 'subject';
-    public const TABLE_COLUMN_BODY         = 'body';
-    public const TABLE_COLUMN_RESULT       = 'result';
+    public const COL_ID           = 'id';
+    public const COL_HASH         = 'hash';
+    public const COL_USER_ID      = 'user_id';
+    public const COL_MESSAGE_NAME = 'name';
+    public const COL_TARGET       = 'target';
+    public const COL_PROCESSED_AT = 'processed_at';
+    public const COL_STATUS       = 'status';
+    public const COL_TRANSPORT    = 'transport';
+    public const COL_LANG         = 'lang';
+    public const COL_SUBJ         = 'subject';
+    public const COL_BODY         = 'body';
+    public const COL_RESULT       = 'result';
+    public const COL_READ_AT      = 'read_at';
 
     public const STATUS_SUCCEEDED = 'succeeded';
     public const STATUS_FAILED    = 'failed';
 
     public const MAX_LENGTH_CODENAME = 64;
 
-    private static $tablesChecked = false;
+    private static bool $tablesChecked = false;
 
     /**
      * Custom configuration (set table name, configure relations, load_with(), etc)
@@ -41,10 +42,10 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         $this->_db_group   = 'notifications';
         $this->_table_name = 'notification_log';
 
-        $this->createTablesIfNotExists();
+        $this->initSqliteDB();
     }
 
-    protected function createTablesIfNotExists()
+    protected function initSqliteDB(): void
     {
         if (!static::$tablesChecked) {
             $this->enableAutoVacuum();
@@ -53,7 +54,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         }
     }
 
-    protected function createTableIfNotExists()
+    protected function createTableIfNotExists(): void
     {
         DB::query(Database::SELECT, 'CREATE TABLE IF NOT EXISTS `notification_log` (
     id INTEGER PRIMARY KEY NOT NULL,
@@ -67,35 +68,36 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     transport VARCHAR(16) NOT NULL,
     subject VARCHAR(255) NULL DEFAULT NULL,
     body TEXT NULL DEFAULT NULL,
-    result TEXT NULL DEFAULT NULL
+    result TEXT NULL DEFAULT NULL,
+    read_at DATETIME DEFAULT NULL
 )')->execute($this->_db_group);
     }
 
-    private function enableAutoVacuum()
+    private function enableAutoVacuum(): void
     {
         DB::query(Database::SELECT, 'PRAGMA auto_vacuum = FULL')->execute($this->_db_group);
     }
 
     public function setProcessedAt(DateTimeImmutable $value): NotificationLogInterface
     {
-        $this->set_datetime_column_value(self::TABLE_COLUMN_PROCESSED_AT, $value);
+        $this->set_datetime_column_value(self::COL_PROCESSED_AT, $value);
 
         return $this;
     }
 
     public function setMessageName(string $messageName): NotificationLogInterface
     {
-        $this->set(self::TABLE_COLUMN_MESSAGE_NAME, $messageName);
+        $this->set(self::COL_MESSAGE_NAME, $messageName);
 
         return $this;
     }
 
     public function setTarget(MessageTargetInterface $target): NotificationLogInterface
     {
-        $this->set(self::TABLE_COLUMN_TARGET, $this->makeTargetString($target));
+        $this->set(self::COL_TARGET, $this->makeTargetString($target));
 
         if ($target instanceof UserInterface) {
-            $this->set(self::TABLE_COLUMN_USER_ID, $target->getID());
+            $this->set(self::COL_USER_ID, $target->getID());
         }
 
         return $this;
@@ -108,19 +110,19 @@ class NotificationLog extends \ORM implements NotificationLogInterface
      */
     public function getTargetUserId(): ?string
     {
-        return $this->get(self::TABLE_COLUMN_USER_ID);
+        return $this->get(self::COL_USER_ID);
     }
 
     public function setTransport(TransportInterface $transport): NotificationLogInterface
     {
-        $this->set(self::TABLE_COLUMN_TRANSPORT, $transport->getName());
+        $this->set(self::COL_TRANSPORT, $transport->getName());
 
         return $this;
     }
 
     public function setSubject(string $subj): NotificationLogInterface
     {
-        $this->set(self::TABLE_COLUMN_SUBJ, $subj);
+        $this->set(self::COL_SUBJ, $subj);
 
         return $this;
     }
@@ -130,12 +132,12 @@ class NotificationLog extends \ORM implements NotificationLogInterface
      */
     public function getSubject(): ?string
     {
-        return $this->get(self::TABLE_COLUMN_SUBJ);
+        return $this->get(self::COL_SUBJ);
     }
 
     public function setBody(string $body): NotificationLogInterface
     {
-        $this->set(self::TABLE_COLUMN_BODY, $body);
+        $this->set(self::COL_BODY, $body);
 
         return $this;
     }
@@ -148,7 +150,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     public function markAsFailed(string $result = null): NotificationLogInterface
     {
         if ($result) {
-            $this->set(self::TABLE_COLUMN_RESULT, $result);
+            $this->set(self::COL_RESULT, $result);
         }
 
         return $this->setStatus(self::STATUS_FAILED);
@@ -159,7 +161,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
      */
     public function getFailureReason(): ?string
     {
-        return $this->get(self::TABLE_COLUMN_RESULT);
+        return $this->get(self::COL_RESULT);
     }
 
     /**
@@ -167,7 +169,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
      */
     public function getProcessedAt(): DateTimeImmutable
     {
-        return $this->get_datetime_column_value(self::TABLE_COLUMN_PROCESSED_AT);
+        return $this->get_datetime_column_value(self::COL_PROCESSED_AT);
     }
 
     /**
@@ -175,7 +177,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
      */
     public function getMessageName(): string
     {
-        return (string)$this->get(self::TABLE_COLUMN_MESSAGE_NAME);
+        return (string)$this->get(self::COL_MESSAGE_NAME);
     }
 
     /**
@@ -184,7 +186,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
      */
     public function getTargetString(): string
     {
-        return (string)$this->get(self::TABLE_COLUMN_TARGET);
+        return (string)$this->get(self::COL_TARGET);
     }
 
     /**
@@ -192,7 +194,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
      */
     public function getTransportName(): string
     {
-        return (string)$this->get(self::TABLE_COLUMN_TRANSPORT);
+        return (string)$this->get(self::COL_TRANSPORT);
     }
 
     /**
@@ -200,12 +202,12 @@ class NotificationLog extends \ORM implements NotificationLogInterface
      */
     public function getBody(): string
     {
-        return (string)$this->get(self::TABLE_COLUMN_BODY);
+        return (string)$this->get(self::COL_BODY);
     }
 
     public function isSucceeded(): bool
     {
-        return $this->get(self::TABLE_COLUMN_STATUS) === self::STATUS_SUCCEEDED;
+        return (string)$this->get(self::COL_STATUS) === self::STATUS_SUCCEEDED;
     }
 
     private function makeTargetString(MessageTargetInterface $target): string
@@ -225,7 +227,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
 
     private function setStatus(string $value): NotificationLogInterface
     {
-        $this->set(self::TABLE_COLUMN_STATUS, $value);
+        $this->set(self::COL_STATUS, $value);
 
         return $this;
     }
@@ -235,7 +237,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
      */
     public function getHash(): string
     {
-        return (string)$this->get(self::TABLE_COLUMN_HASH);
+        return (string)$this->get(self::COL_HASH);
     }
 
     /**
@@ -245,7 +247,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
      */
     public function setHash(string $value): NotificationLogInterface
     {
-        $this->set(self::TABLE_COLUMN_HASH, $value);
+        $this->set(self::COL_HASH, $value);
 
         return $this;
     }
@@ -257,7 +259,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
      */
     public function setLanguageIsoCode(string $isoCode): NotificationLogInterface
     {
-        $this->set(self::TABLE_COLUMN_LANG, $isoCode);
+        $this->set(self::COL_LANG, $isoCode);
 
         return $this;
     }
@@ -267,6 +269,30 @@ class NotificationLog extends \ORM implements NotificationLogInterface
      */
     public function getLanguageIsoCode(): string
     {
-        return (string)$this->get(self::TABLE_COLUMN_LANG);
+        return (string)$this->get(self::COL_LANG);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function markAsRead(): void
+    {
+        $this->set_datetime_column_value(self::COL_READ_AT, new DateTimeImmutable("now"));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isRead(): bool
+    {
+        return $this->get(self::COL_READ_AT) !== null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getReadAt(): DateTimeImmutable
+    {
+        return $this->get_datetime_column_value(self::COL_READ_AT);
     }
 }

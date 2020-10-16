@@ -20,7 +20,15 @@
 
           <tbody>
           {% for item in items %}
-            <tr class="{{ item.is_succeeded ? "" : "red white-text" }}">
+            {% set item_classes = "" %}
+
+            {% if item.is_read %}
+              {% set item_classes = "light-green lighten-4" %}
+            {% elseif not item.is_succeeded %}
+              {% set item_classes = "red white-text" %}
+            {% endif %}
+
+            <tr class="{{ item_classes }}">
               <td>{{ item.processed_at|date("d.m.Y @ H:i:s") }}</td>
               <td>{{ item.target }}</td>
               <td>{{ item.name }}</td>

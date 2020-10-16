@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
+    <action uri="mark-notification-as-read" name="MarkNotificationAsRead"
+            zone="public" query="h=NotificationLog.hash" />
+
     <iface uri="notifications" name="Admin\Notification\Index" parent="Admin\Index" zone="admin" label="Notification"
            menu="admin" entity="NotificationGroup" entityAction="list">
 

@@ -133,4 +133,21 @@ interface NotificationLogInterface extends DispatchableEntityInterface
      * @return string
      */
     public function getLanguageIsoCode(): string;
+
+    /**
+     * Mark notification as "read" (email opened, etc)
+     */
+    public function markAsRead(): void;
+
+    /**
+     * Returns "true" if notification was read by target user
+     *
+     * @return bool
+     */
+    public function isRead(): bool;
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getReadAt(): DateTimeImmutable;
 }

@@ -13,20 +13,20 @@ use BetaKiller\Url\Parameter\PaginationUrlParameter;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class LogIndexIFace extends AbstractAdminIFace
+final class LogIndexIFace extends AbstractAdminIFace
 {
     public const ARG_MESSAGE = 'message';
     public const ARG_USER    = 'user';
 
     /**
-     * @var \BetaKiller\Repository\NotificationLogRepository
+     * @var \BetaKiller\Repository\NotificationLogRepositoryInterface
      */
-    private $logRepo;
+    private NotificationLogRepositoryInterface $logRepo;
 
     /**
      * @var \BetaKiller\Repository\UserRepositoryInterface
      */
-    private $userRepo;
+    private UserRepositoryInterface $userRepo;
 
     /**
      * LogIndexIFace constructor.
@@ -89,6 +89,7 @@ class LogIndexIFace extends AbstractAdminIFace
             'transport'    => $item->getTransportName(),
             'target'       => $item->getTargetString(),
             'is_succeeded' => $item->isSucceeded(),
+            'is_read'      => $item->isRead(),
             'body_url'     => $urlHelper->getReadEntityUrl($item, ZoneInterface::ADMIN),
         ];
     }

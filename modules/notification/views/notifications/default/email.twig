@@ -1,8 +1,10 @@
-<html>
+<html lang="{{ __lang__ }}">
     <head>
         <title>{{ subject }}</title>
     </head>
     <body>
     {% block body "" %}
+
+    {% include "@notifications/default/email-tracker" %}
     </body>
 </html>

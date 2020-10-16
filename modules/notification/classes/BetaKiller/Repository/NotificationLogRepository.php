@@ -21,7 +21,7 @@ class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository i
      */
     public function getUrlKeyName(): string
     {
-        return NotificationLog::TABLE_COLUMN_HASH;
+        return NotificationLog::COL_HASH;
     }
 
     /**
@@ -96,28 +96,28 @@ class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository i
 
     private function orderByProcessedAtDesc(ExtendedOrmInterface $orm): self
     {
-        $orm->order_by($orm->object_column(NotificationLog::TABLE_COLUMN_PROCESSED_AT), 'desc');
+        $orm->order_by($orm->object_column(NotificationLog::COL_PROCESSED_AT), 'desc');
 
         return $this;
     }
 
     private function filterMessageCodename(ExtendedOrmInterface $orm, string $codename): self
     {
-        $orm->where($orm->object_column(NotificationLog::TABLE_COLUMN_MESSAGE_NAME), '=', $codename);
+        $orm->where($orm->object_column(NotificationLog::COL_MESSAGE_NAME), '=', $codename);
 
         return $this;
     }
 
     private function filterHash(ExtendedOrmInterface $orm, string $hash): self
     {
-        $orm->where($orm->object_column(NotificationLog::TABLE_COLUMN_HASH), '=', $hash);
+        $orm->where($orm->object_column(NotificationLog::COL_HASH), '=', $hash);
 
         return $this;
     }
 
     private function filterUser(ExtendedOrmInterface $orm, UserInterface $user): self
     {
-        $orm->where($orm->object_column(NotificationLog::TABLE_COLUMN_USER_ID), '=', $user->getID());
+        $orm->where($orm->object_column(NotificationLog::COL_USER_ID), '=', $user->getID());
 
         return $this;
     }

@@ -22,7 +22,9 @@ class NotificationLogResource extends AbstractEntityRelatedAclResource
             ],
 
             self::ACTION_READ => [
-                RoleInterface::DEVELOPER,
+                // Allow public actions with this entity
+                RoleInterface::GUEST,
+                RoleInterface::LOGIN,
             ],
 
             self::ACTION_UPDATE => [

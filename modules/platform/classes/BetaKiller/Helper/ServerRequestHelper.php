@@ -141,6 +141,13 @@ class ServerRequestHelper
         return \mb_strpos($type, 'html') !== false;
     }
 
+    public static function isImagePreferred(ServerRequestInterface $request): bool
+    {
+        $type = self::getPreferredContentType($request);
+
+        return \mb_strpos($type, 'image') !== false;
+    }
+
     private static function getPreferredContentType(ServerRequestInterface $request): string
     {
         // Fetched from ContentType middleware
