@@ -24,22 +24,22 @@ class ClaimRegistrationAction extends AbstractAction
     /**
      * @var \BetaKiller\Helper\NotificationHelper
      */
-    private $facade;
+    private NotificationHelper $facade;
 
     /**
      * @var \BetaKiller\Repository\LanguageRepositoryInterface
      */
-    private $langRepo;
+    private LanguageRepositoryInterface $langRepo;
 
     /**
      * @var \BetaKiller\Repository\UserRepositoryInterface
      */
-    private $userRepo;
+    private UserRepositoryInterface $userRepo;
 
     /**
      * @var \BetaKiller\Workflow\UserWorkflow
      */
-    private $userWorkflow;
+    private UserWorkflow $userWorkflow;
 
     /**
      * ClaimRegistrationAction constructor.
@@ -70,6 +70,7 @@ class ClaimRegistrationAction extends AbstractAction
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
+        /** @var NotificationLogInterface $log */
         $log = ServerRequestHelper::getEntity($request, NotificationLogInterface::class);
 
         $userId = $log->getTargetUserId();
