@@ -6,11 +6,11 @@ namespace BetaKiller\Task\Daemon;
 use BetaKiller\Daemon\DaemonFactory;
 use BetaKiller\Daemon\DaemonInterface;
 use BetaKiller\Daemon\FsWatcher;
-use BetaKiller\Daemon\Lock;
-use BetaKiller\Daemon\LockFactory;
+use BetaKiller\Daemon\DaemonLockFactory;
 use BetaKiller\Daemon\ShutdownDaemonException;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
+use BetaKiller\ProcessLock\LockInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Database;
@@ -19,7 +19,7 @@ use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
 
-class Runner extends AbstractTask
+final class Runner extends AbstractTask
 {
     public const START_TIMEOUT = 5;
     public const STOP_TIMEOUT  = 15;
@@ -35,9 +35,9 @@ class Runner extends AbstractTask
     private DaemonFactory $daemonFactory;
 
     /**
-     * @var \BetaKiller\Daemon\LockFactory
+     * @var \BetaKiller\Daemon\DaemonLockFactory
      */
-    private LockFactory $lockFactory;
+    private DaemonLockFactory $lockFactory;
 
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
@@ -70,9 +70,9 @@ class Runner extends AbstractTask
     private LoopInterface $loop;
 
     /**
-     * @var \BetaKiller\Daemon\Lock
+     * @var \BetaKiller\ProcessLock\LockInterface
      */
-    private Lock $lock;
+    private LockInterface $lock;
 
     /**
      * @var string
@@ -87,15 +87,15 @@ class Runner extends AbstractTask
     /**
      * Run constructor.
      *
-     * @param \BetaKiller\Daemon\DaemonFactory   $daemonFactory
-     * @param \BetaKiller\Daemon\LockFactory     $lockFactory
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
-     * @param \BetaKiller\Daemon\FsWatcher       $fsWatcher
-     * @param \Psr\Log\LoggerInterface           $logger
+     * @param \BetaKiller\Daemon\DaemonFactory     $daemonFactory
+     * @param \BetaKiller\Daemon\DaemonLockFactory $lockFactory
+     * @param \BetaKiller\Helper\AppEnvInterface   $appEnv
+     * @param \BetaKiller\Daemon\FsWatcher         $fsWatcher
+     * @param \Psr\Log\LoggerInterface             $logger
      */
     public function __construct(
         DaemonFactory $daemonFactory,
-        LockFactory $lockFactory,
+        DaemonLockFactory $lockFactory,
         AppEnvInterface $appEnv,
         FsWatcher $fsWatcher,
         LoggerInterface $logger
@@ -301,7 +301,7 @@ class Runner extends AbstractTask
     {
         $usageOnStart = \memory_get_usage(true);
 
-        $this->memoryConsumptionTimer = $this->loop->addPeriodicTimer(1, function() use ($usageOnStart) {
+        $this->memoryConsumptionTimer = $this->loop->addPeriodicTimer(1, function () use ($usageOnStart) {
             if (\memory_get_usage(true) > $usageOnStart * 5) {
                 $this->logger->notice('Daemon ":name" consumes too much memory, restarting', [
                     ':name' => $this->codename,

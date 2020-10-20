@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Daemon;
 
-use BetaKiller\Daemon\LockFactory;
+use BetaKiller\Daemon\DaemonLockFactory;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
@@ -18,7 +18,7 @@ class Start extends AbstractTask
     private $appEnv;
 
     /**
-     * @var \BetaKiller\Daemon\LockFactory
+     * @var \BetaKiller\Daemon\DaemonLockFactory
      */
     private $lockFactory;
 
@@ -30,11 +30,11 @@ class Start extends AbstractTask
     /**
      * Start constructor.
      *
-     * @param \BetaKiller\Daemon\LockFactory     $lockFactory
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
-     * @param \Psr\Log\LoggerInterface           $logger
+     * @param \BetaKiller\Daemon\DaemonLockFactory $lockFactory
+     * @param \BetaKiller\Helper\AppEnvInterface   $appEnv
+     * @param \Psr\Log\LoggerInterface             $logger
      */
-    public function __construct(LockFactory $lockFactory, AppEnvInterface $appEnv, LoggerInterface $logger)
+    public function __construct(DaemonLockFactory $lockFactory, AppEnvInterface $appEnv, LoggerInterface $logger)
     {
         $this->appEnv      = $appEnv;
         $this->lockFactory = $lockFactory;

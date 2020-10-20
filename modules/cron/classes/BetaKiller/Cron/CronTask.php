@@ -3,45 +3,45 @@ namespace BetaKiller\Cron;
 
 use DateTimeImmutable;
 
-class Task
+class CronTask
 {
     /**
      * @var string
      */
-    private $name;
+    private string $name;
 
     /**
      * @var array
      */
-    private $params;
+    private array $params;
 
     /**
      * @var string
      */
-    private $fingerprint;
+    private string $fingerprint;
 
     /**
      * @var \DateTimeImmutable
      */
-    private $queuedAt;
+    private DateTimeImmutable $startAt;
 
     /**
-     * @var \DateTimeImmutable
+     * @var \DateTimeImmutable|null
      */
-    private $startAt;
+    private ?DateTimeImmutable $queuedAt = null;
 
     /**
-     * @var \DateTimeImmutable
+     * @var \DateTimeImmutable|null
      */
-    private $finishedAt;
+    private ?DateTimeImmutable $finishedAt = null;
 
     /**
      * @var int|null
      */
-    private $pid;
+    private ?int $pid = null;
 
     /**
-     * Task constructor.
+     * CronTask constructor.
      *
      * @param string                  $name
      * @param array|null              $params
@@ -66,14 +66,19 @@ class Task
         return $this->params;
     }
 
+    public function getStartAt(): DateTimeImmutable
+    {
+        return $this->startAt;
+    }
+
     public function getQueuedAt(): ?DateTimeImmutable
     {
         return $this->queuedAt;
     }
 
-    public function getStartAt(): DateTimeImmutable
+    public function getFinishedAt(): ?DateTimeImmutable
     {
-        return $this->startAt;
+        return $this->finishedAt;
     }
 
     public function getFingerprint(): string
@@ -83,7 +88,7 @@ class Task
 
     private function calculateFingerprint(): void
     {
-        $this->fingerprint = sha1(\json_encode([$this->name, $this->params]));
+        $this->fingerprint = sha1(\json_encode([$this->name, $this->params], JSON_THROW_ON_ERROR));
     }
 
     public function enqueued(?DateTimeImmutable $queuedAt = null): void
@@ -91,9 +96,9 @@ class Task
         $this->queuedAt = $queuedAt ?? new DateTimeImmutable;
     }
 
-    public function started(/* int $pid, */ ?DateTimeImmutable $startTime = null): void
+    public function started(int $pid, ?DateTimeImmutable $startTime = null): void
     {
-//        $this->pid     = $pid;
+        $this->pid     = $pid;
         $this->startAt = $startTime ?? new DateTimeImmutable;
     }
 
@@ -108,7 +113,7 @@ class Task
         $this->clearPID();
     }
 
-    public function postpone(DateTimeImmutable $nextRunTime = null): void
+    public function postpone(DateTimeImmutable $nextRunTime): void
     {
         $this->startAt = $nextRunTime;
     }
@@ -116,6 +121,11 @@ class Task
     public function getPID(): ?int
     {
         return $this->pid;
+    }
+
+    public function isRunning(): bool
+    {
+        return (bool)$this->pid;
     }
 
     private function clearPID(): void

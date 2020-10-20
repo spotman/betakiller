@@ -5,12 +5,15 @@ namespace BetaKiller\Task;
 
 use BetaKiller\Cron\ConfigItem;
 use BetaKiller\Cron\CronException;
-use BetaKiller\Cron\Task;
+use BetaKiller\Cron\CronLockFactory;
+use BetaKiller\Cron\CronTask;
 use BetaKiller\Cron\TaskQueue;
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Model\CronCommand;
 use BetaKiller\Model\CronLog;
 use BetaKiller\Model\CronLogInterface;
+use BetaKiller\ProcessLock\LockInterface;
 use BetaKiller\Repository\CronCommandRepositoryInterface;
 use BetaKiller\Repository\CronLogRepositoryInterface;
 use BetaKiller\Service\MaintenanceModeService;
@@ -70,6 +73,16 @@ class Cron extends AbstractTask
     private MaintenanceModeService $maintenanceMode;
 
     /**
+     * @var \BetaKiller\Cron\CronLockFactory
+     */
+    private CronLockFactory $lockFactory;
+
+    /**
+     * @var \BetaKiller\ProcessLock\LockInterface[]
+     */
+    private array $locks = [];
+
+    /**
      * Cron constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface                    $env
@@ -77,6 +90,7 @@ class Cron extends AbstractTask
      * @param \BetaKiller\Repository\CronLogRepositoryInterface     $logRepo
      * @param \BetaKiller\Repository\CronCommandRepositoryInterface $cmdRepo
      * @param \BetaKiller\Service\MaintenanceModeService            $maintenanceMode
+     * @param \BetaKiller\Cron\CronLockFactory                      $lockFactory
      * @param \Psr\Log\LoggerInterface                              $logger
      */
     public function __construct(
@@ -85,6 +99,7 @@ class Cron extends AbstractTask
         CronLogRepositoryInterface $logRepo,
         CronCommandRepositoryInterface $cmdRepo,
         MaintenanceModeService $maintenanceMode,
+        CronLockFactory $lockFactory,
         LoggerInterface $logger
     ) {
         $this->env    = $env;
@@ -94,6 +109,7 @@ class Cron extends AbstractTask
         $this->logRepo         = $logRepo;
         $this->cmdRepo         = $cmdRepo;
         $this->maintenanceMode = $maintenanceMode;
+        $this->lockFactory     = $lockFactory;
 
         parent::__construct();
     }
@@ -212,12 +228,23 @@ class Cron extends AbstractTask
 
     private function enqueueTask(string $name, array $params): void
     {
-        $task = new Task($name, $params);
+        $task = new CronTask($name, $params);
 
         // Skip task if already queued
         if ($this->queue->isQueued($task)) {
             $this->logDebug('Task [:task] is already queued, skipping', [':task' => $name]);
 
+            return;
+        }
+
+        $lock = $this->getLockFor($task);
+
+        if ($lock->isValid()) {
+            $this->logger->warning('Cron task ":name" is still running, skip it', [
+                ':name' => $task->getName(),
+            ]);
+
+            // Skip this task
             return;
         }
 
@@ -265,7 +292,7 @@ class Cron extends AbstractTask
         }
     }
 
-    private function makeTaskRun(Task $task): RunInterface
+    private function makeTaskRun(CronTask $task): RunInterface
     {
         $this->logDebug('Task [:name] is ready to start', [':name' => $task->getName()]);
 
@@ -307,12 +334,32 @@ class Cron extends AbstractTask
 
         $run = new ProcessRun(Process::fromShellCommandline($cmd, $docRoot), $tags);
 
-        $run->addListener(RunEvent::STARTED, function (RunEvent $event) {
+        // Listen for UPDATED event coz CREATED is emitted before actual process is started
+        $run->addListener(RunEvent::UPDATED, function (RunEvent $event) {
             $task = $this->getTaskFromRunEvent($event);
 
-            $task->started();
+            // Prevent duplicate processing on subsequent UPDATED events
+            if ($task->isRunning()) {
+                return;
+            }
 
-            $this->logDebug('Task [:name] is started', [':name' => $task->getName()]);
+            $process = $this->getProcessFromRunEvent($event);
+
+//            // Wait for the process to be really started
+//            while (!$process->getPid()) {
+//                \usleep(10000);
+//            }
+
+            // Store PID in CronTask record
+            $task->started($process->getPid());
+
+            // Lock ASAP
+            $this->acquireLock($task);
+
+            $this->logDebug('Task [:name] is started with PID :pid', [
+                ':name' => $task->getName(),
+                ':pid'  => $task->getPID(),
+            ]);
 
             $log = $this->getLogFromRunEvent($event);
             $log->markAsStarted();
@@ -332,6 +379,9 @@ class Cron extends AbstractTask
             $log = $this->getLogFromRunEvent($event);
             $log->markAsSucceeded();
             $this->logRepo->save($log);
+
+            // Keep locked until all processing is done
+            $this->releaseLock($task);
         });
 
         $run->addListener(RunEvent::FAILED, function (RunEvent $event) {
@@ -351,6 +401,9 @@ class Cron extends AbstractTask
             $log = $this->getLogFromRunEvent($event);
             $log->markAsFailed();
             $this->logRepo->save($log);
+
+            // Keep locked until all processing is done
+            $this->releaseLock($task);
         });
 
         return $run;
@@ -359,10 +412,10 @@ class Cron extends AbstractTask
     /**
      * @param \Graze\ParallelProcess\Event\RunEvent $event
      *
-     * @return \BetaKiller\Cron\Task
+     * @return \BetaKiller\Cron\CronTask
      * @throws \BetaKiller\Cron\CronException
      */
-    private function getTaskFromRunEvent(RunEvent $event): Task
+    private function getTaskFromRunEvent(RunEvent $event): CronTask
     {
         $tags        = $event->getRun()->getTags();
         $fingerprint = $tags[self::TAG_FINGERPRINT] ?? '';
@@ -374,6 +427,17 @@ class Cron extends AbstractTask
         }
 
         return $this->queue->getByFingerprint($fingerprint);
+    }
+
+    private function getProcessFromRunEvent(RunEvent $event): Process
+    {
+        $run = $event->getRun();
+
+        if (!$run instanceof ProcessRun) {
+            throw new \LogicException('Event Run must implement ProcessRun');
+        }
+
+        return $run->getProcess();
     }
 
     private function getLogFromRunEvent(RunEvent $event): CronLogInterface
@@ -388,6 +452,67 @@ class Cron extends AbstractTask
         }
 
         return $this->logRepo->getById($logID);
+    }
+
+    private function acquireLock(CronTask $task): bool
+    {
+        $lock = $this->getLockFor($task);
+
+        // Check if it is running already
+        if ($lock->isValid()) {
+            $this->logger->warning('Cron task ":name" is already running', [
+                ':name' => $task->getName(),
+            ]);
+
+            // It is not normal to run cron tasks in parallel
+            return false;
+        }
+
+        if ($lock->isAcquired()) {
+            $this->logger->warning('Cron task ":name" lock is stale, releasing it', [
+                ':name' => $task->getName(),
+            ]);
+
+            $lock->release();
+        }
+
+        if (!$lock->acquire($task->getPID())) {
+            throw new TaskException('Can not acquire lock for cron task ":name"', [
+                ':name' => $task->getName(),
+            ]);
+        }
+
+        return $lock->isAcquired();
+    }
+
+    private function releaseLock(CronTask $task): void
+    {
+        $lock = $this->getLockFor($task);
+
+        try {
+            if ($lock->release()) {
+                $this->logger->debug('Cron task ":name" was unlocked', [
+                    ':name' => $task->getName(),
+                ]);
+            } else {
+                $this->logger->debug('Cron task ":name" is not locked', [
+                    ':name' => $task->getName(),
+                ]);
+            }
+        } catch (\Throwable $e) {
+            LoggerHelper::logRawException($this->logger, $e);
+        }
+    }
+
+    private function getLockFor(CronTask $task): LockInterface
+    {
+        $codename = $task->getName();
+
+        if (!isset($this->locks[$codename])) {
+            $this->locks[$codename] = $this->lockFactory->create($codename);
+        }
+
+        return $this->locks[$codename];
     }
 
     private function logDebug(string $message, array $params = null): void

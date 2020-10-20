@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Daemon\Supervisor;
 
-use BetaKiller\Daemon\LockFactory;
+use BetaKiller\Daemon\DaemonLockFactory;
 use BetaKiller\Daemon\SupervisorDaemon;
 use BetaKiller\Task\AbstractTask;
 use Symfony\Component\Process\Process;
@@ -11,16 +11,16 @@ use Symfony\Component\Process\Process;
 class Reload extends AbstractTask
 {
     /**
-     * @var \BetaKiller\Daemon\LockFactory
+     * @var \BetaKiller\Daemon\DaemonLockFactory
      */
     private $lockFactory;
 
     /**
      * Reload constructor.
      *
-     * @param \BetaKiller\Daemon\LockFactory $lockFactory
+     * @param \BetaKiller\Daemon\DaemonLockFactory $lockFactory
      */
-    public function __construct(LockFactory $lockFactory)
+    public function __construct(DaemonLockFactory $lockFactory)
     {
         $this->lockFactory = $lockFactory;
 

@@ -7,7 +7,7 @@ use DateTimeImmutable;
 class TaskQueue
 {
     /**
-     * @var \BetaKiller\Cron\Task[]
+     * @var \BetaKiller\Cron\CronTask[]
      */
     private $queue = [];
 
@@ -19,9 +19,9 @@ class TaskQueue
     private $stage;
 
     /**
-     * @param \BetaKiller\Cron\Task $task
+     * @param \BetaKiller\Cron\CronTask $task
      */
-    public function enqueue(Task $task): void
+    public function enqueue(CronTask $task): void
     {
         $this->queue[$task->getFingerprint()] = $task;
 
@@ -30,11 +30,11 @@ class TaskQueue
     }
 
     /**
-     * @param \BetaKiller\Cron\Task $task
+     * @param \BetaKiller\Cron\CronTask $task
      *
      * @throws \BetaKiller\Cron\CronException
      */
-    public function dequeue(Task $task): void
+    public function dequeue(CronTask $task): void
     {
         if (!$this->isQueued($task)) {
             throw new CronException('Task is not enqueued? can not dequeue');
@@ -43,7 +43,7 @@ class TaskQueue
         unset($this->queue[$task->getFingerprint()]);
     }
 
-    public function isQueued(Task $task): bool
+    public function isQueued(CronTask $task): bool
     {
         return isset($this->queue[$task->getFingerprint()]);
     }
@@ -51,10 +51,10 @@ class TaskQueue
     /**
      * @param int $pid
      *
-     * @return \BetaKiller\Cron\Task
+     * @return \BetaKiller\Cron\CronTask
      * @throws \BetaKiller\Cron\CronException
      */
-    public function getByPID(int $pid): Task
+    public function getByPID(int $pid): CronTask
     {
         foreach ($this->queue as $task) {
             if ($task->getPID() === $pid) {
@@ -68,10 +68,10 @@ class TaskQueue
     /**
      * @param string $fingerprint
      *
-     * @return \BetaKiller\Cron\Task
+     * @return \BetaKiller\Cron\CronTask
      * @throws \BetaKiller\Cron\CronException
      */
-    public function getByFingerprint(string $fingerprint): Task
+    public function getByFingerprint(string $fingerprint): CronTask
     {
         foreach ($this->queue as $task) {
             if ($task->getFingerprint() === $fingerprint) {
@@ -85,13 +85,13 @@ class TaskQueue
     /**
      * @param \DateTimeImmutable|null $startTime
      *
-     * @return Task[]
+     * @return CronTask[]
      */
     public function getReadyToStart(?DateTimeImmutable $startTime = null): array
     {
         $startTime = $startTime ?? new DateTimeImmutable;
 
-        return array_filter($this->queue, static function (Task $task) use ($startTime) {
+        return array_filter($this->queue, static function (CronTask $task) use ($startTime) {
             return $task->getStartAt() <= $startTime;
         });
     }

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Daemon;
 
-use BetaKiller\Daemon\LockFactory;
+use BetaKiller\Daemon\DaemonLockFactory;
 use BetaKiller\Daemon\ShutdownDaemonException;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
@@ -18,17 +18,17 @@ class Status extends AbstractTask
     private $appEnv;
 
     /**
-     * @var \BetaKiller\Daemon\LockFactory
+     * @var \BetaKiller\Daemon\DaemonLockFactory
      */
     private $lockFactory;
 
     /**
      * Start constructor.
      *
-     * @param \BetaKiller\Daemon\LockFactory     $lockFactory
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \BetaKiller\Daemon\DaemonLockFactory $lockFactory
+     * @param \BetaKiller\Helper\AppEnvInterface   $appEnv
      */
-    public function __construct(LockFactory $lockFactory, AppEnvInterface $appEnv)
+    public function __construct(DaemonLockFactory $lockFactory, AppEnvInterface $appEnv)
     {
         $this->appEnv = $appEnv;
         $this->lockFactory = $lockFactory;

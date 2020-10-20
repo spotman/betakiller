@@ -3,23 +3,23 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Daemon;
 
-use BetaKiller\Daemon\LockFactory;
+use BetaKiller\Daemon\DaemonLockFactory;
 use BetaKiller\Task\AbstractTask;
 use Symfony\Component\Process\Process;
 
 class Stop extends AbstractTask
 {
     /**
-     * @var \BetaKiller\Daemon\LockFactory
+     * @var \BetaKiller\Daemon\DaemonLockFactory
      */
     private $lockFactory;
 
     /**
      * Stop constructor.
      *
-     * @param \BetaKiller\Daemon\LockFactory $lockFactory
+     * @param \BetaKiller\Daemon\DaemonLockFactory $lockFactory
      */
-    public function __construct(LockFactory $lockFactory)
+    public function __construct(DaemonLockFactory $lockFactory)
     {
         $this->lockFactory = $lockFactory;
 

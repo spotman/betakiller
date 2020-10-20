@@ -6,6 +6,7 @@ namespace BetaKiller\Daemon;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Exception;
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\ProcessLock\LockInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\Daemon\Runner;
 use Psr\Log\LoggerInterface;
@@ -59,9 +60,9 @@ class SupervisorDaemon implements DaemonInterface
     private LoggerInterface $logger;
 
     /**
-     * @var \BetaKiller\Daemon\LockFactory
+     * @var \BetaKiller\Daemon\DaemonLockFactory
      */
-    private LockFactory $lockFactory;
+    private DaemonLockFactory $lockFactory;
 
     private bool $isRunning = false;
 
@@ -72,13 +73,13 @@ class SupervisorDaemon implements DaemonInterface
      *
      * @param \BetaKiller\Config\ConfigProviderInterface $config
      * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
-     * @param \BetaKiller\Daemon\LockFactory             $lockFactory
+     * @param \BetaKiller\Daemon\DaemonLockFactory       $lockFactory
      * @param \Psr\Log\LoggerInterface                   $logger
      */
     public function __construct(
         ConfigProviderInterface $config,
         AppEnvInterface $appEnv,
-        LockFactory $lockFactory,
+        DaemonLockFactory $lockFactory,
         LoggerInterface $logger
     ) {
         $this->config      = $config;
@@ -378,7 +379,7 @@ class SupervisorDaemon implements DaemonInterface
         return \array_unique((array)$this->config->load(['daemons']));
     }
 
-    private function checkLockReleased(Lock $lock): bool
+    private function checkLockReleased(LockInterface $lock): bool
     {
         if ($lock->isAcquired()) {
             // Something went wrong on the daemon shutdown so we need to clear the lock

@@ -87,7 +87,7 @@ abstract class AbstractTask extends Minion_Task
      * @param string    $key
      * @param bool|null $required
      *
-     * @return null|mixed
+     * @return string|bool|null
      * @throws \BetaKiller\Task\TaskException
      */
     protected function getOption(string $key, ?bool $required = null)

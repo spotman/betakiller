@@ -1,12 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\Daemon;
+namespace BetaKiller\ProcessLock;
 
 use BetaKiller\Exception;
-use Psr\Log\LoggerInterface;
 
-class Lock
+final class Lock implements LockInterface
 {
     private const TIMEOUT_ACQUIRE = 3;
     private const TIMEOUT_RELEASE = 3;
@@ -14,12 +13,7 @@ class Lock
     /**
      * @var string
      */
-    private $path;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
+    private string $path;
 
     /**
      * Lock constructor.
@@ -29,11 +23,6 @@ class Lock
     public function __construct(string $path)
     {
         $this->path = $path;
-    }
-
-    public function setLogger(LoggerInterface $logger): void
-    {
-        $this->logger = $logger;
     }
 
     public function getPath(): string
