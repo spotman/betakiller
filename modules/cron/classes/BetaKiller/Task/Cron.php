@@ -508,6 +508,17 @@ class Cron extends AbstractTask
     {
         $codename = $task->getName();
 
+        $params = [];
+
+        // Add parameters to codename to separate locks for calls with different arguments
+        foreach ($task->getParams() as $optionName => $optionValue) {
+            $params[] = $optionName.'-'.$optionValue;
+        }
+
+        if ($params) {
+            $codename .= '.'.\implode('.', $params);
+        }
+
         if (!isset($this->locks[$codename])) {
             $this->locks[$codename] = $this->lockFactory->create($codename);
         }
