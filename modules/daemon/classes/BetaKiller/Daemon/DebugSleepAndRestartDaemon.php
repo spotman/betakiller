@@ -5,7 +5,7 @@ namespace BetaKiller\Daemon;
 
 use React\EventLoop\LoopInterface;
 
-class DebugSleepAndRestartDaemon implements DaemonInterface
+final class DebugSleepAndRestartDaemon extends AbstractDaemon
 {
     public const CODENAME = 'DebugSleepAndRestart';
 

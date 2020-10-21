@@ -11,10 +11,11 @@ use BetaKiller\MessageBus\CommandMessageInterface;
 use BetaKiller\Model\AbstractEntityInterface;
 use Interop\Queue\Context;
 use Interop\Queue\Message;
+use Interop\Queue\Queue;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 
-class CommandBusWorkerDaemon implements DaemonInterface
+final class CommandBusWorkerDaemon extends AbstractDaemon
 {
     public const CODENAME   = 'CommandBusWorker';
     public const QUEUE_NAME = 'commands';
@@ -22,32 +23,32 @@ class CommandBusWorkerDaemon implements DaemonInterface
     /**
      * @var \BetaKiller\Config\ConfigProviderInterface
      */
-    private $config;
+    private ConfigProviderInterface $config;
 
     /**
      * @var \BetaKiller\MessageBus\CommandBusInterface
      */
-    private $commandBus;
+    private CommandBusInterface $commandBus;
 
     /**
      * @var \Interop\Queue\Context
      */
-    private $queueContext;
+    private Context $queueContext;
 
     /**
      * @var \Interop\Queue\Queue
      */
-    private $queue;
+    private Queue $queue;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var \BetaKiller\DI\ContainerInterface
      */
-    private $container;
+    private ContainerInterface $container;
 
     /**
      * CommandBusWorkerDaemon constructor.
@@ -92,6 +93,8 @@ class CommandBusWorkerDaemon implements DaemonInterface
 
         // Listen for ESB bus queue messages and call local handlers
         $loop->addPeriodicTimer(0.5, function () use ($consumer) {
+            $this->markAsProcessing();
+
             // Check message
             $message = $consumer->receiveNoWait();
 
@@ -111,6 +114,8 @@ class CommandBusWorkerDaemon implements DaemonInterface
                     ]);
                 }
             }
+
+            $this->markAsIdle();
         });
     }
 

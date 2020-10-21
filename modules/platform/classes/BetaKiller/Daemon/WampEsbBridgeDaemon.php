@@ -11,8 +11,9 @@ use BetaKiller\Wamp\WampClient;
 use BetaKiller\Wamp\WampClientBuilder;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use React\Promise\Promise;
 use React\Promise\PromiseInterface;
-use React\Promise\RejectedPromise;
+use function React\Promise\reject;
 use Throwable;
 use Thruway\ClientSession;
 use Thruway\Logging\Logger;
@@ -22,7 +23,7 @@ use Thruway\Logging\Logger;
  *
  * @package BetaKiller\Daemon
  */
-class WampEsbBridgeDaemon implements DaemonInterface
+final class WampEsbBridgeDaemon extends AbstractDaemon
 {
     public const CODENAME = 'WampEsbBridge';
 
@@ -79,7 +80,13 @@ class WampEsbBridgeDaemon implements DaemonInterface
 
         // Bind ESB event listener
         $this->transport->subscribeAnyOutbound(function (OutboundEventMessageInterface $event) {
-            return $this->forwardEvent($event);
+            $this->markAsProcessing();
+
+            $result = $this->forwardEvent($event);
+
+            $this->markAsIdle();
+
+            return $result;
         });
 
         // Use internal auth and connection coz it is an internal worker
@@ -91,6 +98,8 @@ class WampEsbBridgeDaemon implements DaemonInterface
 
         // Register new session
         $this->wampClient->onSessionOpen(function (ClientSession $session) use ($loop) {
+            $this->markAsProcessing();
+
             // Close previous session (stale)
             if ($this->clientSession) {
                 $this->logger->notice('Session ":prev" is replaced with ":next"', [
@@ -110,15 +119,21 @@ class WampEsbBridgeDaemon implements DaemonInterface
             ]);
 
             $this->transport->startConsuming($loop);
+
+            $this->markAsIdle();
         });
 
         // Remove stale session
         $this->wampClient->onSessionClose(function () use ($loop) {
+            $this->markAsProcessing();
+
             if ($this->clientSession) {
                 $this->transport->stopConsuming($loop);
 
                 $this->clientSession = null;
             }
+
+            $this->markAsIdle();
         });
 
         // Keep alive
@@ -186,7 +201,7 @@ class WampEsbBridgeDaemon implements DaemonInterface
         } catch (Throwable $e) {
             LoggerHelper::logRawException($this->logger, $e);
 
-            return new RejectedPromise;
+            return reject();
         }
     }
 }

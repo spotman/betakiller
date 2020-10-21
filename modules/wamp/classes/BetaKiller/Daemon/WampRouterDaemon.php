@@ -11,9 +11,10 @@ use React\EventLoop\LoopInterface;
 use Thruway\Authentication\AuthenticationManager;
 use Thruway\Authentication\WampCraAuthProvider;
 use Thruway\Authentication\WampCraUserDbInterface;
+use Thruway\Logging\Logger;
 use Thruway\Transport\RatchetTransportProvider;
 
-class WampRouterDaemon implements DaemonInterface
+final class WampRouterDaemon extends AbstractDaemon
 {
     public const CODENAME = 'WampRouter';
 
@@ -54,7 +55,7 @@ class WampRouterDaemon implements DaemonInterface
 
     public function startDaemon(LoopInterface $loop): void
     {
-        \Thruway\Logging\Logger::set($this->logger);
+        Logger::set($this->logger);
 
         $this->router = new WampRouter($loop);
 

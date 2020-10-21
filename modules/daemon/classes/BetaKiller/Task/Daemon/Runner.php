@@ -221,24 +221,32 @@ final class Runner extends AbstractTask
             $this->shutdown(1);
         });
 
-        try {
-            $this->daemon->stopDaemon($this->loop);
-
-            if ($this->memoryConsumptionTimer) {
-                $this->loop->cancelTimer($this->memoryConsumptionTimer);
+        $this->loop->addPeriodicTimer(0.5, function(TimerInterface $pollTimer) use ($timeoutTimer) {
+            if (!$this->daemon->isIdle()) {
+                return;
             }
 
-            $this->logger->debug('Daemon ":name" was stopped', [
-                ':name' => $this->codename,
-            ]);
-        } catch (\Throwable $e) {
-            $this->processException($e);
-        } finally {
-            $this->loop->cancelTimer($timeoutTimer);
-        }
+            $this->loop->cancelTimer($pollTimer);
 
-        // Simply exit with OK status and daemon would be restarted by supervisor
-        $this->shutdown(0);
+            try {
+                $this->daemon->stopDaemon($this->loop);
+
+                if ($this->memoryConsumptionTimer) {
+                    $this->loop->cancelTimer($this->memoryConsumptionTimer);
+                }
+
+                $this->logger->debug('Daemon ":name" was stopped', [
+                    ':name' => $this->codename,
+                ]);
+            } catch (\Throwable $e) {
+                $this->processException($e);
+            } finally {
+                $this->loop->cancelTimer($timeoutTimer);
+            }
+
+            // Simply exit with OK status and daemon would be restarted by supervisor
+            $this->shutdown(0);
+        });
     }
 
     private function shutdown(int $exitCode): void
@@ -301,8 +309,10 @@ final class Runner extends AbstractTask
     {
         $usageOnStart = \memory_get_usage(true);
 
-        $this->memoryConsumptionTimer = $this->loop->addPeriodicTimer(1, function () use ($usageOnStart) {
-            if (\memory_get_usage(true) > $usageOnStart * 5) {
+        $this->memoryConsumptionTimer = $this->loop->addPeriodicTimer(0.5, function () use ($usageOnStart) {
+            $isMemoryLeaking = \memory_get_usage(true) > $usageOnStart * 10;
+
+            if ($isMemoryLeaking && $this->daemon->isIdle()) {
                 $this->logger->notice('Daemon ":name" consumes too much memory, restarting', [
                     ':name' => $this->codename,
                 ]);

@@ -19,4 +19,11 @@ interface DaemonInterface
      * @param \React\EventLoop\LoopInterface $loop
      */
     public function stopDaemon(LoopInterface $loop): void;
+
+    /**
+     * Must return true if daemon is in idle mode (no pending operations)
+     *
+     * @return bool
+     */
+    public function isIdle(): bool;
 }

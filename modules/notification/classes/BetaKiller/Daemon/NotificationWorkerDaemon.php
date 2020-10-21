@@ -17,29 +17,29 @@ use Interop\Queue\Message;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 
-class NotificationWorkerDaemon implements DaemonInterface
+final class NotificationWorkerDaemon extends AbstractDaemon
 {
     public const CODENAME = 'NotificationWorker';
 
     /**
      * @var \Interop\Queue\Context
      */
-    private $context;
+    private Context $context;
 
     /**
      * @var \BetaKiller\Notification\NotificationFacade
      */
-    private $notification;
+    private NotificationFacade $notification;
 
     /**
      * @var \BetaKiller\Notification\MessageSerializer
      */
-    private $serializer;
+    private MessageSerializer $serializer;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var \BetaKiller\MessageBus\BoundedEventTransportInterface
@@ -78,12 +78,14 @@ class NotificationWorkerDaemon implements DaemonInterface
         $priorityConsumer = $this->context->createConsumer($priorityQueue);
 
         $loop->addPeriodicTimer(0.5, function () use ($regularConsumer, $priorityConsumer) {
+            $this->markAsProcessing();
+
             // Process priority messages first
-            if ($this->processConsumer($priorityConsumer)) {
-                return;
+            if (!$this->processConsumer($priorityConsumer)) {
+                $this->processConsumer($regularConsumer);
             }
 
-            $this->processConsumer($regularConsumer);
+            $this->markAsIdle();
         });
 
         $this->subscribeForDismissibleEvents($loop);
@@ -153,6 +155,8 @@ class NotificationWorkerDaemon implements DaemonInterface
 
     private function onDismissibleEvent(EventMessageInterface $event, string $messageCodename): void
     {
+        $this->markAsProcessing();
+
         $this->logger->debug('Dismissible event :event fired', [
             ':event'   => \get_class($event),
             ':message' => $messageCodename,
@@ -180,6 +184,8 @@ class NotificationWorkerDaemon implements DaemonInterface
 
             $this->notification->dismissDirect($messageCodename, $event->getDismissibleTarget());
         }
+
+        $this->markAsIdle();
     }
 
     public function stopDaemon(LoopInterface $loop): void

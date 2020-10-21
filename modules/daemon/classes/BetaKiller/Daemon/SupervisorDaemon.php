@@ -14,7 +14,7 @@ use React\ChildProcess\Process;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
 
-class SupervisorDaemon implements DaemonInterface
+final class SupervisorDaemon extends AbstractDaemon
 {
     public const CODENAME = 'Supervisor';
 

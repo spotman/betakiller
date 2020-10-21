@@ -21,7 +21,7 @@ use Thruway\ClientSession;
 use Thruway\Logging\Logger;
 use Thruway\Registration;
 
-abstract class AbstractApiWorkerDaemon implements DaemonInterface
+abstract class AbstractApiWorkerDaemon extends AbstractDaemon
 {
     public const CODENAME = 'ApiWorker';
 
@@ -105,7 +105,13 @@ abstract class AbstractApiWorkerDaemon implements DaemonInterface
             $session->register(
                 'api',
                 function () {
-                    return $this->apiCallProcedure(...\func_get_args());
+                    $this->markAsProcessing();
+
+                    $result = $this->apiCallProcedure(...\func_get_args());
+
+                    $this->markAsIdle();
+
+                    return $result;
                 },
                 [
                     'disclose_caller' => true,

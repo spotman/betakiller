@@ -11,7 +11,7 @@ use React\EventLoop\LoopInterface;
 use Thruway\ClientSession;
 use Thruway\Logging\Logger;
 
-class WampPingDaemon implements DaemonInterface
+final class WampPingDaemon extends AbstractDaemon
 {
     public const CODENAME = 'WampPing';
 

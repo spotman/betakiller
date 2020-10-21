@@ -6,7 +6,7 @@ namespace BetaKiller\Daemon;
 use BetaKiller\Task\Daemon\Runner;
 use React\EventLoop\LoopInterface;
 
-class DebugStopDelayDaemon implements DaemonInterface
+final class DebugStopDelayDaemon extends AbstractDaemon
 {
     public const CODENAME = 'DebugStopDelay';
 
