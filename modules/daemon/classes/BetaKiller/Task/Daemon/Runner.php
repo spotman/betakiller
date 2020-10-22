@@ -26,7 +26,7 @@ final class Runner extends AbstractTask
 
     private const STATUS_LOADING  = 'loading';
     private const STATUS_STARTING = 'starting';
-    private const STATUS_STARTED  = 'started';
+    private const STATUS_RUNNING  = 'started';
     private const STATUS_STOPPING = 'stopping';
 
     /**
@@ -195,7 +195,7 @@ final class Runner extends AbstractTask
             $this->processException($e);
         }
 
-        $this->setStatus(self::STATUS_STARTED);
+        $this->setStatus(self::STATUS_RUNNING);
     }
 
     private function stop(): void
@@ -310,6 +310,11 @@ final class Runner extends AbstractTask
         $usageOnStart = \memory_get_usage(true);
 
         $this->memoryConsumptionTimer = $this->loop->addPeriodicTimer(0.5, function () use ($usageOnStart) {
+            // Prevent duplicate calls
+            if (!$this->isRunning()) {
+                return;
+            }
+
             $isMemoryLeaking = \memory_get_usage(true) > $usageOnStart * 10;
 
             if ($isMemoryLeaking && $this->daemon->isIdle()) {
@@ -349,9 +354,9 @@ final class Runner extends AbstractTask
         return $this->status === self::STATUS_STARTING;
     }
 
-    private function isStarted(): bool
+    private function isRunning(): bool
     {
-        return $this->status === self::STATUS_STARTED;
+        return $this->status === self::STATUS_RUNNING;
     }
 
     private function isStopping(): bool
