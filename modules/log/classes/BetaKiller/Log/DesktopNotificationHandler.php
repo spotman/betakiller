@@ -12,11 +12,11 @@ final class DesktopNotificationHandler extends AbstractHandler
     /**
      * @var \Joli\JoliNotif\Notifier
      */
-    private $notifier;
+    private Notifier $notifier;
 
     public function __construct()
     {
-        $this->notifier = NotifierFactory::createOrThrowException();
+        $this->notifier = NotifierFactory::create();
 
         parent::__construct();
     }
