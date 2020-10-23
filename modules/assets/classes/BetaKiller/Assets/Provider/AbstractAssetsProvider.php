@@ -421,7 +421,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
             throw new AssetsProviderException('Store is not allowed');
         }
 
-        if (!file_exists($fullPath) || !is_readable($fullPath)) {
+        if (!is_file($fullPath) || !is_readable($fullPath)) {
             throw new AssetsProviderException('File is not readable :path', [':path' => $fullPath]);
         }
 
@@ -518,7 +518,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param array                           $postData
      * @param \BetaKiller\Model\UserInterface $user
      */
-    protected function postUploadProcessing($model, array $postData, UserInterface $user): void
+    protected function postUploadProcessing(AssetsModelInterface $model, array $postData, UserInterface $user): void
     {
         if ($this->postUploadHandlers) {
             foreach ($this->postUploadHandlers as $handler) {

@@ -28,13 +28,13 @@ class SaveEntityItemRelationHandler implements AssetsHandlerInterface
 
     /**
      * @param \BetaKiller\Assets\Provider\AssetsProviderInterface $provider
-     * @param \BetaKiller\Model\EntityItemRelatedInterface        $model
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface       $model
      * @param array                                               $postData
      * @param \BetaKiller\Model\UserInterface                     $user
      *
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function update(AssetsProviderInterface $provider, $model, array $postData, UserInterface $user): void
+    public function update(AssetsProviderInterface $provider, \BetaKiller\Assets\Model\AssetsModelInterface $model, array $postData, UserInterface $user): void
     {
         if (!$model instanceof EntityItemRelatedInterface) {
             throw new AssetsException('Assets model ":name" must implement :must', [

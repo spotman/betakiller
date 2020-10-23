@@ -1,5 +1,7 @@
 parameters:
-  bootstrap: modules/unittest/bootstrap.php
+  bootstrapFiles:
+      - modules/unittest/bootstrap.php
+
   level: 1
   paths:
     - modules/ddd/classes

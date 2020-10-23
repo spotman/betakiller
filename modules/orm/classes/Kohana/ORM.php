@@ -149,13 +149,13 @@ class Kohana_ORM extends Model implements Serializable {
 
 	/**
 	 * Auto-update columns for updates
-	 * @var string
+	 * @var mixed[]|null
 	 */
 	protected $_updated_column = NULL;
 
 	/**
 	 * Auto-update columns for creation
-	 * @var string
+	 * @var mixed[]|null
 	 */
 	protected $_created_column = NULL;
 

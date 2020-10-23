@@ -1,10 +1,13 @@
 <?php
 namespace BetaKiller\Test;
 
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
 abstract class AbstractTestCase extends \PHPUnit\Framework\TestCase
 {
+    use ProphecyTrait;
+
     protected function revealOrReturn($object)
     {
         return ($object instanceof ObjectProphecy)

@@ -3,26 +3,26 @@ namespace BetaKiller\Api\Method\HitPage;
 
 use BetaKiller\Api\Method\AbstractEntityUpdateApiMethod;
 use BetaKiller\Factory\UrlHelperFactory;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\HitPageRedirectRepository;
-use Spotman\Api\ApiMethodException;
-use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 
-class UpdateApiMethod extends AbstractEntityUpdateApiMethod
+final class UpdateApiMethod extends AbstractEntityUpdateApiMethod
 {
     private const ARG_TARGET_URL = 'targetUrl';
 
     /**
      * @var \BetaKiller\Repository\HitPageRedirectRepository
      */
-    private $targetRepo;
+    private HitPageRedirectRepository $targetRepo;
 
     /**
      * @var \BetaKiller\Helper\UrlHelperInterface
      */
-    private $urlHelper;
+    private UrlHelperInterface $urlHelper;
 
     /**
      * UpdateApiMethod constructor.
@@ -53,17 +53,20 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     /**
      * Override this method
      *
-     * @param \BetaKiller\Model\HitPage $model
-     * @param \Spotman\Defence\ArgumentsInterface        $arguments
-     * @param \BetaKiller\Model\UserInterface            $user
+     * @param \BetaKiller\Model\AbstractEntityInterface $model
+     * @param \Spotman\Defence\ArgumentsInterface       $arguments
+     * @param \BetaKiller\Model\UserInterface           $user
      *
      * @return \BetaKiller\Model\AbstractEntityInterface|mixed|null
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Spotman\Api\ApiMethodException
      */
-    protected function update($model, ArgumentsInterface $arguments, UserInterface $user): ?AbstractEntityInterface
-    {
+    protected function processUpdate(
+        AbstractEntityInterface $model,
+        ArgumentsInterface $arguments,
+        UserInterface $user
+    ): ?AbstractEntityInterface {
         $url = $arguments->getString(self::ARG_TARGET_URL);
 
         if ($url) {

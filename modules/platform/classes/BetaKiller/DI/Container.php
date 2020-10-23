@@ -12,17 +12,17 @@ use Invoker\Exception\NotCallableException;
 use Invoker\Exception\NotEnoughParametersException;
 use Invoker\InvokerInterface;
 
-class Container implements ContainerInterface
+final class Container implements ContainerInterface
 {
     /**
-     * @var Container
+     * @var Container|null
      */
-    protected static $instance;
+    private static ?Container $instance = null;
 
     /**
-     * @var ContainerInterface
+     * @var \DI\Container|null
      */
-    protected $container;
+    private ?\DI\Container $container = null;
 
     /**
      * @deprecated Bad practice, use DI in constructor instead
@@ -40,7 +40,7 @@ class Container implements ContainerInterface
      * You can`t create objects directly, use CLASS::instance() instead
      * Also you can define your own protected constructor in child class
      */
-    protected function __construct()
+    private function __construct()
     {
     }
 
@@ -147,8 +147,8 @@ class Container implements ContainerInterface
     /**
      * Call the given function using the given parameters.
      *
-     * @param callable $callable   Function to call.
-     * @param array    $parameters Parameters to use.
+     * @param callable|array|string $callable   Function to call.
+     * @param array|null            $parameters Parameters to use.
      *
      * @return mixed Result of the function.
      *
@@ -162,9 +162,9 @@ class Container implements ContainerInterface
     }
 
     /**
-     * @return ContainerInterface|mixed
+     * @return \DI\Container
      */
-    protected function getContainer()
+    private function getContainer(): \DI\Container
     {
         if (!$this->container) {
             throw new Exception('Initialize DI container before using it');
@@ -176,7 +176,7 @@ class Container implements ContainerInterface
     /**
      * Prevent cloning
      */
-    final private function __clone()
+    private function __clone()
     {
     }
 }

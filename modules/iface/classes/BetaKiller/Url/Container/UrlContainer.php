@@ -29,7 +29,7 @@ class UrlContainer implements UrlContainerInterface
     /**
      * UrlContainer constructor.
      */
-    public function __construct()
+    final public function __construct()
     {
         $this->paramsRegistry = new BasicRegistry;
     }

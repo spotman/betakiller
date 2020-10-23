@@ -3,11 +3,12 @@ namespace BetaKiller\Api\Method\ContentComment;
 
 use BetaKiller\Api\Method\AbstractEntityUpdateApiMethod;
 use BetaKiller\Model\AbstractEntityInterface;
+use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\UserInterface;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class UpdateApiMethod extends AbstractEntityUpdateApiMethod
+final class UpdateApiMethod extends AbstractEntityUpdateApiMethod
 {
     private const ARG_DATA        = 'data';
     private const ARG_AUTHOR_NAME = 'author_name';
@@ -29,7 +30,7 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     /**
      * Override this method
      *
-     * @param \BetaKiller\Model\ContentCommentInterface $model
+     * @param \BetaKiller\Model\AbstractEntityInterface $model
      * @param \Spotman\Defence\ArgumentsInterface       $arguments
      * @param \BetaKiller\Model\UserInterface           $user
      *
@@ -37,8 +38,12 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function update($model, ArgumentsInterface $arguments, UserInterface $user): ?AbstractEntityInterface
+    protected function processUpdate(AbstractEntityInterface $model, ArgumentsInterface $arguments, UserInterface $user): ?AbstractEntityInterface
     {
+        if (!$model instanceof ContentCommentInterface) {
+            throw new \LogicException;
+        }
+
         $data = $arguments->getArray(self::ARG_DATA);
 
         if (isset($data[self::ARG_AUTHOR_NAME])) {

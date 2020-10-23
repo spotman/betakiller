@@ -3,7 +3,7 @@ namespace BetaKiller\Assets\Storage;
 
 use BetaKiller\Assets\Exception\AssetsStorageException;
 
-class LocalCfsAssetsStorage implements AssetsStorageInterface
+final class LocalCfsAssetsStorage implements AssetsStorageInterface
 {
     /**
      * @var string
@@ -77,6 +77,14 @@ class LocalCfsAssetsStorage implements AssetsStorageInterface
         $ext = mb_substr($path, $extDotPosition+1);
 
         return \Kohana::find_file($this->basePath, $path, $ext);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasFile(string $path): bool
+    {
+        throw new AssetsStorageException('Implement me!');
     }
 
     /**

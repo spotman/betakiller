@@ -104,7 +104,7 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
 
         foreach ($this->doGetFiles($path) as $file) {
             // Strip base path
-            $files[] = explode($this->basePath, $file, 2)[1];
+            $files[] = \str_replace($this->basePath, '', $file);
         }
 
         return $files;

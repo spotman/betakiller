@@ -11,7 +11,7 @@ final class LocalProtectedAssetsStorage extends AbstractLocalAssetsStorage
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
-    private $appEnv;
+    private AppEnvInterface $appEnv;
 
     /**
      * AbstractLocalAssetsStorage constructor.

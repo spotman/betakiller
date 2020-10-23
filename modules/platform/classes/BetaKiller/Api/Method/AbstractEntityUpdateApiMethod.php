@@ -24,7 +24,7 @@ abstract class AbstractEntityUpdateApiMethod extends AbstractEntityBasedApiMetho
         }
 
         $model    = $this->getEntity($arguments);
-        $response = $this->update($model, $arguments, $user);
+        $response = $this->processUpdate($model, $arguments, $user);
 
         return $this->response($response);
     }
@@ -32,14 +32,14 @@ abstract class AbstractEntityUpdateApiMethod extends AbstractEntityBasedApiMetho
     /**
      * Override this method
      *
-     * @param                                 $model
-     * @param \Spotman\Defence\ArgumentsInterface $arguments
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \BetaKiller\Model\AbstractEntityInterface $model
+     * @param \Spotman\Defence\ArgumentsInterface       $arguments
+     * @param \BetaKiller\Model\UserInterface           $user
      *
      * @return \BetaKiller\Model\AbstractEntityInterface|null
      */
-    abstract protected function update(
-        $model,
+    abstract protected function processUpdate(
+        AbstractEntityInterface $model,
         ArgumentsInterface $arguments,
         UserInterface $user
     ): ?AbstractEntityInterface;

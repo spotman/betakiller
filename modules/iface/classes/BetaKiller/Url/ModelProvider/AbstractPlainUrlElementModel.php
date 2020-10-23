@@ -73,6 +73,14 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     private $environments = [];
 
     /**
+     * AbstractPlainUrlElementModel constructor.
+     */
+    final public function __construct()
+    {
+        // No op here
+    }
+
+    /**
      * @param array $data
      *
      * @return \BetaKiller\Url\UrlElementInterface|static

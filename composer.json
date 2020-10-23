@@ -77,15 +77,16 @@
     "zendframework/zend-permissions-acl": "^2.7"
   },
   "require-dev": {
-    "codedungeon/phpunit-result-printer": "^0.26",
+    "codedungeon/phpunit-result-printer": "^0.29",
     "deployer/deployer": "^6.4",
     "jolicode/jolinotif": "^2.0",
     "kint-php/kint": "^3.0",
     "kint-php/kint-twig": "^2.0",
     "php-school/cli-menu": "^3.2",
-    "phpstan/phpstan": "0.10.3",
-    "phpunit/php-code-coverage": "^7.0",
-    "phpunit/phpunit": "^8.0",
+    "phpspec/prophecy-phpunit": "^2.0",
+    "phpstan/phpstan": "^0.12",
+    "phpunit/php-code-coverage": "^9.2",
+    "phpunit/phpunit": "^9.4",
     "roave/security-advisories": "dev-master",
     "tsufeki/react-filesystem-monitor": "^0.4.1"
   },

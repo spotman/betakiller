@@ -2,9 +2,11 @@
 namespace BetaKiller\Api\Method\MissingUrl;
 
 use BetaKiller\Api\Method\AbstractEntityDeleteApiMethod;
+use BetaKiller\Model\AbstractEntityInterface;
+use BetaKiller\Model\UserInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class DeleteApiMethod extends AbstractEntityDeleteApiMethod
+final class DeleteApiMethod extends AbstractEntityDeleteApiMethod
 {
     /**
      * @param \Spotman\Defence\DefinitionBuilderInterface $builder
@@ -20,15 +22,14 @@ class DeleteApiMethod extends AbstractEntityDeleteApiMethod
     /**
      * Implement this method
      *
-     * @param                                                 $model
-     *
-     * @param \BetaKiller\Api\Method\MissingUrl\UserInterface $user
+     * @param \BetaKiller\Model\AbstractEntityInterface       $entity
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Factory\FactoryException
      */
-    protected function delete($model, UserInterface $user): void
+    protected function processDelete(AbstractEntityInterface $entity, UserInterface $user): void
     {
-        $this->deleteEntity($model);
+        $this->deleteEntity($entity);
     }
 }
