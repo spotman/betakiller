@@ -22,6 +22,7 @@ class Exception extends \Exception implements ExceptionInterface
      */
     public static function wrap(\Throwable $e, string $message = null)
     {
+        /** @phpstan-ignore-next-line */
         return new static(':error', [':error' => $message ?? $e->getMessage()], $e->getCode(), $e);
     }
 
