@@ -24,9 +24,9 @@ class LazyAggregateI18nLoader implements I18nKeysLoaderInterface
     private I18nConfigInterface $config;
 
     /**
-     * @var \BetaKiller\I18n\I18nKeysLoaderInterface
+     * @var \BetaKiller\I18n\I18nKeysLoaderInterface|null
      */
-    private I18nKeysLoaderInterface $loader;
+    private ?I18nKeysLoaderInterface $loader = null;
 
     /**
      * LazyAggregateI18nLoader constructor.
