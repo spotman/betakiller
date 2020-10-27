@@ -63,6 +63,7 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
         $currentUri = $request->getUri();
 
         $filterLangName = ServerRequestHelper::getQueryPart($request, 'filter');
+        $displayType    = ServerRequestHelper::getQueryPart($request, 'display') ?? 'rich';
 
         // Allow filtering for one language
         $filterLang = $filterLangName
@@ -70,12 +71,16 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
             : null;
 
         return [
-            'filter' => [
+            'display' => [
+                'current' => $displayType,
+                'list' => $this->getDisplayList($currentUri, $filterLang),
+            ],
+            'filter'  => [
                 'self'    => (string)$currentUri->withQuery(''),
                 'current' => $filterLangName,
                 'list'    => $this->getLangList($currentUri),
             ],
-            'items'  => $this->getItems($urlHelper, $filterLang),
+            'items'   => $this->getFormattedItems($urlHelper, $filterLang),
         ];
     }
 
@@ -96,7 +101,31 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
         return $langList;
     }
 
-    private function getItems(UrlHelperInterface $helper, ?LanguageInterface $filterLang): array
+    private function getDisplayList(UriInterface $currentUri, ?LanguageInterface $filterLang): array
+    {
+        $langName = $filterLang
+            ? $filterLang->getIsoCode()
+            : null;
+
+        $baseQuery = $langName
+            ? '?filter='.$langName.'&'
+            : '?';
+
+        return [
+            'rich' => [
+                'name' => 'rich',
+                'label' => 'Rich',
+                'url' => (string)$currentUri->withQuery($baseQuery . 'display=rich'),
+            ],
+            'plain' => [
+                'name' => 'plain',
+                'label' => 'Plain',
+                'url' => (string)$currentUri->withQuery($baseQuery . 'display=plain'),
+            ],
+        ];
+    }
+
+    private function getItems(?LanguageInterface $filterLang): array
     {
         $data = [];
 
@@ -118,7 +147,26 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
                 }
             }
 
-            $data[] = $this->formatItem($emptyItem, $helper);
+            $data[] = $emptyItem;
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param \BetaKiller\Helper\UrlHelperInterface    $helper
+     * @param \BetaKiller\Model\LanguageInterface|null $filterLang
+     *
+     * @return mixed[]
+     * @throws \BetaKiller\Exception
+     * @throws \BetaKiller\Url\UrlElementException
+     */
+    private function getFormattedItems(UrlHelperInterface $helper, ?LanguageInterface $filterLang): array
+    {
+        $data = [];
+
+        foreach ($this->getItems($filterLang) as $item) {
+            $data[] = $this->formatItem($item, $helper);
         }
 
         return $data;

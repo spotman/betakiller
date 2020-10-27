@@ -13,6 +13,14 @@
             {{ filter_item.label }}
           </a>
         {% endfor %}
+
+        <span>&nbsp;&nbsp;</span>
+
+        {% for display_item in display.list %}
+          <a href="{{ display_item.url }}" class="btn {{ display.current == display_item.name ? "green" : "" }}">
+            {{ display_item.label }}
+          </a>
+        {% endfor %}
       </div>
 
       <h1>
@@ -23,27 +31,50 @@
         {% endif %}
       </h1>
 
-      <table>
-        <thead>
-        <tr>
-          <td>#</td>
-          <td>Key with default value</td>
-        </tr>
-        </thead>
-        <tbody>
-
-        {% for item in items %}
+      {% if display.current == "rich" %}
+        <table>
+          <thead>
           <tr>
-            <td>{{ loop.index }}</td>
-            <td>
-              <a href="{{ item.url }}">{{ item.key }}</a><br />
-              <small>{{ item.value }}</small>
-            </td>
+            <td>#</td>
+            <td>Key with default value</td>
           </tr>
-        {% endfor %}
+          </thead>
+          <tbody>
 
-        </tbody>
-      </table>
+          {% for item in items %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>
+                <a href="{{ item.url }}">{{ item.key }}</a><br/>
+                <small>{{ item.value }}</small>
+              </td>
+            </tr>
+          {% endfor %}
+
+          </tbody>
+        </table>
+      {% elseif display.current == "plain" %}
+        <table>
+          <thead>
+          <tr>
+            <td>#</td>
+            <td>Key</td>
+            <td>Default value</td>
+          </tr>
+          </thead>
+          <tbody>
+
+          {% for item in items %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ item.key }}</td>
+              <td>{{ item.value }}</td>
+            </tr>
+          {% endfor %}
+
+          </tbody>
+        </table>
+      {% endif %}
 
     </div>
   </div>
