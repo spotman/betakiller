@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace BetaKiller\IFace\Admin\I18n;
 
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\TextHelper;
 use BetaKiller\Helper\UrlHelperInterface;
+use BetaKiller\I18n\I18nConfigInterface;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Model\I18nKeyModelInterface;
 use BetaKiller\Model\LanguageInterface;
@@ -19,23 +21,33 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
     /**
      * @var \BetaKiller\Repository\I18nKeyRepositoryInterface
      */
-    private $keyRepo;
+    private I18nKeyRepositoryInterface $keyRepo;
 
     /**
      * @var \BetaKiller\Repository\LanguageRepositoryInterface
      */
-    private $langRepo;
+    private LanguageRepositoryInterface $langRepo;
+
+    /**
+     * @var \BetaKiller\I18n\I18nConfigInterface
+     */
+    private I18nConfigInterface $i18nConfig;
 
     /**
      * CommonListIFace constructor.
      *
      * @param \BetaKiller\Repository\I18nKeyRepositoryInterface  $keyRepo
      * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
+     * @param \BetaKiller\I18n\I18nConfigInterface               $i18nConfig
      */
-    public function __construct(I18nKeyRepositoryInterface $keyRepo, LanguageRepositoryInterface $langRepo)
-    {
-        $this->keyRepo  = $keyRepo;
-        $this->langRepo = $langRepo;
+    public function __construct(
+        I18nKeyRepositoryInterface $keyRepo,
+        LanguageRepositoryInterface $langRepo,
+        I18nConfigInterface $i18nConfig
+    ) {
+        $this->keyRepo    = $keyRepo;
+        $this->langRepo   = $langRepo;
+        $this->i18nConfig = $i18nConfig;
     }
 
     /**
@@ -92,7 +104,20 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
             ? $this->keyRepo->findKeysWithEmptyValues($filterLang)
             : $this->keyRepo->getAllI18nKeys();
 
+        $fallbackOnlyKeys = $this->i18nConfig->getFallbackOnlyKeys();
+
         foreach ($items as $emptyItem) {
+            $keyName = $emptyItem->getI18nKeyName();
+
+            // Skip fallback-only keys in filtered mode
+            if ($filterLang) {
+                foreach ($fallbackOnlyKeys as $fallbackOnlyKey) {
+                    if (TextHelper::startsWith($keyName, $fallbackOnlyKey)) {
+                        continue 2;
+                    }
+                }
+            }
+
             $data[] = $this->formatItem($emptyItem, $helper);
         }
 

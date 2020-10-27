@@ -27,52 +27,52 @@ final class I18nFacade
     /**
      * @var \BetaKiller\Model\LanguageInterface[]
      */
-    private $languages;
+    private array $languages;
 
     /**
      * @var string[]
      */
-    private $languagesIsoCodes;
+    private array $languagesIsoCodes;
 
     /**
      * @var LanguageInterface
      */
-    private $primaryLang;
+    private LanguageInterface $primaryLang;
 
     /**
      * @var LanguageInterface
      */
-    private $fallbackLang;
+    private LanguageInterface $fallbackLang;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var \BetaKiller\Repository\LanguageRepositoryInterface
      */
-    private $langRepo;
+    private LanguageRepositoryInterface $langRepo;
 
     /**
      * @var \BetaKiller\I18n\PluralBagFormatterInterface
      */
-    private $formatter;
+    private PluralBagFormatterInterface $formatter;
 
     /**
      * @var \BetaKiller\I18n\I18nKeysLoaderInterface
      */
-    private $loader;
+    private I18nKeysLoaderInterface $loader;
 
     /**
      * @var I18nKeyInterface[]
      */
-    private $keysCache = [];
+    private array $keysCache = [];
 
     /**
-     * @var \BetaKiller\I18n\I18nConfig
+     * @var \BetaKiller\I18n\I18nConfigInterface
      */
-    private $config;
+    private I18nConfigInterface $config;
 
     /**
      * I18nFacade constructor.
@@ -80,14 +80,14 @@ final class I18nFacade
      * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
      * @param \BetaKiller\I18n\PluralBagFormatterInterface       $formatter
      * @param \BetaKiller\I18n\I18nKeysLoaderInterface           $loader
-     * @param \BetaKiller\I18n\I18nConfig                        $config
+     * @param \BetaKiller\I18n\I18nConfigInterface               $config
      * @param \Psr\Log\LoggerInterface                           $logger
      */
     public function __construct(
         LanguageRepositoryInterface $langRepo,
         PluralBagFormatterInterface $formatter,
         I18nKeysLoaderInterface $loader,
-        I18nConfig $config,
+        I18nConfigInterface $config,
         LoggerInterface $logger
     ) {
         $this->langRepo  = $langRepo;

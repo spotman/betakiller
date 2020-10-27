@@ -12,7 +12,7 @@ use BetaKiller\Model\TranslationKeyModelInterface;
  * @method save(TranslationKeyModelInterface $model)
  * @method TranslationKeyModelInterface[] getAll()
  */
-interface TranslationKeyRepositoryInterface extends DispatchableRepositoryInterface
+interface TranslationKeyRepositoryInterface extends DispatchableRepositoryInterface, I18nKeyRepositoryInterface
 {
     public function findByKeyName(string $i18nKey): ?TranslationKeyModelInterface;
 }

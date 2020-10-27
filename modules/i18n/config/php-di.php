@@ -2,6 +2,8 @@
 
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\I18n\CachingI18nLoader;
+use BetaKiller\I18n\I18nConfig;
+use BetaKiller\I18n\I18nConfigInterface;
 use BetaKiller\I18n\I18nKeysLoaderInterface;
 use BetaKiller\I18n\JsonPluralBagFormatter;
 use BetaKiller\I18n\LazyAggregateI18nLoader;
@@ -18,6 +20,8 @@ use function DI\factory;
 return [
 
     'definitions' => [
+        I18nConfigInterface::class => autowire(I18nConfig::class),
+
         I18nKeysLoaderInterface::class => factory(static function (
             AppEnvInterface $appEnv,
             LazyAggregateI18nLoader $loader

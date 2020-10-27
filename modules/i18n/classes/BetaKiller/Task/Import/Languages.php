@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Import;
 
-use BetaKiller\I18n\I18nConfig;
+use BetaKiller\I18n\I18nConfigInterface;
 use BetaKiller\Model\Language;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
@@ -14,21 +14,21 @@ class Languages extends AbstractTask
     /**
      * @var \BetaKiller\Repository\LanguageRepositoryInterface
      */
-    private $langRepo;
+    private LanguageRepositoryInterface $langRepo;
 
     /**
-     * @var \BetaKiller\I18n\I18nConfig
+     * @var \BetaKiller\I18n\I18nConfigInterface
      */
-    private $config;
+    protected I18nConfigInterface $config;
 
     /**
      * Languages constructor.
      *
-     * @param \BetaKiller\I18n\I18nConfig                        $config
+     * @param \BetaKiller\I18n\I18nConfigInterface               $config
      * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
      */
     public function __construct(
-        I18nConfig $config,
+        I18nConfigInterface $config,
         LanguageRepositoryInterface $langRepo
     ) {
         $this->langRepo = $langRepo;

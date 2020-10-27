@@ -1,10 +1,13 @@
 <?php
 declare(strict_types=1);
 
+use BetaKiller\I18n\FilesystemI18nKeysLoader;
+use BetaKiller\I18n\I18nConfig;
+
 return [
-    'loaders' => [
+    I18nConfig::KEY_LOADERS => [
         // Standard i18n from database
 //        \BetaKiller\I18n\DatabaseI18nLoader::class,
-        \BetaKiller\I18n\FilesystemI18nKeysLoader::class,
+        FilesystemI18nKeysLoader::class,
     ],
 ];

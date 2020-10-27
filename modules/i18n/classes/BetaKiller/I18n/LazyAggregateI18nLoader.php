@@ -11,31 +11,31 @@ class LazyAggregateI18nLoader implements I18nKeysLoaderInterface
     /**
      * @var \Psr\Container\ContainerInterface
      */
-    private $container;
+    private ContainerInterface $container;
 
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
-    private $appEnv;
+    private AppEnvInterface $appEnv;
 
     /**
-     * @var I18nConfig
+     * @var \BetaKiller\I18n\I18nConfigInterface
      */
-    private $config;
+    private I18nConfigInterface $config;
 
     /**
      * @var \BetaKiller\I18n\I18nKeysLoaderInterface
      */
-    private $loader;
+    private I18nKeysLoaderInterface $loader;
 
     /**
      * LazyAggregateI18nLoader constructor.
      *
-     * @param \Psr\Container\ContainerInterface  $container
-     * @param \BetaKiller\I18n\I18nConfig        $config
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \Psr\Container\ContainerInterface    $container
+     * @param \BetaKiller\I18n\I18nConfigInterface $config
+     * @param \BetaKiller\Helper\AppEnvInterface   $appEnv
      */
-    public function __construct(ContainerInterface $container, I18nConfig $config, AppEnvInterface $appEnv)
+    public function __construct(ContainerInterface $container, I18nConfigInterface $config, AppEnvInterface $appEnv)
     {
         $this->container = $container;
         $this->config    = $config;
