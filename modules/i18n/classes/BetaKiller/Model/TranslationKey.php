@@ -9,7 +9,7 @@ class TranslationKey extends \ORM implements TranslationKeyModelInterface
 {
     use I18nKeyOrmTrait;
 
-    public const COL_KEY       = 'key';
+    public const COL_CODENAME  = 'codename';
     public const COL_I18N      = 'i18n';
     public const COL_IS_PLURAL = 'is_plural';
 
@@ -34,7 +34,7 @@ class TranslationKey extends \ORM implements TranslationKeyModelInterface
     public function rules(): array
     {
         return [
-            self::COL_KEY => [
+            self::COL_CODENAME => [
                 ['not_empty'],
                 ['max_length', [':value', 128]],
                 ['regex', [':value', I18nFacade::KEY_REGEX]],
@@ -47,7 +47,7 @@ class TranslationKey extends \ORM implements TranslationKeyModelInterface
      */
     public function getI18nKeyName(): string
     {
-        return $this->get(self::COL_KEY);
+        return $this->get(self::COL_CODENAME);
     }
 
     /**
@@ -55,7 +55,7 @@ class TranslationKey extends \ORM implements TranslationKeyModelInterface
      */
     public function setI18nKey(string $keyName): void
     {
-        $this->set(self::COL_KEY, $keyName);
+        $this->set(self::COL_CODENAME, $keyName);
     }
 
     /**
