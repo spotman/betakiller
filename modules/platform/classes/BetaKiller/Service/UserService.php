@@ -3,12 +3,9 @@ namespace BetaKiller\Service;
 
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Exception\DomainException;
-use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\Model\GuestUserInterface;
 use BetaKiller\Model\RoleInterface;
-use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RoleRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
@@ -22,37 +19,31 @@ class UserService
     /**
      * @var \BetaKiller\Repository\UserRepositoryInterface
      */
-    private $userRepository;
+    private UserRepositoryInterface $userRepository;
 
     /**
      * @var \BetaKiller\Repository\RoleRepositoryInterface
      */
-    private $roleRepository;
+    private RoleRepositoryInterface $roleRepository;
 
     /**
      * @var \BetaKiller\Config\AppConfigInterface
      */
-    private $appConfig;
+    private AppConfigInterface $appConfig;
 
     /**
      * @var \BetaKiller\Factory\GuestUserFactory
      */
-    private $guestFactory;
-
-    /**
-     * @var \BetaKiller\Factory\EntityFactoryInterface
-     */
-    private $entityFactory;
+    private GuestUserFactory $guestFactory;
 
     /**
      * @var \BetaKiller\Workflow\UserWorkflow
      */
-    private $workflow;
+    private UserWorkflow $workflow;
 
     /**
      * UserService constructor.
      *
-     * @param \BetaKiller\Factory\EntityFactoryInterface     $entityFactory
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
      * @param \BetaKiller\Repository\RoleRepositoryInterface $roleRepo
      * @param \BetaKiller\Factory\GuestUserFactory           $guestFactory
@@ -60,14 +51,12 @@ class UserService
      * @param \BetaKiller\Workflow\UserWorkflow              $workflow
      */
     public function __construct(
-        EntityFactoryInterface $entityFactory,
         UserRepositoryInterface $userRepo,
         RoleRepositoryInterface $roleRepo,
         GuestUserFactory $guestFactory,
         AppConfigInterface $appConfig,
         UserWorkflow $workflow
     ) {
-        $this->entityFactory  = $entityFactory;
         $this->userRepository = $userRepo;
         $this->roleRepository = $roleRepo;
         $this->appConfig      = $appConfig;
@@ -91,45 +80,7 @@ class UserService
         string $createdFromIp,
         string $username = null
     ): UserInterface {
-        if ($this->userRepository->searchBy($email)) {
-            throw new DomainException('User ":email" already exists', [
-                ':email' => $email,
-            ]);
-        }
-
-        $loginRole   = $this->roleRepository->getLoginRole();
-        $primaryRole = $this->roleRepository->getByName($primaryRoleName);
-
-        if (!$primaryRole->isInherits($loginRole)) {
-            throw new DomainException('Role ":name" must inherit ":login" role', [
-                ':name'  => $primaryRole->getName(),
-                ':login' => $loginRole->getName(),
-            ]);
-        }
-
-        /** @var UserInterface $user */
-        $user = $this->entityFactory->create(User::getModelName());
-
-        $user
-            ->setCreatedAt()
-            ->setEmail($email)
-            ->setCreatedFromIP($createdFromIp);
-
-        if ($username) {
-            $user->setUsername($username);
-        }
-
-        // Enable email notifications by default
-        $user->enableEmailNotification();
-
-        $this->workflow->justCreated($user);
-
-        // Create new model via save so ID will be populated for adding roles
-        $this->userRepository->save($user);
-
-        $user->addRole($primaryRole);
-
-        return $user;
+        return $this->workflow->create($email, $primaryRoleName, $createdFromIp, $username);
     }
 
     /**

@@ -5,13 +5,18 @@ namespace BetaKiller\Workflow;
 
 use BetaKiller\Event\UserBlockedEvent;
 use BetaKiller\Event\UserConfirmationEmailRequestedEvent;
+use BetaKiller\Event\UserCreatedEvent;
 use BetaKiller\Event\UserEmailChangedEvent;
 use BetaKiller\Event\UserEmailConfirmedEvent;
 use BetaKiller\Event\UserResumedEvent;
 use BetaKiller\Event\UserSuspendedEvent;
 use BetaKiller\Event\UserUnlockedEvent;
+use BetaKiller\Exception\DomainException;
+use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\MessageBus\EventBusInterface;
+use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Repository\RoleRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 
 final class UserWorkflow
@@ -29,38 +34,99 @@ final class UserWorkflow
     /**
      * @var \BetaKiller\Workflow\StatusWorkflowInterface
      */
-    private $state;
+    private StatusWorkflowInterface $state;
 
     /**
      * @var \BetaKiller\Repository\UserRepositoryInterface
      */
-    private $userRepo;
+    private UserRepositoryInterface $userRepo;
 
     /**
      * @var \BetaKiller\MessageBus\EventBusInterface
      */
-    private $eventBus;
+    private EventBusInterface $eventBus;
+
+    /**
+     * @var \BetaKiller\Repository\RoleRepositoryInterface
+     */
+    private RoleRepositoryInterface $roleRepo;
+
+    /**
+     * @var \BetaKiller\Factory\EntityFactoryInterface
+     */
+    private EntityFactoryInterface $entityFactory;
 
     /**
      * UserWorkflow constructor.
      *
      * @param \BetaKiller\Workflow\StatusWorkflowInterface   $workflow
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
+     * @param \BetaKiller\Repository\RoleRepositoryInterface $roleRepo
+     * @param \BetaKiller\Factory\EntityFactoryInterface     $entityFactory
      * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
     public function __construct(
         StatusWorkflowInterface $workflow,
         UserRepositoryInterface $userRepo,
+        RoleRepositoryInterface $roleRepo,
+        EntityFactoryInterface $entityFactory,
         EventBusInterface $eventBus
     ) {
-        $this->state    = $workflow;
-        $this->userRepo = $userRepo;
+        $this->state         = $workflow;
+        $this->userRepo      = $userRepo;
+        $this->roleRepo      = $roleRepo;
+        $this->entityFactory = $entityFactory;
+
         $this->eventBus = $eventBus;
     }
 
-    public function justCreated(UserInterface $user): void
-    {
+    public function create(
+        string $email,
+        string $primaryRoleName,
+        string $createdFromIp,
+        string $username = null
+    ): UserInterface {
+        if ($this->userRepo->searchBy($email)) {
+            throw new DomainException('User ":email" already exists', [
+                ':email' => $email,
+            ]);
+        }
+
+        $primaryRole = $this->roleRepo->getByName($primaryRoleName);
+        $loginRole   = $this->roleRepo->getLoginRole();
+
+        if (!$primaryRole->isInherits($loginRole)) {
+            throw new DomainException('Role ":name" must inherit ":login" role', [
+                ':name'  => $primaryRole->getName(),
+                ':login' => $loginRole->getName(),
+            ]);
+        }
+
+        /** @var UserInterface $user */
+        $user = $this->entityFactory->create(User::getModelName());
+
+        $user
+            ->setCreatedAt()
+            ->setEmail($email)
+            ->setCreatedFromIP($createdFromIp);
+
+        if ($username) {
+            $user->setUsername($username);
+        }
+
+        // Enable email notifications by default
+        $user->enableEmailNotification();
+
         $this->state->setStartState($user);
+
+        // Create new model via save so ID will be populated for adding roles
+        $this->userRepo->save($user);
+
+        $user->addRole($primaryRole);
+
+        $this->eventBus->emit(new UserCreatedEvent($user));
+
+        return $user;
     }
 
     public function requestConfirmationEmail(UserInterface $user): void

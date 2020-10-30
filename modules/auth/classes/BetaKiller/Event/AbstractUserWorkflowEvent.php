@@ -11,7 +11,7 @@ abstract class AbstractUserWorkflowEvent implements EventMessageInterface
     /**
      * @var \BetaKiller\Model\UserInterface
      */
-    private $user;
+    private UserInterface $user;
 
     /**
      * AbstractUserWorkflowEvent constructor.
