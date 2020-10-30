@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Behaviour;
 
-use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlPathIterator;
@@ -20,15 +19,11 @@ interface UrlBehaviourInterface
      * @param \BetaKiller\Url\UrlPathIterator                      $it
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
+     * @return bool
      * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      *
-     * @return bool
      */
-    public function parseUri(
-        UrlElementInterface $urlElement,
-        UrlPathIterator $it,
-        UrlContainerInterface $params
-    ): bool;
+    public function parseUri(UrlElementInterface $urlElement, UrlPathIterator $it, UrlContainerInterface $params): bool;
 
     /**
      * Returns IFace uri part based on an optional UrlContainer
@@ -46,8 +41,5 @@ interface UrlBehaviourInterface
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      */
-    public function getAvailableUrls(
-        UrlElementInterface $urlElement,
-        UrlContainerInterface $params
-    ): \Generator;
+    public function getAvailableUrls(UrlElementInterface $urlElement, UrlContainerInterface $params): \Generator;
 }
