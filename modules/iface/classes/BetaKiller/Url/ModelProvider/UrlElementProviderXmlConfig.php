@@ -118,11 +118,11 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
         $extends = $config[AbstractPlainUrlElementModel::OPTION_EXTENDS] ?? null;
 
         if ($xmlParent) {
-            if ($extends) {
-                throw new UrlElementException('UrlElement extending ":name" must be placed in a root', [
-                    ':name' => $extends,
-                ]);
-            }
+//            if ($extends) {
+//                throw new UrlElementException('UrlElement extending ":name" must be placed in a root', [
+//                    ':name' => $extends,
+//                ]);
+//            }
 
             // Parent codename is not needed if nested in XML
             if (isset($config[AbstractPlainUrlElementModel::OPTION_PARENT])) {
