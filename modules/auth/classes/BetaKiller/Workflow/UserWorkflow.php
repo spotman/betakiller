@@ -84,7 +84,8 @@ final class UserWorkflow
         string $email,
         string $primaryRoleName,
         string $createdFromIp,
-        string $username = null
+        string $username = null,
+        callable $callback = null
     ): UserInterface {
         if ($this->userRepo->searchBy($email)) {
             throw new DomainException('User ":email" already exists', [
@@ -123,6 +124,12 @@ final class UserWorkflow
         $this->userRepo->save($user);
 
         $user->addRole($primaryRole);
+
+        // Call custom callback and save User
+        if ($callback) {
+            $callback($user);
+            $this->userRepo->save($user);
+        }
 
         $this->eventBus->emit(new UserCreatedEvent($user));
 
