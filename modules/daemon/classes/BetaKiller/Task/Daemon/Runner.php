@@ -24,6 +24,8 @@ final class Runner extends AbstractTask
     public const START_TIMEOUT = 5;
     public const STOP_TIMEOUT  = 15;
 
+    public const MAX_MEMORY_RATIO  = 20;
+
     private const STATUS_LOADING  = 'loading';
     private const STATUS_STARTING = 'starting';
     private const STATUS_RUNNING  = 'started';
@@ -315,7 +317,7 @@ final class Runner extends AbstractTask
                 return;
             }
 
-            $isMemoryLeaking = \memory_get_usage(true) > $usageOnStart * 10;
+            $isMemoryLeaking = \memory_get_usage(true) > $usageOnStart * self::MAX_MEMORY_RATIO;
 
             if ($isMemoryLeaking && $this->daemon->isIdle()) {
                 $this->logger->notice('Daemon ":name" consumes too much memory, restarting', [
