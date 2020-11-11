@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Url\ModelProvider;
 
 use BetaKiller\Exception\NotImplementedHttpException;
-use BetaKiller\Url\UrlElementException;
+use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
 
 abstract class AbstractPlainUrlElementModel implements UrlElementInterface
@@ -25,52 +25,57 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     /**
      * @var string
      */
-    private $codename;
+    private string $codename;
 
     /**
      * @var string|null
      */
-    private $parentCodename;
+    private ?string $parentCodename = null;
 
     /**
      * @var bool
      */
-    private $isDefault = false;
+    private bool $isDefault = false;
 
     /**
      * @var string
      */
-    private $uri;
+    private string $uri;
 
     /**
      * @var string[]
      */
-    private $query = [];
+    private array $query = [];
 
     /**
      * @var bool
      */
-    private $hasDynamicUrl = false;
+    private bool $hasDynamicUrl = false;
 
     /**
      * @var bool
      */
-    private $hasTreeBehaviour = false;
+    private bool $hasTreeBehaviour = false;
 
     /**
      * @var string
      */
-    private $zone = '';
+    private string $zone = '';
 
     /**
      * @var string[]
      */
-    private $aclRules = [];
+    private array $aclRules = [];
 
     /**
      * @var string[]
      */
-    private $environments = [];
+    private array $environments = [];
+
+    /**
+     * @var bool|null
+     */
+    private ?bool $isHiddenInSitemap = null;
 
     /**
      * AbstractPlainUrlElementModel constructor.
@@ -211,6 +216,15 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function isHiddenInSiteMap(): bool
+    {
+        // Hide all secondary UrlElements by default (can be overrided in ifaces.xml)
+        return $this->isHiddenInSitemap ?? !$this instanceof IFaceModelInterface;
+    }
+
+    /**
      * Returns array representation of the model data
      *
      * @return array
@@ -249,6 +263,10 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
         }
 
         $this->hasTreeBehaviour = $this->validateBooleanOption($data, self::OPTION_HAS_TREE_BEHAVIOUR, false);
+
+        if (isset($data[self::OPTION_HIDE_IN_SITEMAP])) {
+            $this->isHiddenInSitemap = $this->validateBooleanOption($data, self::OPTION_HIDE_IN_SITEMAP, false);
+        }
 
         if (isset($data[self::OPTION_PARENT])) {
             $this->parentCodename = (string)$data[self::OPTION_PARENT];
@@ -289,6 +307,11 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     {
         if (!isset($data[$key])) {
             return $default;
+        }
+
+        // Return plain bool without conversion
+        if (\is_bool($data[$key])) {
+            return $data[$key];
         }
 
         return \mb_strtolower((string)$data[$key]) === 'true';

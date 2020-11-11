@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Service;
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Url\AvailableUrlsCollector;
@@ -17,32 +18,32 @@ class SitemapService
     /**
      * @var AppConfigInterface
      */
-    private $appConfig;
+    private AppConfigInterface $appConfig;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var \samdark\sitemap\Sitemap
      */
-    private $sitemap;
+    private Sitemap $sitemap;
 
     /**
      * @var int
      */
-    protected $linksCounter;
+    protected int $linksCounter = 0;
 
     /**
      * @var \BetaKiller\Url\AvailableUrlsCollector
      */
-    private $urlCollector;
+    private AvailableUrlsCollector $urlCollector;
 
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
-    private $appEnv;
+    private AppEnvInterface $appEnv;
 
     /**
      * SitemapService constructor.
@@ -118,20 +119,30 @@ class SitemapService
     {
         $path = $this->getSitemapFilePath();
 
-        if (\file_exists($path)) {
+        if (\is_file($path)) {
             \unlink($path);
         }
 
-        $path = $this->getSitemapFilePath();
+        $path = $this->getSitemapIndexFilePath();
 
-        if (\file_exists($path)) {
+        if (\is_file($path)) {
             \unlink($path);
         }
     }
 
     public function serve(): ResponseInterface
     {
-        $content = file_get_contents($this->getSitemapFilePath());
+        $path = $this->getSitemapFilePath();
+
+        if (!\is_file($path)) {
+            $this->generate();
+        }
+
+        $content = file_get_contents($path);
+
+        if (!$content) {
+            throw new NotFoundHttpException();
+        }
 
         return ResponseHelper::xml($content);
     }

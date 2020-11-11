@@ -6,7 +6,7 @@ use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementForMenuPlainModelTrait;
 
-class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFaceModelInterface
+final class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFaceModelInterface
 {
     use UrlElementForMenuPlainModelTrait;
 
@@ -26,11 +26,6 @@ class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFa
      * @var string|null
      */
     private $layoutCodename;
-
-    /**
-     * @var bool
-     */
-    private $hideInSiteMap = false;
 
     /**
      * @return string
@@ -136,10 +131,6 @@ class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFa
         $this->label = $data[self::OPTION_LABEL] ?? null;
         $this->title = $data[self::OPTION_TITLE] ?? null;
 
-        if (!empty($data[self::OPTION_HIDE_IN_SITEMAP])) {
-            $this->hideInSiteMap = (bool)$data[self::OPTION_HIDE_IN_SITEMAP];
-        }
-
         if (isset($data[self::OPTION_LAYOUT])) {
             $this->layoutCodename = (string)$data[self::OPTION_LAYOUT];
         }
@@ -147,13 +138,5 @@ class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFa
         $this->menuFromArray($data);
 
         parent::fromArray($data);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isHiddenInSiteMap(): bool
-    {
-        return $this->hideInSiteMap;
     }
 }

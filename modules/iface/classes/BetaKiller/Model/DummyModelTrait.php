@@ -5,5 +5,5 @@ namespace BetaKiller\Model;
 
 trait DummyModelTrait
 {
-    use SecondaryUrlElementModelTrait;
+//    use HiddenInSitemapUrlElementModelTrait;
 }

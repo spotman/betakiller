@@ -356,6 +356,10 @@ task('migrations:history', static function () {
     runMinionTask('migrations:history');
 })->desc('Show migrations list');
 
+task('sitemap:generate', static function () {
+    runMinionTask('sitemap', true);
+})->desc('Generate sitemap.xml');
+
 task('cache:warmup', static function () {
     runMinionTask('cache:warmup', true);
 })->desc('Warm up cache by making internal HTTP request to every IFace');
@@ -509,6 +513,7 @@ task('deploy', [
     'migrate',
 
     // Prepare
+    'sitemap:generate',
     'cache:warmup',
 
     // Restart daemons and workers
