@@ -28,7 +28,7 @@ option('repo', null, InputOption::VALUE_OPTIONAL, 'Tag to deploy.', 'app');
 \define('DEFAULT_BRANCH', 'master');
 
 // Option --to for migrations:down
-option('to', 't', InputOption::VALUE_OPTIONAL, 'Target migration');
+option('to', null, InputOption::VALUE_OPTIONAL, 'Target migration');
 
 // Option for Minion tasks direct calls
 option('task', null, InputOption::VALUE_OPTIONAL, 'Minion task name');
@@ -453,7 +453,7 @@ task('deploy:done', static function () use ($tz) {
 /**
  * Keep maintenance mode in case ofo failure
  */
-after('deploy:failed', 'maintenance:prolong');
+//after('deploy:failed', 'maintenance:prolong');
 
 task('migrate', [
     // Migrate DB
