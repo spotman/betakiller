@@ -450,8 +450,8 @@ task('import:notification', static function () {
  * Success message
  */
 task('deploy:done', static function () use ($tz) {
-    $dateTime = new \DateTimeImmutable();
-    writeln('<info>Successfully deployed at '.$dateTime->setTimezone($tz)->format('H:i:s T').'!</info>');
+    $dateTime = (new \DateTimeImmutable())->setTimezone($tz)->format('H:i:s T');
+    writeln('<info>Successfully deployed to <comment>https://{{hostname}}</comment> at '.$dateTime.'!</info>');
 });
 
 /**
