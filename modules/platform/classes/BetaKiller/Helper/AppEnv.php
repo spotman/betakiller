@@ -268,6 +268,10 @@ class AppEnv implements AppEnvInterface
 
         $options = \getopt('', [$key]);
 
+        if ($options === false) {
+            throw new \LogicException('CLI arguments parsing error');
+        }
+
         return $options[$name] ?? $default;
     }
 
