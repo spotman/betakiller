@@ -447,6 +447,13 @@ task('import:notification', static function () {
 })->desc('Import notifications data');
 
 /**
+ * Started message
+ */
+task('deploy:started', static function () {
+    writeln('<info>Deploying to <comment>https://{{hostname}}</comment></info>');
+});
+
+/**
  * Success message
  */
 task('deploy:done', static function () use ($tz) {
@@ -474,6 +481,7 @@ task('deploy', [
     // Check app configuration
     'check',
 
+    'deploy:started',
     'deploy:lock',
 
     // Prepare directories
