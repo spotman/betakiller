@@ -313,7 +313,8 @@ task('migrations:create', static function () {
         throw new Exception('Migration name is required');
     }
 
-    $desc = ask('Enter migration description', '');
+//    $desc = ask('Enter migration description', '');
+    $desc = ''; // Prevent CLI interaction from Minion task
 
     $output = runMinionTask("migrations:create --name=$name --description=$desc --scope=$scope", false, true);
 
