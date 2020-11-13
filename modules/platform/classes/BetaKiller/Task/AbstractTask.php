@@ -56,7 +56,6 @@ abstract class AbstractTask extends Minion_Task
         if (!$showOutput) {
             $fileNameArray = [
                 $taskName,
-                $stage,
             ];
 
             // Add parameters to logfile to separate logs for calls with different arguments
