@@ -33,8 +33,9 @@ final class LockFactory
         }
 
         $fileName = implode('.', [
-            $this->appEnv->getAppCodename(),
-            $this->appEnv->getModeName(),
+            // App codename and mode are already processed via AppEnv
+//            $this->appEnv->getAppCodename(),
+//            $this->appEnv->getModeName(),
             $codename,
             $namespace,
             'lock',
