@@ -2,6 +2,7 @@
 namespace Deployer;
 
 use Deployer\Exception\Exception;
+use Deployer\Task\Context;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Exception\RuntimeException;
 
@@ -219,7 +220,7 @@ task('git:config:user', static function () {
     $name = ask('Enter git name:', stage());
     gitConfig('user.name', $name);
 
-    $email = ask('Enter git email:', 'no-reply@betakiller.ru');
+    $email = ask('Enter git email:');
     gitConfig('user.email', $email);
 })->desc('set global git properties like user.email');
 
@@ -740,6 +741,12 @@ function gitRevision(string $repo)
  */
 function stage()
 {
+    $context = Context::get();
+
+    if ($context) {
+        return $context->getHost()->get('stage');
+    }
+
     return input()->getArgument('stage') ?: get('default_stage');
 }
 
