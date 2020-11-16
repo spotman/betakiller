@@ -34,21 +34,21 @@ option('to', null, InputOption::VALUE_OPTIONAL, 'Target migration');
 //option('task', null, InputOption::VALUE_OPTIONAL, 'Minion task name');
 
 
-\define('DEPLOYER_DEV_STAGE', 'development');
-\define('DEPLOYER_TESTING_STAGE', 'testing');
-\define('DEPLOYER_STAGING_STAGE', 'staging');
-\define('DEPLOYER_PRODUCTION_STAGE', 'production');
+\define('DEPLOYER_STAGE_DEV', 'development');
+\define('DEPLOYER_STAGE_TESTING', 'testing');
+\define('DEPLOYER_STAGE_STAGING', 'staging');
+\define('DEPLOYER_STAGE_PRODUCTION', 'production');
 
-set('default_stage', DEPLOYER_DEV_STAGE);
+set('default_stage', DEPLOYER_STAGE_DEV);
 
 // Local server for creating migrations, git actions, etc
 localhost('dev')
-    ->stage(DEPLOYER_DEV_STAGE);
+    ->stage(DEPLOYER_STAGE_DEV);
 
 // Local server for testing deployment tasks in dev environment
 localhost('testing')
     ->set('deploy_path', sys_get_temp_dir().DIRECTORY_SEPARATOR.'deployer-testing')
-    ->stage(DEPLOYER_TESTING_STAGE);
+    ->stage(DEPLOYER_STAGE_TESTING);
 
 $serversFile = getcwd().'/hosts.yml';
 if (file_exists($serversFile)) {
@@ -62,7 +62,7 @@ set('keep_releases', 3);
  * Check environment before real deployment starts
  */
 task('check', static function () {
-    if (stage() === DEPLOYER_DEV_STAGE) {
+    if (stage() === DEPLOYER_STAGE_DEV) {
         throw new RuntimeException('Can not deploy to a local stage');
     }
 
@@ -332,7 +332,7 @@ task('migrations:create', static function () {
     } else {
         writeln('Can not parse output, add migration file to git by yourself');
     }
-})->onStage(DEPLOYER_DEV_STAGE)->desc('Create migration');
+})->onStage(DEPLOYER_STAGE_DEV)->desc('Create migration');
 
 /**
  * Apply migrations
@@ -439,8 +439,8 @@ task('import:zones', static function () {
 task('import:i18n', static function () {
     runMinionTask('import:i18n');
 })->desc('Import localization data')->onStage(
-    \DEPLOYER_STAGING_STAGE,
-    \DEPLOYER_PRODUCTION_STAGE
+    \DEPLOYER_STAGE_STAGING,
+    \DEPLOYER_STAGE_PRODUCTION
 );
 
 task('import:notification', static function () {
@@ -539,14 +539,14 @@ task('deploy', [
     'deploy:unlock',
     'deploy:done',
 ])->desc('Deploy app bundle')->onStage(
-    DEPLOYER_STAGING_STAGE,
-    DEPLOYER_PRODUCTION_STAGE,
-    DEPLOYER_TESTING_STAGE
+    DEPLOYER_STAGE_STAGING,
+    DEPLOYER_STAGE_PRODUCTION,
+    DEPLOYER_STAGE_TESTING
 );
 
 task('update', [
     'migrate',
-])->desc('Update local workspace')->onHosts('dev')->onStage(\DEPLOYER_DEV_STAGE);
+])->desc('Update local workspace')->onHosts('dev')->onStage(\DEPLOYER_STAGE_DEV);
 
 task('load:errors', static function () {
     download('{{release_path}}/{{core_path}}/application/logs/errors.sqlite', __DIR__.'/application/logs/');
@@ -597,14 +597,14 @@ function runMinionTask(string $name, bool $asHttpUser = null, bool $tty = null)
 /**
  * Run git command and echo result to console
  *
- * @param string    $gitCmd
- * @param string    $path
- * @param bool|null $silent
+ * @param string      $gitCmd
+ * @param string|null $path
+ * @param bool|null   $silent
  *
  * @return string
  * @throws \Deployer\Exception\Exception
  */
-function runGitCommand($gitCmd, $path = null, ?bool $silent = null)
+function runGitCommand(string $gitCmd, string $path = null, ?bool $silent = null)
 {
     $path   = $path ?: getRepoPath();
     $silent = $silent ?? false;
@@ -771,14 +771,14 @@ function getLatestReleasePath()
  */
 function getRepoPath(?string $repo = null, ?string $basePath = null)
 {
-    if (stage() === DEPLOYER_DEV_STAGE) {
+    if (stage() === DEPLOYER_STAGE_DEV) {
         return getcwd();
     }
 
     $allowed = ['core', 'app'];
 
     if (!$repo) {
-        $repo = input()->getOption('repo') ?: 'core';
+        $repo = (string)input()->getOption('repo') ?: 'core';
     }
 
     if (!\in_array($repo, $allowed, true)) {
