@@ -366,13 +366,6 @@ class Cron extends AbstractTask
             $this->logRepo->save($log);
         });
 
-        $run->addListener(RunEvent::COMPLETED, function (RunEvent $event) {
-            $task = $this->getTaskFromRunEvent($event);
-
-            // Keep locked until all processing is done
-            $this->releaseLock($task);
-        });
-
         $run->addListener(RunEvent::SUCCESSFUL, function (RunEvent $event) {
             $task = $this->getTaskFromRunEvent($event);
 
@@ -386,6 +379,9 @@ class Cron extends AbstractTask
             $log = $this->getLogFromRunEvent($event);
             $log->markAsSucceeded();
             $this->logRepo->save($log);
+
+            // Keep locked until all processing is done
+            $this->releaseLock($task);
         });
 
         $run->addListener(RunEvent::FAILED, function (RunEvent $event) {
@@ -405,6 +401,9 @@ class Cron extends AbstractTask
             $log = $this->getLogFromRunEvent($event);
             $log->markAsFailed();
             $this->logRepo->save($log);
+
+            // Keep locked until all processing is done
+            $this->releaseLock($task);
         });
 
         return $run;
