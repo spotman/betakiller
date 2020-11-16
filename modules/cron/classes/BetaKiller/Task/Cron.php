@@ -366,6 +366,13 @@ class Cron extends AbstractTask
             $this->logRepo->save($log);
         });
 
+        $run->addListener(RunEvent::COMPLETED, function (RunEvent $event) {
+            $task = $this->getTaskFromRunEvent($event);
+
+            // Keep locked until all processing is done
+            $this->releaseLock($task);
+        });
+
         $run->addListener(RunEvent::SUCCESSFUL, function (RunEvent $event) {
             $task = $this->getTaskFromRunEvent($event);
 
@@ -379,9 +386,6 @@ class Cron extends AbstractTask
             $log = $this->getLogFromRunEvent($event);
             $log->markAsSucceeded();
             $this->logRepo->save($log);
-
-            // Keep locked until all processing is done
-            $this->releaseLock($task);
         });
 
         $run->addListener(RunEvent::FAILED, function (RunEvent $event) {
@@ -401,9 +405,6 @@ class Cron extends AbstractTask
             $log = $this->getLogFromRunEvent($event);
             $log->markAsFailed();
             $this->logRepo->save($log);
-
-            // Keep locked until all processing is done
-            $this->releaseLock($task);
         });
 
         return $run;
@@ -487,15 +488,18 @@ class Cron extends AbstractTask
 
     private function releaseLock(CronTask $task): void
     {
-        $lock = $this->getLockFor($task);
-
         try {
-            if ($lock->release()) {
-                $this->logger->debug('Cron task ":name" was unlocked', [
+            $lock = $this->getLockFor($task);
+
+            if (!$lock->isAcquired()) {
+                $this->logger->warning('Cron task ":name" is not locked, release skipped', [
                     ':name' => $task->getName(),
                 ]);
-            } else {
-                $this->logger->debug('Cron task ":name" is not locked', [
+                return;
+            }
+
+            if ($lock->release()) {
+                $this->logger->debug('Cron task ":name" was unlocked', [
                     ':name' => $task->getName(),
                 ]);
             }
