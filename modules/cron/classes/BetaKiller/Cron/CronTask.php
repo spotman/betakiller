@@ -28,12 +28,22 @@ class CronTask
     /**
      * @var \DateTimeImmutable|null
      */
+    private ?DateTimeImmutable $startedAt = null;
+
+    /**
+     * @var \DateTimeImmutable|null
+     */
     private ?DateTimeImmutable $queuedAt = null;
 
     /**
      * @var \DateTimeImmutable|null
      */
     private ?DateTimeImmutable $finishedAt = null;
+
+    /**
+     * @var \DateTimeImmutable|null
+     */
+    private ?DateTimeImmutable $failedAt = null;
 
     /**
      * @var int|null
@@ -76,9 +86,19 @@ class CronTask
         return $this->queuedAt;
     }
 
+    public function getStartedAt(): ?DateTimeImmutable
+    {
+        return $this->startedAt;
+    }
+
     public function getFinishedAt(): ?DateTimeImmutable
     {
         return $this->finishedAt;
+    }
+
+    public function getFailedAt(): ?DateTimeImmutable
+    {
+        return $this->failedAt;
     }
 
     public function getFingerprint(): string
@@ -98,8 +118,8 @@ class CronTask
 
     public function started(int $pid, ?DateTimeImmutable $startTime = null): void
     {
-        $this->pid     = $pid;
-        $this->startAt = $startTime ?? new DateTimeImmutable;
+        $this->pid       = $pid;
+        $this->startedAt = $startTime ?? new DateTimeImmutable;
     }
 
     public function done(?DateTimeImmutable $stopTime = null): void
@@ -108,9 +128,10 @@ class CronTask
         $this->finishedAt = $stopTime ?? new DateTimeImmutable;
     }
 
-    public function failed(): void
+    public function failed(?DateTimeImmutable $stopTime = null): void
     {
         $this->clearPID();
+        $this->failedAt = $stopTime ?? new DateTimeImmutable;
     }
 
     public function postpone(DateTimeImmutable $nextRunTime): void
@@ -118,14 +139,29 @@ class CronTask
         $this->startAt = $nextRunTime;
     }
 
-    public function getPID(): ?int
+    public function getPID(): int
     {
         return $this->pid;
+    }
+
+    public function isStarted(): bool
+    {
+        return $this->startedAt !== null;
     }
 
     public function isRunning(): bool
     {
         return (bool)$this->pid;
+    }
+
+    public function isDone(): bool
+    {
+        return $this->finishedAt !== null;
+    }
+
+    public function isFailed(): bool
+    {
+        return $this->failedAt !== null;
     }
 
     private function clearPID(): void

@@ -334,7 +334,7 @@ class Cron extends AbstractTask
 
         $run = new ProcessRun(Process::fromShellCommandline($cmd, $docRoot), $tags);
 
-        // Listen for UPDATED event coz CREATED is emitted before actual process is started
+        // Listen for UPDATED event coz STARTED is emitted before actual process is started
         $run->addListener(RunEvent::UPDATED, function (RunEvent $event) {
             $task = $this->getTaskFromRunEvent($event);
 
@@ -487,6 +487,11 @@ class Cron extends AbstractTask
 
     private function releaseLock(CronTask $task): void
     {
+        // Task was not started => no lock acquired => nothing to do
+        if (!$task->isStarted()) {
+            return;
+        }
+
         try {
             $lock = $this->getLockFor($task);
 
