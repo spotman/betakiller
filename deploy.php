@@ -31,7 +31,7 @@ option('repo', null, InputOption::VALUE_OPTIONAL, 'Tag to deploy.', 'app');
 option('to', null, InputOption::VALUE_OPTIONAL, 'Target migration');
 
 // Option for Minion tasks direct calls
-option('task', null, InputOption::VALUE_OPTIONAL, 'Minion task name');
+//option('task', null, InputOption::VALUE_OPTIONAL, 'Minion task name');
 
 
 \define('DEPLOYER_DEV_STAGE', 'development');
@@ -279,15 +279,15 @@ task('git:checkout', static function () {
 /**
  * Custom Minion tasks
  */
-task('minion', static function () {
-    if (!input()->hasOption('task')) {
-        throw new Exception('Specify task name via --task option');
-    }
-
-    $name = input()->getOption('task');
-
-    runMinionTask($name, false, true);
-})->desc('Run Minion task by its name');
+//task('minion', static function () {
+//    if (!input()->hasOption('task')) {
+//        throw new Exception('Specify task name via --task option');
+//    }
+//
+//    $name = input()->getOption('task');
+//
+//    runMinionTask($name, false, true);
+//})->desc('Run Minion task by its name');
 
 
 /**
