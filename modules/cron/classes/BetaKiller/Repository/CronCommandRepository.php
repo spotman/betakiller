@@ -55,7 +55,7 @@ final class CronCommandRepository extends AbstractOrmBasedRepository implements 
      */
     private function filterParams(OrmInterface $orm, array $params): self
     {
-        $orm->where($orm->object_column(CronCommand::COL_PARAMS), '=', \json_encode($params));
+        $orm->where($orm->object_column(CronCommand::COL_PARAMS), '=', \json_encode($params, JSON_THROW_ON_ERROR));
 
         return $this;
     }

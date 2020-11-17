@@ -32,9 +32,9 @@ class CronLogRepository extends AbstractOrmBasedRepository implements CronLogRep
 
         $orm->filter_datetime_column_value(CronLog::COL_QUEUED_AT, $afterDate, '>=');
 
-        return (bool)$this
+        return $this
             ->filterCmd($orm, $cmd)
-            ->findOne($orm);
+            ->countAll($orm) > 0;
     }
 
     /**

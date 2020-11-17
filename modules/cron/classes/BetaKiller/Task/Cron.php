@@ -9,6 +9,7 @@ use BetaKiller\Cron\CronLockFactory;
 use BetaKiller\Cron\CronTask;
 use BetaKiller\Cron\TaskQueue;
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Helper\DateTimeHelper;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Model\CronCommand;
 use BetaKiller\Model\CronLog;
@@ -189,19 +190,22 @@ class Cron extends AbstractTask
         foreach ($this->getConfigTasksGenerator() as $item) {
             $name   = $item->getName();
             $params = $item->getParams();
-            $cron   = $item->getExpression();
 
-            $previousRun = \DateTimeImmutable::createFromMutable($cron->getPreviousRunDate());
+            $previousRun = $item->getPreviousRunDate();
+
+            $tz = DateTimeHelper::getUtcTimezone();
 
             $this->logDebug('Checking task [:task] is missed after :date', [
                 ':task' => $name,
-                ':date' => $previousRun->format(\DateTimeImmutable::ATOM),
+                ':date' => $previousRun->setTimezone($tz)->format(\DateTimeImmutable::ATOM),
             ]);
 
             $cmd = $this->cmdRepo->findByNameAndParams($name, $params);
 
             if (!$cmd || !$this->logRepo->hasTaskRecordAfter($cmd, $previousRun)) {
-                $this->logDebug('Task [:task] is missing previous run', [':task' => $name]);
+                $this->logDebug('Task [:task] is missing previous run', [
+                    ':task' => $name,
+                ]);
 
                 $this->enqueueTask($name, $params);
             }
@@ -299,10 +303,9 @@ class Cron extends AbstractTask
         $name   = $task->getName();
         $params = $task->getParams();
 
-        $cmd     = self::getTaskCmd($this->env, $name, $params);
-        $docRoot = $this->env->getDocRootPath();
+        $cmd = self::getTaskCmd($this->env, $name, $params);
 
-        $command = $this->cmdRepo->findByCmd($cmd);
+        $command = $this->cmdRepo->findByNameAndParams($name, $params);
 
         if (!$command) {
             $command = new CronCommand;
@@ -330,7 +333,11 @@ class Cron extends AbstractTask
             self::TAG_FINGERPRINT => $task->getFingerprint(),
         ];
 
-        $this->logDebug('Command: :cmd', [':cmd' => $cmd]);
+        $this->logDebug('Command: :cmd', [
+            ':cmd' => $cmd,
+        ]);
+
+        $docRoot = $this->env->getDocRootPath();
 
         $run = new ProcessRun(Process::fromShellCommandline($cmd, $docRoot), $tags);
 

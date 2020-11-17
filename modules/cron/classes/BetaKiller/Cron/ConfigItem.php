@@ -88,6 +88,14 @@ final class ConfigItem
     }
 
     /**
+     * @return \DateTimeImmutable
+     */
+    public function getPreviousRunDate(): \DateTimeImmutable
+    {
+        return \DateTimeImmutable::createFromMutable($this->expr->getPreviousRunDate());
+    }
+
+    /**
      * @return array
      */
     public function getStages(): array
