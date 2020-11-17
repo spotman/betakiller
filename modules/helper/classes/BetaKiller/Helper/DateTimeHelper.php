@@ -21,6 +21,11 @@ final class DateTimeHelper
         return new DateTimeZone('UTC');
     }
 
+    public static function getServerTimezone(): DateTimeZone
+    {
+        return new DateTimeZone(date_default_timezone_get());
+    }
+
     public static function getDateTimeFromTimestamp(int $timestamp): DateTimeImmutable
     {
         return (new DateTimeImmutable)->setTimezone(self::getUtcTimezone())->setTimestamp($timestamp);
