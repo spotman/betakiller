@@ -3,8 +3,25 @@ declare(strict_types=1);
 
 namespace Spotman\Defence;
 
+use Spotman\Defence\Parameter\ParameterProviderFactoryInterface;
+
 class ArgumentsFacade
 {
+    /**
+     * @var \Spotman\Defence\Parameter\ParameterProviderFactoryInterface
+     */
+    private ParameterProviderFactoryInterface $paramProviderFactory;
+
+    /**
+     * ArgumentsFacade constructor.
+     *
+     * @param \Spotman\Defence\Parameter\ParameterProviderFactoryInterface $paramProviderFactory
+     */
+    public function __construct(ParameterProviderFactoryInterface $paramProviderFactory)
+    {
+        $this->paramProviderFactory = $paramProviderFactory;
+    }
+
     /**
      * @param array                                       $requestArguments
      * @param \Spotman\Defence\DefinitionBuilderInterface $definition
@@ -20,7 +37,7 @@ class ArgumentsFacade
 
         // Check for unnecessary arguments
         if (\count($requestArguments) > \count($namedArguments)) {
-            $allowedArgs = array_map(function (ArgumentDefinitionInterface $arg) {
+            $allowedArgs = array_map(static function (ArgumentDefinitionInterface $arg) {
                 return $arg->getName();
             }, $definition->getArguments());
 
@@ -158,6 +175,10 @@ class ArgumentsFacade
 
         $this->checkRules($value, $argument);
 
+        if ($argument->isParameter()) {
+            return $this->paramProviderFactory->createFor($argument)->convertValue($value);
+        }
+
         return $value;
     }
 
@@ -185,7 +206,7 @@ class ArgumentsFacade
                 'Composite value must be an array for "%s" but "%s" provided: %s',
                 $argument->getName(),
                 \gettype($value),
-                \json_encode($value)
+                \json_encode($value, JSON_THROW_ON_ERROR)
             ));
         }
 
@@ -206,7 +227,7 @@ class ArgumentsFacade
                 'CompositeArray data must be an array for "%s" but "%s" provided: %s',
                 $argument->getName(),
                 \gettype($value),
-                \json_encode($value)
+                \json_encode($value, JSON_THROW_ON_ERROR)
             ));
         }
 
@@ -224,7 +245,7 @@ class ArgumentsFacade
                     'CompositeArray data for "%s" contains NULL item at index [%d]: %s',
                     $argument->getName(),
                     $index,
-                    \json_encode($value)
+                    \json_encode($value, JSON_THROW_ON_ERROR)
                 ));
             }
 
@@ -260,7 +281,7 @@ class ArgumentsFacade
                         $argument->getName(),
                         $filter->getName(),
                         \gettype($value),
-                        \json_encode($value)
+                        \json_encode($value, JSON_THROW_ON_ERROR)
                     ),
                     $e->getCode(),
                     $e
@@ -292,7 +313,7 @@ class ArgumentsFacade
                         $argument->getName(),
                         $rule->getName(),
                         \gettype($value),
-                        \json_encode($value)
+                        \json_encode($value, JSON_THROW_ON_ERROR)
                     )
                 );
             }

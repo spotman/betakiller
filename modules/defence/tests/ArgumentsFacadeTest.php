@@ -6,6 +6,12 @@ namespace Spotman\Defence\Test;
 use Spotman\Defence\ArgumentsFacade;
 use Spotman\Defence\DefinitionBuilder;
 use Spotman\Defence\DefinitionBuilderInterface;
+use Spotman\Defence\Parameter\ParameterInterface;
+use Spotman\Defence\Parameter\ParameterProviderFactoryInterface;
+
+include 'FakeParameterProviderFactory.php';
+include 'FakeStringParameterProvider.php';
+include 'FakeStringParameter.php';
 
 class ArgumentsFacadeTest extends AbstractDefenceTest
 {
@@ -117,7 +123,7 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             ],
 
             // Int
-            'int'           => [
+            'int'             => [
                 $this->def()->int('a'),
                 ['a' => 12345],
             ],
@@ -128,7 +134,7 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             ],
 
             // Float
-            'float'           => [
+            'float'          => [
                 $this->def()->float('a'),
                 ['a' => 123.45],
             ],
@@ -139,7 +145,7 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             ],
 
             // String
-            'string'       => [
+            'string'           => [
                 $this->def()->string('a'),
                 ['a' => 'qwerty'],
             ],
@@ -150,7 +156,7 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             ],
 
             // String
-            'text'       => [
+            'text'              => [
                 $this->def()->text('a'),
                 ['a' => "qwerty\r\nasdfgh\nzxcvbn\rpoiuytre"],
             ],
@@ -173,7 +179,7 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             ],
 
             // Composite
-            'compositeStart'       => [
+            'compositeStart'  => [
                 $this->def()->compositeStart('a')->int('b')->string('c')->compositeEnd(),
                 ['a' => ['b' => 123, 'c' => 'qwe']],
             ],
@@ -184,7 +190,7 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             ],
 
             // Composite array
-            'compositeStart array'    => [
+            'compositeStart array'      => [
                 $this->def()->compositeArrayStart('a')->int('b')->string('c'),
                 [
                     'a' => [
@@ -203,6 +209,8 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             // String
             [$this->def()->string('a')->lowercase(), 'QWERTY', 'qwerty'],
             [$this->def()->string('a')->uppercase(), 'qwerty', 'QWERTY'],
+
+            [$this->def()->stringParam('a', 'string'), 'qwerty', $this->makeStringParamInstance('qwerty')],
         ];
     }
 
@@ -247,6 +255,11 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             'string + default' => [
                 $this->def()->string('a')->optional()->default('qwerty'),
                 ['a' => 'qwerty'],
+            ],
+
+            'string parameter' => [
+                $this->def()->stringParam('a', 'string')->optional(),
+                [],
             ],
 
             'intArray' => [
@@ -346,6 +359,16 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
 
     private function getFacade(): ArgumentsFacade
     {
-        return new ArgumentsFacade();
+        return new ArgumentsFacade($this->getParameterProviderFactory());
+    }
+
+    private function getParameterProviderFactory(): ParameterProviderFactoryInterface
+    {
+        return new FakeParameterProviderFactory;
+    }
+
+    private function makeStringParamInstance(string $value): ParameterInterface
+    {
+        return (new FakeStringParameterProvider())->convertValue($value);
     }
 }

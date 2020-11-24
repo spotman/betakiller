@@ -31,17 +31,17 @@ class DefinitionBuilder implements DefinitionBuilderInterface
     /**
      * @var \Spotman\Defence\DefinitionCollectionInterface
      */
-    private $collection;
+    private DefinitionCollectionInterface $collection;
 
     /**
      * @var \Spotman\Defence\ArgumentDefinitionInterface|null
      */
-    private $last;
+    private ?ArgumentDefinitionInterface $last = null;
 
     /**
      * @var \Spotman\Defence\DefinitionCollectionInterface[]
      */
-    private $stack = [];
+    private array $stack = [];
 
     /**
      * DefinitionBuilder constructor.
@@ -178,6 +178,21 @@ class DefinitionBuilder implements DefinitionBuilderInterface
     }
 
     /**
+     * Define string parameter argument
+     *
+     * @param string $name
+     * @param string $codename Provider codename
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function stringParam(string $name, string $codename): DefinitionBuilderInterface
+    {
+        return $this
+            ->addParamType($name, ArgumentDefinitionInterface::TYPE_STRING_PARAMETER, $codename)
+            ->addFilter(new StringFilter);
+    }
+
+    /**
      * Define indexed array of integers
      *
      * @param string $name
@@ -278,6 +293,12 @@ class DefinitionBuilder implements DefinitionBuilderInterface
 
         if (!$top) {
             throw new \LogicException('No nested definition found, define it with compositeStart() method');
+        }
+
+        if (!$top instanceof ArgumentDefinitionInterface) {
+            throw new \LogicException(
+                sprintf('Argument definition stack must contain %s only', ArgumentDefinitionInterface::class)
+            );
         }
 
         $this->last = $top;
@@ -462,6 +483,13 @@ class DefinitionBuilder implements DefinitionBuilderInterface
     private function addSingleType(string $name, string $type): self
     {
         $this->addArgument(new SingleArgumentDefinition($name, $type));
+
+        return $this;
+    }
+
+    private function addParamType(string $name, string $type, string $codename): self
+    {
+        $this->addArgument(new ParameterArgumentDefinition($name, $type, $codename));
 
         return $this;
     }

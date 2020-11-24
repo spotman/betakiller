@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Spotman\Defence;
 
+use Spotman\Defence\Parameter\ParameterInterface;
+
 interface ArgumentsInterface
 {
     public const IDENTITY_KEY = 'id';
@@ -78,6 +80,13 @@ interface ArgumentsInterface
      * @return \DateTimeImmutable
      */
     public function getDateTime(string $key): \DateTimeImmutable;
+
+    /**
+     * @param string $key
+     *
+     * @return \Spotman\Defence\Parameter\ParameterInterface
+     */
+    public function getParam(string $key): ParameterInterface;
 
     /**
      * @param string $key

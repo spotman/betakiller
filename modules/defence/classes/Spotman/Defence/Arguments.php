@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace Spotman\Defence;
 
+use Spotman\Defence\Parameter\ParameterInterface;
+
 class Arguments implements ArgumentsInterface
 {
     /**
      * @var array
      */
-    private $args;
+    private array $args;
 
     /**
      * Arguments constructor.
@@ -124,6 +126,14 @@ class Arguments implements ArgumentsInterface
     public function getBool(string $key): bool
     {
         return (bool)$this->args[$key];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getParam(string $key): ParameterInterface
+    {
+        return $this->args[$key];
     }
 
     /**

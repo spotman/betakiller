@@ -16,6 +16,9 @@ interface ArgumentDefinitionInterface
     public const TYPE_HTML     = 'html';
     public const TYPE_DATETIME = 'datetime';
 
+    // String with auto-conversion to object
+    public const TYPE_STRING_PARAMETER = 'string_param';
+
     // Named collection of scalars
     public const TYPE_COMPOSITE = 'composite';
 
@@ -35,6 +38,7 @@ interface ArgumentDefinitionInterface
         self::TYPE_TEXT,
         self::TYPE_HTML,
         self::TYPE_DATETIME,
+        self::TYPE_STRING_PARAMETER,
         self::TYPE_COMPOSITE,
         self::TYPE_SINGLE_ARRAY,
         self::TYPE_COMPOSITE_ARRAY,
@@ -154,6 +158,13 @@ interface ArgumentDefinitionInterface
      * @return bool
      */
     public function isDateTime(): bool;
+
+    /**
+     * Returns true if rule defines a string containing parameter
+     *
+     * @return bool
+     */
+    public function isParameter(): bool;
 
     /**
      * Returns true if rule defines an array argument

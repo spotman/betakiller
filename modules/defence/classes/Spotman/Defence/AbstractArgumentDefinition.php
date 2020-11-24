@@ -8,22 +8,22 @@ abstract class AbstractArgumentDefinition implements ArgumentDefinitionInterface
     /**
      * @var string
      */
-    private $name;
+    private string $name;
 
     /**
      * @var string
      */
-    private $type;
+    private string $type;
 
     /**
      * @var bool
      */
-    private $optional = false;
+    private bool $optional = false;
 
     /**
      * @var bool
      */
-    private $nullable = false;
+    private bool $nullable = false;
 
     /**
      * @var mixed|null
@@ -198,6 +198,14 @@ abstract class AbstractArgumentDefinition implements ArgumentDefinitionInterface
     public function isHtml(): bool
     {
         return $this->getType() === self::TYPE_HTML;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isParameter(): bool
+    {
+        return $this instanceof ParameterArgumentDefinitionInterface;
     }
 
     /**
