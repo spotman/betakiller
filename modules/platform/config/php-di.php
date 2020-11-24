@@ -5,12 +5,15 @@ use BetaKiller\Acl\EntityPermissionResolverInterface;
 use BetaKiller\Acl\UrlElementAccessResolver;
 use BetaKiller\Acl\UrlElementAccessResolverInterface;
 use BetaKiller\Api\ApiLanguageDetector;
+use BetaKiller\DefenceParameterProviderFactory;
+use BetaKiller\DummyIdentityConverter;
 use BetaKiller\Exception;
 use BetaKiller\Factory\EntityFactory;
 use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\LoggerHelper;
+use BetaKiller\IdentityConverterInterface;
 use BetaKiller\MessageBus\EventSerializerInterface;
 use BetaKiller\MessageBus\NativeEventSerializer;
 use BetaKiller\Middleware\CspReportBodyParamsStrategy;
@@ -44,6 +47,7 @@ use Psr\Log\LogLevel;
 use Ramsey\Uuid\UuidFactory;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Spotman\Api\ApiLanguageDetectorInterface;
+use Spotman\Defence\Parameter\ParameterProviderFactoryInterface;
 use Zend\Diactoros\RequestFactory;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ResponseFactory;
@@ -208,7 +212,9 @@ return [
         RoleRepositoryInterface::class  => autowire(RoleRepository::class),
         TokenRepositoryInterface::class => autowire(TokenRepository::class),
 
-        BetaKiller\IdentityConverterInterface::class => autowire(BetaKiller\DummyIdentityConverter::class),
+        IdentityConverterInterface::class => autowire(DummyIdentityConverter::class),
+
+        ParameterProviderFactoryInterface::class => autowire(DefenceParameterProviderFactory::class),
 
         ApiLanguageDetectorInterface::class => autowire(ApiLanguageDetector::class),
 
