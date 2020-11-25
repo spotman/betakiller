@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Spotman\Defence;
 
-use Spotman\Defence\Parameter\ParameterInterface;
+use Spotman\Defence\Parameter\ArgumentParameterInterface;
 
 interface ArgumentsInterface
 {
@@ -84,9 +84,9 @@ interface ArgumentsInterface
     /**
      * @param string $key
      *
-     * @return \Spotman\Defence\Parameter\ParameterInterface
+     * @return \Spotman\Defence\Parameter\ArgumentParameterInterface|mixed
      */
-    public function getParam(string $key): ParameterInterface;
+    public function getParam(string $key): ArgumentParameterInterface;
 
     /**
      * @param string $key

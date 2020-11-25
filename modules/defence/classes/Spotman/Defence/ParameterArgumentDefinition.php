@@ -15,9 +15,9 @@ class ParameterArgumentDefinition extends SingleArgumentDefinition implements Pa
     /**
      * @inheritDoc
      */
-    public function __construct(string $name, string $type, string $codename)
+    public function __construct(string $name, string $codename)
     {
-        parent::__construct($name, $type);
+        parent::__construct($name, self::TYPE_PARAMETER);
 
         $this->codename = $codename;
     }

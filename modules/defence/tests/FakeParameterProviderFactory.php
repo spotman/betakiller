@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace Spotman\Defence\Test;
 
 use Spotman\Defence\ArgumentDefinitionInterface;
-use Spotman\Defence\Parameter\ParameterInterface;
+use Spotman\Defence\Parameter\ArgumentParameterInterface;
 use Spotman\Defence\Parameter\ParameterProviderFactoryInterface;
 use Spotman\Defence\Parameter\ParameterProviderInterface;
 
 final class FakeParameterProviderFactory implements ParameterProviderFactoryInterface
 {
-    public function convertValue($value): ParameterInterface
+    public function convertValue($value): ArgumentParameterInterface
     {
         if (!\is_string($value)) {
             throw new \LogicException('Test value must be "string"');
@@ -22,7 +22,7 @@ final class FakeParameterProviderFactory implements ParameterProviderFactoryInte
     public function createFor(ArgumentDefinitionInterface $argDef): ParameterProviderInterface
     {
         switch ($argDef->getType()) {
-            case ArgumentDefinitionInterface::TYPE_STRING_PARAMETER:
+            case ArgumentDefinitionInterface::TYPE_PARAMETER:
                 return new FakeStringParameterProvider();
 
             default:

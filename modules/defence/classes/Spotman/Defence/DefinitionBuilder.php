@@ -185,10 +185,10 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      *
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function stringParam(string $name, string $codename): DefinitionBuilderInterface
+    public function param(string $name, string $codename): DefinitionBuilderInterface
     {
         return $this
-            ->addParamType($name, ArgumentDefinitionInterface::TYPE_STRING_PARAMETER, $codename)
+            ->addParamType($name, $codename)
             ->addFilter(new StringFilter);
     }
 
@@ -487,9 +487,9 @@ class DefinitionBuilder implements DefinitionBuilderInterface
         return $this;
     }
 
-    private function addParamType(string $name, string $type, string $codename): self
+    private function addParamType(string $name, string $codename): self
     {
-        $this->addArgument(new ParameterArgumentDefinition($name, $type, $codename));
+        $this->addArgument(new ParameterArgumentDefinition($name, $codename));
 
         return $this;
     }

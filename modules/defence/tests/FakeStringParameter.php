@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Spotman\Defence\Test;
 
-use Spotman\Defence\Parameter\ParameterInterface;
+use Spotman\Defence\Parameter\ArgumentParameterInterface;
 
-final class FakeStringParameter implements ParameterInterface
+final class FakeStringParameter implements ArgumentParameterInterface
 {
     private string $value;
 

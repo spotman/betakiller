@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Spotman\Defence;
 
-use Spotman\Defence\Parameter\ParameterInterface;
+use Spotman\Defence\Parameter\ArgumentParameterInterface;
 
 class Arguments implements ArgumentsInterface
 {
@@ -131,7 +131,7 @@ class Arguments implements ArgumentsInterface
     /**
      * @inheritDoc
      */
-    public function getParam(string $key): ParameterInterface
+    public function getParam(string $key): ArgumentParameterInterface
     {
         return $this->args[$key];
     }

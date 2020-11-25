@@ -87,6 +87,16 @@ interface DefinitionBuilderInterface
     public function bool(string $name): DefinitionBuilderInterface;
 
     /**
+     * Define string parameter argument
+     *
+     * @param string $name
+     * @param string $codename Provider codename
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function param(string $name, string $codename): DefinitionBuilderInterface;
+
+    /**
      * Define indexed array of integers
      *
      * @param string $name

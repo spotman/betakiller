@@ -6,7 +6,7 @@ namespace Spotman\Defence\Test;
 use Spotman\Defence\ArgumentsFacade;
 use Spotman\Defence\DefinitionBuilder;
 use Spotman\Defence\DefinitionBuilderInterface;
-use Spotman\Defence\Parameter\ParameterInterface;
+use Spotman\Defence\Parameter\ArgumentParameterInterface;
 use Spotman\Defence\Parameter\ParameterProviderFactoryInterface;
 
 include 'FakeParameterProviderFactory.php';
@@ -210,7 +210,7 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             [$this->def()->string('a')->lowercase(), 'QWERTY', 'qwerty'],
             [$this->def()->string('a')->uppercase(), 'qwerty', 'QWERTY'],
 
-            [$this->def()->stringParam('a', 'string'), 'qwerty', $this->makeStringParamInstance('qwerty')],
+            [$this->def()->param('a', 'string'), 'qwerty', $this->makeStringParamInstance('qwerty')],
         ];
     }
 
@@ -258,7 +258,7 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             ],
 
             'string parameter' => [
-                $this->def()->stringParam('a', 'string')->optional(),
+                $this->def()->param('a', 'string')->optional(),
                 [],
             ],
 
@@ -367,7 +367,7 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
         return new FakeParameterProviderFactory;
     }
 
-    private function makeStringParamInstance(string $value): ParameterInterface
+    private function makeStringParamInstance(string $value): ArgumentParameterInterface
     {
         return (new FakeStringParameterProvider())->convertValue($value);
     }

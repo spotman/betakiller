@@ -22,7 +22,7 @@ class StringFilter extends AbstractFilterVarFilter
     {
         return [
             ArgumentDefinitionInterface::TYPE_STRING,
-            ArgumentDefinitionInterface::TYPE_STRING_PARAMETER,
+            ArgumentDefinitionInterface::TYPE_PARAMETER,
         ];
     }
 
