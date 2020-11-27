@@ -3,20 +3,8 @@ declare(strict_types=1);
 
 namespace Spotman\Defence;
 
-use Spotman\Defence\Filter\BooleanFilter;
-use Spotman\Defence\Filter\DateTimeFilter;
-use Spotman\Defence\Filter\EmailFilter;
 use Spotman\Defence\Filter\FilterInterface;
-use Spotman\Defence\Filter\FloatArrayFilter;
-use Spotman\Defence\Filter\FloatFilter;
-use Spotman\Defence\Filter\HtmlFilter;
-use Spotman\Defence\Filter\IdentityFilter;
-use Spotman\Defence\Filter\IntArrayFilter;
-use Spotman\Defence\Filter\IntegerFilter;
 use Spotman\Defence\Filter\LowercaseFilter;
-use Spotman\Defence\Filter\StringArrayFilter;
-use Spotman\Defence\Filter\StringFilter;
-use Spotman\Defence\Filter\TextFilter;
 use Spotman\Defence\Filter\UppercaseFilter;
 use Spotman\Defence\Rule\DefinitionRuleInterface;
 use Spotman\Defence\Rule\LengthBetweenRule;
@@ -60,9 +48,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      */
     public function identity(string $name = null): DefinitionBuilderInterface
     {
-        return $this
-            ->addSingleType($name ?? 'id', ArgumentDefinitionInterface::TYPE_IDENTITY)
-            ->addFilter(new IdentityFilter);
+        return $this->addArgument(new IdentityArgumentDefinition($name));
     }
 
     /**
@@ -74,9 +60,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      */
     public function int(string $name): DefinitionBuilderInterface
     {
-        return $this
-            ->addSingleType($name, ArgumentDefinitionInterface::TYPE_INTEGER)
-            ->addFilter(new IntegerFilter);
+        return $this->addArgument(new IntegerArgumentDefinition($name));
     }
 
     /**
@@ -88,9 +72,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      */
     public function float(string $name): DefinitionBuilderInterface
     {
-        return $this
-            ->addSingleType($name, ArgumentDefinitionInterface::TYPE_FLOAT)
-            ->addFilter(new FloatFilter);
+        return $this->addArgument(new FloatArgumentDefinition($name));
     }
 
     /**
@@ -102,9 +84,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      */
     public function string(string $name): DefinitionBuilderInterface
     {
-        return $this
-            ->addSingleType($name, ArgumentDefinitionInterface::TYPE_STRING)
-            ->addFilter(new StringFilter);
+        return $this->addArgument(new StringArgumentDefinition($name));
     }
 
     /**
@@ -116,9 +96,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      */
     public function email(string $name): DefinitionBuilderInterface
     {
-        return $this
-            ->addSingleType($name, ArgumentDefinitionInterface::TYPE_EMAIL)
-            ->addFilter(new EmailFilter);
+        return $this->addArgument(new EmailArgumentDefinition($name));
     }
 
     /**
@@ -130,9 +108,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      */
     public function text(string $name): DefinitionBuilderInterface
     {
-        return $this
-            ->addSingleType($name, ArgumentDefinitionInterface::TYPE_TEXT)
-            ->addFilter(new TextFilter);
+        return $this->addArgument(new TextArgumentDefinition($name));
     }
 
     /**
@@ -144,9 +120,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      */
     public function html(string $name): DefinitionBuilderInterface
     {
-        return $this
-            ->addSingleType($name, ArgumentDefinitionInterface::TYPE_HTML)
-            ->addFilter(new HtmlFilter);
+        return $this->addArgument(new HtmlArgumentDefinition($name));
     }
 
     /**
@@ -158,9 +132,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      */
     public function datetime(string $name): DefinitionBuilderInterface
     {
-        return $this
-            ->addSingleType($name, ArgumentDefinitionInterface::TYPE_DATETIME)
-            ->addFilter(new DateTimeFilter);
+        return $this->addArgument(new DateTimeArgumentDefinition($name));
     }
 
     /**
@@ -172,9 +144,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      */
     public function bool(string $name): DefinitionBuilderInterface
     {
-        return $this
-            ->addSingleType($name, ArgumentDefinitionInterface::TYPE_BOOLEAN)
-            ->addFilter(new BooleanFilter);
+        return $this->addArgument(new BooleanArgumentDefinition($name));
     }
 
     /**
@@ -187,9 +157,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      */
     public function param(string $name, string $codename): DefinitionBuilderInterface
     {
-        return $this
-            ->addParamType($name, $codename)
-            ->addFilter(new StringFilter);
+        return $this->addArgument(new ParameterArgumentDefinition($name, $codename));
     }
 
     /**
@@ -201,9 +169,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      */
     public function intArray(string $name): DefinitionBuilderInterface
     {
-        return $this
-            ->addSingleType($name, ArgumentDefinitionInterface::TYPE_SINGLE_ARRAY)
-            ->addFilter(new IntArrayFilter);
+        return $this->addArgument(new SingleArrayArgumentDefinition($name, new IntegerArgumentDefinition($name)));
     }
 
     /**
@@ -215,9 +181,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      */
     public function floatArray(string $name): DefinitionBuilderInterface
     {
-        return $this
-            ->addSingleType($name, ArgumentDefinitionInterface::TYPE_SINGLE_ARRAY)
-            ->addFilter(new FloatArrayFilter);
+        return $this->addArgument(new SingleArrayArgumentDefinition($name, new FloatArgumentDefinition($name)));
     }
 
     /**
@@ -229,9 +193,16 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      */
     public function stringArray(string $name): DefinitionBuilderInterface
     {
-        return $this
-            ->addSingleType($name, ArgumentDefinitionInterface::TYPE_SINGLE_ARRAY)
-            ->addFilter(new StringArrayFilter);
+        return $this->addArgument(new SingleArrayArgumentDefinition($name, new StringArgumentDefinition($name)));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function paramArray(string $name, string $codename): DefinitionBuilderInterface
+    {
+        return $this->addArgument(new SingleArrayArgumentDefinition($name,
+            new ParameterArgumentDefinition($name, $codename)));
     }
 
     /**
@@ -361,7 +332,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
         }
 
         if (!$last->mayHaveDefaultValue()) {
-            throw new \LogicException('Only scalar types can define default value');
+            throw new \LogicException('Only scalar/array types can define default value');
         }
 
         $last->setDefaultValue($value);
@@ -480,20 +451,6 @@ class DefinitionBuilder implements DefinitionBuilderInterface
         return $this->addRule(new WhitelistRule($allowed));
     }
 
-    private function addSingleType(string $name, string $type): self
-    {
-        $this->addArgument(new SingleArgumentDefinition($name, $type));
-
-        return $this;
-    }
-
-    private function addParamType(string $name, string $codename): self
-    {
-        $this->addArgument(new ParameterArgumentDefinition($name, $codename));
-
-        return $this;
-    }
-
     private function addArgument(ArgumentDefinitionInterface $argument): self
     {
         $this->checkArgumentExists($argument);
@@ -520,8 +477,6 @@ class DefinitionBuilder implements DefinitionBuilderInterface
     {
         $argument = $this->getLastArgument();
 
-        $this->checkGuardIsAllowed($rule, $argument);
-
         if (!$argument instanceof ArgumentWithRulesInterface) {
             throw new \LogicException('Only types implementing ArgumentWithRulesInterface can define rules');
         }
@@ -535,8 +490,6 @@ class DefinitionBuilder implements DefinitionBuilderInterface
     {
         $argument = $this->getLastArgument();
 
-        $this->checkGuardIsAllowed($filter, $argument);
-
         if (!$argument instanceof ArgumentWithFiltersInterface) {
             throw new \LogicException('Only types implementing ArgumentWithFiltersInterface can define filters');
         }
@@ -546,19 +499,6 @@ class DefinitionBuilder implements DefinitionBuilderInterface
         return $this;
     }
 
-    private function checkGuardIsAllowed(GuardInterface $guard, ArgumentDefinitionInterface $argument): void
-    {
-        $type    = $argument->getType();
-        $allowed = $guard->getArgumentTypes();
-
-        if (!\in_array($type, $allowed, true)) {
-            throw new \DomainException(sprintf(
-                '"%s" may be applied to these argument types only: "%s"',
-                \get_class($guard),
-                \implode('", "', $allowed)
-            ));
-        }
-    }
 
     private function getLastArgument(): ArgumentDefinitionInterface
     {

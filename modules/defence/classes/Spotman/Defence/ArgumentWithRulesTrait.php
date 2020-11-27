@@ -7,10 +7,12 @@ use Spotman\Defence\Rule\DefinitionRuleInterface;
 
 trait ArgumentWithRulesTrait
 {
+    use ArgumentWithGuardsTrait;
+
     /**
      * @var \Spotman\Defence\Rule\DefinitionRuleInterface[]
      */
-    private $rules = [];
+    private array $rules = [];
 
     /**
      * @param \Spotman\Defence\Rule\DefinitionRuleInterface $rule
@@ -22,6 +24,8 @@ trait ArgumentWithRulesTrait
         if (isset($this->rules[$name])) {
             throw new \LogicException(sprintf('Duplicate rule "%s" for argument "%s"', $name, $this->getName()));
         }
+
+        $this->checkGuardIsAllowed($rule);
 
         $this->rules[$name] = $rule;
     }

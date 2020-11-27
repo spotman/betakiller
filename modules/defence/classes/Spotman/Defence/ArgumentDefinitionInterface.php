@@ -22,7 +22,7 @@ interface ArgumentDefinitionInterface
     // Named collection of scalars
     public const TYPE_COMPOSITE = 'composite';
 
-    // Indexed array of scalars
+    // Indexed array of scalars/params
     public const TYPE_SINGLE_ARRAY = 'single_array';
 
     // Indexed array of composites
@@ -165,6 +165,13 @@ interface ArgumentDefinitionInterface
      * @return bool
      */
     public function isParameter(): bool;
+
+    /**
+     * Returns true if rule defines an array of single values
+     *
+     * @return bool
+     */
+    public function isArray(): bool;
 
     /**
      * Returns true if rule defines an array argument

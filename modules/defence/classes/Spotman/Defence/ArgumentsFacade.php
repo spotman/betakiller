@@ -119,8 +119,8 @@ class ArgumentsFacade
                 // No value, but required => warn
                 throw new \InvalidArgumentException($msg);
             } elseif ($argument->hasDefaultValue()) {
-                // No value, optional, has default value => use default
-                $filtered[$targetKey] = $argument->getDefaultValue();
+                // No value, optional, has default value => use default (process params)
+                $filtered[$targetKey] = $this->processValue($argument, $argument->getDefaultValue(), $parent);
             }
         }
 
@@ -156,6 +156,9 @@ class ArgumentsFacade
             case $argument instanceof SingleArgumentDefinitionInterface:
                 return $this->processSingleValue($argument, $value);
 
+            case $argument instanceof SingleArrayArgumentDefinitionInterface:
+                return $this->processSingleArrayValue($argument, $value);
+
             case $argument instanceof CompositeArgumentDefinitionInterface:
                 return $this->processCompositeValue($argument, $value);
 
@@ -180,6 +183,48 @@ class ArgumentsFacade
         }
 
         return $value;
+    }
+
+    private function processSingleArrayValue(SingleArrayArgumentDefinitionInterface $argument, $values): array
+    {
+        if (\is_object($values)) {
+            // Cast any incoming object to array for simplicity
+            $values = (array)$values;
+        }
+
+        // Check for nested data type
+        if (!\is_array($values)) {
+            throw new \InvalidArgumentException(sprintf(
+                'SingleArray data must be an array for "%s" but "%s" provided: %s',
+                $argument->getName(),
+                \gettype($values),
+                \json_encode($values, JSON_THROW_ON_ERROR)
+            ));
+        }
+
+        // Check array rules
+        $this->checkRules($values, $argument);
+
+        $output = [];
+
+        $nestedArg = $argument->getNested();
+
+        foreach ($values as $itemValue) {
+            $itemValue = $this->processSingleValue($nestedArg, $itemValue);
+
+            // Prevent null values in single arrays
+            if ($itemValue === null) {
+                throw new \InvalidArgumentException(sprintf(
+                    'SingleArray data for "%s" contains NULL item: %s',
+                    $argument->getName(),
+                    \json_encode($values, JSON_THROW_ON_ERROR)
+                ));
+            }
+
+            $output[] = $itemValue;
+        }
+
+        return $output;
     }
 
     private function processCompositeValue(CompositeArgumentDefinitionInterface $argument, $value): ?array
@@ -256,13 +301,23 @@ class ArgumentsFacade
     }
 
     /**
-     * @param \Spotman\Defence\SingleArgumentDefinitionInterface $argument
-     * @param mixed                                              $value
+     * @param \Spotman\Defence\ArgumentDefinitionInterface $argument
+     * @param mixed                                        $value
      *
      * @return mixed
      */
-    private function filterValue(SingleArgumentDefinitionInterface $argument, $value)
+    private function filterValue(ArgumentDefinitionInterface $argument, $value)
     {
+        if (!$argument instanceof ArgumentWithFiltersInterface) {
+            throw new \LogicException(
+                \sprintf(
+                    'Argument "%s" must implement "%s" to process filters',
+                    $argument->getName(),
+                    ArgumentWithFiltersInterface::class
+                )
+            );
+        }
+
         $filters = $argument->getFilters();
 
         if (!$filters) {
@@ -293,13 +348,23 @@ class ArgumentsFacade
     }
 
     /**
-     * @param mixed                                              $value
-     * @param \Spotman\Defence\SingleArgumentDefinitionInterface $argument
+     * @param mixed                                        $value
+     * @param \Spotman\Defence\ArgumentDefinitionInterface $argument
      *
      * @throws \InvalidArgumentException
      */
-    private function checkRules($value, SingleArgumentDefinitionInterface $argument): void
+    private function checkRules($value, ArgumentDefinitionInterface $argument): void
     {
+        if (!$argument instanceof ArgumentWithRulesInterface) {
+            throw new \LogicException(
+                \sprintf(
+                    'Argument "%s" must implement "%s" to process rules',
+                    $argument->getName(),
+                    ArgumentWithRulesInterface::class
+                )
+            );
+        }
+
         foreach ($argument->getRules() as $rule) {
             // Allow empty values in optional arguments
             if (empty($value) && $argument->isOptional()) {

@@ -223,8 +223,8 @@ abstract class AbstractArgumentDefinition implements ArgumentDefinitionInterface
      */
     public function mayHaveDefaultValue(): bool
     {
-        // Only scalar types may have a default value
-        return $this->isScalar();
+        // Only scalar/array types may have a default value
+        return $this->isScalar() || $this->isArray();
     }
 
     /**
@@ -235,5 +235,13 @@ abstract class AbstractArgumentDefinition implements ArgumentDefinitionInterface
     public function isScalar(): bool
     {
         return $this instanceof SingleArgumentDefinitionInterface;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isArray(): bool
+    {
+        return $this instanceof SingleArrayArgumentDefinitionInterface;
     }
 }

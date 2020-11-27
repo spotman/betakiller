@@ -124,6 +124,16 @@ interface DefinitionBuilderInterface
     public function stringArray(string $name): DefinitionBuilderInterface;
 
     /**
+     * Define array of string parameter arguments
+     *
+     * @param string $name
+     * @param string $codename Provider codename
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function paramArray(string $name, string $codename): DefinitionBuilderInterface;
+
+    /**
      * Define indexed array of nested collections like [{}, {}, {}]
      *
      * @param string $name

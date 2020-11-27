@@ -211,6 +211,18 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             [$this->def()->string('a')->uppercase(), 'qwerty', 'QWERTY'],
 
             [$this->def()->param('a', 'string'), 'qwerty', $this->makeStringParamInstance('qwerty')],
+
+            [
+                $this->def()->paramArray('a', 'string'),
+                [
+                    'qwerty',
+                    'zxcvbn',
+                ],
+                [
+                    $this->makeStringParamInstance('qwerty'),
+                    $this->makeStringParamInstance('zxcvbn'),
+                ],
+            ],
         ];
     }
 
@@ -280,6 +292,21 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             'stringArray + default' => [
                 $this->def()->stringArray('a')->optional()->default(['asd', 'qwe']),
                 ['a' => ['asd', 'qwe']],
+            ],
+
+            'paramArray' => [
+                $this->def()->paramArray('a', 'string')->optional(),
+                [],
+            ],
+
+            'paramArray + default' => [
+                $this->def()->paramArray('a', 'string')->optional()->default(['qwerty', 'zxcvbn']),
+                [
+                    'a' => [
+                        $this->makeStringParamInstance('qwerty'),
+                        $this->makeStringParamInstance('zxcvbn'),
+                    ],
+                ],
             ],
 
             'compositeStart' => [
