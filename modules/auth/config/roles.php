@@ -29,11 +29,16 @@ return [
         ],
     ],
 
+    RoleInterface::FORCE_LOGIN => [
+        RoleConfig::OPTION_DESC     => 'Grants access to force login without credentials',
+    ],
+
     RoleInterface::DEVELOPER => [
         RoleConfig::OPTION_DESC     => 'Developer',
         RoleConfig::OPTION_INHERITS => [
             RoleInterface::ADMIN_PANEL, // Developer has access to admin panel
             RoleInterface::USER_MANAGEMENT, // Allow user management for developers
+            RoleInterface::FORCE_LOGIN, // Allow force-login
         ],
     ],
 

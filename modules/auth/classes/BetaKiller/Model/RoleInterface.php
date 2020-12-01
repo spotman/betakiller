@@ -43,6 +43,11 @@ interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, Multi
     public const USER_MANAGEMENT = 'user-management';
 
     /**
+     * This role allows force-login with any user credentials
+     */
+    public const FORCE_LOGIN = 'force-login';
+
+    /**
      * @return string
      */
     public function getName(): string;
