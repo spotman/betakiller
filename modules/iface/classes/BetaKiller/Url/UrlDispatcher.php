@@ -114,13 +114,26 @@ class UrlDispatcher implements UrlDispatcherInterface
 
         $prototype = $this->prototypeService->createPrototypeFromString(sprintf('{%s}', $binding));
 
+        if (\is_array($partValue)) {
+            // TODO Deal with this case (UrlContainer can not handler multiple instances, only the last one is stored)
+            foreach ($partValue as $item) {
+                $this->processQueryPartValue($prototype, $item, $urlParams);
+            }
+        }
+
+        if (\is_string($partValue)) {
+            $this->processQueryPartValue($prototype, $partValue, $urlParams);
+        }
+    }
+
+    private function processQueryPartValue(UrlPrototype $prototype, string $partValue, UrlContainerInterface $urlParams): void
+    {
         $item = $this->prototypeService->createParameterInstance($prototype, $partValue, $urlParams);
 
         if (!$item) {
-            throw new UrlBehaviourException('Can not find item for ":proto" by ":value" in query key ":key"', [
+            throw new UrlBehaviourException('Can not find item for ":proto" by ":value"', [
                 ':proto' => $prototype->asString(),
                 ':value' => $partValue,
-                ':key'   => $key,
             ]);
         }
 

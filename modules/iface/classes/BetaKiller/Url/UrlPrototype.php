@@ -57,7 +57,15 @@ final class UrlPrototype
 
         $string = trim($string, '{}');
 
-        $parsed    = explode(self::KEY_SEPARATOR, $string, 2);
+        $parsed = explode(self::KEY_SEPARATOR, $string, 2);
+
+        if ($parsed === false) {
+            throw new UrlPrototypeException('Key separator ":sep" is missing in URL prototype string ":value"', [
+                ':value' => $string,
+                ':sep'   => self::KEY_SEPARATOR,
+            ]);
+        }
+
         $modelName = $parsed[0];
         $keyPart   = $parsed[1] ?? null;
 
