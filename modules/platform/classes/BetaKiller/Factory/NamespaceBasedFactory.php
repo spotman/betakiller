@@ -182,7 +182,7 @@ final class NamespaceBasedFactory
      * @return mixed
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function create($codename, array $arguments = null)
+    public function create(string $codename, array $arguments = null)
     {
         if (!$codename) {
             throw new FactoryException('Object codename is missing');
@@ -194,7 +194,16 @@ final class NamespaceBasedFactory
             $className = $this->detectClassName($codename);
 
             if ($this->prepareArgumentsCallback) {
-                $arguments = \call_user_func($this->prepareArgumentsCallback, $arguments, $className);
+                $prepArgs = \call_user_func($this->prepareArgumentsCallback, $arguments, $className);
+
+                if ($prepArgs === false) {
+                    throw new FactoryException('Can not prepare arguments for ":class" with :data', [
+                        ':class' => $className,
+                        ':data' => \json_encode($arguments, JSON_THROW_ON_ERROR),
+                    ]);
+                }
+
+                $arguments = $prepArgs;
             }
 
             try {
