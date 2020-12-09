@@ -12,7 +12,7 @@ use BetaKiller\Url\UrlElementException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractLanguageSubRouteAction extends AbstractAction implements AfterDispatchingInterface
+abstract class AbstractLanguageSubRouteItemAction extends AbstractAction implements AfterDispatchingInterface
 {
     /**
      * @inheritDoc
