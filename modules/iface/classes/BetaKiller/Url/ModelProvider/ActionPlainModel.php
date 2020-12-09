@@ -6,8 +6,6 @@ use BetaKiller\Url\ActionModelInterface;
 
 class ActionPlainModel extends AbstractPlainEntityLinkedUrlElement implements ActionModelInterface
 {
-    use HiddenInSitemapUrlElementModelTrait;
-
     /**
      * @return string
      */
