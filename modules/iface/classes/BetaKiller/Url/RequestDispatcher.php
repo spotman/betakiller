@@ -8,42 +8,44 @@ use BetaKiller\Acl\UrlElementAccessResolverInterface;
 use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Factory\UrlElementInstanceFactory;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
 use BetaKiller\Url\Zone\ZoneAccessSpecFactory;
+use Psr\Http\Message\ServerRequestInterface;
 
-class UrlProcessor
+class RequestDispatcher
 {
     /**
      * @var \BetaKiller\Url\UrlDispatcherInterface
      */
-    private $urlDispatcher;
+    private UrlDispatcherInterface $urlDispatcher;
 
     /**
      * @var \BetaKiller\Factory\UrlElementInstanceFactory
      */
-    private $instanceFactory;
+    private UrlElementInstanceFactory $instanceFactory;
 
     /**
      * @var \BetaKiller\Url\Zone\ZoneAccessSpecFactory
      */
-    private $specFactory;
+    private ZoneAccessSpecFactory $specFactory;
 
     /**
      * @var \BetaKiller\Acl\UrlElementAccessResolverInterface
      */
-    private $elementAccessResolver;
+    private UrlElementAccessResolverInterface $elementAccessResolver;
 
     /**
      * @var \BetaKiller\Acl\EntityPermissionResolverInterface
      */
-    private $entityPermissionResolver;
+    private EntityPermissionResolverInterface $entityPermissionResolver;
 
     /**
-     * UrlProcessor constructor.
+     * RequestDispatcher constructor.
      *
      * @param \BetaKiller\Url\UrlDispatcherInterface            $urlDispatcher
      * @param \BetaKiller\Factory\UrlElementInstanceFactory     $instanceFactory
@@ -66,23 +68,22 @@ class UrlProcessor
     }
 
     /**
-     * @param string                                          $url
-     * @param \BetaKiller\Url\UrlElementStack                 $stack
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
-     * @param \BetaKiller\Model\UserInterface                 $user
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\MissingUrlElementException
+     * @throws \BetaKiller\Url\UrlElementException
      * @throws \Spotman\Acl\AclException
      */
-    public function process(
-        string $url,
-        UrlElementStack $stack,
-        UrlContainerInterface $params,
-        UserInterface $user
-    ): void {
+    public function process(ServerRequestInterface $request): void
+    {
+        $stack  = ServerRequestHelper::getUrlElementStack($request);
+        $params = ServerRequestHelper::getUrlContainer($request);
+        $user   = ServerRequestHelper::getUser($request);
+        $url    = ServerRequestHelper::getUrl($request);
+
         $this->urlDispatcher->process($url, $stack, $params);
 
         // Check current user access for all URL elements
@@ -91,7 +92,7 @@ class UrlProcessor
 
             // Process afterDispatching() hooks on every UrlElement in stack
             if ($instance && $instance instanceof AfterDispatchingInterface) {
-                $instance->afterDispatching($stack, $params, $user);
+                $instance->afterDispatching($request);
             }
 
             // Check current user access (may depend on Entities injected in afterDispatching() hook)

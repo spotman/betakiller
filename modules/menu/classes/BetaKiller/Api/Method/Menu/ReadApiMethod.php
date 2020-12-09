@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace BetaKiller\Api\Method\Menu;
 
+use BetaKiller\Acl\UrlElementAccessResolverInterface;
+use BetaKiller\Exception\SecurityException;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\MenuService;
 use BetaKiller\Url\Container\ResolvingUrlContainer;
+use BetaKiller\Url\UrlDispatcherInterface;
 use BetaKiller\Url\UrlElementStack;
-use BetaKiller\Url\UrlProcessor;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\Method\AbstractApiMethod;
 use Spotman\Defence\ArgumentsInterface;
@@ -38,25 +40,33 @@ class ReadApiMethod extends AbstractApiMethod
     /**
      * @var \BetaKiller\Service\MenuService
      */
-    private $service;
+    private MenuService $service;
 
     /**
-     * @var \BetaKiller\Url\UrlProcessor
+     * @var \BetaKiller\Url\UrlDispatcherInterface
      */
-    private $urlProcessor;
+    private UrlDispatcherInterface $urlDispatcher;
+
+    /**
+     * @var \BetaKiller\Acl\UrlElementAccessResolverInterface
+     */
+    private UrlElementAccessResolverInterface $elementAccessResolver;
 
     /**
      * ReadApiMethod constructor.
      *
-     * @param \BetaKiller\Service\MenuService $service
-     * @param \BetaKiller\Url\UrlProcessor    $urlProcessor
+     * @param \BetaKiller\Service\MenuService                   $service
+     * @param \BetaKiller\Url\UrlDispatcherInterface            $urlDispatcher
+     * @param \BetaKiller\Acl\UrlElementAccessResolverInterface $elementAccessResolver
      */
     public function __construct(
         MenuService $service,
-        UrlProcessor $urlProcessor
+        UrlDispatcherInterface $urlDispatcher,
+        UrlElementAccessResolverInterface $elementAccessResolver
     ) {
-        $this->service      = $service;
-        $this->urlProcessor = $urlProcessor;
+        $this->service               = $service;
+        $this->urlDispatcher         = $urlDispatcher;
+        $this->elementAccessResolver = $elementAccessResolver;
     }
 
     /**
@@ -90,7 +100,16 @@ class ReadApiMethod extends AbstractApiMethod
         $stack  = new UrlElementStack($params);
 
         // Parse provided URL for active items detection
-        $this->urlProcessor->process($url, $stack, $params, $user);
+        $this->urlDispatcher->process($url, $stack, $params);
+
+        $urlElement = $stack->getCurrent();
+
+        if (!$this->elementAccessResolver->isAllowed($user, $urlElement, $params)) {
+            throw new SecurityException('Menu for current UrlElement ":name" is not allowed to User ":who"', [
+                ':name' => $urlElement->getCodename(),
+                ':who'  => $user->isGuest() ? 'Guest' : $user->getID(),
+            ]);
+        }
 
         return $this->response(
             $this->service->getItems($menuName, $user, $level, $depth, $params, $stack)

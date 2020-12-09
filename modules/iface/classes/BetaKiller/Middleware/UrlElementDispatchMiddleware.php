@@ -9,12 +9,8 @@ use BetaKiller\Event\UrlDispatchedEvent;
 use BetaKiller\Exception\SeeOtherHttpException;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\MessageBus\EventBusInterface;
-use BetaKiller\Model\LanguageInterface;
-use BetaKiller\Model\UserInterface;
-use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\MissingUrlElementException;
-use BetaKiller\Url\UrlElementStack;
-use BetaKiller\Url\UrlProcessor;
+use BetaKiller\Url\RequestDispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -23,27 +19,27 @@ use Psr\Http\Server\RequestHandlerInterface;
 class UrlElementDispatchMiddleware implements MiddlewareInterface
 {
     /**
-     * @var \BetaKiller\Url\UrlProcessor
+     * @var \BetaKiller\Url\RequestDispatcher
      */
-    private $urlProcessor;
+    private RequestDispatcher $requestDispatcher;
 
     /**
      * @var \BetaKiller\MessageBus\EventBusInterface
      */
-    private $eventBus;
+    private EventBusInterface $eventBus;
 
     /**
      * UrlElementDispatchMiddleware constructor.
      *
-     * @param \BetaKiller\Url\UrlProcessor             $urlProcessor
+     * @param \BetaKiller\Url\RequestDispatcher        $urlProcessor
      * @param \BetaKiller\MessageBus\EventBusInterface $eventBus
      */
     public function __construct(
-        UrlProcessor $urlProcessor,
+        RequestDispatcher $urlProcessor,
         EventBusInterface $eventBus
     ) {
-        $this->urlProcessor = $urlProcessor;
-        $this->eventBus     = $eventBus;
+        $this->requestDispatcher = $urlProcessor;
+        $this->eventBus          = $eventBus;
     }
 
     /**
@@ -57,37 +53,18 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $stack  = ServerRequestHelper::getUrlElementStack($request);
-        $params = ServerRequestHelper::getUrlContainer($request);
-        $user   = ServerRequestHelper::getUser($request);
-        $i18n   = ServerRequestHelper::getI18n($request);
-
-        $this->dispatchRequest($request, $stack, $params, $user);
-
-        /** @var LanguageInterface $lang */
-        $lang = ServerRequestHelper::getEntity($request, LanguageInterface::class);
-
-        // Override i18n language with parsed model (if exists)
-        if ($lang) {
-            $i18n->setLang($lang);
-        }
+        $this->dispatchRequest($request);
 
         // Forward call
         return $handler->handle($request);
     }
 
-    private function dispatchRequest(
-        ServerRequestInterface $request,
-        UrlElementStack $stack,
-        UrlContainerInterface $params,
-        UserInterface $user
-    ): void {
+    private function dispatchRequest(ServerRequestInterface $request): void
+    {
         $pid = RequestProfiler::begin($request, 'UrlElement dispatch');
 
-        $url = ServerRequestHelper::getUrl($request);
-
         try {
-            $this->urlProcessor->process($url, $stack, $params, $user);
+            $this->requestDispatcher->process($request);
 
             // Emit event about successful url parsing
             $this->eventBus->emit(new UrlDispatchedEvent($request));
