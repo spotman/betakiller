@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Url\ModelProvider;
 
-use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementWithLayoutInterface;
@@ -188,17 +187,8 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
         }
 
         // Layout options
-        if ($parent instanceof UrlElementWithLayoutInterface) {
-            if (empty($config[UrlElementWithLayoutInterface::OPTION_LAYOUT])) {
-                $config[UrlElementWithLayoutInterface::OPTION_LAYOUT] = $parent->getLayoutCodename();
-            }
-        }
-
-        // IFace options
-        if ($parent instanceof IFaceModelInterface) {
-            if (empty($config[IFacePlainModel::OPTION_HIDE_IN_SITEMAP])) {
-                $config[IFacePlainModel::OPTION_HIDE_IN_SITEMAP] = $parent->isHiddenInSiteMap();
-            }
+        if ($parent instanceof UrlElementWithLayoutInterface && empty($config[UrlElementWithLayoutInterface::OPTION_LAYOUT])) {
+            $config[UrlElementWithLayoutInterface::OPTION_LAYOUT] = $parent->getLayoutCodename();
         }
 
         return $config;
