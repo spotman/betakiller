@@ -138,16 +138,15 @@ class BarWidget extends AbstractAdminWidget
     }
 
     /**
-     * @param \BetaKiller\Model\UserInterface                 $user
-     * @param \BetaKiller\Helper\UrlHelperInterface           $urlHelper
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
-     * @param \BetaKiller\Helper\I18nHelper                   $i18n
+     * @param \BetaKiller\Model\UserInterface                   $user
+     * @param \BetaKiller\Helper\UrlHelperInterface             $urlHelper
+     * @param \BetaKiller\Url\Container\UrlContainerInterface   $params
+     * @param \BetaKiller\Helper\RequestLanguageHelperInterface $i18n
      *
      * @return array
-     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\I18n\I18nException
      * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
-     * @throws \Spotman\Acl\AclException
      */
     protected function getCreateButtonItems(
         UserInterface $user,
