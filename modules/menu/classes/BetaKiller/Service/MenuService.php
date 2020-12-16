@@ -108,12 +108,13 @@ class MenuService
 
     /**
      * @param string                                          $menuName
-     * @param \BetaKiller\Model\UserInterface                 $user
      * @param int                                             $level Menu level to start (1, 2, 3, etc)
      * @param int                                             $depth Menu depth in levels (1, 2, 3, etc)
      *
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParams
      * @param \BetaKiller\Url\UrlElementStack                 $stack
+     *
+     * @param \BetaKiller\Model\UserInterface                 $user
      *
      * @return \BetaKiller\Menu\MenuItem[]
      * @throws \BetaKiller\Factory\FactoryException
@@ -124,11 +125,11 @@ class MenuService
      */
     public function getItems(
         string $menuName,
-        UserInterface $user,
         int $level,
         int $depth,
         UrlContainerInterface $urlParams,
-        UrlElementStack $stack
+        UrlElementStack $stack,
+        UserInterface $user
     ): array {
         // Get all items with proper 'menu' attribute (merge in root)
         // If level is not null => get only items in provided depth filtered by current stack (search for items in result set)

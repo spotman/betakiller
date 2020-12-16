@@ -5,6 +5,12 @@ namespace BetaKiller\Url;
 
 use Psr\Http\Message\ServerRequestInterface;
 
+/**
+ * Interface AfterDispatchingInterface
+ *
+ * @package    BetaKiller\Url
+ * @deprecated Use AfterUrlDispatchingInterface instead
+ */
 interface AfterDispatchingInterface
 {
     /**
@@ -12,6 +18,7 @@ interface AfterDispatchingInterface
      * Place here the code that needs to be executed on every UrlElement "level" (no need to be the current element)
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @deprecated
      */
     public function afterDispatching(ServerRequestInterface $request): void;
 }

@@ -4,6 +4,7 @@ namespace BetaKiller\Widget\Admin;
 use BetaKiller\Acl\UrlElementAccessResolverInterface;
 use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Helper\I18nHelper;
+use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Helper\UrlHelperInterface;
@@ -152,7 +153,7 @@ class BarWidget extends AbstractAdminWidget
         UserInterface $user,
         UrlHelperInterface $urlHelper,
         UrlContainerInterface $params,
-        I18nHelper $i18n
+        RequestLanguageHelperInterface $i18n
     ): array {
         $items       = [];
         $urlElements = $this->tree->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE,

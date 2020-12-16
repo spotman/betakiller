@@ -6,6 +6,7 @@ namespace BetaKiller\Middleware;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\I18nHelper;
+use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\I18n\I18nFacade;
 use Psr\Http\Message\ResponseInterface;
@@ -21,12 +22,12 @@ class I18nMiddleware implements MiddlewareInterface
     /**
      * @var \BetaKiller\I18n\I18nFacade
      */
-    private $facade;
+    private I18nFacade $facade;
 
     /**
      * @var \BetaKiller\Helper\CookieHelper
      */
-    private $cookies;
+    private CookieHelper $cookies;
 
     /**
      * I18nMiddleware constructor.
@@ -59,12 +60,11 @@ class I18nMiddleware implements MiddlewareInterface
             ? $this->facade->getLanguageByIsoCode($langIsoCode)
             : $this->facade->getPrimaryLanguage(); // App default language as fallback
 
-        $i18n = new I18nHelper($this->facade);
-        $i18n->setLang($lang);
+        $i18n = new I18nHelper($lang);
 
         RequestProfiler::end($pid);
 
-        $response = $handler->handle($request->withAttribute(I18nHelper::class, $i18n));
+        $response = $handler->handle($request->withAttribute(RequestLanguageHelperInterface::class, $i18n));
 
         // Allow other middleware to change language via I18nHelper::setLang()
         return $this->cookies->set(

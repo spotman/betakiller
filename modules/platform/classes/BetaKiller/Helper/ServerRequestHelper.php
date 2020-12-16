@@ -265,14 +265,14 @@ class ServerRequestHelper
         return $request->getHeaderLine('Accept-Language');
     }
 
-    public static function getI18n(ServerRequestInterface $request): I18nHelper
+    public static function getI18n(ServerRequestInterface $request): RequestLanguageHelperInterface
     {
-        return $request->getAttribute(I18nHelper::class);
+        return $request->getAttribute(RequestLanguageHelperInterface::class);
     }
 
     public static function hasI18n(ServerRequestInterface $request): bool
     {
-        return (bool)$request->getAttribute(I18nHelper::class);
+        return (bool)$request->getAttribute(RequestLanguageHelperInterface::class);
     }
 
     public static function hasCsp(ServerRequestInterface $request): bool

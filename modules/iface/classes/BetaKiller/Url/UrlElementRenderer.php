@@ -75,14 +75,14 @@ class UrlElementRenderer implements UrlElementRendererInterface
         $instance     = $this->instanceFactory->createFromUrlElement($urlElement);
 
         // Starting hook
-        if ($instance && $instance instanceof BeforeProcessingInterface) {
+        if ($instance && $instance instanceof BeforeRequestProcessingInterface) {
             $instance->beforeProcessing($request);
         }
 
         $response = $urlProcessor->process($instance, $request);
 
         // Final hook
-        if ($instance && $instance instanceof AfterProcessingInterface) {
+        if ($instance && $instance instanceof AfterRequestProcessingInterface) {
             $instance->afterProcessing($request);
         }
 

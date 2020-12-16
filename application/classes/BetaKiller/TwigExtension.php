@@ -6,10 +6,11 @@ use BetaKiller\Assets\StaticAssets;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\LoggerHelper;
+use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\I18n\I18nFacade;
+use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Security\SecurityConfigInterface;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;
@@ -60,12 +61,18 @@ final class TwigExtension extends AbstractExtension
     private SecurityConfigInterface $securityConfig;
 
     /**
+     * @var \BetaKiller\I18n\I18nFacade
+     */
+    private I18nFacade $i18n;
+
+    /**
      * TwigExtension constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface           $appEnv
      * @param \BetaKiller\Config\AppConfigInterface        $appConfig
      * @param \BetaKiller\Security\SecurityConfigInterface $securityConfig
      * @param \BetaKiller\Widget\WidgetFacade              $widgetFacade
+     * @param \BetaKiller\I18n\I18nFacade                  $i18n
      * @param \BetaKiller\IdentityConverterInterface       $identityConverter
      * @param \Psr\Log\LoggerInterface                     $logger
      */
@@ -74,13 +81,15 @@ final class TwigExtension extends AbstractExtension
         AppConfigInterface $appConfig,
         SecurityConfigInterface $securityConfig,
         WidgetFacade $widgetFacade,
+        I18nFacade $i18n,
         IdentityConverterInterface $identityConverter,
         LoggerInterface $logger
     ) {
         $this->appEnv            = $appEnv;
         $this->appConfig         = $appConfig;
-        $this->securityConfig = $securityConfig;
+        $this->securityConfig    = $securityConfig;
         $this->widgetFacade      = $widgetFacade;
+        $this->i18n              = $i18n;
         $this->logger            = $logger;
         $this->identityConverter = $identityConverter;
     }
@@ -358,7 +367,7 @@ final class TwigExtension extends AbstractExtension
             new TwigFunction(
                 'lang',
                 function (array $context): string {
-                    return $this->getI18n($context)->getLang()->getIsoCode();
+                    return $this->getRequestLang($context)->getIsoCode();
                 },
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),
@@ -624,7 +633,9 @@ final class TwigExtension extends AbstractExtension
 
                 $values = I18nFacade::addPlaceholderPrefixToKeys($values);
 
-                return $this->getI18n($context)->pluralizeKeyName($key, $form ?? current($values), $values);
+                $lang = $this->getRequestLang($context);
+
+                return $this->i18n->pluralizeKeyName($lang, $key, $form ?? current($values), $values);
             }, ['needs_context' => true, 'is_safe' => ['html']]),
 
             /**
@@ -637,7 +648,9 @@ final class TwigExtension extends AbstractExtension
                     $values = I18nFacade::addPlaceholderPrefixToKeys($values);
                 }
 
-                return $this->getI18n($context)->translateKeyName($text, $values);
+                $lang = $this->getRequestLang($context);
+
+                return $this->i18n->translateKeyName($lang, $text, $values);
             }, ['needs_context' => true, 'is_safe' => ['html']]),
 
             /**
@@ -663,9 +676,14 @@ final class TwigExtension extends AbstractExtension
         return $context[IFaceView::REQUEST_KEY];
     }
 
-    private function getI18n(array $context): I18nHelper
+    private function getI18nHelper(array $context): RequestLanguageHelperInterface
     {
         return $context[IFaceView::I18N_KEY];
+    }
+
+    private function getRequestLang(array $context): LanguageInterface
+    {
+        return $this->getI18nHelper($context)->getLang();
     }
 
     private function getStaticAssets(array $context): StaticAssets

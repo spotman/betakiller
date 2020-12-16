@@ -4,25 +4,31 @@ declare(strict_types=1);
 namespace BetaKiller\Action\App\I18n;
 
 use BetaKiller\Action\AbstractAction;
+use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\LanguageInterface;
-use BetaKiller\Url\AfterDispatchingInterface;
+use BetaKiller\Url\AfterUrlDispatchingInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\RequestUserInterface;
 use BetaKiller\Url\UrlElementException;
+use BetaKiller\Url\UrlElementStack;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractLanguageSubRouteItemAction extends AbstractAction implements AfterDispatchingInterface
+abstract class AbstractLanguageSubRouteItemAction extends AbstractAction implements AfterUrlDispatchingInterface
 {
     /**
      * @inheritDoc
      */
-    public function afterDispatching(ServerRequestInterface $request): void
-    {
-        $i18n = ServerRequestHelper::getI18n($request);
-
-        /** @var \BetaKiller\Model\LanguageInterface $lang */
-        $lang = ServerRequestHelper::getEntity($request, LanguageInterface::class);
+    public function afterDispatching(
+        UrlElementStack $stack,
+        UrlContainerInterface $params,
+        RequestUserInterface $user,
+        RequestLanguageHelperInterface $i18n
+    ): void {
+        /** @var \BetaKiller\Model\LanguageInterface|null $lang */
+        $lang = $params->getEntityByClassName(LanguageInterface::class);
 
         if (!$lang) {
             throw new UrlElementException('Can not process subroute coz of missing Language UrlParameter');

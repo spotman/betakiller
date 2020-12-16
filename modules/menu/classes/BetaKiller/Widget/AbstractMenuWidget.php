@@ -47,7 +47,7 @@ abstract class AbstractMenuWidget extends AbstractWidget
         $level        = $context['level'] ?? 1;
         $depth        = $context['depth'] ?? 1;
 
-        $items = $this->service->getItems($menuCodename, $user, $level, $depth, $urlParams, $stack);
+        $items = $this->service->getItems($menuCodename, $level, $depth, $urlParams, $stack, $user);
 
         return [
             'items' => $this->service->convertToJson($items),

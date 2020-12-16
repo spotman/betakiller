@@ -6,11 +6,11 @@ use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Model\ContentPost;
-use BetaKiller\Url\BeforeProcessingInterface;
+use BetaKiller\Url\BeforeRequestProcessingInterface;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PostItemIFace extends AbstractAppBase implements BeforeProcessingInterface
+class PostItemIFace extends AbstractAppBase implements BeforeRequestProcessingInterface
 {
     /**
      * @var \BetaKiller\Helper\AssetsHelper

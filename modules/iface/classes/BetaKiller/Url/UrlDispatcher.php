@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url;
 
+use BetaKiller\Factory\UrlElementInstanceFactory;
+use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -17,45 +19,60 @@ class UrlDispatcher implements UrlDispatcherInterface
     /**
      * @var \BetaKiller\Url\Behaviour\UrlBehaviourFactory
      */
-    private $behaviourFactory;
+    private UrlBehaviourFactory $behaviourFactory;
 
     /**
      * @var \BetaKiller\Url\UrlPrototypeService
      */
-    private $prototypeService;
+    private UrlPrototypeService $prototypeService;
 
     /**
      * @var \BetaKiller\Url\UrlElementTreeInterface
      */
-    private $tree;
+    private UrlElementTreeInterface $tree;
+
+    /**
+     * @var \BetaKiller\Factory\UrlElementInstanceFactory
+     */
+    private UrlElementInstanceFactory $instanceFactory;
 
     /**
      * @param \BetaKiller\Url\UrlElementTreeInterface       $tree
      * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
      * @param \BetaKiller\Url\UrlPrototypeService           $prototypeService
+     * @param \BetaKiller\Factory\UrlElementInstanceFactory $instanceFactory
      */
     public function __construct(
         UrlElementTreeInterface $tree,
         UrlBehaviourFactory $behaviourFactory,
-        UrlPrototypeService $prototypeService
+        UrlPrototypeService $prototypeService,
+        UrlElementInstanceFactory $instanceFactory
     ) {
         $this->tree             = $tree;
         $this->behaviourFactory = $behaviourFactory;
         $this->prototypeService = $prototypeService;
+        $this->instanceFactory  = $instanceFactory;
     }
 
     /**
-     * @param string                                          $uri
+     * @param string                                            $uri
      *
-     * @param \BetaKiller\Url\UrlElementStack                 $stack
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     * @param \BetaKiller\Url\UrlElementStack                   $stack
+     * @param \BetaKiller\Url\Container\UrlContainerInterface   $params
+     * @param \BetaKiller\Url\RequestUserInterface              $user
+     * @param \BetaKiller\Helper\RequestLanguageHelperInterface $i18n
      *
      * @return void
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\MissingUrlElementException
      */
-    public function process(string $uri, UrlElementStack $stack, UrlContainerInterface $params): void
-    {
+    public function process(
+        string $uri,
+        UrlElementStack $stack,
+        UrlContainerInterface $params,
+        RequestUserInterface $user,
+        RequestLanguageHelperInterface $i18n
+    ): void {
         // Prevent XSS via URL
         $uri = htmlspecialchars($uri, ENT_QUOTES);
 
@@ -72,6 +89,16 @@ class UrlDispatcher implements UrlDispatcherInterface
             $last = $stack->hasCurrent() ? $stack->getCurrent() : null;
 
             throw new MissingUrlElementException($params, $last, false, $e);
+        }
+
+        // Check current user access for all URL elements
+        foreach ($stack as $urlElement) {
+            $instance = $this->instanceFactory->createFromUrlElement($urlElement);
+
+            // Process afterDispatching() hooks on every UrlElement in stack
+            if ($instance && $instance instanceof AfterUrlDispatchingInterface) {
+                $instance->afterDispatching($stack, $params, $user, $i18n);
+            }
         }
     }
 
@@ -126,8 +153,11 @@ class UrlDispatcher implements UrlDispatcherInterface
         }
     }
 
-    private function processQueryPartValue(UrlPrototype $prototype, string $partValue, UrlContainerInterface $urlParams): void
-    {
+    private function processQueryPartValue(
+        UrlPrototype $prototype,
+        string $partValue,
+        UrlContainerInterface $urlParams
+    ): void {
         $item = $this->prototypeService->createParameterInstance($prototype, $partValue, $urlParams);
 
         if (!$item) {

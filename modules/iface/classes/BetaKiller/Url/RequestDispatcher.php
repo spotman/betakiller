@@ -7,7 +7,6 @@ use BetaKiller\Acl\EntityPermissionResolverInterface;
 use BetaKiller\Acl\UrlElementAccessResolverInterface;
 use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\CrudlsActionsInterface;
-use BetaKiller\Factory\UrlElementInstanceFactory;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
@@ -23,11 +22,6 @@ class RequestDispatcher
      * @var \BetaKiller\Url\UrlDispatcherInterface
      */
     private UrlDispatcherInterface $urlDispatcher;
-
-    /**
-     * @var \BetaKiller\Factory\UrlElementInstanceFactory
-     */
-    private UrlElementInstanceFactory $instanceFactory;
 
     /**
      * @var \BetaKiller\Url\Zone\ZoneAccessSpecFactory
@@ -55,13 +49,11 @@ class RequestDispatcher
      */
     public function __construct(
         UrlDispatcherInterface $urlDispatcher,
-        UrlElementInstanceFactory $instanceFactory,
         UrlElementAccessResolverInterface $elementAccessResolver,
         EntityPermissionResolverInterface $entityPermissionResolver,
         ZoneAccessSpecFactory $specFactory
     ) {
         $this->urlDispatcher            = $urlDispatcher;
-        $this->instanceFactory          = $instanceFactory;
         $this->elementAccessResolver    = $elementAccessResolver;
         $this->entityPermissionResolver = $entityPermissionResolver;
         $this->specFactory              = $specFactory;
@@ -82,19 +74,13 @@ class RequestDispatcher
         $stack  = ServerRequestHelper::getUrlElementStack($request);
         $params = ServerRequestHelper::getUrlContainer($request);
         $user   = ServerRequestHelper::getUser($request);
+        $i18n   = ServerRequestHelper::getI18n($request);
         $url    = ServerRequestHelper::getUrl($request);
 
-        $this->urlDispatcher->process($url, $stack, $params);
+        $this->urlDispatcher->process($url, $stack, $params, $user, $i18n);
 
         // Check current user access for all URL elements
         foreach ($stack as $urlElement) {
-            $instance = $this->instanceFactory->createFromUrlElement($urlElement);
-
-            // Process afterDispatching() hooks on every UrlElement in stack
-            if ($instance && $instance instanceof AfterDispatchingInterface) {
-                $instance->afterDispatching($request);
-            }
-
             // Check current user access (may depend on Entities injected in afterDispatching() hook)
             $this->checkUrlElementAccess($urlElement, $params, $user);
         }
@@ -170,7 +156,7 @@ class RequestDispatcher
      *
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
      */
-    public function forceAuthorizationIfNeeded(UrlElementInterface $urlElement, UserInterface $user): void
+    private function forceAuthorizationIfNeeded(UrlElementInterface $urlElement, UserInterface $user): void
     {
         $zoneSpec = $this->specFactory->createFromUrlElement($urlElement);
 

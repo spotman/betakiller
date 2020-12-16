@@ -5,7 +5,7 @@ namespace BetaKiller\Url;
 
 use Psr\Http\Message\ServerRequestInterface;
 
-interface BeforeProcessingInterface
+interface BeforeRequestProcessingInterface
 {
     /**
      * This hook executed before UrlElement processing (on every request regardless of caching)

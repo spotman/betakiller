@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Url;
 
 use BetaKiller\Helper\LoggerHelper;
+use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
 use Psr\Log\LoggerInterface;
@@ -54,21 +55,28 @@ class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
     }
 
     /**
-     * @param string                                          $uri
+     * @param string                                            $uri
      *
-     * @param \BetaKiller\Url\UrlElementStack                 $stack
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     * @param \BetaKiller\Url\UrlElementStack                   $stack
+     * @param \BetaKiller\Url\Container\UrlContainerInterface   $params
+     * @param \BetaKiller\Url\RequestUserInterface              $user
+     * @param \BetaKiller\Helper\RequestLanguageHelperInterface $i18n
      *
      * @return void
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function process(string $uri, UrlElementStack $stack, UrlContainerInterface $params): void
-    {
+    public function process(
+        string $uri,
+        UrlElementStack $stack,
+        UrlContainerInterface $params,
+        RequestUserInterface $user,
+        RequestLanguageHelperInterface $i18n
+    ): void {
         $cacheKey = $this->getUrlCacheKey($uri);
 
         // Check cache for stack and url params for current URL
         if (!$this->restoreDataFromCache($cacheKey, $stack, $params)) {
-            $this->proxy->process($uri, $stack, $params);
+            $this->proxy->process($uri, $stack, $params, $user, $i18n);
 
             // Cache stack + url parameters (between HTTP requests) for current URL
             $this->storeDataInCache($cacheKey, $params, $stack);

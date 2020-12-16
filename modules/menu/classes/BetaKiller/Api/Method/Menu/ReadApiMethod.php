@@ -5,6 +5,7 @@ namespace BetaKiller\Api\Method\Menu;
 
 use BetaKiller\Acl\UrlElementAccessResolverInterface;
 use BetaKiller\Exception\SecurityException;
+use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\MenuService;
 use BetaKiller\Url\Container\ResolvingUrlContainer;
@@ -98,9 +99,10 @@ class ReadApiMethod extends AbstractApiMethod
 
         $params = ResolvingUrlContainer::create();
         $stack  = new UrlElementStack($params);
+        $i18n   = new I18nHelper($user->getLanguage());
 
         // Parse provided URL for active items detection
-        $this->urlDispatcher->process($url, $stack, $params);
+        $this->urlDispatcher->process($url, $stack, $params, $user, $i18n);
 
         $urlElement = $stack->getCurrent();
 
@@ -112,7 +114,7 @@ class ReadApiMethod extends AbstractApiMethod
         }
 
         return $this->response(
-            $this->service->getItems($menuName, $user, $level, $depth, $params, $stack)
+            $this->service->getItems($menuName, $level, $depth, $params, $stack, $user)
         );
     }
 }

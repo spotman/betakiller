@@ -5,10 +5,10 @@ use BetaKiller\Auth\UserUrlDetectorInterface;
 use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\AbstractIFace;
-use BetaKiller\Url\BeforeProcessingInterface;
+use BetaKiller\Url\BeforeRequestProcessingInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class LoginIFace extends AbstractIFace implements BeforeProcessingInterface
+class LoginIFace extends AbstractIFace implements BeforeRequestProcessingInterface
 {
     public const URL = '/login/';
 

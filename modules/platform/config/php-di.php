@@ -13,6 +13,7 @@ use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\LoggerHelper;
+use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\IdentityConverterInterface;
 use BetaKiller\MessageBus\EventSerializerInterface;
 use BetaKiller\MessageBus\NativeEventSerializer;
@@ -160,6 +161,10 @@ return [
 
         I18nHelper::class => factory(static function () {
             throw new Exception(I18nHelper::class.' DI injection deprecated, use ServerRequestHelper::getI18n() instead');
+        }),
+
+        RequestLanguageHelperInterface::class => factory(static function () {
+            throw new Exception(RequestLanguageHelperInterface::class.' DI injection deprecated, use ServerRequestHelper::getI18n() instead');
         }),
 
         EntityFactoryInterface::class => autowire(EntityFactory::class),
