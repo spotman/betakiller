@@ -244,11 +244,10 @@ class AppEnv implements AppEnvInterface
     }
 
     /**
-     * @param string    $name
+     * @param string      $name
      *
-     * @param bool|null $required
-     *
-     * @param string    $default
+     * @param bool|null   $required
+     * @param string|null $default
      *
      * @return null|string
      */
