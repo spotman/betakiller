@@ -22,6 +22,10 @@ class TextHelper
             Transliterator::FORWARD
         );
 
+        if (!$trans) {
+            throw new \LogicException('Can not create Transliterator');
+        }
+
         return $trans->transliterate($utf8);
     }
 
@@ -91,5 +95,22 @@ class TextHelper
     public static function contains(string $haystack, string $needle): bool
     {
         return \strpos($haystack, $needle) !== false;
+    }
+
+    /**
+     * @param string $haystack
+     * @param string $needle
+     * @param string $replace
+     *
+     * @return string
+     * @see https://stackoverflow.com/a/1252710
+     */
+    public static function replaceFirst(string $haystack, string $needle, string $replace): string
+    {
+        $pos = strpos($haystack, $needle);
+
+        return $pos !== false
+            ? substr_replace($haystack, $replace, $pos, strlen($needle))
+            : $haystack;
     }
 }

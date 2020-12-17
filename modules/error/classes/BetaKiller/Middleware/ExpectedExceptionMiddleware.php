@@ -12,7 +12,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Diactoros\Response\RedirectResponse;
 
-class ExpectedExceptionMiddleware implements MiddlewareInterface
+final class ExpectedExceptionMiddleware implements MiddlewareInterface
 {
     /**
      * Process an incoming server request and return a response, optionally delegating

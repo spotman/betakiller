@@ -5,6 +5,7 @@ namespace BetaKiller\Task\Cache;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Middleware\PhpBuiltInServerMiddleware;
 use BetaKiller\Service\HttpClientService;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
@@ -231,7 +232,7 @@ class Warmup extends AbstractTask
     private function canConnectToServer(): bool
     {
         // Disable error handler for now
-        set_error_handler(function () {
+        set_error_handler(static function () {
             return true;
         });
 
@@ -253,6 +254,12 @@ class Warmup extends AbstractTask
     private function warmupUrl(string $url): void
     {
         $response = $this->makeHttpRequest($url);
+
+        if (!$response->hasHeader(PhpBuiltInServerMiddleware::HTTP_HEADER_NAME)) {
+            throw new TaskException('Missing marker HTTP header from built-in web-server for :url', [
+                ':url' => $url,
+            ]);
+        }
 
         $status = $response->getStatusCode();
 
@@ -331,9 +338,34 @@ class Warmup extends AbstractTask
         // see https://github.com/guzzle/guzzle/issues/590
         return $this->httpClient->syncGet($url, $this->cookieJar, [
             'curl' => [
+                // Limit to HTTP only
+                \CURLOPT_PROTOCOLS       => \CURLPROTO_HTTP,
+                \CURLOPT_REDIR_PROTOCOLS => \CURLPROTO_HTTP,
+
+                // Force DNS to point to built-in server
+                \CURLOPT_RESOLVE         => [
+                    implode(':', [
+                        \parse_url($url, \PHP_URL_HOST),
+                        $this->serverPort,
+                        $this->serverHost,
+                    ]),
+                ],
+
                 // No SSL is using so no checks
-                \CURLOPT_SSL_VERIFYHOST => false,
-                \CURLOPT_SSL_VERIFYPEER => false,
+                \CURLOPT_SSL_VERIFYHOST  => false,
+                \CURLOPT_SSL_VERIFYPEER  => false,
+
+                // Allow redirects
+                \CURLOPT_FOLLOWLOCATION  => true,
+                \CURLOPT_RETURNTRANSFER  => true,
+
+                // Force host/port for redirects
+//                \CURLOPT_INTERFACE       => $this->serverHost,
+
+                \CURLOPT_PROXY     => $this->serverHost,
+                \CURLOPT_PROXYPORT => $this->serverPort,
+
+                \CURLOPT_VERBOSE => $this->appEnv->isDebugEnabled(),
             ],
         ]);
     }

@@ -23,6 +23,7 @@ use BetaKiller\Middleware\ExpectedExceptionMiddleware;
 use BetaKiller\Middleware\FallbackErrorMiddleware;
 use BetaKiller\Middleware\I18nMiddleware;
 use BetaKiller\Middleware\MaintenanceModeMiddleware;
+use BetaKiller\Middleware\PhpBuiltInServerMiddleware;
 use BetaKiller\Middleware\ProfilerMiddleware;
 use BetaKiller\Middleware\RequestUserMiddleware;
 use BetaKiller\Middleware\RequestUuidMiddleware;
@@ -86,6 +87,9 @@ class WebApp
 
         // Profiling
         $this->app->pipe(ProfilerMiddleware::class);
+
+        // Marker header for built-in PHP web-server
+        $this->app->pipe(PhpBuiltInServerMiddleware::class);
 
         // Generate and bind request ID
         $this->app->pipe(RequestUuidMiddleware::class);
