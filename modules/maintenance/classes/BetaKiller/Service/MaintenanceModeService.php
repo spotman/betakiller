@@ -92,7 +92,7 @@ final class MaintenanceModeService
 
         \clearstatcache(true, $file);
 
-        if (!\file_exists($file) || !\is_readable($file)) {
+        if (!\is_file($file) || !\is_readable($file)) {
             throw new \LogicException('Maintenance mode file is not readable by web-server');
         }
     }
@@ -103,7 +103,7 @@ final class MaintenanceModeService
 
         \clearstatcache(true, $file);
 
-        if (!\file_exists($file)) {
+        if (!\is_file($file)) {
             // No file => no maintenance mode
             return null;
         }
@@ -126,7 +126,9 @@ final class MaintenanceModeService
     {
         $file = $this->getFilePath();
 
-        if (\file_exists($file)) {
+        \clearstatcache(true, $file);
+
+        if (\is_file($file)) {
             // No file => maintenance mode mode off
             \unlink($file);
         }
@@ -134,13 +136,7 @@ final class MaintenanceModeService
 
     private function getFilePath(): string
     {
-        $name = implode('.', [
-            $this->appEnv->getAppCodename(),
-            $this->appEnv->getModeName(),
-            'maintenance',
-        ]);
-
         // Store file in a /tmp with prefix from project name and env
-        return $this->appEnv->getTempPath($name);
+        return $this->appEnv->getTempPath('maintenance');
     }
 }
