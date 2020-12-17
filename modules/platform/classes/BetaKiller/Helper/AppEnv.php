@@ -180,31 +180,21 @@ class AppEnv implements AppEnvInterface
      */
     public function isCli(): bool
     {
-        if (PHP_SAPI === 'cli') {
-            return true;
-        }
-
         if ($this->isInternalWebServer()) {
             return false;
         }
 
-        if (\defined('STDIN')) {
-            return true;
-        }
+        switch (true) {
+            case PHP_SAPI === 'cli':
+            case \defined('STDIN'):
+            case array_key_exists('SHELL', $_ENV):
+            case empty($_SERVER['REMOTE_ADDR']) && empty($_SERVER['HTTP_USER_AGENT']) && \count($_SERVER['argv']) > 0:
+            case !array_key_exists('REQUEST_METHOD', $_SERVER):
+                return true;
 
-        if (array_key_exists('SHELL', $_ENV)) {
-            return true;
+            default:
+                return false;
         }
-
-        if (empty($_SERVER['REMOTE_ADDR']) && empty($_SERVER['HTTP_USER_AGENT']) && \count($_SERVER['argv']) > 0) {
-            return true;
-        }
-
-        if (!array_key_exists('REQUEST_METHOD', $_SERVER)) {
-            return true;
-        }
-
-        return false;
     }
 
     public function getAppRootPath(): string
