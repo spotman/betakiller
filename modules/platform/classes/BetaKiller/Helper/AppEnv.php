@@ -358,7 +358,7 @@ class AppEnv implements AppEnvInterface
         // Get base directory
         $dir = \dirname($filePath);
 
-        if (!file_exists($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
+        if (!is_dir($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $dir));
         }
     }
