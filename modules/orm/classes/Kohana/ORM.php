@@ -1763,12 +1763,12 @@ class Kohana_ORM extends Model implements Serializable {
 
 	protected function _serialize_value($value)
 	{
-		return json_encode($value);
+		return json_encode($value, JSON_THROW_ON_ERROR);
 	}
 
 	protected function _unserialize_value($value)
 	{
-		return json_decode($value, TRUE);
+		return json_decode($value, true, 512, JSON_THROW_ON_ERROR);
 	}
 
 	public function object_name()
