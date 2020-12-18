@@ -1768,7 +1768,9 @@ class Kohana_ORM extends Model implements Serializable {
 
 	protected function _unserialize_value($value)
 	{
-		return json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+		return $value
+            ? json_decode($value, true, 512, JSON_THROW_ON_ERROR)
+            : [];
 	}
 
 	public function object_name()
