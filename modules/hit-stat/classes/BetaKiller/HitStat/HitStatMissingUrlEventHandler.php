@@ -3,39 +3,38 @@ namespace BetaKiller\HitStat;
 
 use BetaKiller\Event\MissingUrlEvent;
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Repository\HitPageRepository;
+use BetaKiller\Repository\HitPageRepositoryInterface;
 use BetaKiller\Service\HitService;
 
-class HitStatMissingUrlEventHandler
+final class HitStatMissingUrlEventHandler
 {
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
-    private $appEnv;
+    private AppEnvInterface $appEnv;
 
     /**
-     * @var \BetaKiller\Repository\HitPageRepository
+     * @var \BetaKiller\Repository\HitPageRepositoryInterface
      */
-    private $pageRepo;
+    private HitPageRepositoryInterface $pageRepo;
 
     /**
      * @var \BetaKiller\Service\HitService
      */
-    private $service;
+    private HitService $service;
 
     /**
      * HitStatMissingUrlEventHandler constructor.
      *
-     * @param AppEnvInterface                          $appEnv
-     * @param \BetaKiller\Repository\HitPageRepository $pageRepo
-     * @param \BetaKiller\Service\HitService           $service
+     * @param AppEnvInterface                                   $appEnv
+     * @param \BetaKiller\Repository\HitPageRepositoryInterface $pageRepo
+     * @param \BetaKiller\Service\HitService                    $service
      */
     public function __construct(
         AppEnvInterface $appEnv,
-        HitPageRepository $pageRepo,
+        HitPageRepositoryInterface $pageRepo,
         HitService $service
     ) {
-
         $this->appEnv   = $appEnv;
         $this->pageRepo = $pageRepo;
         $this->service  = $service;

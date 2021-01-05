@@ -14,7 +14,7 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
  * @method HitPageInterface[] getAll()
  * @method void save(HitPageInterface $entity)
  */
-final class HitPageRepository extends AbstractOrmBasedRepository
+final class HitPageRepository extends AbstractOrmBasedRepository implements HitPageRepositoryInterface
 {
     public function findByUri(HitDomain $domain, string $uri): ?HitPageInterface
     {
@@ -28,7 +28,7 @@ final class HitPageRepository extends AbstractOrmBasedRepository
 
     private function filterDomain(OrmInterface $orm, HitDomain $domain): self
     {
-        $this->filterRelated($orm, HitPage::RELATION_DOMAIN, $domain);
+        $this->filterRelated($orm, HitPage::REL_DOMAIN, $domain);
 
         return $this;
     }

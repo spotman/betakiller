@@ -6,10 +6,9 @@ namespace BetaKiller\Task\HitStat;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\HitInterface;
-use BetaKiller\Model\HitPage;
 use BetaKiller\Model\HitPageInterface;
 use BetaKiller\Repository\HitLinkRepository;
-use BetaKiller\Repository\HitPageRepository;
+use BetaKiller\Repository\HitPageRepositoryInterface;
 use BetaKiller\Repository\HitRepository;
 use BetaKiller\Repository\UserSessionRepository;
 use BetaKiller\Service\HitService;
@@ -62,7 +61,7 @@ class ProcessHits extends AbstractTask
     private $sessionRepo;
 
     /**
-     * @var \BetaKiller\Repository\HitPageRepository
+     * @var \BetaKiller\Repository\HitPageRepositoryInterface
      */
     private $pageRepo;
 
@@ -79,17 +78,17 @@ class ProcessHits extends AbstractTask
     /**
      * ProcessHits constructor.
      *
-     * @param \BetaKiller\Repository\HitRepository         $hitsRepository
-     * @param \BetaKiller\Repository\HitPageRepository     $pageRepo
-     * @param \BetaKiller\Repository\HitLinkRepository     $linkRepo
-     * @param \BetaKiller\Repository\UserSessionRepository $sessionRepo
-     * @param \BetaKiller\Service\HitService               $service
-     * @param \BetaKiller\Helper\NotificationHelper        $notification
-     * @param \Psr\Log\LoggerInterface                     $logger
+     * @param \BetaKiller\Repository\HitRepository              $hitsRepository
+     * @param \BetaKiller\Repository\HitPageRepositoryInterface $pageRepo
+     * @param \BetaKiller\Repository\HitLinkRepository          $linkRepo
+     * @param \BetaKiller\Repository\UserSessionRepository      $sessionRepo
+     * @param \BetaKiller\Service\HitService                    $service
+     * @param \BetaKiller\Helper\NotificationHelper             $notification
+     * @param \Psr\Log\LoggerInterface                          $logger
      */
     public function __construct(
         HitRepository $hitsRepository,
-        HitPageRepository $pageRepo,
+        HitPageRepositoryInterface $pageRepo,
         HitLinkRepository $linkRepo,
         UserSessionRepository $sessionRepo,
         HitService $service,

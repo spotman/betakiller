@@ -1,8 +1,10 @@
 <?php
 namespace BetaKiller\Model;
 
-class HitDomain extends \ORM
+final class HitDomain extends \ORM
 {
+    public const TABLE_NAME = 'stat_hit_domains';
+
     /**
      * Prepares the model database connection, determines the table name,
      * and loads column information.
@@ -11,7 +13,7 @@ class HitDomain extends \ORM
      */
     protected function configure(): void
     {
-        $this->_table_name = 'stat_hit_domains';
+        $this->_table_name = self::TABLE_NAME;
     }
 
     public function setName(string $name): HitDomain

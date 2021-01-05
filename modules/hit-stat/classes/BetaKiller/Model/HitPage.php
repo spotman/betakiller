@@ -2,53 +2,55 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Uri;
-use function mb_strimwidth;
 use Psr\Http\Message\UriInterface;
+use function mb_strimwidth;
 
 final class HitPage extends \ORM implements HitPageInterface
 {
-    public const RELATION_DOMAIN   = 'domain';
-    public const RELATION_REDIRECT = 'redirect';
+    public const TABLE_NAME = 'stat_hit_pages';
 
-    private const FIELD_DOMAIN_ID   = 'domain_id';
-    private const FIELD_IS_MISSING  = 'is_missing';
-    private const FIELD_IS_IGNORED  = 'is_ignored';
-    private const FIELD_REDIRECT_ID = 'redirect_id';
+    public const REL_DOMAIN   = 'domain';
+    public const REL_REDIRECT = 'redirect';
+
+    public const COL_DOMAIN_ID   = 'domain_id';
+    public const COL_IS_MISSING  = 'is_missing';
+    public const COL_IS_IGNORED  = 'is_ignored';
+    public const COL_REDIRECT_ID = 'redirect_id';
 
     /**
      * Prepares the model database connection, determines the table name,
      * and loads column information.
      *
-     * @throws \Exception
      * @return void
+     * @throws \Exception
      */
     protected function configure(): void
     {
-        $this->_table_name = 'stat_hit_pages';
+        $this->_table_name = self::TABLE_NAME;
 
         $this->belongs_to([
-            self::RELATION_DOMAIN => [
+            self::REL_DOMAIN => [
                 'model'       => 'HitDomain',
-                'foreign_key' => self::FIELD_DOMAIN_ID,
+                'foreign_key' => self::COL_DOMAIN_ID,
             ],
         ]);
 
         $this->belongs_to([
-            self::RELATION_REDIRECT => [
+            self::REL_REDIRECT => [
                 'model'       => 'HitPageRedirect',
-                'foreign_key' => self::FIELD_REDIRECT_ID,
+                'foreign_key' => self::COL_REDIRECT_ID,
             ],
         ]);
 
         $this->load_with([
-            self::RELATION_DOMAIN,
-            self::RELATION_REDIRECT,
+            self::REL_DOMAIN,
+            self::REL_REDIRECT,
         ]);
     }
 
     public function setDomain(HitDomain $domain): HitPageInterface
     {
-        $this->set(self::RELATION_DOMAIN, $domain);
+        $this->set(self::REL_DOMAIN, $domain);
 
         return $this;
     }
@@ -89,12 +91,12 @@ final class HitPage extends \ORM implements HitPageInterface
 
     public function isIgnored(): bool
     {
-        return $this->getDomain()->isIgnored() || (bool)$this->get(self::FIELD_IS_IGNORED);
+        return $this->getDomain()->isIgnored() || (bool)$this->get(self::COL_IS_IGNORED);
     }
 
     public function markAsIgnored(): HitPageInterface
     {
-        $this->set(self::FIELD_IS_IGNORED, true);
+        $this->set(self::COL_IS_IGNORED, true);
 
         return $this;
     }
@@ -115,19 +117,19 @@ final class HitPage extends \ORM implements HitPageInterface
 
     public function isMissing(): bool
     {
-        return (bool)$this->get(self::FIELD_IS_MISSING);
+        return (bool)$this->get(self::COL_IS_MISSING);
     }
 
     public function setRedirect(HitPageRedirectInterface $redirect): HitPageInterface
     {
-        $this->set(self::RELATION_REDIRECT, $redirect);
+        $this->set(self::REL_REDIRECT, $redirect);
 
         return $this;
     }
 
     public function getRedirect(): ?HitPageRedirectInterface
     {
-        return $this->getRelatedEntity(self::RELATION_REDIRECT, true);
+        return $this->getRelatedEntity(self::REL_REDIRECT, true);
     }
 
     public function setLastSeenAt(\DateTimeImmutable $dateTime): HitPageInterface
@@ -168,12 +170,12 @@ final class HitPage extends \ORM implements HitPageInterface
      */
     private function getDomain(): HitDomain
     {
-        return $this->getRelatedEntity(self::RELATION_DOMAIN);
+        return $this->getRelatedEntity(self::REL_DOMAIN);
     }
 
     private function setIsMissing(bool $value): HitPage
     {
-        $this->set(self::FIELD_IS_MISSING, $value);
+        $this->set(self::COL_IS_MISSING, $value);
 
         return $this;
     }

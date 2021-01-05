@@ -16,7 +16,7 @@ use BetaKiller\Repository\HitDomainRepository;
 use BetaKiller\Repository\HitLinkRepository;
 use BetaKiller\Repository\HitMarkerRepository;
 use BetaKiller\Repository\HitPageRedirectRepository;
-use BetaKiller\Repository\HitPageRepository;
+use BetaKiller\Repository\HitPageRepositoryInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use DateTimeImmutable;
 use Psr\Http\Message\UriInterface;
@@ -29,7 +29,7 @@ class HitService
     private $domainRepo;
 
     /**
-     * @var \BetaKiller\Repository\HitPageRepository
+     * @var \BetaKiller\Repository\HitPageRepositoryInterface
      */
     private $pageRepo;
 
@@ -56,15 +56,15 @@ class HitService
     /**
      * HitService constructor.
      *
-     * @param \BetaKiller\Repository\HitPageRepository         $pageRepo
-     * @param \BetaKiller\Repository\HitDomainRepository       $domainRepo
-     * @param \BetaKiller\Repository\HitLinkRepository         $linkRepo
-     * @param \BetaKiller\Repository\HitMarkerRepository       $markerRepo
-     * @param \BetaKiller\Repository\HitPageRedirectRepository $redirectRepo
-     * @param \BetaKiller\Config\AppConfigInterface            $appConfig
+     * @param \BetaKiller\Repository\HitPageRepositoryInterface $pageRepo
+     * @param \BetaKiller\Repository\HitDomainRepository        $domainRepo
+     * @param \BetaKiller\Repository\HitLinkRepository          $linkRepo
+     * @param \BetaKiller\Repository\HitMarkerRepository        $markerRepo
+     * @param \BetaKiller\Repository\HitPageRedirectRepository  $redirectRepo
+     * @param \BetaKiller\Config\AppConfigInterface             $appConfig
      */
     public function __construct(
-        HitPageRepository $pageRepo,
+        HitPageRepositoryInterface $pageRepo,
         HitDomainRepository $domainRepo,
         HitLinkRepository $linkRepo,
         HitMarkerRepository $markerRepo,
