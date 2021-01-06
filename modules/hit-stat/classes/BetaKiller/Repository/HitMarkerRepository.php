@@ -4,6 +4,7 @@ namespace BetaKiller\Repository;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\HitMarker;
 use BetaKiller\Model\HitMarkerInterface;
+use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 /**
  * Class HitMarkerRepository
@@ -16,9 +17,9 @@ use BetaKiller\Model\HitMarkerInterface;
 class HitMarkerRepository extends AbstractOrmBasedRepository
 {
     public function find(
-        string $source,
-        string $medium,
-        string $campaign,
+        ?string $source,
+        ?string $medium,
+        ?string $campaign,
         ?string $content,
         ?string $term
     ): ?HitMarkerInterface {
@@ -35,72 +36,65 @@ class HitMarkerRepository extends AbstractOrmBasedRepository
 
     /**
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
-     * @param string                                 $value
+     * @param string|null                            $value
      *
      * @return \BetaKiller\Repository\HitMarkerRepository
      */
-    private function filterSource(ExtendedOrmInterface $orm, string $value): self
+    private function filterSource(ExtendedOrmInterface $orm, ?string $value): self
     {
-        $orm->where($orm->object_column(HitMarker::FIELD_SOURCE), '=', $value);
-
-        return $this;
+        return $this->filterUtmFieldValue($orm, HitMarker::COL_SOURCE, $value);
     }
 
     /**
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
-     * @param string                                 $value
+     * @param string|null                            $value
      *
      * @return \BetaKiller\Repository\HitMarkerRepository
      */
-    private function filterMedium(ExtendedOrmInterface $orm, string $value): self
+    private function filterMedium(ExtendedOrmInterface $orm, ?string $value): self
     {
-        $orm->where($orm->object_column(HitMarker::FIELD_MEDIUM), '=', $value);
-
-        return $this;
+        return $this->filterUtmFieldValue($orm, HitMarker::COL_MEDIUM, $value);
     }
 
     /**
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
-     * @param string                                 $value
+     * @param string|null                            $value
      *
      * @return \BetaKiller\Repository\HitMarkerRepository
      */
-    private function filterCampaign(ExtendedOrmInterface $orm, string $value): self
+    private function filterCampaign(ExtendedOrmInterface $orm, ?string $value): self
     {
-        $orm->where($orm->object_column(HitMarker::FIELD_CAMPAIGN), '=', $value);
-
-        return $this;
+        return $this->filterUtmFieldValue($orm, HitMarker::COL_CAMPAIGN, $value);
     }
 
     /**
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
-     * @param string                                 $value
+     * @param string|null                            $value
      *
      * @return \BetaKiller\Repository\HitMarkerRepository
      */
     private function filterContent(ExtendedOrmInterface $orm, ?string $value): self
     {
-        if ($value === null) {
-            $orm->where($orm->object_column(HitMarker::FIELD_CONTENT), 'is', null);
-        } else {
-            $orm->where($orm->object_column(HitMarker::FIELD_CONTENT), '=', $value);
-        }
-
-        return $this;
+        return $this->filterUtmFieldValue($orm, HitMarker::COL_CONTENT, $value);
     }
 
     /**
-     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
-     * @param string                                 $value
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     * @param string|null                               $value
      *
      * @return \BetaKiller\Repository\HitMarkerRepository
      */
-    private function filterTerm(ExtendedOrmInterface $orm, ?string $value): self
+    private function filterTerm(OrmInterface $orm, ?string $value): self
+    {
+        return $this->filterUtmFieldValue($orm, HitMarker::COL_TERM, $value);
+    }
+
+    protected function filterUtmFieldValue(OrmInterface $orm, string $field, ?string $value): self
     {
         if ($value === null) {
-            $orm->where($orm->object_column(HitMarker::FIELD_TERM), 'is', null);
+            $orm->where($orm->object_column($field), 'is', null);
         } else {
-            $orm->where($orm->object_column(HitMarker::FIELD_TERM), '=', $value);
+            $orm->where($orm->object_column($field), '=', $value);
         }
 
         return $this;

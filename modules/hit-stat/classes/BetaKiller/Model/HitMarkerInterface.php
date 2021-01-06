@@ -54,19 +54,19 @@ interface HitMarkerInterface
     public function setContent(string $value): HitMarkerInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getSource(): string;
+    public function getSource(): ?string;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getMedium(): string;
+    public function getMedium(): ?string;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCampaign(): string;
+    public function getCampaign(): ?string;
 
     /**
      * @return string|null

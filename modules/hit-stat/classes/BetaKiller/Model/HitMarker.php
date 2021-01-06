@@ -3,18 +3,18 @@ namespace BetaKiller\Model;
 
 class HitMarker extends \ORM implements HitMarkerInterface
 {
-    public const FIELD_SOURCE   = 'source';
-    public const FIELD_MEDIUM   = 'medium';
-    public const FIELD_CAMPAIGN = 'campaign';
-    public const FIELD_TERM     = 'term';
-    public const FIELD_CONTENT  = 'content';
+    public const COL_SOURCE   = 'source';
+    public const COL_MEDIUM   = 'medium';
+    public const COL_CAMPAIGN = 'campaign';
+    public const COL_TERM     = 'term';
+    public const COL_CONTENT  = 'content';
 
     /**
      * Prepares the model database connection, determines the table name,
      * and loads column information.
      *
-     * @throws \Exception
      * @return void
+     * @throws \Exception
      */
     protected function configure(): void
     {
@@ -28,7 +28,7 @@ class HitMarker extends \ORM implements HitMarkerInterface
      */
     public function setSource(string $value): HitMarkerInterface
     {
-        $this->set(self::FIELD_SOURCE, $value);
+        $this->set(self::COL_SOURCE, $value);
 
         return $this;
     }
@@ -40,7 +40,7 @@ class HitMarker extends \ORM implements HitMarkerInterface
      */
     public function setMedium(string $value): HitMarkerInterface
     {
-        $this->set(self::FIELD_MEDIUM, $value);
+        $this->set(self::COL_MEDIUM, $value);
 
         return $this;
     }
@@ -52,7 +52,7 @@ class HitMarker extends \ORM implements HitMarkerInterface
      */
     public function setCampaign(string $value): HitMarkerInterface
     {
-        $this->set(self::FIELD_CAMPAIGN, $value);
+        $this->set(self::COL_CAMPAIGN, $value);
 
         return $this;
     }
@@ -64,7 +64,7 @@ class HitMarker extends \ORM implements HitMarkerInterface
      */
     public function setTerm(string $value): HitMarkerInterface
     {
-        $this->set(self::FIELD_TERM, $value);
+        $this->set(self::COL_TERM, $value);
 
         return $this;
     }
@@ -76,49 +76,49 @@ class HitMarker extends \ORM implements HitMarkerInterface
      */
     public function setContent(string $value): HitMarkerInterface
     {
-        $this->set(self::FIELD_CONTENT, $value);
+        $this->set(self::COL_CONTENT, $value);
 
         return $this;
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
-    public function getSource(): string
+    public function getSource(): ?string
     {
-        return (string)$this->get(self::FIELD_SOURCE);
+        return (string)$this->get(self::COL_SOURCE);
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
-    public function getMedium(): string
+    public function getMedium(): ?string
     {
-        return (string)$this->get(self::FIELD_MEDIUM);
+        return $this->get(self::COL_MEDIUM);
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
-    public function getCampaign(): string
+    public function getCampaign(): ?string
     {
-        return (string)$this->get(self::FIELD_CAMPAIGN);
+        return $this->get(self::COL_CAMPAIGN);
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getTerm(): ?string
     {
-        return (string)$this->get(self::FIELD_TERM);
+        return (string)$this->get(self::COL_TERM);
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getContent(): ?string
     {
-        return (string)$this->get(self::FIELD_CONTENT);
+        return (string)$this->get(self::COL_CONTENT);
     }
 
     /**

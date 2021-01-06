@@ -176,17 +176,17 @@ class HitService
         $content  = $params->getQueryPart(HitMarkerInterface::UTM_QUERY_CONTENT);
         $term     = $params->getQueryPart(HitMarkerInterface::UTM_QUERY_TERM);
 
-        if ($source && $medium && $campaign) {
-            $marker = $this->markerRepo->find($source, $medium, $campaign, $content, $term);
-
-            if (!$marker) {
-                $marker = $this->createMarker($source, $medium, $campaign, $content, $term);
-            }
-
-            return $marker;
+        if (!$source && !$medium && !$campaign && !$content && !$term) {
+            return null;
         }
 
-        return null;
+        $marker = $this->markerRepo->find($source, $medium, $campaign, $content, $term);
+
+        if (!$marker) {
+            $marker = $this->createMarker($source, $medium, $campaign, $content, $term);
+        }
+
+        return $marker;
     }
 
     public function createDomain(string $domainName): HitDomain
@@ -246,25 +246,32 @@ class HitService
     }
 
     public function createMarker(
-        string $source,
-        string $medium,
-        string $campaign,
+        ?string $source,
+        ?string $medium,
+        ?string $campaign,
         ?string $content,
         ?string $term
     ): ?HitMarkerInterface {
         $marker = new HitMarker;
 
-        $marker
-            ->setSource($source)
-            ->setMedium($medium)
-            ->setCampaign($campaign);
+        if ($source) {
+            $marker->setSource($source);
+        }
 
-        if ($term) {
-            $marker->setTerm($term);
+        if ($medium) {
+            $marker->setMedium($medium);
+        }
+
+        if ($campaign) {
+            $marker->setCampaign($campaign);
         }
 
         if ($content) {
             $marker->setContent($content);
+        }
+
+        if ($term) {
+            $marker->setTerm($term);
         }
 
         $this->markerRepo->save($marker);
