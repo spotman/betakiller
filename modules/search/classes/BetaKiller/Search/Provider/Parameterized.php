@@ -38,7 +38,7 @@ abstract class Parameterized extends AbstractProvider
         $result = $model->getSearchResults($page, $itemsPerPage);
 
         $url = $this->makeResultsUrl();
-        $result->setURL($url);
+        $result->setUrl($url);
 
         return $result;
     }

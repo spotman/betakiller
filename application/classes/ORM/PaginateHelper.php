@@ -74,13 +74,17 @@ class PaginateHelper
     {
         $start = $this->itemsPerPage * ($this->currentPage - 1);
 
-        /** @var ExtendedOrmInterface[] $results */
-        $results = $this->paginate->limit($start, $this->itemsPerPage)->execute()->result()->as_array();
+        /** @var \Database_Result|null $result */
+        $result = $this->paginate->limit($start, $this->itemsPerPage)->execute()->result();
+
+        if ($result === null) {
+            throw new \LogicException('Search results are null');
+        }
 
         $this->totalItems = $this->paginate->count_total();
         $this->totalPages = ceil($this->totalItems / $this->itemsPerPage);
 
-        return $results;
+        return $result->as_array();
     }
 
     /**
@@ -122,7 +126,7 @@ class PaginateHelper
             $this->getResults(),
             $this->getTotalItems(),
             $this->getTotalPages(),
-            $this->hasNextPage()
+            $this->hasNextPage(), $this->hasNextPage()
         );
     }
 }

@@ -12,12 +12,13 @@ namespace BetaKiller\Search;
 interface SearchResultsInterface extends \IteratorAggregate, \JsonSerializable
 {
     /**
-     * @param string|null $url
-     *
      * @return \BetaKiller\Search\SearchResultsInterface
      */
-    public static function emptyResult(string $url = null): SearchResultsInterface;
+    public static function emptyResult(): SearchResultsInterface;
 
+    /**
+     * @param \BetaKiller\Search\SearchResultsItemInterface $item
+     */
     public function addItem(SearchResultsItemInterface $item): void;
 
     /**
@@ -36,9 +37,9 @@ interface SearchResultsInterface extends \IteratorAggregate, \JsonSerializable
     public function hasNextPage(): bool;
 
     /**
-     * @return string
+     * @return bool
      */
-    public function getURL(): ?string;
+    public function hasPrevPage(): bool;
 
     /**
      * @return SearchResultsItemInterface[]|\Traversable
@@ -46,12 +47,17 @@ interface SearchResultsInterface extends \IteratorAggregate, \JsonSerializable
     public function getItems();
 
     /**
-     * @return array
-     */
-    public function getItemsData(): array;
-
-    /**
      * @param string $url
      */
-    public function setURL(string $url): void;
+    public function setUrl(string $url): void;
+
+    /**
+     * @return bool
+     */
+    public function hasUrl(): bool;
+
+    /**
+     * @return string
+     */
+    public function getUrl(): string;
 }

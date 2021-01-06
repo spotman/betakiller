@@ -15,27 +15,32 @@ class SearchResults implements SearchResultsInterface
     /**
      * @var \BetaKiller\Search\SearchResultsItemInterface[]
      */
-    protected $items = [];
+    protected array $items = [];
 
     /**
      * @var int
      */
-    protected $totalCount;
+    protected int $totalCount;
 
     /**
      * @var int
      */
-    protected $totalPages;
+    protected int $totalPages;
 
     /**
      * @var bool
      */
-    protected $hasNextPage;
+    private bool $hasPrevPage;
 
     /**
-     * @var string
+     * @var bool
      */
-    private $url;
+    protected bool $hasNextPage;
+
+    /**
+     * @var string|null
+     */
+    protected ?string $url = null;
 
     /**
      * SearchResults constructor.
@@ -43,14 +48,15 @@ class SearchResults implements SearchResultsInterface
      * @param array $items
      * @param int   $totalCount
      * @param int   $totalPages
+     * @param bool  $hasPrevPage
      * @param bool  $hasNextPage
      */
-    public function __construct(array $items, int $totalCount, int $totalPages, bool $hasNextPage, string $url = null)
+    public function __construct(array $items, int $totalCount, int $totalPages, bool $hasPrevPage, bool $hasNextPage)
     {
         $this->totalCount  = $totalCount;
         $this->totalPages  = $totalPages;
+        $this->hasPrevPage = $hasPrevPage;
         $this->hasNextPage = $hasNextPage;
-        $this->url         = $url;
 
         foreach ($items as $item) {
             $this->addItem($item);
@@ -58,13 +64,11 @@ class SearchResults implements SearchResultsInterface
     }
 
     /**
-     * @param string|null $url
-     *
-     * @return \BetaKiller\Search\SearchResultsInterface
+     * @inheritDoc
      */
-    public static function emptyResult(string $url = null): SearchResultsInterface
+    public static function emptyResult(): SearchResultsInterface
     {
-        return new self([], 0, 0, false, $url);
+        return new self([], 0, 0, false, false);
     }
 
     /**
@@ -80,33 +84,48 @@ class SearchResults implements SearchResultsInterface
         return new \ArrayIterator($this->items);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function addItem(SearchResultsItemInterface $item): void
     {
         $this->items[] = $item;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getTotalCount(): int
     {
         return $this->totalCount;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getTotalPages(): int
     {
         return $this->totalPages;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function hasNextPage(): bool
     {
         return $this->hasNextPage;
     }
 
-    public function getURL(): ?string
+    /**
+     * @inheritDoc
+     */
+    public function hasPrevPage(): bool
     {
-        return $this->url;
+        return $this->hasPrevPage;
     }
 
     /**
-     * @return SearchResultsItemInterface[]|\Traversable
+     * @inheritDoc
      */
     public function getItems()
     {
@@ -114,17 +133,27 @@ class SearchResults implements SearchResultsInterface
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
-    public function getItemsData(): array
+    public function setUrl(string $url): void
     {
-        $items = [];
+        $this->url = $url;
+    }
 
-        foreach ($this->items as $item) {
-            $items[] = $item->getSearchResultsItemData();
-        }
+    /**
+     * @inheritDoc
+     */
+    public function hasUrl(): bool
+    {
+        return $this->url !== null;
+    }
 
-        return $items;
+    /**
+     * @inheritDoc
+     */
+    public function getUrl(): string
+    {
+        return $this->url;
     }
 
     /**
@@ -138,19 +167,12 @@ class SearchResults implements SearchResultsInterface
     public function jsonSerialize()
     {
         return [
-            'items_found'   => $this->getItemsData(),
+            'items_found'   => $this->getItems(),
             'total_items'   => $this->getTotalCount(),
             'total_pages'   => $this->getTotalPages(),
+            'has_prev_page' => $this->hasPrevPage(),
             'has_next_page' => $this->hasNextPage(),
-            'url'           => $this->getURL(),
+            'url'           => $this->hasUrl() ? $this->getUrl() : null,
         ];
-    }
-
-    /**
-     * @param string $url
-     */
-    public function setURL(string $url): void
-    {
-        $this->url = $url;
     }
 }
