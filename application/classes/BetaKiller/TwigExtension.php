@@ -492,6 +492,34 @@ final class TwigExtension extends AbstractExtension
             ),
 
             new TwigFunction(
+                'user_full_name',
+                function (array $context): string {
+                    $request = $this->getRequest($context);
+
+                    if (ServerRequestHelper::isGuest($request)) {
+                        return 'Guest';
+                    }
+
+                    return ServerRequestHelper::getUser($request)->getFullName();
+                },
+                ['needs_context' => true]
+            ),
+
+            new TwigFunction(
+                'user_email',
+                function (array $context): string {
+                    $request = $this->getRequest($context);
+
+                    if (ServerRequestHelper::isGuest($request)) {
+                        return 'guest@example.com';
+                    }
+
+                    return ServerRequestHelper::getUser($request)->getEmail();
+                },
+                ['needs_context' => true]
+            ),
+
+            new TwigFunction(
                 'json_encode',
                 'json_encode',
                 ['is_safe' => ['html']]
