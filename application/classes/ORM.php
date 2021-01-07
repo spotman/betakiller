@@ -386,4 +386,13 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
                 return !empty($current);
         }
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function isCachingAllowed(): bool
+    {
+        // Caching for Entities is allowed by default
+        return true;
+    }
 }

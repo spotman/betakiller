@@ -20,4 +20,11 @@ interface UrlParameterInterface
      * @return bool
      */
     public function isSameAs(UrlParameterInterface $parameter): bool;
+
+    /**
+     * Must return true if caching of this UrlParameter is allowed
+     *
+     * @return bool
+     */
+    public function isCachingAllowed(): bool;
 }

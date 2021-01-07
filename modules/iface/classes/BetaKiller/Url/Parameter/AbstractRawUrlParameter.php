@@ -59,4 +59,13 @@ abstract class AbstractRawUrlParameter implements RawUrlParameterInterface
      * @param string $value
      */
     abstract protected function importUriValue(string $value): void;
+
+    /**
+     * @inheritDoc
+     */
+    public function isCachingAllowed(): bool
+    {
+        // Caching for raw parameters is allowed by default
+        return true;
+    }
 }

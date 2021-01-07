@@ -98,6 +98,10 @@ class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
         $paramsData = $params->getAllParameters();
 
         foreach ($paramsData as $param) {
+            if (!$param->isCachingAllowed()) {
+                return false;
+            }
+
             if (!$this->isParameterSerializable($param)) {
                 $this->logger->debug('Skip caching non-serializable parameter');
 
@@ -155,6 +159,12 @@ class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
             foreach ($paramsData as $key => $value) {
                 if (!($value instanceof UrlParameterInterface)) {
                     throw new UrlDispatcherException('Cached data for url parameters is incorrect');
+                }
+
+                if (!$value->isCachingAllowed()) {
+                    $this->logger->debug('Skip unpacking data from non-caching parameter');
+
+                    return false;
                 }
 
                 if (!$this->isParameterSerializable($value)) {

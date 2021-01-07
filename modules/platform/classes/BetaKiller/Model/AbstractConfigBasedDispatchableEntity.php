@@ -148,4 +148,13 @@ abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispa
             && ($parameter->getCodename() === $this->getCodename())
             && ($parameter->getConfigOptions() === $this->getConfigOptions());
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function isCachingAllowed(): bool
+    {
+        // Allow caching for config-based Entities
+        return true;
+    }
 }
