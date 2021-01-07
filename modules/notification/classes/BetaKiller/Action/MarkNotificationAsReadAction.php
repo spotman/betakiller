@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Action;
 
+use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\TextHelper;
@@ -42,6 +43,10 @@ final class MarkNotificationAsReadAction extends AbstractAction
 
         /** @var NotificationLogInterface $logRecord */
         $logRecord = ServerRequestHelper::getEntity($request, NotificationLogInterface::class);
+
+        if (!$logRecord) {
+            throw new BadRequestHttpException('Missing notification log record');
+        }
 
         if (!$logRecord->isRead()) {
             $logRecord->markAsRead();
