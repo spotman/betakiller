@@ -73,6 +73,10 @@ class ClaimRegistrationAction extends AbstractAction
         /** @var NotificationLogInterface $log */
         $log = ServerRequestHelper::getEntity($request, NotificationLogInterface::class);
 
+        if (!$log) {
+            throw new BadRequestHttpException('Missing notification log record');
+        }
+
         $userId = $log->getTargetUserId();
 
         if (!$userId) {
