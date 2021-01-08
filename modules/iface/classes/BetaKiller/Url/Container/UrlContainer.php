@@ -264,13 +264,7 @@ class UrlContainer implements UrlContainerInterface
     }
 
     /**
-     * Returns query part value
-     *
-     * @param string    $key
-     * @param bool|null $required
-     *
-     * @return string|string[]
-     * @throws \BetaKiller\Url\Container\UrlContainerException
+     * @inheritDoc
      */
     public function getQueryPart(string $key, bool $required = null)
     {

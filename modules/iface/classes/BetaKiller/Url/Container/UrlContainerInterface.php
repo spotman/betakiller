@@ -122,7 +122,7 @@ interface UrlContainerInterface
      * @param string    $key
      * @param bool|null $required
      *
-     * @return string|int|array
+     * @return string|int|array|null
      */
     public function getQueryPart(string $key, bool $required = null);
 
