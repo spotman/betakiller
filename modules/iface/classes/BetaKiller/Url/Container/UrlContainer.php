@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Url\Container;
 
 use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Url\Parameter\CommonUrlParameterInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
 use BetaKiller\Utils\Registry\BasicRegistry;
 use BetaKiller\Utils\Registry\RegistryException;
@@ -310,6 +311,11 @@ class UrlContainer implements UrlContainerInterface
         foreach ($from->getAllParameters() as $param) {
             // Skip existing params
             if (!$overwrite && $this->hasParameterInstance($param)) {
+                continue;
+            }
+
+            // Skip common params like UTM markers
+            if ($param instanceof CommonUrlParameterInterface) {
                 continue;
             }
 
