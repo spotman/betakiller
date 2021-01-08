@@ -18,11 +18,24 @@ use BetaKiller\Repository\HitMarkerRepository;
 use BetaKiller\Repository\HitPageRedirectRepository;
 use BetaKiller\Repository\HitPageRepositoryInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\Parameter\UtmCampaignUrlParameter;
+use BetaKiller\Url\Parameter\UtmContentUrlParameter;
+use BetaKiller\Url\Parameter\UtmMediumUrlParameter;
+use BetaKiller\Url\Parameter\UtmSourceUrlParameter;
+use BetaKiller\Url\Parameter\UtmTermUrlParameter;
 use DateTimeImmutable;
 use Psr\Http\Message\UriInterface;
 
 class HitService
 {
+    public const UTM_QUERY_KEYS = [
+        UtmSourceUrlParameter::QUERY_KEY,
+        UtmMediumUrlParameter::QUERY_KEY,
+        UtmCampaignUrlParameter::QUERY_KEY,
+        UtmContentUrlParameter::QUERY_KEY,
+        UtmTermUrlParameter::QUERY_KEY,
+    ];
+
     /**
      * @var \BetaKiller\Repository\HitDomainRepository
      */
@@ -170,11 +183,11 @@ class HitService
     public function getMarkerFromUrlContainer(UrlContainerInterface $params): ?HitMarkerInterface
     {
         // Fetch UTM tags if exists
-        $source   = $params->getQueryPart(HitMarkerInterface::UTM_QUERY_SOURCE);
-        $medium   = $params->getQueryPart(HitMarkerInterface::UTM_QUERY_MEDIUM);
-        $campaign = $params->getQueryPart(HitMarkerInterface::UTM_QUERY_CAMPAIGN);
-        $content  = $params->getQueryPart(HitMarkerInterface::UTM_QUERY_CONTENT);
-        $term     = $params->getQueryPart(HitMarkerInterface::UTM_QUERY_TERM);
+        $source   = $params->getQueryPart(UtmSourceUrlParameter::QUERY_KEY);
+        $medium   = $params->getQueryPart(UtmMediumUrlParameter::QUERY_KEY);
+        $campaign = $params->getQueryPart(UtmCampaignUrlParameter::QUERY_KEY);
+        $content  = $params->getQueryPart(UtmContentUrlParameter::QUERY_KEY);
+        $term     = $params->getQueryPart(UtmTermUrlParameter::QUERY_KEY);
 
         if (!$source && !$medium && !$campaign && !$content && !$term) {
             return null;

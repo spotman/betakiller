@@ -10,7 +10,6 @@ use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\Hit;
-use BetaKiller\Model\HitMarkerInterface;
 use BetaKiller\Repository\HitRepository;
 use BetaKiller\Service\HitService;
 use InvalidArgumentException;
@@ -88,9 +87,6 @@ class HitStatMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $i = RequestProfiler::begin($request, 'Hit stat (init)');
-
-        // Remove UTM markers to simplify further UrlElement processing
-        $request = ServerRequestHelper::removeQueryParams($request, HitMarkerInterface::UTM_QUERY_KEYS);
 
         $user = ServerRequestHelper::getUser($request);
 

@@ -12,6 +12,6 @@ return [
     ],
 
     MissingUrlEvent::class => [
-        HitStatMissingUrlEventHandler::class
-    ]
+        HitStatMissingUrlEventHandler::class,
+    ],
 ];
