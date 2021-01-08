@@ -12,6 +12,7 @@ use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\DummyModelInterface;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\Parameter\CommonUrlParameterInterface;
 use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
@@ -207,13 +208,34 @@ class UrlHelper implements UrlHelperInterface
     private function makeQueryData(UrlElementInterface $element, UrlContainerInterface $params): array
     {
         $data = [];
+        $boundParams = [];
 
         foreach ($element->getQueryParams() as $key => $binding) {
             $proto = $this->prototypeService->createPrototypeFromString(sprintf('{%s}', $binding));
 
             if ($this->prototypeService->hasProtoInParameters($proto, $params)) {
                 $data[$key] = $this->prototypeService->getCompiledPrototypeValue($proto, $params);
+
+                $boundParams[] = $binding;
             }
+        }
+
+        // Proceed common parameters
+        foreach ($params->getAllParameters() as $urlParam) {
+            if (!$urlParam instanceof CommonUrlParameterInterface) {
+                continue;
+            }
+
+            $codename = $urlParam::getUrlContainerKey();
+
+            // Skip already bound parameters
+            if (in_array($codename, $boundParams, true)) {
+                continue;
+            }
+
+            $proto = $this->prototypeService->createPrototypeFromString(sprintf('{%s}', $codename));
+
+            $data[$urlParam::getQueryKey()] = $this->prototypeService->getCompiledPrototypeValue($proto, $params);
         }
 
         return $data;
