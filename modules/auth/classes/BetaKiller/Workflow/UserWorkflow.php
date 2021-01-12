@@ -200,6 +200,11 @@ final class UserWorkflow
 
     public function notRegisteredClaim(UserInterface $user): void
     {
+        // Some users click on the "claim" link by mistake, so prevent workflow exceptions
+        if (!$this->state->isTransitionAllowed($user, self::TRANSITION_REG_CLAIM, $user)) {
+            return;
+        }
+
         // Mark user as "claimed" to prevent future communication
         $this->state->doTransition($user, self::TRANSITION_REG_CLAIM, $user);
 
