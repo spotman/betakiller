@@ -4,14 +4,14 @@ namespace BetaKiller\Model;
 use Psr\Http\Message\UriInterface;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
+use Worknector\Model\AbstractCreatedByAt;
 
-class Hit extends \ORM implements HitInterface
+class Hit extends AbstractCreatedByAt implements HitInterface
 {
     public const TABLE_NAME = 'stat_hits';
 
     public const COL_IS_PROCESSED  = 'is_processed';
     public const COL_IS_PROTECTED  = 'is_protected';
-    public const COL_CREATED_AT    = 'created_at';
     public const COL_UUID          = 'uuid';
     public const COL_SESSION_TOKEN = 'session_token';
     public const COL_SOURCE_ID     = 'source_id';
@@ -25,7 +25,6 @@ class Hit extends \ORM implements HitInterface
 
     private const REL_SOURCE_PAGE   = 'source';
     private const REL_TARGET_MARKER = 'marker';
-    private const REL_USER          = 'user';
 
     /**
      * Prepares the model database connection, determines the table name,
@@ -52,11 +51,6 @@ class Hit extends \ORM implements HitInterface
                 'model'       => HitMarker::getModelName(),
                 'foreign_key' => self::COL_MARKER_ID,
             ],
-
-            self::REL_USER => [
-                'model'       => User::getModelName(),
-                'foreign_key' => self::COL_USER_ID,
-            ],
         ]);
 
         $this->load_with([
@@ -64,6 +58,18 @@ class Hit extends \ORM implements HitInterface
             self::REL_TARGET_PAGE,
             self::REL_TARGET_MARKER,
         ]);
+
+        parent::configure();
+    }
+
+    protected function isCreatedByRequired(): bool
+    {
+        return false;
+    }
+
+    public static function getCreatedByColumnName(): string
+    {
+        return self::COL_USER_ID;
     }
 
     /**
@@ -112,26 +118,6 @@ class Hit extends \ORM implements HitInterface
     public function getSessionToken(): string
     {
         return (string)$this->get(self::COL_SESSION_TOKEN);
-    }
-
-    /**
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @return \BetaKiller\Model\HitInterface
-     */
-    public function bindToUser(UserInterface $user): HitInterface
-    {
-        $this->set(self::REL_USER, $user);
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isBoundToUser(): bool
-    {
-        return (bool)$this->get(self::COL_USER_ID);
     }
 
     /**
@@ -217,13 +203,6 @@ class Hit extends \ORM implements HitInterface
         return $this;
     }
 
-    public function setTimestamp(\DateTimeImmutable $dateTime): HitInterface
-    {
-        $this->set_datetime_column_value(self::COL_CREATED_AT, $dateTime);
-
-        return $this;
-    }
-
     /**
      * @return bool
      */
@@ -263,11 +242,6 @@ class Hit extends \ORM implements HitInterface
     public function getIP(): string
     {
         return $this->get(self::COL_IP_ADDRESS);
-    }
-
-    public function getTimestamp(): \DateTimeImmutable
-    {
-        return $this->get_datetime_column_value(self::COL_CREATED_AT);
     }
 
     /**

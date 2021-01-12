@@ -3,8 +3,9 @@ namespace BetaKiller\Model;
 
 use Psr\Http\Message\UriInterface;
 use Ramsey\Uuid\UuidInterface;
+use Worknector\Model\CreatedByAtInterface;
 
-interface HitInterface extends AbstractEntityInterface
+interface HitInterface extends AbstractEntityInterface, CreatedByAtInterface
 {
     /**
      * @param string $token
@@ -36,18 +37,6 @@ interface HitInterface extends AbstractEntityInterface
     public function getUuid(): UuidInterface;
 
     /**
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @return \BetaKiller\Model\HitInterface
-     */
-    public function bindToUser(UserInterface $user): HitInterface;
-
-    /**
-     * @return bool
-     */
-    public function isBoundToUser(): bool;
-
-    /**
      * @param \BetaKiller\Model\HitPageInterface $value
      *
      * @return \BetaKiller\Model\HitInterface
@@ -74,13 +63,6 @@ interface HitInterface extends AbstractEntityInterface
      * @return \BetaKiller\Model\HitInterface
      */
     public function setTargetMarker(HitMarkerInterface $value): HitInterface;
-
-    /**
-     * @param \DateTimeImmutable $dateTime
-     *
-     * @return \BetaKiller\Model\HitInterface
-     */
-    public function setTimestamp(\DateTimeImmutable $dateTime): HitInterface;
 
     /**
      * @return bool
@@ -111,11 +93,6 @@ interface HitInterface extends AbstractEntityInterface
      * @return string
      */
     public function getIP(): string;
-
-    /**
-     * @return \DateTimeImmutable
-     */
-    public function getTimestamp(): \DateTimeImmutable;
 
     /**
      * @return \Psr\Http\Message\UriInterface

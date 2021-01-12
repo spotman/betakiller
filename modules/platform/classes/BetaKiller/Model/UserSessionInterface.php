@@ -26,7 +26,7 @@ interface UserSessionInterface extends AbstractEntityInterface
 
     public function hasUser(): bool;
 
-    public function getUser(): ?UserInterface;
+    public function getUser(): UserInterface;
 
     public function isExpiredIn(DateInterval $interval): bool;
 

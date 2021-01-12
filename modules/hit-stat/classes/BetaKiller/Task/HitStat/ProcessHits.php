@@ -9,11 +9,13 @@ use BetaKiller\Model\HitInterface;
 use BetaKiller\Model\HitPageInterface;
 use BetaKiller\Repository\HitLinkRepository;
 use BetaKiller\Repository\HitPageRepositoryInterface;
-use BetaKiller\Repository\HitRepository;
+use BetaKiller\Repository\HitRepositoryInterface;
 use BetaKiller\Repository\UserSessionRepository;
 use BetaKiller\Service\HitService;
 use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
+use Worknector\Exception\UserInheritanceException;
+use Worknector\Model\UserInterface;
 
 class ProcessHits extends AbstractTask
 {
@@ -21,9 +23,9 @@ class ProcessHits extends AbstractTask
     public const NEW_SOURCES     = 'admin/hit-stat/new-sources';
 
     /**
-     * @var \BetaKiller\Repository\HitRepository
+     * @var \BetaKiller\Repository\HitRepositoryInterface
      */
-    private $hitsRepository;
+    private HitRepositoryInterface $hitsRepository;
 
     /**
      * @var \BetaKiller\Model\Hit[]
@@ -78,7 +80,7 @@ class ProcessHits extends AbstractTask
     /**
      * ProcessHits constructor.
      *
-     * @param \BetaKiller\Repository\HitRepository              $hitsRepository
+     * @param \BetaKiller\Repository\HitRepositoryInterface     $hitsRepository
      * @param \BetaKiller\Repository\HitPageRepositoryInterface $pageRepo
      * @param \BetaKiller\Repository\HitLinkRepository          $linkRepo
      * @param \BetaKiller\Repository\UserSessionRepository      $sessionRepo
@@ -87,7 +89,7 @@ class ProcessHits extends AbstractTask
      * @param \Psr\Log\LoggerInterface                          $logger
      */
     public function __construct(
-        HitRepository $hitsRepository,
+        HitRepositoryInterface $hitsRepository,
         HitPageRepositoryInterface $pageRepo,
         HitLinkRepository $linkRepo,
         UserSessionRepository $sessionRepo,
@@ -126,7 +128,7 @@ class ProcessHits extends AbstractTask
             return;
         }
 
-        $firstHitTimestamp = $firstNotProcessed->getTimestamp();
+        $firstHitTimestamp = $firstNotProcessed->getCreatedAt();
 
         // Process missing targets
         foreach ($this->hitsRepository->getPending(1000) as $hit) {
@@ -170,7 +172,13 @@ class ProcessHits extends AbstractTask
                 $session = $this->sessionRepo->findByToken($hit->getSessionToken());
 
                 if ($session && $session->hasUser()) {
-                    $hit->bindToUser($session->getUser());
+                    $user = $session->getUser();
+
+                    if (!$user instanceof UserInterface) {
+                        throw new UserInheritanceException;
+                    }
+
+                    $hit->setCreatedBy($user);
                 }
             }
 
@@ -196,7 +204,7 @@ class ProcessHits extends AbstractTask
 
     private function processCounters(HitInterface $hit): void
     {
-        $moment = $hit->getTimestamp();
+        $moment = $hit->getCreatedAt();
         $target = $hit->getTargetPage();
 
         // Increment hit counter for target URL

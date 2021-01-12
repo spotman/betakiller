@@ -5,6 +5,7 @@ use BetaKiller\Model\Hit;
 use BetaKiller\Model\HitInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use Ramsey\Uuid\UuidInterface;
+use Worknector\Repository\CreatedAtByRepositoryTrait;
 
 /**
  * Class HitRepository
@@ -14,8 +15,10 @@ use Ramsey\Uuid\UuidInterface;
  * @method HitInterface[] getAll()
  * @method save(HitInterface $entity)
  */
-class HitRepository extends AbstractOrmBasedRepository
+class HitRepository extends AbstractOrmBasedRepository implements HitRepositoryInterface
 {
+    use CreatedAtByRepositoryTrait;
+
     /**
      * @param \Ramsey\Uuid\UuidInterface $uuid
      *
@@ -79,9 +82,31 @@ class HitRepository extends AbstractOrmBasedRepository
             ->findOne($orm);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getUnused(\DateTimeImmutable $before): array
+    {
+        $orm = $this->getOrmInstance();
+
+        return $this
+            ->filterProcessed($orm, true)
+            ->filterProtected($orm, false)
+            ->filterCreatedAtBefore($orm, $before)
+            ->limit($orm, 300)
+            ->findAll($orm);
+    }
+
     private function filterProcessed(OrmInterface $orm, bool $value): self
     {
         $orm->where(Hit::COL_IS_PROCESSED, '=', $value);
+
+        return $this;
+    }
+
+    private function filterProtected(OrmInterface $orm, bool $value): self
+    {
+        $orm->where(Hit::COL_IS_PROTECTED, '=', $value);
 
         return $this;
     }
@@ -93,10 +118,13 @@ class HitRepository extends AbstractOrmBasedRepository
         return $this;
     }
 
-    private function orderByCreatedAt(OrmInterface $orm): self
+    protected function getCreatedByColumnName(): string
     {
-        $orm->order_by(Hit::COL_CREATED_AT, 'asc');
+        return Hit::getCreatedByColumnName();
+    }
 
-        return $this;
+    protected function getCreatedAtColumnName(): string
+    {
+        return Hit::getCreatedAtColumnName();
     }
 }

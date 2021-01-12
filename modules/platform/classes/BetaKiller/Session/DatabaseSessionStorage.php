@@ -135,10 +135,8 @@ class DatabaseSessionStorage implements SessionStorageInterface
         SessionHelper::markAsPersistent($session);
 
         // Restore user in session if exists
-        $user = $model->getUser();
-
-        if ($user) {
-            SessionHelper::setUserID($session, $user);
+        if ($model->hasUser()) {
+            SessionHelper::setUserID($session, $model->getUser());
         }
 
         // Valid session => return it

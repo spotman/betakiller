@@ -11,7 +11,7 @@ use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\Hit;
 use BetaKiller\Model\HitInterface;
-use BetaKiller\Repository\HitRepository;
+use BetaKiller\Repository\HitRepositoryInterface;
 use BetaKiller\Service\HitService;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
@@ -46,24 +46,24 @@ class HitStatMiddleware implements MiddlewareInterface
     private UriFactoryInterface $uriFactory;
 
     /**
-     * @var \BetaKiller\Repository\HitRepository
+     * @var \BetaKiller\Repository\HitRepositoryInterface
      */
-    private HitRepository $hitRepo;
+    private HitRepositoryInterface $hitRepo;
 
     /**
      * HitStatMiddleware constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface    $appEnv
-     * @param \BetaKiller\Service\HitService        $service
-     * @param \Psr\Http\Message\UriFactoryInterface $uriFactory
-     * @param \BetaKiller\Repository\HitRepository  $hitRepo
-     * @param \Psr\Log\LoggerInterface              $logger
+     * @param \BetaKiller\Helper\AppEnvInterface            $appEnv
+     * @param \BetaKiller\Service\HitService                $service
+     * @param \Psr\Http\Message\UriFactoryInterface         $uriFactory
+     * @param \BetaKiller\Repository\HitRepositoryInterface $hitRepo
+     * @param \Psr\Log\LoggerInterface                      $logger
      */
     public function __construct(
         AppEnvInterface $appEnv,
         HitService $service,
         UriFactoryInterface $uriFactory,
-        HitRepository $hitRepo,
+        HitRepositoryInterface $hitRepo,
         LoggerInterface $logger
     ) {
         $this->appEnv     = $appEnv;
@@ -195,8 +195,9 @@ class HitStatMiddleware implements MiddlewareInterface
         // Create new Hit object with source/target pages, marker, ip and other info
         $hit = new Hit;
 
+        $hit->setCreatedAt(new \DateTimeImmutable());
+
         $hit
-            ->setTimestamp(new \DateTimeImmutable())
             ->setIP($ip)
             ->setUuid($requestId)
             ->setSessionToken($session->getId())

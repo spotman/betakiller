@@ -90,7 +90,7 @@ class UserSession extends \ORM implements UserSessionInterface
         return (bool)$this->get('user_id');
     }
 
-    public function getUser(): ?UserInterface
+    public function getUser(): UserInterface
     {
         return $this->getRelatedEntity('user', true);
     }
