@@ -10,6 +10,7 @@ use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\Hit;
+use BetaKiller\Model\HitInterface;
 use BetaKiller\Repository\HitRepository;
 use BetaKiller\Service\HitService;
 use InvalidArgumentException;
@@ -103,7 +104,11 @@ class HitStatMiddleware implements MiddlewareInterface
         try {
             $p = RequestProfiler::begin($request, 'Hit stat (processing)');
 
-            $this->processHit($request);
+            $hit = $this->processHit($request);
+
+            if ($hit) {
+                $request = HitStatRequestHelper::withHit($request, $hit);
+            }
         } catch (HttpExceptionExpectedInterface $e) {
             // Re-throw redirect
             throw $e;
@@ -117,11 +122,17 @@ class HitStatMiddleware implements MiddlewareInterface
         return $handler->handle($request);
     }
 
-    private function processHit(ServerRequestInterface $request): void
+    private function processHit(ServerRequestInterface $request): ?HitInterface
     {
         $ip        = ServerRequestHelper::getIpAddress($request);
+        $userAgent = ServerRequestHelper::getUserAgent($request);
         $sourceUrl = ServerRequestHelper::getHttpReferrer($request);
         $targetUri = $request->getUri();
+
+        // Prevent stupid spammers and bots
+        if (!$userAgent) {
+            return null;
+        }
 
         try {
             // Prevent wrong URLs
@@ -144,7 +155,7 @@ class HitStatMiddleware implements MiddlewareInterface
 
         // Skip ignored pages and domains
         if ($sourcePage && $sourcePage->isIgnored()) {
-            return;
+            return null;
         }
 
         $p2 = RequestProfiler::begin($request, 'Hit stat: detect target page');
@@ -156,7 +167,7 @@ class HitStatMiddleware implements MiddlewareInterface
 
         // Skip ignored pages and domains
         if ($targetPage->isIgnored()) {
-            return;
+            return null;
         }
 
         // If target page is missing and redirect is defined => redirect
@@ -175,7 +186,7 @@ class HitStatMiddleware implements MiddlewareInterface
         // Detect marker
         $marker = $this->service->getMarkerFromUrlContainer($params);
 
-        $p3 = RequestProfiler::begin($request, 'Hit stat: enqueue command');
+        $p3 = RequestProfiler::begin($request, 'Hit stat: store');
 
         if (!$session instanceof SessionIdentifierAwareInterface) {
             throw new \LogicException();
@@ -202,5 +213,7 @@ class HitStatMiddleware implements MiddlewareInterface
         $this->hitRepo->save($hit);
 
         RequestProfiler::end($p3);
+
+        return $hit;
     }
 }
