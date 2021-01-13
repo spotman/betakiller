@@ -1,23 +1,19 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Model\HitDomain;
+use BetaKiller\Model\HitDomainInterface;
 
 /**
  * Class HitDomainRepository
  *
  * @package BetaKiller\Repository
- * @method HitDomain findById(int $id)
- * @method HitDomain[] getAll()
  */
-class HitDomainRepository extends AbstractOrmBasedRepository
+final class HitDomainRepository extends AbstractOrmBasedRepository implements HitDomainRepositoryInterface
 {
     /**
-     * @param string $name
-     *
-     * @return \BetaKiller\Model\HitDomain|null
+     * @inheritDoc
      */
-    public function getByName(string $name): ?HitDomain
+    public function getByName(string $name): ?HitDomainInterface
     {
         $orm = $this->getOrmInstance();
 

@@ -10,6 +10,7 @@ class Hit extends AbstractCreatedByAt implements HitInterface
 {
     public const TABLE_NAME = 'stat_hits';
 
+    public const COL_ID            = 'id';
     public const COL_IS_PROCESSED  = 'is_processed';
     public const COL_IS_PROTECTED  = 'is_protected';
     public const COL_UUID          = 'uuid';

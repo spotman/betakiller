@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Model\HitDomain;
+use BetaKiller\Model\HitDomainInterface;
 use BetaKiller\Model\HitPageInterface;
 
 /**
@@ -15,5 +15,5 @@ use BetaKiller\Model\HitPageInterface;
  */
 interface HitPageRepositoryInterface extends RepositoryInterface
 {
-    public function findByUri(HitDomain $domain, string $uri): ?HitPageInterface;
+    public function findByUri(HitDomainInterface $domain, string $uri): ?HitPageInterface;
 }

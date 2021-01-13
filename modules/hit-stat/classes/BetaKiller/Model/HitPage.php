@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
+use BetaKiller\IdentityConverterInterface;
 use BetaKiller\Uri;
 use Psr\Http\Message\UriInterface;
 use function mb_strimwidth;
@@ -12,6 +13,7 @@ final class HitPage extends \ORM implements HitPageInterface
     public const REL_DOMAIN   = 'domain';
     public const REL_REDIRECT = 'redirect';
 
+    public const COL_ID          = 'id';
     public const COL_DOMAIN_ID   = 'domain_id';
     public const COL_IS_MISSING  = 'is_missing';
     public const COL_IS_IGNORED  = 'is_ignored';
@@ -48,7 +50,7 @@ final class HitPage extends \ORM implements HitPageInterface
         ]);
     }
 
-    public function setDomain(HitDomain $domain): HitPageInterface
+    public function setDomain(HitDomainInterface $domain): HitPageInterface
     {
         $this->set(self::REL_DOMAIN, $domain);
 
@@ -166,9 +168,30 @@ final class HitPage extends \ORM implements HitPageInterface
     }
 
     /**
-     * @return \BetaKiller\Model\HitDomain
+     * @inheritDoc
      */
-    private function getDomain(): HitDomain
+    public function getApiResponseData(): callable
+    {
+        return function (IdentityConverterInterface $converter) {
+            return [
+                self::API_KEY_ID       => $converter->encode($this),
+                self::API_KEY_FULL_URL => (string)$this->getFullUrl(),
+            ];
+        };
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getApiLastModified(): ?\DateTimeImmutable
+    {
+        return $this->getLastSeenAt();
+    }
+
+    /**
+     * @return \BetaKiller\Model\HitDomainInterface
+     */
+    private function getDomain(): HitDomainInterface
     {
         return $this->getRelatedEntity(self::REL_DOMAIN);
     }

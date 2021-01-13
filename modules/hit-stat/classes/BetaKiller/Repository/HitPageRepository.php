@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Model\HitDomain;
+use BetaKiller\Model\HitDomainInterface;
 use BetaKiller\Model\HitPage;
 use BetaKiller\Model\HitPageInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
@@ -16,7 +16,7 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
  */
 final class HitPageRepository extends AbstractOrmBasedRepository implements HitPageRepositoryInterface
 {
-    public function findByUri(HitDomain $domain, string $uri): ?HitPageInterface
+    public function findByUri(HitDomainInterface $domain, string $uri): ?HitPageInterface
     {
         $orm = $this->getOrmInstance();
 
@@ -26,7 +26,7 @@ final class HitPageRepository extends AbstractOrmBasedRepository implements HitP
             ->findOne($orm);
     }
 
-    private function filterDomain(OrmInterface $orm, HitDomain $domain): self
+    private function filterDomain(OrmInterface $orm, HitDomainInterface $domain): self
     {
         $this->filterRelated($orm, HitPage::REL_DOMAIN, $domain);
 

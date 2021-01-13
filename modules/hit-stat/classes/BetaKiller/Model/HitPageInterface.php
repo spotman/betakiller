@@ -2,10 +2,14 @@
 namespace BetaKiller\Model;
 
 use Psr\Http\Message\UriInterface;
+use Spotman\Api\ApiResponseItemInterface;
 
-interface HitPageInterface extends AbstractEntityInterface
+interface HitPageInterface extends AbstractEntityInterface, ApiResponseItemInterface
 {
-    public function setDomain(HitDomain $domain): HitPageInterface;
+    public const API_KEY_ID       = 'id';
+    public const API_KEY_FULL_URL = 'full_url';
+
+    public function setDomain(HitDomainInterface $domain): HitPageInterface;
 
     public function setUri(string $url): HitPageInterface;
 

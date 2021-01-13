@@ -5,6 +5,7 @@ namespace BetaKiller\Service;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Model\HitDomain;
+use BetaKiller\Model\HitDomainInterface;
 use BetaKiller\Model\HitLink;
 use BetaKiller\Model\HitMarker;
 use BetaKiller\Model\HitMarkerInterface;
@@ -12,7 +13,7 @@ use BetaKiller\Model\HitPage;
 use BetaKiller\Model\HitPageInterface;
 use BetaKiller\Model\HitPageRedirect;
 use BetaKiller\Model\HitPageRedirectInterface;
-use BetaKiller\Repository\HitDomainRepository;
+use BetaKiller\Repository\HitDomainRepositoryInterface;
 use BetaKiller\Repository\HitLinkRepository;
 use BetaKiller\Repository\HitMarkerRepository;
 use BetaKiller\Repository\HitPageRedirectRepository;
@@ -37,14 +38,14 @@ class HitService
     ];
 
     /**
-     * @var \BetaKiller\Repository\HitDomainRepository
+     * @var \BetaKiller\Repository\HitDomainRepositoryInterface
      */
-    private $domainRepo;
+    private HitDomainRepositoryInterface $domainRepo;
 
     /**
      * @var \BetaKiller\Repository\HitPageRepositoryInterface
      */
-    private $pageRepo;
+    private HitPageRepositoryInterface $pageRepo;
 
     /**
      * @var \BetaKiller\Repository\HitLinkRepository
@@ -54,7 +55,7 @@ class HitService
     /**
      * @var \BetaKiller\Config\AppConfigInterface
      */
-    private $appConfig;
+    private AppConfigInterface $appConfig;
 
     /**
      * @var \BetaKiller\Repository\HitMarkerRepository
@@ -69,16 +70,16 @@ class HitService
     /**
      * HitService constructor.
      *
-     * @param \BetaKiller\Repository\HitPageRepositoryInterface $pageRepo
-     * @param \BetaKiller\Repository\HitDomainRepository        $domainRepo
-     * @param \BetaKiller\Repository\HitLinkRepository          $linkRepo
-     * @param \BetaKiller\Repository\HitMarkerRepository        $markerRepo
-     * @param \BetaKiller\Repository\HitPageRedirectRepository  $redirectRepo
-     * @param \BetaKiller\Config\AppConfigInterface             $appConfig
+     * @param \BetaKiller\Repository\HitPageRepositoryInterface   $pageRepo
+     * @param \BetaKiller\Repository\HitDomainRepositoryInterface $domainRepo
+     * @param \BetaKiller\Repository\HitLinkRepository            $linkRepo
+     * @param \BetaKiller\Repository\HitMarkerRepository          $markerRepo
+     * @param \BetaKiller\Repository\HitPageRedirectRepository    $redirectRepo
+     * @param \BetaKiller\Config\AppConfigInterface               $appConfig
      */
     public function __construct(
         HitPageRepositoryInterface $pageRepo,
-        HitDomainRepository $domainRepo,
+        HitDomainRepositoryInterface $domainRepo,
         HitLinkRepository $linkRepo,
         HitMarkerRepository $markerRepo,
         HitPageRedirectRepository $redirectRepo,
@@ -202,7 +203,7 @@ class HitService
         return $marker;
     }
 
-    public function createDomain(string $domainName): HitDomain
+    public function createDomain(string $domainName): HitDomainInterface
     {
         $domain = new HitDomain;
 
@@ -224,7 +225,7 @@ class HitService
         return $domain;
     }
 
-    public function createPage(HitDomain $domain, string $relativeUrl): HitPage
+    public function createPage(HitDomainInterface $domain, string $relativeUrl): HitPage
     {
         $now = new DateTimeImmutable;
 
