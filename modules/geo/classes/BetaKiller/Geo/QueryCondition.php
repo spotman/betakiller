@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Geo;
 
+use BetaKiller\Helper\TextHelper;
 use Geocoder\Location;
 
 final class QueryCondition implements QueryConditionInterface
@@ -139,7 +140,8 @@ final class QueryCondition implements QueryConditionInterface
             case self::TYPE_CITY:
                 return !$this->hasBuilding($location)
                     && $this->hasCity($location)
-                    && $this->hasRegion($location)
+                        // No region check (Zagreb has no region)
+//                    && (self::isBothRegionAndCity($location) || $this->hasRegion($location))
                     && $this->hasCountry($location);
 
             case self::TYPE_REGION:
@@ -165,13 +167,19 @@ final class QueryCondition implements QueryConditionInterface
         $regionName  = $adminLevels->count() > 0 ? $adminLevels->first()->getName() : null;
         $cityName    = $point->getLocality();
 
+        // City without region
+        if ($cityName && !$regionName) {
+            return true;
+        }
+
+        // Guard check
         if (!$cityName || !$regionName) {
             return false;
         }
 
         \similar_text($cityName, $regionName, $similarity);
 
-        return $similarity >= 90;
+        return $similarity >= 90 || TextHelper::contains($regionName, $cityName);
     }
 
     private function hasBuilding(Location $location): bool
