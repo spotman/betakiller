@@ -96,7 +96,7 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractReadOnl
      */
     public function getAll(): array
     {
-        return $this->items;
+        return array_values($this->items);
     }
 
     /**
