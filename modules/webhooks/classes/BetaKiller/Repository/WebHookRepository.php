@@ -77,4 +77,10 @@ final class WebHookRepository extends AbstractConfigBasedDispatchableRepository 
     {
         return ['webhooks'];
     }
+
+    protected function prepareCodename(string $codename): string
+    {
+        // Use class-based codenames
+        return \ucfirst($codename);
+    }
 }

@@ -102,4 +102,10 @@ class ShortcodeRepository extends AbstractConfigBasedDispatchableRepository
     ): ConfigBasedDispatchableEntityInterface {
         return new ShortcodeEntity($codename, $options);
     }
+
+    protected function prepareCodename(string $codename): string
+    {
+        // Use class-based codenames
+        return \ucfirst($codename);
+    }
 }

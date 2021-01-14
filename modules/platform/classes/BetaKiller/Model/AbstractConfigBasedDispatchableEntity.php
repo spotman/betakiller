@@ -27,6 +27,23 @@ abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispa
     }
 
     /**
+     * @inheritDoc
+     */
+    public static function getModelName(): string
+    {
+        $className = static::class;
+
+        // Try namespaces first
+        $pos = strrpos($className, '\\');
+
+        if ($pos === false) {
+            throw new \LogicException(sprintf('Wrong naming for config-based Entity %s', $className));
+        }
+
+        return substr($className, $pos + 1);
+    }
+
+    /**
      * AbstractConfigBasedDispatchableEntity constructor.
      *
      * @param string     $codename

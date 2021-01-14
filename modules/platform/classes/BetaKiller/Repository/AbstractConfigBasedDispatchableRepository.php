@@ -8,7 +8,7 @@ use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
 
 abstract class AbstractConfigBasedDispatchableRepository extends AbstractReadOnlyRepository
-    implements DispatchableRepositoryInterface
+    implements ConfigBasedDispatchableRepositoryInterface
 {
     /**
      * @var ConfigBasedDispatchableEntityInterface[]
@@ -66,7 +66,7 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractReadOnl
      */
     public function findByCodename(string $name)
     {
-        $name = ucfirst($name);
+        $name = $this->prepareCodename($name);
 
         return $this->items[$name] ?? null;
     }
@@ -233,6 +233,8 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractReadOnl
 
         return $filtered;
     }
+
+    abstract protected function prepareCodename(string $codename): string;
 
     /**
      * @param string     $codename
