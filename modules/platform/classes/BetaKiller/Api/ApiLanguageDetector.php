@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Api;
 
+use BetaKiller\Exception\DomainException;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiLanguageDetectorInterface;
@@ -28,8 +29,14 @@ class ApiLanguageDetector implements ApiLanguageDetectorInterface
             ? $instance->detectLanguage($arguments)
             : null;
 
-        if (!$lang) {
+        if (!$lang && !$user->isGuest()) {
             $lang = $user->getLanguage();
+        }
+
+        if (!$lang) {
+            throw new DomainException('Can not detect API Language for User ":id"', [
+                ':id' => $user->getID(),
+            ]);
         }
 
         return $lang;
