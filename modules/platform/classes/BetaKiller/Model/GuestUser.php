@@ -4,15 +4,23 @@ declare(strict_types=1);
 namespace BetaKiller\Model;
 
 use BetaKiller\Exception\NotImplementedHttpException;
+use BetaKiller\Workflow\WorkflowStateInterface;
 use DateTimeImmutable;
 
 class GuestUser extends User implements GuestUserInterface
 {
     /**
-     * @return \BetaKiller\Model\UserStateInterface
-     * @throws \BetaKiller\Exception\NotImplementedHttpException
+     * @inheritDoc
      */
-    public function getStatus(): UserStateInterface
+    public function hasWorkflowState(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getWorkflowState(): WorkflowStateInterface
     {
         throw new NotImplementedHttpException();
     }
@@ -33,6 +41,14 @@ class GuestUser extends User implements GuestUserInterface
         return [
             new Role(['name' => RoleInterface::GUEST]),
         ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getID(): string
+    {
+        return 'Guest';
     }
 
     /**
@@ -74,6 +90,14 @@ class GuestUser extends User implements GuestUserInterface
      * @inheritDoc
      */
     public function getLastLoggedIn(): ?DateTimeImmutable
+    {
+        throw new NotImplementedHttpException();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLanguage(): LanguageInterface
     {
         throw new NotImplementedHttpException();
     }
