@@ -357,6 +357,11 @@ class Cron extends AbstractTask
 //                \usleep(10000);
 //            }
 
+            // Prevent starting of a terminated task (race condition, will be processed by another handler below)
+            if ($process->isTerminated()) {
+                return;
+            }
+
             // Store PID in CronTask record
             $task->started($process->getPid());
 
