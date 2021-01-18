@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\Notification;
 
+use BetaKiller\Acl\Resource\NotificationLogResource;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
@@ -122,6 +123,9 @@ final class LogIndexIFace extends AbstractAdminIFace
             'status'       => $item->getStatus(),
             'is_read'      => $item->isRead(),
             'body_url'     => $urlHelper->getReadEntityUrl($item, ZoneInterface::ADMIN),
+            'retry_url'    => $item->isRetryAvailable()
+                ? $urlHelper->getEntityUrl($item, NotificationLogResource::ACTION_RETRY, ZoneInterface::ADMIN)
+                : null,
         ];
     }
 }

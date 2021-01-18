@@ -249,9 +249,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     }
 
     /**
-     * @param string $value
-     *
-     * @return mixed
+     * @inheritDoc
      */
     public function setHash(string $value): NotificationLogInterface
     {
@@ -302,5 +300,15 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     public function getReadAt(): DateTimeImmutable
     {
         return $this->get_datetime_column_value(self::COL_READ_AT);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isRetryAvailable(): bool
+    {
+        return !$this->isSucceeded()
+            && $this->getTargetUserId()
+            && $this->getBody();
     }
 }

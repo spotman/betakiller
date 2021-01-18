@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <action uri="mark-notification-as-read" name="MarkNotificationAsRead"
-            zone="public" query="h=NotificationLog.hash" />
+            zone="public" query="h=NotificationLog.hash"/>
 
     <iface uri="notifications" name="Admin\Notification\Index" parent="Admin\Index" zone="admin" label="Notification"
            menu="admin" entity="NotificationGroup" entityAction="list">
@@ -17,7 +17,10 @@
             <iface uri="{Page}" name="Admin\Notification\LogPage" label="Page {Page}"/>
             <dummy uri="item" name="Admin\Notification\ItemDummy" label="Item">
                 <iface uri="{NotificationLog.id}" name="Admin\Notification\LogItem" label="Message"
-                       entity="NotificationLog" entityAction="read"/>
+                       entity="NotificationLog" entityAction="read">
+                    <action uri="retry" name="Admin\RetryNotification"
+                            entity="NotificationLog" entityAction="retry"/>
+                </iface>
             </dummy>
         </iface>
 

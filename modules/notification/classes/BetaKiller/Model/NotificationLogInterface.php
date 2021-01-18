@@ -111,6 +111,11 @@ interface NotificationLogInterface extends DispatchableEntityInterface
     public function isSucceeded(): bool;
 
     /**
+     * @return bool
+     */
+    public function isRetryAvailable(): bool;
+
+    /**
      * @return string
      */
     public function getStatus(): string;
@@ -123,7 +128,7 @@ interface NotificationLogInterface extends DispatchableEntityInterface
     /**
      * @param string $value
      *
-     * @return NotificationLogInterface
+     * @return \BetaKiller\Model\NotificationLogInterface
      */
     public function setHash(string $value): NotificationLogInterface;
 

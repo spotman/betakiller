@@ -101,7 +101,13 @@
                   {{ item.transport }}
                 </a>
               </td>
-              <td><a href="{{ item.body_url }}" class="btn blue right" target="_blank">Check body</a></td>
+              <td class="right-align">
+                {% if item.retry_url %}
+                  <a href="{{ item.retry_url }}" class="btn blue" target="_blank">Retry</a>
+                {% endif %}
+
+                <a href="{{ item.body_url }}" class="btn blue" target="_blank">Check body</a>
+              </td>
             </tr>
           {% endfor %}
           </tbody>

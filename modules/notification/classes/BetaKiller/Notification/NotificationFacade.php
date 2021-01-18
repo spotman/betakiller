@@ -11,6 +11,7 @@ use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\NotificationGroupUserConfig;
 use BetaKiller\Model\NotificationGroupUserConfigInterface;
 use BetaKiller\Model\NotificationLog;
+use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\Transport\DismissibleTransportInterface;
 use BetaKiller\Repository\NotificationFrequencyRepositoryInterface;
@@ -240,31 +241,15 @@ final class NotificationFacade
     {
         $transport = $this->transportFactory->create($message->getTransportName());
 
-        $target = $message->getTarget();
-
-        if (!$transport->canHandle($message)) {
-            throw new TransportException('Transport ":transport" can not handle message ":message"', [
-                ':transport' => $transport->getName(),
-                ':message'   => $message->getCodename(),
-            ]);
-        }
-
-        if (!$transport->isEnabledFor($target)) {
+        if (!$this->isTransportSupported($message, $transport)) {
             return false;
         }
 
-        $log = new NotificationLog;
+        $log = $this->createLogRecord($message, $transport);
 
-        $log->setHash($message->getHash());
+        $target = $message->getTarget();
 
         try {
-            $log
-                ->setProcessedAt(new DateTimeImmutable)
-                ->setMessageName($message->getCodename())
-                ->setTarget($target)
-                ->setTransport($transport)
-                ->setLanguageIsoCode($target->getLanguageIsoCode());
-
             // Fill subject line if transport need it
             if ($transport->isSubjectRequired()) {
                 $subj = $this->renderer->makeSubject($message, $target);
@@ -292,6 +277,91 @@ final class NotificationFacade
         $this->logRepo->save($log);
 
         return $log->isSucceeded();
+    }
+
+    private function isTransportSupported(MessageInterface $message, TransportInterface $transport): bool
+    {
+        if (!$transport->canHandle($message)) {
+            throw new TransportException('Transport ":transport" can not handle message ":message"', [
+                ':transport' => $transport->getName(),
+                ':message'   => $message->getCodename(),
+            ]);
+        }
+
+        $target = $message->getTarget();
+
+        return $transport->isEnabledFor($target);
+    }
+
+    private function createLogRecord(MessageInterface $message, TransportInterface $transport): NotificationLogInterface
+    {
+        $target = $message->getTarget();
+
+        return (new NotificationLog)
+            ->setHash($message->getHash())
+            ->setProcessedAt(new DateTimeImmutable)
+            ->setMessageName($message->getCodename())
+            ->setTarget($target)
+            ->setTransport($transport)
+            ->setLanguageIsoCode($target->getLanguageIsoCode());
+    }
+
+    public function retry(NotificationLogInterface $logRecord): bool
+    {
+        if ($logRecord->isSucceeded()) {
+            throw new NotificationException('Can not retry succeeded message; hash ":hash"', [
+                ':hash' => $logRecord->getHash(),
+            ]);
+        }
+
+        $userId = $logRecord->getTargetUserId();
+        $body   = $logRecord->getBody();
+
+        if (!$userId) {
+            throw new NotificationException('Can not retry message without target User ID; hash ":hash"', [
+                ':hash' => $logRecord->getHash(),
+            ]);
+        }
+
+        if (!$body) {
+            throw new NotificationException('Can not retry message without a body; hash ":hash"', [
+                ':hash' => $logRecord->getHash(),
+            ]);
+        }
+
+        try {
+            $target = $this->userRepo->getById($userId);
+
+            $transportName = $logRecord->getTransportName();
+
+            $message   = $this->messageFactory->create($logRecord->getMessageName(), $target, $transportName, true);
+            $transport = $this->transportFactory->create($transportName);
+
+            if ($transport->isSubjectRequired()) {
+                $subject = $logRecord->getSubject();
+
+                if (!$subject) {
+                    throw new NotificationException('Can not retry message without a subject line; hash ":hash"', [
+                        ':hash' => $logRecord->getHash(),
+                    ]);
+                }
+
+                $message->setSubject($subject);
+            }
+
+            if ($transport->send($message, $target, $body)) {
+                $logRecord->markAsSucceeded();
+            }
+        } catch (Throwable $e) {
+            LoggerHelper::logRawException($this->logger, $e);
+
+            // Store exception as result
+            $logRecord->markAsFailed(Exception::oneLiner($e));
+        }
+
+        $this->logRepo->save($logRecord);
+
+        return $logRecord->isSucceeded();
     }
 
     public function dismissDirect(string $messageCodename, MessageTargetInterface $target): void

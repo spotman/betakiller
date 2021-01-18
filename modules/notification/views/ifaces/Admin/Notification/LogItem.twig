@@ -5,6 +5,7 @@
   <div class="row">
     <div class="col s12">
       <ul>
+        <li class="{{ item.is_succeeded ? "green-text" : "red-text" }}">{{ item.status|upper }}</li>
         <li>{{ item.date }}</li>
         <li>{{ item.target }}</li>
       </ul>
@@ -21,11 +22,11 @@
     </div>
 
     {% if item.result %}
-    <div class="col s12">
-      <hr>
-      <h3>Result:</h3>
-      <div>{{ item.result }}</div>
-    </div>
+      <div class="col s12">
+        <hr>
+        <h3>Result:</h3>
+        <div>{{ item.result }}</div>
+      </div>
     {% endif %}
   </div>
 
