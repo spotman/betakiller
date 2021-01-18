@@ -7,6 +7,7 @@ use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\NotificationLog;
 use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Query\NotificationLogQuery;
 
 /**
  * Class NotificationLogRepository
@@ -40,56 +41,14 @@ class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository i
     }
 
     /**
-     * @param int $page
-     * @param int $itemsPerPage
-     *
-     * @return \BetaKiller\Model\NotificationLogInterface[]
-     *
-     * @throws \BetaKiller\Repository\RepositoryException
+     * @inheritDoc
      */
-    public function getList(int $page, int $itemsPerPage): array
+    public function getList(NotificationLogQuery $query, int $page, int $itemsPerPage): array
     {
         $orm = $this->getOrmInstance();
 
         return $this
-            ->orderByProcessedAtDesc($orm)
-            ->findAll($orm, $page, $itemsPerPage);
-    }
-
-    /**
-     * @param string $messageCodename
-     * @param int    $page
-     * @param int    $itemsPerPage
-     *
-     * @return \BetaKiller\Model\NotificationLogInterface[]
-     *
-     * @throws \BetaKiller\Repository\RepositoryException
-     */
-    public function getMessageList(string $messageCodename, int $page, int $itemsPerPage): array
-    {
-        $orm = $this->getOrmInstance();
-
-        return $this
-            ->filterMessageCodename($orm, $messageCodename)
-            ->orderByProcessedAtDesc($orm)
-            ->findAll($orm, $page, $itemsPerPage);
-    }
-
-    /**
-     * @param \BetaKiller\Model\UserInterface $user
-     * @param int                             $page
-     * @param int                             $itemsPerPage
-     *
-     * @return \BetaKiller\Model\NotificationLogInterface[]
-     *
-     * @throws \BetaKiller\Repository\RepositoryException
-     */
-    public function getUserList(UserInterface $user, int $page, int $itemsPerPage): array
-    {
-        $orm = $this->getOrmInstance();
-
-        return $this
-            ->filterUser($orm, $user)
+            ->applyQuery($orm, $query)
             ->orderByProcessedAtDesc($orm)
             ->findAll($orm, $page, $itemsPerPage);
     }
@@ -118,6 +77,19 @@ class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository i
     private function filterUser(ExtendedOrmInterface $orm, UserInterface $user): self
     {
         $orm->where($orm->object_column(NotificationLog::COL_USER_ID), '=', $user->getID());
+
+        return $this;
+    }
+
+    private function applyQuery(ExtendedOrmInterface $orm, NotificationLogQuery $query): self
+    {
+        if ($query->hasUserDefined()) {
+            $this->filterUser($orm, $query->getUser());
+        }
+
+        if ($query->hasMessageCodenameDefined()) {
+            $this->filterMessageCodename($orm, $query->getMessageCodename());
+        }
 
         return $this;
     }

@@ -7,6 +7,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Model\NotificationLogInterface;
+use BetaKiller\Query\NotificationLogQuery;
 use BetaKiller\Repository\NotificationLogRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Url\Parameter\PaginationUrlParameter;
@@ -52,23 +53,28 @@ final class LogIndexIFace extends AbstractAdminIFace
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
         $urlParams = ServerRequestHelper::getUrlContainer($request);
 
-        $itemsPerPage = 50;
+        $itemsPerPage = 100;
 
         $messageCodename = $urlParams->getQueryPart(self::ARG_MESSAGE);
-        $userID          = $urlParams->getQueryPart(self::ARG_USER);
+        $userId          = $urlParams->getQueryPart(self::ARG_USER);
 
         /** @var PaginationUrlParameter $pageParam */
         $pageParam   = ServerRequestHelper::getParameter($request, PaginationUrlParameter::class);
         $currentPage = $pageParam ? $pageParam->getValue() : 1;
 
+        $user = $userId ? $this->userRepo->getById($userId) : null;
+
+        $query = new NotificationLogQuery;
+
         if ($messageCodename) {
-            $items = $this->logRepo->getMessageList($messageCodename, $currentPage, $itemsPerPage);
-        } elseif ($userID) {
-            $user  = $this->userRepo->getById($userID);
-            $items = $this->logRepo->getUserList($user, $currentPage, $itemsPerPage);
-        } else {
-            $items = $this->logRepo->getList($currentPage, $itemsPerPage);
+            $query->withMessageCodename($messageCodename);
         }
+
+        if ($user) {
+            $query->forUser($user);
+        }
+
+        $items = $this->logRepo->getList($query, $currentPage, $itemsPerPage);
 
         $data = [];
 
@@ -78,6 +84,15 @@ final class LogIndexIFace extends AbstractAdminIFace
 
         return [
             'items' => $data,
+
+            'filters' => [
+                'user'    => [
+                    'id'    => $user ? $user->getID() : null,
+                    'name'  => $user ? $user->getFullName() : null,
+                    'email' => $user ? $user->getEmail() : null,
+                ],
+                'message' => $messageCodename,
+            ],
         ];
     }
 
@@ -88,6 +103,7 @@ final class LogIndexIFace extends AbstractAdminIFace
             'name'         => $item->getMessageName(),
             'transport'    => $item->getTransportName(),
             'target'       => $item->getTargetString(),
+            'user_id'      => $item->getTargetUserId(),
             'is_succeeded' => $item->isSucceeded(),
             'is_read'      => $item->isRead(),
             'body_url'     => $urlHelper->getReadEntityUrl($item, ZoneInterface::ADMIN),
