@@ -7,8 +7,8 @@
       <div class="row">
         {% if filters.user.id %}
           <div class="col">
-            <a href="?message={{ filters.message }}">
-              <span class="">{{ filters.user.name }} / {{ filters.user.email }}</span>
+            <a href="?message={{ filters.message }}&status={{ filters.status }}&transport={{ filters.transport }}">
+              <span>{{ filters.user.name }} / {{ filters.user.email }}</span>
               <span class="red-text">&times;</span>
             </a>
           </div>
@@ -16,8 +16,26 @@
 
         {% if filters.message %}
           <div class="col">
-            <a href="?user={{ filters.user.id }}">
-              <span class="">{{ filters.message }}</span>
+            <a href="?user={{ filters.user.id }}&status={{ filters.status }}&transport={{ filters.transport }}">
+              <span>{{ filters.message }}</span>
+              <span class="red-text">&times;</span>
+            </a>
+          </div>
+        {% endif %}
+
+        {% if filters.status %}
+          <div class="col">
+            <a href="?user={{ filters.user.id }}&message={{ filters.message }}&transport={{ filters.transport }}">
+              <span>{{ filters.status|upper }}</span>
+              <span class="red-text">&times;</span>
+            </a>
+          </div>
+        {% endif %}
+
+        {% if filters.transport %}
+          <div class="col">
+            <a href="?user={{ filters.user.id }}&message={{ filters.message }}&status={{ filters.status }}">
+              <span>{{ filters.transport|upper }}</span>
               <span class="red-text">&times;</span>
             </a>
           </div>
@@ -32,6 +50,7 @@
 
           <thead>
           <tr>
+            <th>State</th>
             <th>Processed at</th>
             <th>Target</th>
             <th>Name</th>
@@ -51,18 +70,37 @@
             {% endif %}
 
             <tr class="{{ item_classes }}">
+              <td>
+                {% if item.is_succeeded %}
+                  <a href="?user={{ filters.user.id }}&message={{ filters.message }}&status={{ item.status }}&transport={{ filters.transport }}">
+                    <i class="material-icons">done</i>
+                  </a>
+                {% else %}
+                  <a href="?user={{ filters.user.id }}&message={{ filters.message }}&status={{ item.status }}&transport={{ filters.transport }}">
+                    <i class="material-icons">close</i>
+                  </a>
+                {% endif %}
+              </td>
               <td>{{ item.processed_at|date("d.m.Y @ H:i:s") }}</td>
               <td>
                 {% if item.user_id %}
-                  <a href="?user={{ item.user_id }}&message={{ filters.message }}">{{ item.target }}</a>
+                  <a href="?user={{ item.user_id }}&message={{ filters.message }}&status={{ filters.status }}&transport={{ filters.transport }}">
+                    {{ item.target }}
+                  </a>
                 {% else %}
                   {{ item.target }}
                 {% endif %}
               </td>
               <td>
-                <a href="?user={{ filters.user.id }}&message={{ item.name }}">{{ item.name }}</a>
+                <a href="?user={{ filters.user.id }}&message={{ item.name }}&status={{ filters.status }}&transport={{ filters.transport }}">
+                  {{ item.name }}
+                </a>
               </td>
-              <td>{{ item.transport }}</td>
+              <td>
+                <a href="?user={{ filters.user.id }}&message={{ filters.message }}&status={{ filters.status }}&transport={{ item.transport }}">
+                  {{ item.transport }}
+                </a>
+              </td>
               <td><a href="{{ item.body_url }}" class="btn blue right" target="_blank">Check body</a></td>
             </tr>
           {% endfor %}

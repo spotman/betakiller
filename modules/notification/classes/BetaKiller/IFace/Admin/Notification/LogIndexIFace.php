@@ -16,8 +16,10 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class LogIndexIFace extends AbstractAdminIFace
 {
-    public const ARG_MESSAGE = 'message';
-    public const ARG_USER    = 'user';
+    public const ARG_MESSAGE   = 'message';
+    public const ARG_USER      = 'user';
+    public const ARG_STATUS    = 'status';
+    public const ARG_TRANSPORT = 'transport';
 
     /**
      * @var \BetaKiller\Repository\NotificationLogRepositoryInterface
@@ -57,6 +59,8 @@ final class LogIndexIFace extends AbstractAdminIFace
 
         $messageCodename = $urlParams->getQueryPart(self::ARG_MESSAGE);
         $userId          = $urlParams->getQueryPart(self::ARG_USER);
+        $status          = $urlParams->getQueryPart(self::ARG_STATUS);
+        $transport       = $urlParams->getQueryPart(self::ARG_TRANSPORT);
 
         /** @var PaginationUrlParameter $pageParam */
         $pageParam   = ServerRequestHelper::getParameter($request, PaginationUrlParameter::class);
@@ -74,6 +78,14 @@ final class LogIndexIFace extends AbstractAdminIFace
             $query->forUser($user);
         }
 
+        if ($status) {
+            $query->withStatus($status);
+        }
+
+        if ($transport) {
+            $query->throughTransport($transport);
+        }
+
         $items = $this->logRepo->getList($query, $currentPage, $itemsPerPage);
 
         $data = [];
@@ -86,12 +98,14 @@ final class LogIndexIFace extends AbstractAdminIFace
             'items' => $data,
 
             'filters' => [
-                'user'    => [
+                'user'      => [
                     'id'    => $user ? $user->getID() : null,
                     'name'  => $user ? $user->getFullName() : null,
                     'email' => $user ? $user->getEmail() : null,
                 ],
-                'message' => $messageCodename,
+                'message'   => $messageCodename,
+                'status'    => $status,
+                'transport' => $transport,
             ],
         ];
     }
@@ -105,6 +119,7 @@ final class LogIndexIFace extends AbstractAdminIFace
             'target'       => $item->getTargetString(),
             'user_id'      => $item->getTargetUserId(),
             'is_succeeded' => $item->isSucceeded(),
+            'status'       => $item->getStatus(),
             'is_read'      => $item->isRead(),
             'body_url'     => $urlHelper->getReadEntityUrl($item, ZoneInterface::ADMIN),
         ];

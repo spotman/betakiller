@@ -113,6 +113,11 @@ interface NotificationLogInterface extends DispatchableEntityInterface
     /**
      * @return string
      */
+    public function getStatus(): string;
+
+    /**
+     * @return string
+     */
     public function getHash(): string;
 
     /**

@@ -205,9 +205,17 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         return (string)$this->get(self::COL_BODY);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getStatus(): string
+    {
+        return (string)$this->get(self::COL_STATUS);
+    }
+
     public function isSucceeded(): bool
     {
-        return (string)$this->get(self::COL_STATUS) === self::STATUS_SUCCEEDED;
+        return $this->getStatus() === self::STATUS_SUCCEEDED;
     }
 
     private function makeTargetString(MessageTargetInterface $target): string

@@ -81,6 +81,20 @@ class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository i
         return $this;
     }
 
+    private function filterStatus(ExtendedOrmInterface $orm, string $codename): self
+    {
+        $orm->where($orm->object_column(NotificationLog::COL_STATUS), '=', $codename);
+
+        return $this;
+    }
+
+    private function filterTransport(ExtendedOrmInterface $orm, string $codename): self
+    {
+        $orm->where($orm->object_column(NotificationLog::COL_TRANSPORT), '=', $codename);
+
+        return $this;
+    }
+
     private function applyQuery(ExtendedOrmInterface $orm, NotificationLogQuery $query): self
     {
         if ($query->hasUserDefined()) {
@@ -89,6 +103,14 @@ class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository i
 
         if ($query->hasMessageCodenameDefined()) {
             $this->filterMessageCodename($orm, $query->getMessageCodename());
+        }
+
+        if ($query->hasStatusDefined()) {
+            $this->filterStatus($orm, $query->getStatus());
+        }
+
+        if ($query->hasTransportDefined()) {
+            $this->filterTransport($orm, $query->getTransport());
         }
 
         return $this;
