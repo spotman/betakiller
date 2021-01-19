@@ -107,7 +107,7 @@ final class CommandBusWorkerDaemon extends AbstractDaemon
                         ':msg' => $message->getMessageId(),
                     ]);
                 } else {
-                    $consumer->reject($message);
+                    $consumer->reject($message, true);
 
                     $this->logger->debug('ESB message failed :msg', [
                         ':msg' => $message->getMessageId(),

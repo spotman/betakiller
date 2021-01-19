@@ -141,7 +141,7 @@ final class EsbOutboundEventTransport implements OutboundEventTransportInterface
                 $consumer->acknowledge($message);
             },
             static function () use ($message, $consumer) {
-                $consumer->reject($message);
+                $consumer->reject($message, true);
             }
         );
     }

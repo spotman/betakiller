@@ -208,6 +208,8 @@ return [
                 'predis_options' => [
                     'prefix' => $prefix,
                 ],
+
+                'redelivery_delay' => 300,
             ]);
 
             return $factory->createContext();

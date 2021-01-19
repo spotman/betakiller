@@ -105,7 +105,7 @@ final class NotificationWorkerDaemon extends AbstractDaemon
         if ($result) {
             $consumer->acknowledge($message);
         } else {
-            $consumer->reject($message);
+            $consumer->reject($message, true);
         }
 
         return $result;
