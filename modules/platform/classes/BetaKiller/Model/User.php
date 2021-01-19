@@ -73,6 +73,15 @@ class User extends \ORM implements UserInterface
     /**
      * @inheritDoc
      */
+    public function isCachingAllowed(): bool
+    {
+        // User-related Entity
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public static function getWorkflowStateModelName(): string
     {
         return UserState::getModelName();

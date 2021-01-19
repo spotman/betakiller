@@ -20,8 +20,8 @@ class PhpException extends ORM implements PhpExceptionModelInterface
      * Prepares the model database connection, determines the table name,
      * and loads column information.
      *
-     * @throws \Exception
      * @return void
+     * @throws \Exception
      */
     protected function configure(): void
     {
@@ -94,6 +94,15 @@ class PhpException extends ORM implements PhpExceptionModelInterface
     private function enableAutoVacuum()
     {
         DB::query(Database::SELECT, 'PRAGMA auto_vacuum = FULL')->execute($this->_db_group);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isCachingAllowed(): bool
+    {
+        // Too much garbage in the cache
+        return false;
     }
 
     /**

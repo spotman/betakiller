@@ -78,6 +78,15 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         DB::query(Database::SELECT, 'PRAGMA auto_vacuum = FULL')->execute($this->_db_group);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function isCachingAllowed(): bool
+    {
+        // Too much garbage in the cache
+        return false;
+    }
+
     public function setProcessedAt(DateTimeImmutable $value): NotificationLogInterface
     {
         $this->set_datetime_column_value(self::COL_PROCESSED_AT, $value);
