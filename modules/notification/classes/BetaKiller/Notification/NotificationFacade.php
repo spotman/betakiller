@@ -155,7 +155,7 @@ final class NotificationFacade
         $this->logRepo            = $logRepo;
         $this->logger             = $logger;
 
-        $this->queueProducer = $this->queueContext->createProducer()->setTimeToLive(10000);
+        $this->queueProducer = $this->queueContext->createProducer()->setTimeToLive(0); // Never expire
         $this->regularQueue  = $this->queueContext->createQueue(self::QUEUE_NAME_REGULAR);
         $this->priorityQueue = $this->queueContext->createQueue(self::QUEUE_NAME_PRIORITY);
     }
@@ -587,11 +587,12 @@ final class NotificationFacade
         return $this->groupRepo->getUserGroups($user);
     }
 
-    private function isMessageEnabledForUser(
-        MessageInterface $message,
-        MessageTargetInterface $user
+    private function isMessageEnabledForTarget(
+        MessageInterface $message
     ): bool {
-        if (!$user instanceof UserInterface) {
+        $target = $message->getTarget();
+
+        if (!$target instanceof UserInterface) {
             // Custom target types can not be checked here and always allowed
             return true;
         }
@@ -599,13 +600,19 @@ final class NotificationFacade
         // Fetch group by message codename
         $group = $this->getMessageGroup($message);
 
-        if (!$group->isEnabledForUser($user)) {
+        if (!$group->isEnabledForUser($target)) {
             return false;
         }
 
-        if (!$group->isAllowedToUser($user)) {
+        $transport = $this->transportFactory->create($message->getTransportName());
+
+        if (!$transport->isEnabledFor($target)) {
+            return false;
+        }
+
+        if (!$group->isAllowedToUser($target)) {
             throw new DomainException('User ":user" is not allowed for notification group ":group"', [
-                ':user'  => $user->getID(),
+                ':user'  => $target->getID(),
                 ':group' => $group->getCodename(),
             ]);
         }
@@ -635,10 +642,8 @@ final class NotificationFacade
      */
     private function enqueue(MessageInterface $message): void
     {
-        $target = $message->getTarget();
-
         // Send only if targets were specified or message group was allowed
-        if (!$this->isMessageEnabledForUser($message, $target)) {
+        if (!$this->isMessageEnabledForTarget($message)) {
             return;
         }
 
