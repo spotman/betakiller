@@ -68,9 +68,9 @@ final class ExportToExcel extends AbstractTask
         $spread = new Spreadsheet();
 
         $spread->getProperties()
-            ->setCreator('Worknector website')
+            ->setCreator('Website')
             ->setModified(time())
-            ->setLastModifiedBy('Worknector website')
+            ->setLastModifiedBy('Website')
             ->setTitle('Localization keys export')
             ->setSubject('Localization keys export');
 
