@@ -133,8 +133,12 @@ final class NotificationWorkerDaemon extends AbstractDaemon
     {
         // For each dismissible message
         foreach ($this->notification->getDismissibleMessages() as $messageCodename => $eventsNames) {
+            $isBroadcast = $this->notification->isBroadcastMessage($messageCodename);
+
             // Iterate over events
             foreach ($eventsNames as $eventName) {
+                $this->checkEvent($eventName, $isBroadcast);
+
                 $this->logger->debug('Listening :event event to dismiss ":message" message', [
                     ':event'   => $eventName,
                     ':message' => $messageCodename,
@@ -143,8 +147,12 @@ final class NotificationWorkerDaemon extends AbstractDaemon
                 // Subscribe for provided event
                 $this->eventTransport->subscribeBounded(
                     $eventName,
-                    function (EventMessageInterface $event) use ($messageCodename) {
-                        $this->onDismissibleEvent($event, $messageCodename);
+                    function (EventMessageInterface $event) use ($messageCodename, $isBroadcast) {
+                        if ($isBroadcast) {
+                            $this->onDismissBroadcastEvent($event, $messageCodename);
+                        } else {
+                            $this->onDismissDirectEvent($event, $messageCodename);
+                        }
                     }
                 );
             }
@@ -153,37 +161,61 @@ final class NotificationWorkerDaemon extends AbstractDaemon
         $this->eventTransport->startConsuming($loop);
     }
 
-    private function onDismissibleEvent(EventMessageInterface $event, string $messageCodename): void
+    private function checkEvent(string $eventFQN, bool $isBroadcast): void
+    {
+        if ($isBroadcast && !is_a($eventFQN, DismissBroadcastOnEventMessageInterface::class, true)) {
+            throw new NotificationException('Event ":event" must implement :must to dismiss broadcast messages', [
+                ':event' => $eventFQN,
+                ':must'  => DismissBroadcastOnEventMessageInterface::class,
+            ]);
+        }
+
+        if (!$isBroadcast && !is_a($eventFQN, DismissDirectOnEventMessageInterface::class, true)) {
+            throw new NotificationException('Event ":event" must implement :must to dismiss direct messages', [
+                ':event' => $eventFQN,
+                ':must'  => DismissDirectOnEventMessageInterface::class,
+            ]);
+        }
+    }
+
+    private function onDismissBroadcastEvent(EventMessageInterface $event, string $messageCodename): void
     {
         $this->markAsProcessing();
 
-        $this->logger->debug('Dismissible event :event fired', [
+        if (!$event instanceof DismissBroadcastOnEventMessageInterface) {
+            throw new NotificationException('Event ":event" must implement :must to dismiss broadcast messages', [
+                ':event' => \get_class($event),
+                ':must'  => DismissBroadcastOnEventMessageInterface::class,
+            ]);
+        }
+
+        $this->logger->debug('Dismiss broadcast event :event fired', [
             ':event'   => \get_class($event),
             ':message' => $messageCodename,
         ]);
 
-        // Check message is broadcast
-        if ($this->notification->isBroadcastMessage($messageCodename)) {
-            // Check event type
-            if (!$event instanceof DismissBroadcastOnEventMessageInterface) {
-                throw new NotificationException('Event ":event" must implement :must to dismiss broadcast', [
-                    ':event' => \get_class($event),
-                    ':must'  => DismissBroadcastOnEventMessageInterface::class,
-                ]);
-            }
+        $this->notification->dismissBroadcast($messageCodename);
 
-            $this->notification->dismissBroadcast($messageCodename);
-        } else {
-            // Check event type
-            if (!$event instanceof DismissDirectOnEventMessageInterface) {
-                throw new NotificationException('Event ":event" must implement :must to dismiss direct', [
-                    ':event' => \get_class($event),
-                    ':must'  => DismissDirectOnEventMessageInterface::class,
-                ]);
-            }
+        $this->markAsIdle();
+    }
 
-            $this->notification->dismissDirect($messageCodename, $event->getDismissibleTarget());
+    private function onDismissDirectEvent(EventMessageInterface $event, string $messageCodename): void
+    {
+        $this->markAsProcessing();
+
+        if (!$event instanceof DismissDirectOnEventMessageInterface) {
+            throw new NotificationException('Event ":event" must implement :must to dismiss direct messages', [
+                ':event' => \get_class($event),
+                ':must'  => DismissDirectOnEventMessageInterface::class,
+            ]);
         }
+
+        $this->logger->debug('Dismiss direct event :event fired', [
+            ':event'   => \get_class($event),
+            ':message' => $messageCodename,
+        ]);
+
+        $this->notification->dismissDirect($messageCodename, $event->getDismissibleTarget());
 
         $this->markAsIdle();
     }
