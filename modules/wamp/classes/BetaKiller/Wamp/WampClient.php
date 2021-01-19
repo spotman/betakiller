@@ -82,6 +82,11 @@ class WampClient extends \Thruway\Peer\Client
         $this->onSessionClose(function (ClientSession $session) {
             $id = $session->getSessionId();
 
+            // Session is terminated, no ID at this point, can not stop ping timer
+            if (!$id) {
+                return;
+            }
+
             if (!isset($this->pingTimers[$id])) {
                 throw new Exception('WAMP session ":id" ping timer is missing', [
                     ':id' => $id,
