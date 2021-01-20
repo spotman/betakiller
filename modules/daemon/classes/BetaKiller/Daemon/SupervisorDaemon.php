@@ -414,6 +414,9 @@ final class SupervisorDaemon extends AbstractDaemon
             function () use ($deferred, $name, $process, $stopTimeout) {
                 // Double check
                 if (!$process->isRunning()) {
+                    // Notify about successful daemon stop
+                    $deferred->resolve();
+
                     return;
                 }
 
