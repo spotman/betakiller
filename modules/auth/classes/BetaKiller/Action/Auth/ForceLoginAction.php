@@ -31,22 +31,22 @@ final class ForceLoginAction extends AbstractAction
     /**
      * @var \BetaKiller\Service\AuthService
      */
-    private $auth;
+    private AuthService $auth;
 
     /**
      * @var \BetaKiller\MessageBus\EventBusInterface
      */
-    private $eventBus;
+    private EventBusInterface $eventBus;
 
     /**
      * @var \BetaKiller\Auth\UserUrlDetectorInterface
      */
-    private $urlDetector;
+    private UserUrlDetectorInterface $urlDetector;
 
     /**
      * @var \BetaKiller\Repository\UserRepositoryInterface
      */
-    private $userRepo;
+    private UserRepositoryInterface $userRepo;
 
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
@@ -90,7 +90,10 @@ final class ForceLoginAction extends AbstractAction
     {
         $session = ServerRequestHelper::getSession($request);
 
-        if ($this->appEnv->inProductionMode() && !SessionHelper::hasRoleName($session, RoleInterface::FORCE_LOGIN)) {
+        $isRestrictedEnv     = $this->appEnv->inProductionMode() || $this->appEnv->inStagingMode();
+        $isForceLoginAllowed = SessionHelper::hasRoleName($session, RoleInterface::FORCE_LOGIN);
+
+        if ($isRestrictedEnv && !$isForceLoginAllowed) {
             throw new AccessDeniedException();
         }
 
