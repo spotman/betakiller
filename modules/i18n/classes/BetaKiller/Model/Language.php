@@ -23,6 +23,15 @@ class Language extends ORM implements LanguageInterface
         $this->_table_name = static::TABLE_NAME;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function isCachingAllowed(): bool
+    {
+        // User-related / app related
+        return false;
+    }
+
     protected function getI18nValueColumn(): string
     {
         return self::COL_I18N;
