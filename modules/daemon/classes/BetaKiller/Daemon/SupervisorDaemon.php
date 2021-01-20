@@ -125,7 +125,7 @@ final class SupervisorDaemon extends AbstractDaemon
         // Watch status changes
         $this->loop->addPeriodicTimer(0.1, function () {
             // Prevent auto-restart
-            if (!$this->isRunning || $this->isStoppingDaemons) {
+            if (!$this->isRunning || $this->isStoppingDaemons || $this->isRestartingDaemons) {
                 return;
             }
 
@@ -314,7 +314,23 @@ final class SupervisorDaemon extends AbstractDaemon
 
             $this->checkLockReleased($lock);
 
-            $this->setStatus($name, $isOk ? self::STATUS_FINISHED : self::STATUS_FAILED);
+            $status = $this->getStatus($name);
+
+            switch ($status) {
+                case self::STATUS_STARTING:
+                case self::STATUS_RUNNING:
+                    $status = $isOk ? self::STATUS_FINISHED : self::STATUS_FAILED;
+                    break;
+
+                case self::STATUS_STOPPING:
+                    $status = $isOk ? self::STATUS_STOPPED : self::STATUS_FAILED;
+                    break;
+
+                default:
+                    throw new \LogicException(sprintf('Unknown daemon status upon exit "%s"', $status));
+            }
+
+            $this->setStatus($name, $status);
         });
 
         // Ensure task is running
@@ -409,10 +425,25 @@ final class SupervisorDaemon extends AbstractDaemon
 
         $stopTimeout = Runner::STOP_TIMEOUT + 1;
 
+        $pollingTimer = $this->loop->addPeriodicTimer($stopTimeout,
+            function (TimerInterface $timer) use ($deferred, $process) {
+                if ($process->isRunning()) {
+                    return;
+                }
+
+                // Stop polling
+                $this->loop->cancelTimer($timer);
+
+                // Notify about successful daemon stop
+                $deferred->resolve();
+            });
+
         // Stop timeout timer
         $timeoutTimer = $this->loop->addTimer($stopTimeout,
-            function () use ($deferred, $name, $process, $stopTimeout) {
-                // Double check
+            function () use ($pollingTimer, $deferred, $name, $process, $stopTimeout) {
+                // Stop polling
+                $this->loop->cancelTimer($pollingTimer);
+
                 if (!$process->isRunning()) {
                     // Notify about successful daemon stop
                     $deferred->resolve();
