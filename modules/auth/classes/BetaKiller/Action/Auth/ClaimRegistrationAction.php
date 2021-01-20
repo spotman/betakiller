@@ -96,6 +96,11 @@ class ClaimRegistrationAction extends AbstractAction
                 'notification_url'  => $urlHelper->getReadEntityUrl($log, ZoneInterface::ADMIN),
                 'notification_hash' => $log->getHash(),
             ]);
+
+            // User went from an email link, so confirm email too
+            if (!$user->isEmailConfirmed()) {
+                $this->userWorkflow->confirmEmail($user);
+            }
         }
 
         $lang = $this->langRepo->getByIsoCode($log->getLanguageIsoCode());
