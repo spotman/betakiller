@@ -11,7 +11,6 @@ use BetaKiller\Wamp\WampClient;
 use BetaKiller\Wamp\WampClientBuilder;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 use function React\Promise\reject;
 use Throwable;
