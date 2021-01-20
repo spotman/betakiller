@@ -29,7 +29,6 @@ return [
                 WorkflowConfig::TRANSITIONS => [
                     UserWorkflow::TRANSITION_CHANGE_EMAIL    => UserState::EMAIL_CHANGED,
                     UserWorkflow::TRANSITION_EMAIL_CONFIRMED => UserState::EMAIL_CONFIRMED,
-                    UserWorkflow::TRANSITION_REG_CLAIM       => UserState::CLAIMED,
                     UserWorkflow::TRANSITION_SUSPEND         => UserState::SUSPENDED,
                     UserWorkflow::TRANSITION_BLOCK           => UserState::BLOCKED,
                 ],
@@ -128,29 +127,9 @@ return [
                     UserWorkflow::TRANSITION_UNLOCK => UserState::RESUMED,
                 ],
             ],
-
-            UserState::CLAIMED => [
-                WorkflowConfig::IS_FINISH => true,
-
-                WorkflowConfig::ACTIONS     => [
-                    UserResource::ACTION_READ   => [
-                        RoleInterface::USER_MANAGEMENT,
-                    ],
-                    UserResource::ACTION_UPDATE => [
-                        // No one can update
-                    ],
-                ],
-
-                // No transitions for claimed Users
-                WorkflowConfig::TRANSITIONS => [],
-            ],
         ],
 
         WorkflowConfig::TRANSITIONS => [
-            UserWorkflow::TRANSITION_REG_CLAIM => [
-                RoleInterface::LOGIN,
-            ],
-
             UserWorkflow::TRANSITION_EMAIL_CONFIRMED => [
                 RoleInterface::LOGIN,
             ],

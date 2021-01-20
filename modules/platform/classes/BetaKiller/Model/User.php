@@ -34,10 +34,11 @@ class User extends \ORM implements UserInterface
     public const COL_LOGINS          = 'logins';
     public const COL_LAST_LOGIN      = 'last_login';
     public const COL_CREATED_FROM_IP = 'created_from_ip';
+    public const COL_IS_CLAIMED      = 'is_reg_claimed';
 
     public const  REL_LANGUAGE = 'language';
 
-    protected $allUserRolesNames = [];
+    protected array $allUserRolesNames = [];
 
     protected function configure(): void
     {
@@ -192,16 +193,21 @@ class User extends \ORM implements UserInterface
         return $this->getWorkflowState()->isSuspended();
     }
 
+    public function markAsRegistrationClaimed(): void
+    {
+        $this->set(self::COL_IS_CLAIMED, true);
+    }
+
     /**
      * @return bool
      */
     public function isRegistrationClaimed(): bool
     {
-        return $this->getWorkflowState()->isClaimed();
+        return (bool)$this->get(self::COL_IS_CLAIMED);
     }
 
     /**
-     * @param \DateTimeInterface $value [optional]
+     * @param \DateTimeInterface|null $value [optional]
      *
      * @return \BetaKiller\Model\UserInterface
      */

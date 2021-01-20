@@ -30,11 +30,6 @@ interface UserStateInterface extends WorkflowStateInterface
     /**
      * @return bool
      */
-    public function isClaimed(): bool;
-
-    /**
-     * @return bool
-     */
     public function isSuspended(): bool;
 
     /**

@@ -28,6 +28,11 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     public function completeLogin(): void;
 
     /**
+     * User claimed about registration
+     */
+    public function markAsRegistrationClaimed(): void;
+
+    /**
      * @return bool
      */
     public function isEmailConfirmed(): bool;
@@ -48,7 +53,7 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     public function isRegistrationClaimed(): bool;
 
     /**
-     * @param \DateTimeInterface $value [optional]
+     * @param \DateTimeInterface|null $value [optional]
      *
      * @return \BetaKiller\Model\UserInterface
      */
@@ -241,20 +246,6 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
      * @return bool
      */
     public function hasPhoneDefined(): bool;
-
-    /**
-     * @return bool
-     */
-    public function isEmailNotificationAllowed(): bool;
-
-    /**
-     * @return bool
-     */
-    public function isOnlineNotificationAllowed(): bool;
-
-    public function enableEmailNotification(): void;
-
-    public function disableEmailNotification(): void;
 
     /**
      * @return string

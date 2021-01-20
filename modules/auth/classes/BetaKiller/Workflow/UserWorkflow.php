@@ -8,6 +8,7 @@ use BetaKiller\Event\UserConfirmationEmailRequestedEvent;
 use BetaKiller\Event\UserCreatedEvent;
 use BetaKiller\Event\UserEmailChangedEvent;
 use BetaKiller\Event\UserEmailConfirmedEvent;
+use BetaKiller\Event\UserRegistrationClaimedEvent;
 use BetaKiller\Event\UserResumedEvent;
 use BetaKiller\Event\UserSuspendedEvent;
 use BetaKiller\Event\UserUnlockedEvent;
@@ -200,14 +201,10 @@ final class UserWorkflow
 
     public function notRegisteredClaim(UserInterface $user): void
     {
-        // Some users click on the "claim" link by mistake, so prevent workflow exceptions
-        if (!$this->state->isTransitionAllowed($user, self::TRANSITION_REG_CLAIM, $user)) {
-            return;
-        }
-
-        // Mark user as "claimed" to prevent future communication
-        $this->state->doTransition($user, self::TRANSITION_REG_CLAIM, $user);
+        $user->markAsRegistrationClaimed();
 
         $this->userRepo->save($user);
+
+        $this->eventBus->emit(new UserRegistrationClaimedEvent($user));
     }
 }

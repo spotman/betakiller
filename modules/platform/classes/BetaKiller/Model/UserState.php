@@ -13,7 +13,6 @@ final class UserState extends AbstractWorkflowStateOrm implements UserStateInter
     public const EMAIL_CONFIRMED = 'confirmed';     // Email confirmed
     public const EMAIL_CHANGED   = 'email-changed'; // Email changed
     public const BLOCKED         = 'blocked';       // Blocked coz of hacking, spam, or app rules violation
-    public const CLAIMED         = 'claimed';       // User claimed about registration
     public const SUSPENDED       = 'suspended';     // Account removal requested so it will be suspended for 6 months
     public const RESUMED         = 'resumed';       // Resumed from suspend, requires additional confirmation (potential fraud)
 
@@ -82,14 +81,6 @@ final class UserState extends AbstractWorkflowStateOrm implements UserStateInter
     public function isBlocked(): bool
     {
         return $this->isWorkflowStateCodename(self::BLOCKED);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isClaimed(): bool
-    {
-        return $this->isWorkflowStateCodename(self::CLAIMED);
     }
 
     /**
