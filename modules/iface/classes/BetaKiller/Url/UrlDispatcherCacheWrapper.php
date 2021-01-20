@@ -97,6 +97,18 @@ class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
         $stackData  = $stack->getCodenames();
         $paramsData = $params->getAllParameters();
 
+        foreach ($stack as $urlElement) {
+            // No caching for Actions
+            if ($urlElement instanceof ActionModelInterface) {
+                return false;
+            }
+
+            // No caching for elements with URL query params
+            if ($urlElement->getQueryParams()) {
+                return false;
+            }
+        }
+
         foreach ($paramsData as $param) {
             if (!$param->isCachingAllowed()) {
                 return false;
