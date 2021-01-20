@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Daemon;
 
 use BetaKiller\Config\ConfigProviderInterface;
-use BetaKiller\Exception;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\ProcessLock\LockInterface;
 use BetaKiller\Task\AbstractTask;
@@ -13,6 +12,12 @@ use Psr\Log\LoggerInterface;
 use React\ChildProcess\Process;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
+use React\Promise\Deferred;
+use React\Promise\PromiseInterface;
+use function Clue\React\Block\await;
+use function React\Promise\all;
+use function React\Promise\reject;
+use function React\Promise\resolve;
 
 final class SupervisorDaemon extends AbstractDaemon
 {
@@ -68,6 +73,8 @@ final class SupervisorDaemon extends AbstractDaemon
 
     private bool $isStoppingDaemons = false;
 
+    private bool $isRestartingDaemons = false;
+
     /**
      * Supervisor constructor.
      *
@@ -101,7 +108,7 @@ final class SupervisorDaemon extends AbstractDaemon
         // Restart signal => hot restart
         $loop->addSignal(self::RESTART_SIGNAL, function () {
             $this->logger->debug('Restarting all daemons');
-            $this->stopAll();
+            $this->restartRunning();
         });
 
         $this->addSupervisorTimer();
@@ -197,24 +204,62 @@ final class SupervisorDaemon extends AbstractDaemon
         }
     }
 
-    private function stopAll(): void
+    private function restartRunning(): PromiseInterface
     {
-        if ($this->isStoppingDaemons) {
-            return;
+        if ($this->isStoppingDaemons || $this->isRestartingDaemons) {
+            return reject();
+        }
+
+        $this->isRestartingDaemons = true;
+
+        $restartPromises = [];
+
+        // Trying to restart failed daemons
+        foreach ($this->filterStatus(self::STATUS_RUNNING) as $name) {
+            // Start only after successful stop
+            $restartPromises[] = $this->stopSupervisedDaemon($name)->then(function () use ($name) {
+                return $this->startSupervisedDaemon($name, true);
+            });
+        }
+
+
+        $allPromise = all($restartPromises);
+
+        $allPromise->done(function () {
+            $this->logger->info('All daemons are restarted');
+
+            $this->isRestartingDaemons = false;
+        });
+
+        return $allPromise;
+    }
+
+    private function stopAll(): PromiseInterface
+    {
+        if ($this->isStoppingDaemons || $this->isRestartingDaemons) {
+            return reject();
         }
 
         $this->isStoppingDaemons = true;
 
         $this->logger->debug('Shutting down daemons');
 
+        $stopPromises = [];
+
         // Trying to restart failed daemons
         foreach ($this->filterStatus(self::STATUS_RUNNING) as $name) {
-            $this->stopSupervisedDaemon($name);
+            $stopPromises[] = $this->stopSupervisedDaemon($name);
         }
 
-        $this->logger->info('All daemons are stopped');
+        $allPromise = all($stopPromises);
 
-        $this->isStoppingDaemons = false;
+        $allPromise->done(function () {
+            $this->logger->info('All daemons are stopped');
+
+            $this->isStoppingDaemons = false;
+        });
+
+        return $allPromise;
     }
 
     public function stopDaemon(LoopInterface $loop): void
@@ -222,12 +267,12 @@ final class SupervisorDaemon extends AbstractDaemon
         // Prevent auto-restart
         $this->isRunning = false;
 
-        $this->stopAll();
+        await($this->stopAll(), $loop);
 
         $this->logger->info('Supervisor is shutting down');
     }
 
-    private function startSupervisedDaemon(string $name, bool $clearCounter = null): void
+    private function startSupervisedDaemon(string $name, bool $clearCounter = null): PromiseInterface
     {
         $ignoreStatuses = [
             self::STATUS_STARTING,
@@ -236,8 +281,10 @@ final class SupervisorDaemon extends AbstractDaemon
 
         // Prevent duplicates
         if ($this->hasStatus($name) && in_array($this->getStatus($name), $ignoreStatuses, true)) {
-            return;
+            return resolve();
         }
+
+        $deferred = new Deferred;
 
         $this->setStatus($name, self::STATUS_STARTING);
 
@@ -255,6 +302,7 @@ final class SupervisorDaemon extends AbstractDaemon
 
         $lock = $this->lockFactory->create($name);
 
+        // Listen to process stop
         $process->on('exit', function ($exitCode, $termSignal) use ($name, $lock) {
             $this->logger->debug('Daemon ":name" exited with :code code and :signal signal', [
                 ':name'   => $name,
@@ -270,29 +318,41 @@ final class SupervisorDaemon extends AbstractDaemon
         });
 
         // Ensure task is running
-        $this->loop->addPeriodicTimer(0.1, function (TimerInterface $timer) use ($name, $process) {
-            if ($process->isRunning()) {
-                $this->setStatus($name, self::STATUS_RUNNING);
-                $this->loop->cancelTimer($timer);
-
-                $this->logger->debug('Daemon ":name" started', [
-                    ':name' => $name,
-                ]);
+        $this->loop->addPeriodicTimer(0.1, function (TimerInterface $timer) use ($deferred, $name, $process) {
+            if (!$process->isRunning()) {
+                return;
             }
+
+            $this->loop->cancelTimer($timer);
+            $this->setStatus($name, self::STATUS_RUNNING);
+
+            $this->logger->debug('Daemon ":name" started', [
+                ':name' => $name,
+            ]);
+
+            $deferred->resolve();
         });
 
         $startTimeout = Runner::START_TIMEOUT;
 
-        $this->loop->addTimer($startTimeout, function () use ($name, $process, $startTimeout) {
+        $this->loop->addTimer($startTimeout, function () use ($deferred, $name, $process, $startTimeout) {
+            if ($process->isRunning()) {
+                $deferred->resolve();
+
+                return;
+            }
+
             $status = $this->getStatus($name);
 
-            if ($status === self::STATUS_STARTING && !$process->isRunning()) {
+            if ($status === self::STATUS_STARTING) {
                 $this->setStatus($name, self::STATUS_FAILED);
 
                 $this->logger->warning('Can not start ":name" daemon in :timeout seconds', [
                     ':name'    => $name,
                     ':timeout' => $startTimeout,
                 ]);
+
+                $deferred->reject();
             }
         });
 
@@ -304,9 +364,11 @@ final class SupervisorDaemon extends AbstractDaemon
         $process->start($this->loop);
 
         $this->setProcess($name, $process);
+
+        return $deferred->promise();
     }
 
-    private function stopSupervisedDaemon(string $name): void
+    private function stopSupervisedDaemon(string $name): PromiseInterface
     {
         $this->logger->debug('Stopping ":name" daemon', [
             ':name' => $name,
@@ -328,50 +390,78 @@ final class SupervisorDaemon extends AbstractDaemon
             ]);
 
             // Already stopping/stopped => nothing to do here
-            return;
+            return resolve();
         }
+
+        $deferred = new Deferred();
 
         $this->setStatus($name, self::STATUS_STOPPING);
 
+        $process = $this->getProcess($name);
+
         $lock = $this->lockFactory->create($name);
 
-        if (!$lock->isAcquired()) {
-            throw new Exception('Daemon ":name" is running but has no acquired lock', [
+        if ($process->isRunning() && !$lock->isAcquired()) {
+            $this->logger->warning('Daemon ":name" is running but has no acquired lock', [
                 ':name' => $name,
             ]);
         }
 
-        $process = $this->getProcess($name);
+        $stopTimeout = Runner::STOP_TIMEOUT + 1;
+
+        // Stop timeout timer
+        $timeoutTimer = $this->loop->addTimer($stopTimeout,
+            function () use ($deferred, $name, $process, $stopTimeout) {
+                // Double check
+                if (!$process->isRunning()) {
+                    return;
+                }
+
+                $this->logger->warning('Daemon ":name" had not been stopped in :timeout seconds, force kill', [
+                    ':name'    => $name,
+                    ':timeout' => $stopTimeout,
+                ]);
+
+                // Force kill
+                if (!$process->terminate(\SIGKILL)) {
+                    $this->logger->warning('Daemon ":name" had not been killed (signaling failed)', [
+                        ':name' => $name,
+                    ]);
+
+                    $this->setStatus($name, self::STATUS_RUNNING);
+                    $deferred->reject();
+                }
+            });
+
+        // Async wait for process to be stopped
+        $process->on('exit', function () use ($deferred, $timeoutTimer) {
+            $this->loop->cancelTimer($timeoutTimer);
+
+            // Notify about successful daemon stop
+            $deferred->resolve();
+        });
+
+        /**
+         * Actual stop processing is placed below
+         */
 
         $this->logger->debug('Sending "stop" signal to ":name" daemon with PID = :pid', [
             ':pid'  => $process->getPid(),
             ':name' => $name,
         ]);
 
-        $stopTimeout = Runner::STOP_TIMEOUT + 1;
-
         // Send stop signal to the daemon
-        $process->terminate(\SIGTERM);
-
-        // Sync wait for process stop ()
-        if (!$lock->waitForRelease($stopTimeout)) {
-            $this->logger->warning('Daemon ":name" had not been stopped in :timeout seconds, force exit', [
-                ':name'    => $name,
-                ':timeout' => $stopTimeout,
+        if (!$process->terminate(\SIGTERM)) {
+            $this->logger->warning('Daemon ":name" had not been stopped (signaling failed)', [
+                ':name' => $name,
             ]);
 
-            // Kill daemon
-            $process->terminate(\SIGKILL);
-
-            // Release the lock (cleanup)
-            $lock->release();
+            // No signaling => revert stopping
+            $this->setStatus($name, self::STATUS_RUNNING);
+            $deferred->reject();
         }
 
-        $this->setStatus($name, self::STATUS_STOPPED);
-
-        $this->logger->debug('Daemon ":name" stopped', [
-            ':name' => $name,
-        ]);
+        return $deferred->promise();
     }
 
     private function getDefinedDaemons(): array

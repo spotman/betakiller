@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9ba922cd782ebd4a40a95c0243471d94",
+    "content-hash": "7c5df8df37ef53998be05ec5b9ff4dd1",
     "packages": [
         {
             "name": "aidantwoods/secureheaders",
@@ -315,16 +315,80 @@
             "time": "2020-07-07T15:50:14+00:00"
         },
         {
+            "name": "clue/block-react",
+            "version": "v1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/clue/reactphp-block.git",
+                "reference": "c8e7583ae55127b89d6915480ce295bac81c4f88"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/clue/reactphp-block/zipball/c8e7583ae55127b89d6915480ce295bac81c4f88",
+                "reference": "c8e7583ae55127b89d6915480ce295bac81c4f88",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3",
+                "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3.5",
+                "react/promise": "^2.7 || ^1.2.1",
+                "react/promise-timer": "^1.5"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.3 || ^5.7 || ^4.8.35",
+                "react/http": "^1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/functions_include.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Lück",
+                    "email": "christian@clue.engineering"
+                }
+            ],
+            "description": "Lightweight library that eases integrating async components built for ReactPHP in a traditional, blocking environment.",
+            "homepage": "https://github.com/clue/reactphp-block",
+            "keywords": [
+                "async",
+                "await",
+                "blocking",
+                "event loop",
+                "promise",
+                "reactphp",
+                "sleep",
+                "synchronous"
+            ],
+            "funding": [
+                {
+                    "url": "https://clue.engineering/support",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/clue",
+                    "type": "github"
+                }
+            ],
+            "time": "2020-08-21T14:09:44+00:00"
+        },
+        {
             "name": "clue/stream-filter",
             "version": "v1.5.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/clue/php-stream-filter.git",
+                "url": "https://github.com/clue/stream-filter.git",
                 "reference": "aeb7d8ea49c7963d3b581378955dbf5bc49aa320"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/php-stream-filter/zipball/aeb7d8ea49c7963d3b581378955dbf5bc49aa320",
+                "url": "https://api.github.com/repos/clue/stream-filter/zipball/aeb7d8ea49c7963d3b581378955dbf5bc49aa320",
                 "reference": "aeb7d8ea49c7963d3b581378955dbf5bc49aa320",
                 "shasum": ""
             },
@@ -10762,17 +10826,17 @@
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-mysqli": "*",
+        "ext-pcntl": "*",
         "ext-pdo": "*",
         "ext-simplexml": "*",
         "ext-sodium": "*",
         "ext-sqlite3": "*",
         "ext-xml": "*",
-        "ext-zlib": "*",
-        "ext-pcntl": "*"
+        "ext-zlib": "*"
     },
     "platform-dev": [],
     "platform-overrides": {
-        "php": "7.4.4"
+        "php": "7.4.14"
     },
     "plugin-api-version": "1.1.0"
 }
