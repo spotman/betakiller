@@ -74,7 +74,7 @@ class Logger implements LoggerInterface
         $monolog
             ->pushProcessor(new KohanaPlaceholderProcessor())
             ->pushProcessor(new MemoryPeakUsageProcessor())
-            ->pushProcessor(new IntrospectionProcessor($monolog::WARNING));
+            ->pushProcessor(new IntrospectionProcessor($monolog::WARNING, [], 2));
 
         // CLI mode logging
         if ($this->appEnv->isCli()) {
