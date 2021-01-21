@@ -52,6 +52,14 @@ class Token extends \ORM implements TokenInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function isCachingAllowed(): bool
+    {
+        return false;
+    }
+
+    /**
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \BetaKiller\Model\TokenInterface
