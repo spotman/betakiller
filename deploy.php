@@ -409,10 +409,10 @@ task('maintenance:off', static function () {
 /**
  * Daemons maintenance
  */
-task('daemon:supervisor:restart', [
+task('daemon:supervisor:kill', [
     'daemon:supervisor:stop',
     'daemon:supervisor:start',
-])->desc('Restart supervisor');
+])->desc('Kill and restart supervisor');
 
 task('daemon:supervisor:start', static function () {
     runMinionTask('daemon:start --name="supervisor"', true);
@@ -423,8 +423,12 @@ task('daemon:supervisor:stop', static function () {
 })->desc('Stop supervisor');
 
 task('daemon:supervisor:reload', static function () {
-    runMinionTask('daemon:supervisor:reload');
+    runMinionTask('daemon:supervisor:reload', true);
 })->desc('Reload daemons in supervisor');
+
+task('daemon:supervisor:restart', static function () {
+    runMinionTask('daemon:supervisor:restart', true);
+})->desc('Restart daemons in supervisor');
 
 /**
  * Import data

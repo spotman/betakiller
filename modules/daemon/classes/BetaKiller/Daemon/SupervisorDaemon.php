@@ -24,8 +24,8 @@ final class SupervisorDaemon extends AbstractDaemon
     public const CODENAME = 'Supervisor';
 
     public const RETRY_LIMIT    = 60;
-    public const RELOAD_SIGNAL  = \SIGUSR1;
-    public const RESTART_SIGNAL = \SIGUSR2;
+    public const SIGNAL_RELOAD  = \SIGUSR1;
+    public const SIGNAL_RESTART = \SIGUSR2;
 
     private const STATUS_STARTING = 'starting';
     private const STATUS_RUNNING  = 'running';
@@ -100,13 +100,13 @@ final class SupervisorDaemon extends AbstractDaemon
         $this->loop = $loop;
 
         // Reload signal => hot restart
-        $loop->addSignal(self::RELOAD_SIGNAL, function () {
+        $loop->addSignal(self::SIGNAL_RELOAD, function () {
             $this->logger->debug('Reloading stopped daemons');
             $this->restartStopped();
         });
 
         // Restart signal => hot restart
-        $loop->addSignal(self::RESTART_SIGNAL, function () {
+        $loop->addSignal(self::SIGNAL_RESTART, function () {
             $this->logger->debug('Restarting all daemons');
             $this->restartRunning();
         });
