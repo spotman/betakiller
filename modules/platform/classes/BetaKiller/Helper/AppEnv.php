@@ -313,7 +313,7 @@ class AppEnv implements AppEnvInterface
     {
         $path = implode(\DIRECTORY_SEPARATOR, [
             $this->getAppRootPath(),
-            'storage',
+            'cache',
             $target,
         ]);
 
