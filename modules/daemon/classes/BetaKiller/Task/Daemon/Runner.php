@@ -11,11 +11,11 @@ use BetaKiller\Daemon\ShutdownDaemonException;
 use BetaKiller\Dev\MemoryProfiler;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
+use BetaKiller\Log\LoggerInterface;
 use BetaKiller\ProcessLock\LockInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Database;
-use BetaKiller\Log\LoggerInterface;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
@@ -90,7 +90,7 @@ final class Runner extends AbstractTask
     /**
      * @var int
      */
-    private int $maxMemoryRatio = 5;
+    private int $maxMemoryUsage;
 
     /**
      * @var \BetaKiller\Dev\MemoryProfiler
@@ -105,7 +105,7 @@ final class Runner extends AbstractTask
      * @param \BetaKiller\Helper\AppEnvInterface   $appEnv
      * @param \BetaKiller\Daemon\FsWatcher         $fsWatcher
      * @param \BetaKiller\Dev\MemoryProfiler       $memProf
-     * @param \BetaKiller\Log\LoggerInterface             $logger
+     * @param \BetaKiller\Log\LoggerInterface      $logger
      */
     public function __construct(
         DaemonFactory $daemonFactory,
@@ -123,6 +123,8 @@ final class Runner extends AbstractTask
         $this->logger        = $logger;
 
         $this->loop = Factory::create();
+
+        $this->maxMemoryUsage = (int)$appEnv->getEnvVariable('DAEMON_MAX_MEMORY_USAGE', true);
 
         parent::__construct();
     }
@@ -333,15 +335,13 @@ final class Runner extends AbstractTask
 
     private function startMemoryConsumptionGuard(): void
     {
-        $usageOnStart = \memory_get_usage(true);
-
-        $this->memoryConsumptionTimer = $this->loop->addPeriodicTimer(0.5, function () use ($usageOnStart) {
+        $this->memoryConsumptionTimer = $this->loop->addPeriodicTimer(0.5, function () {
             // Prevent calls on startup and kills during processing
             if (!$this->isRunning() || !$this->daemon->isIdle()) {
                 return;
             }
 
-            $isMemoryLeaking = \memory_get_usage(true) > $usageOnStart * $this->maxMemoryRatio;
+            $isMemoryLeaking = \memory_get_usage(true) > $this->maxMemoryUsage;
 
             if (!$isMemoryLeaking) {
                 return;
