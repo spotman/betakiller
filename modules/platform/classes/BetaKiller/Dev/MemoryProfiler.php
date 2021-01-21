@@ -32,6 +32,11 @@ class MemoryProfiler
 
     public function dump(string $codename): void
     {
+        // Exit early if profiling is not enabled in the current env
+        if (!\getenv('MEMPROF_PROFILE')) {
+            return;
+        }
+
         if (!\function_exists('memprof_enabled')) {
             $this->logger->error('MemProf is not installed');
 
