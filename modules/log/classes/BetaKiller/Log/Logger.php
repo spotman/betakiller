@@ -4,6 +4,7 @@ namespace BetaKiller\Log;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use Monolog\ErrorHandler;
+use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\SlackWebhookHandler;
 use Monolog\Handler\StreamHandler;
@@ -108,10 +109,11 @@ class Logger implements LoggerInterface
         $monolog->pushHandler(new SkipExpectedExceptionsHandler($fileHandler));
 //        $monolog->pushHandler(new SkipExpectedExceptionsHandler(new FingersCrossedHandler($fileHandler, $triggerLevel)));
 
-        if ($this->appEnv->inStagingMode() || $this->appEnv->inProductionMode()) {
-            $slackUrl     = $this->appEnv->getEnvVariable('SLACK_ERROR_WEBHOOK');
+        $slackWebHookUrl = $this->appEnv->getEnvVariable('SLACK_ERROR_WEBHOOK');
+
+        if ($slackWebHookUrl) {
             $slackHandler = new SlackWebhookHandler(
-                $slackUrl,
+                $slackWebHookUrl,
                 null,
                 'Errors Bot',
                 true,
@@ -122,20 +124,16 @@ class Logger implements LoggerInterface
             );
             $slackHandler->pushProcessor(new ContextCleanupProcessor);
 
-//            $slackStorage = implode('.', [
-//                'monolog-slack',
-//                $this->appEnv->getAppCodename(),
-//                $this->appEnv->getModeName(),
-//                'storage',
-//            ]);
-//
-//            $slackStorage = $this->appEnv->getStoragePath($slackStorage);
+            $slackStorage = $this->appEnv->getTempPath('monolog-slack.storage');
 
-            $monolog->pushHandler(new SkipExpectedExceptionsHandler($slackHandler
-//                $slackStorage,
-//                \Monolog\Logger::ERROR,
-//                30 // Repeat notification in 30 seconds
-            ));
+            $slackHandler = new DeduplicationHandler(
+                $slackHandler,
+                $slackStorage,
+                \Monolog\Logger::NOTICE,
+                10 // Repeat notification in 10 seconds
+            );
+
+            $monolog->pushHandler(new SkipExpectedExceptionsHandler($slackHandler));
         }
 
         return $monolog;
