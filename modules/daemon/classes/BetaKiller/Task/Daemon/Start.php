@@ -5,27 +5,22 @@ namespace BetaKiller\Task\Daemon;
 
 use BetaKiller\Daemon\DaemonLockFactory;
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Task\AbstractTask;
+use BetaKiller\ProcessLock\LockInterface;
 use BetaKiller\Task\TaskException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 
-class Start extends AbstractTask
+final class Start extends AbstractDaemonCommandTask
 {
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
-    private $appEnv;
-
-    /**
-     * @var \BetaKiller\Daemon\DaemonLockFactory
-     */
-    private $lockFactory;
+    private AppEnvInterface $appEnv;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * Start constructor.
@@ -36,11 +31,10 @@ class Start extends AbstractTask
      */
     public function __construct(DaemonLockFactory $lockFactory, AppEnvInterface $appEnv, LoggerInterface $logger)
     {
-        $this->appEnv      = $appEnv;
-        $this->lockFactory = $lockFactory;
-        $this->logger      = $logger;
+        $this->appEnv = $appEnv;
+        $this->logger = $logger;
 
-        parent::__construct();
+        parent::__construct($lockFactory);
     }
 
     /**
@@ -57,17 +51,8 @@ class Start extends AbstractTask
         ];
     }
 
-    public function run(): void
+    protected function proceedCommand(string $daemonName, LockInterface $lock): void
     {
-        $name = \ucfirst((string)$this->getOption('name', true));
-
-        if (!$name) {
-            throw new \LogicException('Daemon codename is not defined');
-        }
-
-        // Get lock
-        $lock = $this->lockFactory->create($name);
-
         // Check lock file exists and points to a valid pid
         if ($lock->isValid()) {
             if ($this->getOption('ignore-running')) {
@@ -75,7 +60,7 @@ class Start extends AbstractTask
             }
 
             throw new TaskException('Daemon ":name" is already running', [
-                ':name' => $name,
+                ':name' => $daemonName,
             ]);
         }
 
@@ -85,13 +70,13 @@ class Start extends AbstractTask
         }
 
         $cmd = self::getTaskCmd($this->appEnv, 'daemon:runner', [
-            'name' => $name,
+            'name' => $daemonName,
         ], false, true);
 
         $docRoot = $this->appEnv->getDocRootPath();
 
         $this->logger->debug('Starting ":name" daemon with :cmd', [
-            ':name' => $name,
+            ':name' => $daemonName,
             ':cmd'  => $cmd,
         ]);
 
@@ -105,7 +90,7 @@ class Start extends AbstractTask
             ->mustRun();
 
         $this->logger->debug('Waiting for lock to be acquired by ":name" daemon', [
-            ':name' => $name,
+            ':name' => $daemonName,
             ':cmd'  => $cmd,
         ]);
 
@@ -113,7 +98,7 @@ class Start extends AbstractTask
         $lock->waitForAcquire(Runner::START_TIMEOUT + 1);
 
         $this->logger->debug('Daemon ":name" was successfully started', [
-            ':name' => $name,
+            ':name' => $daemonName,
         ]);
     }
 }

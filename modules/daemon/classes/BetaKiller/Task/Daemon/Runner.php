@@ -5,9 +5,10 @@ namespace BetaKiller\Task\Daemon;
 
 use BetaKiller\Daemon\DaemonFactory;
 use BetaKiller\Daemon\DaemonInterface;
-use BetaKiller\Daemon\FsWatcher;
 use BetaKiller\Daemon\DaemonLockFactory;
+use BetaKiller\Daemon\FsWatcher;
 use BetaKiller\Daemon\ShutdownDaemonException;
+use BetaKiller\Dev\MemoryProfiler;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\ProcessLock\LockInterface;
@@ -24,7 +25,7 @@ final class Runner extends AbstractTask
     public const START_TIMEOUT = 5;
     public const STOP_TIMEOUT  = 15;
 
-    public const MAX_MEMORY_RATIO  = 20;
+    public const SIGNAL_PROFILE = \SIGUSR1;
 
     private const STATUS_LOADING  = 'loading';
     private const STATUS_STARTING = 'starting';
@@ -87,12 +88,23 @@ final class Runner extends AbstractTask
     private ?TimerInterface $memoryConsumptionTimer = null;
 
     /**
+     * @var int
+     */
+    private int $maxMemoryRatio = 5;
+
+    /**
+     * @var \BetaKiller\Dev\MemoryProfiler
+     */
+    private MemoryProfiler $memProf;
+
+    /**
      * Run constructor.
      *
      * @param \BetaKiller\Daemon\DaemonFactory     $daemonFactory
      * @param \BetaKiller\Daemon\DaemonLockFactory $lockFactory
      * @param \BetaKiller\Helper\AppEnvInterface   $appEnv
      * @param \BetaKiller\Daemon\FsWatcher         $fsWatcher
+     * @param \BetaKiller\Dev\MemoryProfiler       $memProf
      * @param \Psr\Log\LoggerInterface             $logger
      */
     public function __construct(
@@ -100,12 +112,14 @@ final class Runner extends AbstractTask
         DaemonLockFactory $lockFactory,
         AppEnvInterface $appEnv,
         FsWatcher $fsWatcher,
+        MemoryProfiler $memProf,
         LoggerInterface $logger
     ) {
         $this->daemonFactory = $daemonFactory;
         $this->lockFactory   = $lockFactory;
         $this->appEnv        = $appEnv;
         $this->fsWatcher     = $fsWatcher;
+        $this->memProf       = $memProf;
         $this->logger        = $logger;
 
         $this->loop = Factory::create();
@@ -156,7 +170,8 @@ final class Runner extends AbstractTask
             // Force GC to be called periodically
             // @see https://github.com/ratchetphp/Ratchet/issues/662
             $this->loop->addPeriodicTimer(60, static function () {
-                gc_collect_cycles();
+                \gc_collect_cycles();
+                \gc_mem_caches();
             });
         } else {
             $this->logger->warning('GC disabled but it is required for proper daemons processing');
@@ -223,7 +238,7 @@ final class Runner extends AbstractTask
             $this->shutdown(1);
         });
 
-        $this->loop->addPeriodicTimer(0.5, function(TimerInterface $pollTimer) use ($timeoutTimer) {
+        $this->loop->addPeriodicTimer(0.5, function (TimerInterface $pollTimer) use ($timeoutTimer) {
             if (!$this->daemon->isIdle()) {
                 return;
             }
@@ -298,6 +313,10 @@ final class Runner extends AbstractTask
         $this->loop->addSignal(\SIGINT, $signalCallable);
         $this->loop->addSignal(\SIGQUIT, $signalCallable);
         $this->loop->addSignal(\SIGTERM, $signalCallable);
+
+        $this->loop->addSignal(self::SIGNAL_PROFILE, function () {
+            $this->dumpMemory();
+        });
     }
 
     private function pingDB(): void
@@ -312,21 +331,33 @@ final class Runner extends AbstractTask
         $usageOnStart = \memory_get_usage(true);
 
         $this->memoryConsumptionTimer = $this->loop->addPeriodicTimer(0.5, function () use ($usageOnStart) {
-            // Prevent duplicate calls
-            if (!$this->isRunning()) {
+            // Prevent calls on startup and kills during processing
+            if (!$this->isRunning() || !$this->daemon->isIdle()) {
                 return;
             }
 
-            $isMemoryLeaking = \memory_get_usage(true) > $usageOnStart * self::MAX_MEMORY_RATIO;
+            $isMemoryLeaking = \memory_get_usage(true) > $usageOnStart * $this->maxMemoryRatio;
 
-            if ($isMemoryLeaking && $this->daemon->isIdle()) {
-                $this->logger->notice('Daemon ":name" consumes too much memory, restarting', [
-                    ':name' => $this->codename,
-                ]);
-
-                $this->stop();
+            if (!$isMemoryLeaking) {
+                return;
             }
+
+            $this->dumpMemory();
+
+            $this->logger->notice('Daemon ":name" consumes too much memory, restarting', [
+                ':name' => $this->codename,
+            ]);
+
+            $this->stop();
         });
+    }
+
+    private function dumpMemory(): void
+    {
+        $this->memProf->dump(implode('.', [
+            'daemon',
+            $this->codename,
+        ]));
     }
 
     private function unlock(): void
