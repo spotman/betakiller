@@ -25,7 +25,7 @@ final class Runner extends AbstractTask
     public const START_TIMEOUT = 5;
     public const STOP_TIMEOUT  = 15;
 
-    public const SIGNAL_PROFILE = \SIGUSR1;
+    public const SIGNAL_PROFILE = \SIGUSR2;
 
     private const STATUS_LOADING  = 'loading';
     private const STATUS_STARTING = 'starting';
@@ -181,6 +181,8 @@ final class Runner extends AbstractTask
 
         $this->addSignalHandlers();
 
+        $this->startMemoryConsumptionGuard();
+
         $this->pingDB();
 
         // Flush Monolog buffers to prevent memory leaks
@@ -188,13 +190,11 @@ final class Runner extends AbstractTask
             $this->logger->flushBuffers();
         });
 
-        $this->start();
-
         if ($this->appEnv->inDevelopmentMode()) {
             $this->startFsWatcher($this->loop);
         }
 
-        $this->startMemoryConsumptionGuard();
+        $this->start();
 
         // Endless loop waiting for signals or exit()
         $this->loop->run();
