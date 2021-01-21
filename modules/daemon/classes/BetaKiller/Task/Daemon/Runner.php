@@ -25,7 +25,7 @@ final class Runner extends AbstractTask
     public const START_TIMEOUT = 5;
     public const STOP_TIMEOUT  = 15;
 
-    public const SIGNAL_PROFILE = \SIGUSR2;
+    public const SIGNAL_PROFILE = \SIGPROF;
 
     private const STATUS_LOADING  = 'loading';
     private const STATUS_STARTING = 'starting';
@@ -341,12 +341,16 @@ final class Runner extends AbstractTask
                 return;
             }
 
-            $isMemoryLeaking = \memory_get_usage(true) > $this->maxMemoryUsage;
+            $isMemoryLeaking = \memory_get_peak_usage(true) > $this->maxMemoryUsage;
 
             if (!$isMemoryLeaking) {
                 return;
             }
 
+            // Stop timer
+            $this->loop->cancelTimer($this->memoryConsumptionTimer);
+
+            // Dump CacheGrind profile
             $this->dumpMemory();
 
             $this->logger->notice('Daemon ":name" consumes too much memory, restarting', [

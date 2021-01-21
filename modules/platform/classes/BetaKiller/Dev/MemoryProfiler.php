@@ -51,7 +51,11 @@ class MemoryProfiler
 
         $path = $this->appEnv->getTempPath(sprintf('cachegrind.%s.%d.out', $codename, time()));
 
-        \memprof_dump_callgrind(fopen($path, 'wb+'));
+        $resource = fopen($path, 'wb+');
+
+        \memprof_dump_callgrind($resource);
+
+        fclose($resource);
 
         $this->logger->notice('Memory dumped to :path', [
             ':path' => $path,
