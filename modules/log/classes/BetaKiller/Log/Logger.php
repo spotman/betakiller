@@ -124,14 +124,15 @@ class Logger implements LoggerInterface
             );
             $slackHandler->pushProcessor(new ContextCleanupProcessor);
 
-            $slackStorage = $this->appEnv->getTempPath('monolog-slack.storage');
-
-            $slackHandler = new DeduplicationHandler(
-                $slackHandler,
-                $slackStorage,
-                \Monolog\Logger::NOTICE,
-                10 // Repeat notification in 10 seconds
-            );
+// No flushing for daemons can be implemented so disable this
+//            $slackStorage = $this->appEnv->getTempPath('monolog-slack.storage');
+//
+//            $slackHandler = new DeduplicationHandler(
+//                $slackHandler,
+//                $slackStorage,
+//                \Monolog\Logger::NOTICE,
+//                60 // Repeat notification in 60 seconds
+//            );
 
             $monolog->pushHandler(new SkipExpectedExceptionsHandler($slackHandler));
         }
