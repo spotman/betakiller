@@ -161,4 +161,9 @@ class Logger implements LoggerInterface
     {
         $this->monolog->pushHandler($handler);
     }
+
+    public function flushBuffers(): void
+    {
+        $this->monolog->close();
+    }
 }

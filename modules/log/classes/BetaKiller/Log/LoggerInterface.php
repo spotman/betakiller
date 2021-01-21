@@ -9,4 +9,6 @@ interface LoggerInterface extends \Psr\Log\LoggerInterface
      * @param \Monolog\Handler\HandlerInterface $handler
      */
     public function pushHandler(HandlerInterface $handler): void;
+
+    public function flushBuffers(): void;
 }

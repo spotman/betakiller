@@ -15,7 +15,7 @@ use BetaKiller\ProcessLock\LockInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Database;
-use Psr\Log\LoggerInterface;
+use BetaKiller\Log\LoggerInterface;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
@@ -53,7 +53,7 @@ final class Runner extends AbstractTask
     private FsWatcher $fsWatcher;
 
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var \BetaKiller\Log\LoggerInterface
      */
     private LoggerInterface $logger;
 
@@ -105,7 +105,7 @@ final class Runner extends AbstractTask
      * @param \BetaKiller\Helper\AppEnvInterface   $appEnv
      * @param \BetaKiller\Daemon\FsWatcher         $fsWatcher
      * @param \BetaKiller\Dev\MemoryProfiler       $memProf
-     * @param \Psr\Log\LoggerInterface             $logger
+     * @param \BetaKiller\Log\LoggerInterface             $logger
      */
     public function __construct(
         DaemonFactory $daemonFactory,
@@ -180,6 +180,11 @@ final class Runner extends AbstractTask
         $this->addSignalHandlers();
 
         $this->pingDB();
+
+        // Flush Monolog buffers to prevent memory leaks
+        $this->loop->addPeriodicTimer(10, function () {
+            $this->logger->flushBuffers();
+        });
 
         $this->start();
 
