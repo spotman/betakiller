@@ -6,7 +6,7 @@ namespace BetaKiller\Task\Test\Log;
 use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
 
-class Alert extends AbstractTask
+class Notice extends AbstractTask
 {
     /**
      * @var \Psr\Log\LoggerInterface
@@ -30,6 +30,6 @@ class Alert extends AbstractTask
 
     public function run(): void
     {
-        $this->logger->alert('Test alert from CLI');
+        $this->logger->notice('Test notice from CLI');
     }
 }

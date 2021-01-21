@@ -3,14 +3,15 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Test\Log;
 
+use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
 
-class Warning extends \BetaKiller\Task\AbstractTask
+class Warning extends AbstractTask
 {
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * Alert constructor.
