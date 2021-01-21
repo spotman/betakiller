@@ -1,1 +1,4 @@
-<img src="{{ base_url() ~ "/mark-notification-as-read?h=" ~ __hash__ }}" alt="transparent pixel" width="1" height="1"/>
+{% if in_production() %}
+  {% set tracking_image_url = base_url() ~ "/mark-notification-as-read?h=" ~ __hash__ %}
+  <img src="{{ tracking_image_url }}" alt="transparent pixel" width="1" height="1"/>
+{% endif %}
