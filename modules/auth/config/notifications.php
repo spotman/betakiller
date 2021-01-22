@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use BetaKiller\Action\Auth\ConfirmEmailAction;
+use BetaKiller\Action\Auth\VerifyAccessRecoveryTokenAction;
 use BetaKiller\Action\Auth\VerifyPasswordChangeTokenAction;
 use BetaKiller\EventHandler\UserConfirmationEmailHandler;
 use BetaKiller\EventHandler\UserPasswordChangeRequestedEmailHandler;
@@ -44,6 +45,7 @@ return [
     'messages' => [
         AccessRecoveryService::NOTIFICATION_NAME => [
             'group'     => AUTH_USER_GROUP,
+            'action'    => VerifyAccessRecoveryTokenAction::codename(),
             'transport' => EmailTransport::CODENAME,
         ],
 

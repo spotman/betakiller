@@ -3,10 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Service;
 
-use BetaKiller\Action\Auth\ClaimRegistrationAction;
-use BetaKiller\Action\Auth\VerifyAccessRecoveryTokenAction;
 use BetaKiller\Event\AccessRecoveryRequestedEvent;
-use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Model\UserInterface;
@@ -21,42 +18,31 @@ class AccessRecoveryService
     /**
      * @var \BetaKiller\Service\TokenService
      */
-    private $tokenService;
+    private TokenService $tokenService;
 
     /**
      * @var \BetaKiller\Helper\NotificationHelper
      */
-    private $notification;
-
-    /**
-     * @var \BetaKiller\Helper\UrlHelperInterface
-     */
-    private $urlHelper;
+    private NotificationHelper $notification;
 
     /**
      * @var \BetaKiller\MessageBus\EventBusInterface
      */
-    private $eventBus;
+    private EventBusInterface $eventBus;
 
     /**
      * @param \BetaKiller\Helper\NotificationHelper    $notificationHelper
      * @param \BetaKiller\Service\TokenService         $tokenService
-     * @param \BetaKiller\Factory\UrlHelperFactory     $urlHelperFactory
      * @param \BetaKiller\MessageBus\EventBusInterface $eventBus
-     *
-     * @throws \DI\DependencyException
-     * @throws \DI\NotFoundException
      */
     public function __construct(
         NotificationHelper $notificationHelper,
         TokenService $tokenService,
-        UrlHelperFactory $urlHelperFactory,
         EventBusInterface $eventBus
     ) {
         $this->tokenService = $tokenService;
         $this->notification = $notificationHelper;
         $this->eventBus     = $eventBus;
-        $this->urlHelper    = $urlHelperFactory->create();
     }
 
     /**
@@ -71,7 +57,6 @@ class AccessRecoveryService
      * @param \BetaKiller\Model\UserInterface                 $user
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParams
      *
-     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
@@ -80,13 +65,9 @@ class AccessRecoveryService
         $ttl   = $this->getTokenPeriod();
         $token = $this->tokenService->create($user, $ttl);
 
-        $actionParams = $this->urlHelper->createUrlContainer()->setEntity($token);
-
         $this->notification->directMessage(self::NOTIFICATION_NAME, $user, [
             // User Language will be fetched from Token
-            'recovery_url' => $this->urlHelper->makeCodenameUrl(VerifyAccessRecoveryTokenAction::codename(),
-                $actionParams),
-            'claim_url'    => $this->urlHelper->makeCodenameUrl(ClaimRegistrationAction::codename(), $actionParams),
+            '$token' => $token,
         ]);
 
         $this->eventBus->emit(new AccessRecoveryRequestedEvent($user, $urlParams));

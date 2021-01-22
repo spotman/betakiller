@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\EventHandler;
 
-use BetaKiller\Action\Auth\ClaimRegistrationAction;
 use BetaKiller\Event\AbstractUserWorkflowEvent;
-use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Service\TokenService;
 
@@ -14,28 +12,21 @@ final class UserConfirmationEmailHandler
     public const EMAIL_VERIFICATION = 'email/user/verification';
 
     /**
-     * @var \BetaKiller\Helper\UrlHelperInterface
-     */
-    private $urlHelper;
-
-    /**
      * @var \BetaKiller\Helper\NotificationHelper
      */
-    private $notification;
+    private NotificationHelper $notification;
 
     /**
      * @var \BetaKiller\Service\TokenService
      */
-    private $tokenService;
+    private TokenService $tokenService;
 
     public function __construct(
         NotificationHelper $notificationHelper,
-        TokenService $tokenService,
-        UrlHelperFactory $urlHelperFactory
+        TokenService $tokenService
     ) {
         $this->tokenService = $tokenService;
         $this->notification = $notificationHelper;
-        $this->urlHelper    = $urlHelperFactory->create();
     }
 
     public function __invoke(AbstractUserWorkflowEvent $event): void
@@ -45,9 +36,8 @@ final class UserConfirmationEmailHandler
         $token = $this->tokenService->create($user, new \DateInterval('P14D'));
 
         $emailData = [
-            'claim_url' => $this->urlHelper->makeCodenameUrl(ClaimRegistrationAction::codename()),
             // For action URL generation
-            '$token'    => $token,
+            '$token' => $token,
         ];
 
         $this->notification->directMessage(self::EMAIL_VERIFICATION, $user, $emailData);
