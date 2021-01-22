@@ -7,7 +7,6 @@ use BetaKiller\Daemon\DaemonLockFactory;
 use BetaKiller\ProcessLock\LockInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
-use Symfony\Component\Process\Process;
 
 abstract class AbstractDaemonCommandTask extends AbstractTask
 {
@@ -53,28 +52,6 @@ abstract class AbstractDaemonCommandTask extends AbstractTask
         $lock = $this->lockFactory->create($name);
 
         $this->proceedCommand($name, $lock);
-
-        // Check lock file exists and points to a valid pid
-        if (!$lock->isAcquired()) {
-            echo sprintf('Daemon "%s" is not running'.PHP_EOL, $name);
-
-            return;
-        }
-
-        // Check lock file exists and points to a valid pid
-        if (!$lock->isValid()) {
-            echo sprintf('Daemon "%s" is stale with pid %d, lock will be released'.PHP_EOL, $name, $lock->getPid());
-            $lock->release();
-
-            return;
-        }
-
-        // Get PID
-        $pid = $lock->getPid();
-
-        // Send signal to a process
-        $process = new Process(['kill', '-s', Runner::SIGNAL_PROFILE, $pid]);
-        $process->mustRun();
     }
 
     protected function checkLockExists(string $daemonName, LockInterface $lock): void

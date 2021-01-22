@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Daemon;
 
+use BetaKiller\Daemon\AbstractDaemon;
 use BetaKiller\Daemon\DaemonFactory;
 use BetaKiller\Daemon\DaemonInterface;
 use BetaKiller\Daemon\DaemonLockFactory;
@@ -22,9 +23,6 @@ use React\EventLoop\TimerInterface;
 
 final class Runner extends AbstractTask
 {
-    public const START_TIMEOUT = 5;
-    public const STOP_TIMEOUT  = 15;
-
     public const SIGNAL_PROFILE = \SIGPROF;
 
     private const STATUS_LOADING  = 'loading';
@@ -90,7 +88,7 @@ final class Runner extends AbstractTask
     /**
      * @var int
      */
-    private int $maxMemoryUsage;
+    private int $maxMemoryIncrease;
 
     /**
      * @var \BetaKiller\Dev\MemoryProfiler
@@ -124,7 +122,7 @@ final class Runner extends AbstractTask
 
         $this->loop = Factory::create();
 
-        $this->maxMemoryUsage = (int)$appEnv->getEnvVariable('DAEMON_MAX_MEMORY_USAGE', true);
+        $this->maxMemoryIncrease = (int)$appEnv->getEnvVariable('DAEMON_MAX_MEMORY_USAGE', true);
 
         parent::__construct();
     }
@@ -181,8 +179,6 @@ final class Runner extends AbstractTask
 
         $this->addSignalHandlers();
 
-        $this->startMemoryConsumptionGuard();
-
         $this->pingDB();
 
         // Flush Monolog buffers to prevent memory leaks
@@ -193,6 +189,8 @@ final class Runner extends AbstractTask
         if ($this->appEnv->inDevelopmentMode()) {
             $this->startFsWatcher($this->loop);
         }
+
+        $this->startMemoryConsumptionGuard();
 
         $this->start();
 
@@ -236,7 +234,7 @@ final class Runner extends AbstractTask
         $this->setStatus(self::STATUS_STOPPING);
 
         // Wait 5 seconds for daemon stop
-        $timeoutTimer = $this->loop->addTimer(self::STOP_TIMEOUT, function () {
+        $timeoutTimer = $this->loop->addTimer(AbstractDaemon::SHUTDOWN_TIMEOUT, function () {
             $this->logger->alert('Daemon ":name" had not stopped, force exit applied', [
                 ':name' => $this->codename,
             ]);
@@ -335,13 +333,16 @@ final class Runner extends AbstractTask
 
     private function startMemoryConsumptionGuard(): void
     {
-        $this->memoryConsumptionTimer = $this->loop->addPeriodicTimer(0.5, function () {
+        $initialUsage = \memory_get_peak_usage(true);
+        $maxUsage = $initialUsage + $this->maxMemoryIncrease;
+
+        $this->memoryConsumptionTimer = $this->loop->addPeriodicTimer(1, function () use ($maxUsage) {
             // Prevent calls on startup and kills during processing
             if (!$this->isRunning() || !$this->daemon->isIdle()) {
                 return;
             }
 
-            $isMemoryLeaking = \memory_get_peak_usage(true) > $this->maxMemoryUsage;
+            $isMemoryLeaking = \memory_get_peak_usage(true) > $maxUsage;
 
             if (!$isMemoryLeaking) {
                 return;

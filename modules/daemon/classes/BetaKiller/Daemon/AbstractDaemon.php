@@ -5,6 +5,9 @@ namespace BetaKiller\Daemon;
 
 abstract class AbstractDaemon implements DaemonInterface
 {
+    public const SHUTDOWN_TIMEOUT = 15;
+    public const STARTUP_TIMEOUT  = 5;
+
     private int $processingCounter = 0;
 
     /**

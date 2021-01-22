@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Daemon;
 
+use BetaKiller\Daemon\AbstractDaemon;
 use BetaKiller\Daemon\DaemonLockFactory;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\ProcessLock\LockInterface;
@@ -95,7 +96,7 @@ final class Start extends AbstractDaemonCommandTask
         ]);
 
         // Ensure daemon was started
-        $lock->waitForAcquire(Runner::START_TIMEOUT + 1);
+        $lock->waitForAcquire(AbstractDaemon::STARTUP_TIMEOUT + 1);
 
         $this->logger->debug('Daemon ":name" was successfully started', [
             ':name' => $daemonName,

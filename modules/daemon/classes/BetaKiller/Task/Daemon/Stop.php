@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Daemon;
 
+use BetaKiller\Daemon\AbstractDaemon;
 use BetaKiller\ProcessLock\LockInterface;
 use Symfony\Component\Process\Process;
 
@@ -20,6 +21,6 @@ final class Stop extends AbstractDaemonCommandTask
         $process->run();
 
         // Wait for daemon to be stopped
-        $lock->waitForRelease(Runner::STOP_TIMEOUT + 2);
+        $lock->waitForRelease(AbstractDaemon::SHUTDOWN_TIMEOUT + 2);
     }
 }

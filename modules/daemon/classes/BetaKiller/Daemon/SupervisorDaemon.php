@@ -7,9 +7,9 @@ use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\ProcessLock\LockInterface;
 use BetaKiller\Task\AbstractTask;
-use BetaKiller\Task\Daemon\Runner;
 use Psr\Log\LoggerInterface;
 use React\ChildProcess\Process;
+use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
 use React\Promise\Deferred;
@@ -18,6 +18,7 @@ use function Clue\React\Block\await;
 use function React\Promise\all;
 use function React\Promise\reject;
 use function React\Promise\resolve;
+use function React\Promise\Timer\timeout;
 
 final class SupervisorDaemon extends AbstractDaemon
 {
@@ -113,11 +114,36 @@ final class SupervisorDaemon extends AbstractDaemon
 
         $this->addSupervisorTimer();
 
+        timeout($this->startAll(), AbstractDaemon::STARTUP_TIMEOUT, Factory::create())
+            ->done(function () {
+                $this->isRunning = true;
+            });
+    }
+
+    private function startAll(): PromiseInterface
+    {
+        $startPromises = [];
+
         foreach ($this->getDefinedDaemons() as $codename) {
-            $this->startSupervisedDaemon($codename, true);
+            $promise = $this->startSupervisedDaemon($codename, true);
+
+            $promise->then(
+                function () use ($codename) {
+                    $this->logger->debug('Started daemon ":name"', [
+                        ':name' => $codename,
+                    ]);
+                },
+                function () use ($codename) {
+                    $this->logger->error('Daemon ":name" start failed', [
+                        ':name' => $codename,
+                    ]);
+                },
+            );
+
+            $startPromises[] = $promise;
         }
 
-        $this->isRunning = true;
+        return all($startPromises);
     }
 
     private function addSupervisorTimer(): void
@@ -222,7 +248,6 @@ final class SupervisorDaemon extends AbstractDaemon
             });
         }
 
-
         $allPromise = all($restartPromises);
 
         $allPromise->done(function () {
@@ -284,7 +309,10 @@ final class SupervisorDaemon extends AbstractDaemon
             return resolve();
         }
 
+        $startTimeout = AbstractDaemon::STARTUP_TIMEOUT;
+
         $deferred = new Deferred;
+        $promise  = timeout($deferred->promise(), $startTimeout, $this->loop);
 
         $this->setStatus($name, self::STATUS_STARTING);
 
@@ -303,7 +331,7 @@ final class SupervisorDaemon extends AbstractDaemon
         $lock = $this->lockFactory->create($name);
 
         // Listen to process stop
-        $process->on('exit', function ($exitCode, $termSignal) use ($name, $lock) {
+        $process->on('exit', function ($exitCode, $termSignal) use ($deferred, $name, $lock) {
             $this->logger->debug('Daemon ":name" exited with :code code and :signal signal', [
                 ':name'   => $name,
                 ':code'   => $exitCode ?? 'unknown',
@@ -314,61 +342,27 @@ final class SupervisorDaemon extends AbstractDaemon
 
             $this->checkLockReleased($lock);
 
-            $status = $this->getStatus($name);
-
-            switch ($status) {
-                case self::STATUS_STARTING:
-                case self::STATUS_RUNNING:
-                    $status = $isOk ? self::STATUS_FINISHED : self::STATUS_FAILED;
+            switch (true) {
+                // Exit code is non-normal
+                // Or exit code is OK but process was starting
+                case !$isOk:
+                case $this->isStatus($name, self::STATUS_STARTING):
+                    $this->setStatus($name, self::STATUS_FAILED);
+                    $deferred->reject();
                     break;
 
-                case self::STATUS_STOPPING:
-                    $status = $isOk ? self::STATUS_STOPPED : self::STATUS_FAILED;
+                // Exit code is OK and process was running
+                case $this->isStatus($name, self::STATUS_RUNNING):
+                    $this->setStatus($name, self::STATUS_FINISHED);
+                    break;
+
+                // Exit code is OK and process was stopping
+                case $this->isStatus($name, self::STATUS_STOPPING):
+                    $this->setStatus($name, self::STATUS_STOPPED);
                     break;
 
                 default:
-                    throw new \LogicException(sprintf('Unknown daemon status upon exit "%s"', $status));
-            }
-
-            $this->setStatus($name, $status);
-        });
-
-        // Ensure task is running
-        $this->loop->addPeriodicTimer(0.1, function (TimerInterface $timer) use ($deferred, $name, $process) {
-            if (!$process->isRunning()) {
-                return;
-            }
-
-            $this->loop->cancelTimer($timer);
-            $this->setStatus($name, self::STATUS_RUNNING);
-
-            $this->logger->debug('Daemon ":name" started', [
-                ':name' => $name,
-            ]);
-
-            $deferred->resolve();
-        });
-
-        $startTimeout = Runner::START_TIMEOUT;
-
-        $this->loop->addTimer($startTimeout, function () use ($deferred, $name, $process, $startTimeout) {
-            if ($process->isRunning()) {
-                $deferred->resolve();
-
-                return;
-            }
-
-            $status = $this->getStatus($name);
-
-            if ($status === self::STATUS_STARTING) {
-                $this->setStatus($name, self::STATUS_FAILED);
-
-                $this->logger->warning('Can not start ":name" daemon in :timeout seconds', [
-                    ':name'    => $name,
-                    ':timeout' => $startTimeout,
-                ]);
-
-                $deferred->reject();
+                    throw new \LogicException(sprintf('Unknown daemon status upon exit "%s"', $this->getStatus($name)));
             }
         });
 
@@ -381,7 +375,37 @@ final class SupervisorDaemon extends AbstractDaemon
 
         $this->setProcess($name, $process);
 
-        return $deferred->promise();
+        // Ensure task is running
+        $pollingTimer = $this->loop->addPeriodicTimer(0.5, static function () use ($deferred, $process) {
+            if ($process->getPid()) {
+                $deferred->resolve();
+            }
+        });
+
+        // On successful startup
+        $promise->done(function () use ($name, $pollingTimer) {
+            $this->loop->cancelTimer($pollingTimer);
+
+            $this->setStatus($name, self::STATUS_RUNNING);
+
+            $this->logger->info('Daemon ":name" started', [
+                ':name' => $name,
+            ]);
+        });
+
+        // On startup error
+        $promise->otherwise(function () use ($name, $startTimeout, $pollingTimer) {
+            $this->loop->cancelTimer($pollingTimer);
+
+            $this->setStatus($name, self::STATUS_FAILED);
+
+            $this->logger->warning('Can not start ":name" daemon in :timeout seconds', [
+                ':name'    => $name,
+                ':timeout' => $startTimeout,
+            ]);
+        });
+
+        return $promise;
     }
 
     private function stopSupervisedDaemon(string $name): PromiseInterface
@@ -423,7 +447,7 @@ final class SupervisorDaemon extends AbstractDaemon
             ]);
         }
 
-        $stopTimeout = Runner::STOP_TIMEOUT + 1;
+        $stopTimeout = AbstractDaemon::SHUTDOWN_TIMEOUT + 1;
 
         $pollingTimer = $this->loop->addPeriodicTimer($stopTimeout,
             function (TimerInterface $timer) use ($deferred, $process) {
@@ -531,6 +555,11 @@ final class SupervisorDaemon extends AbstractDaemon
     private function getStatus(string $name): string
     {
         return $this->statuses[$name]['status'];
+    }
+
+    private function isStatus(string $name, string $status): bool
+    {
+        return $this->hasStatus($name) ? $this->getStatus($name) === $status : false;
     }
 
     private function hasStatus(string $name): bool

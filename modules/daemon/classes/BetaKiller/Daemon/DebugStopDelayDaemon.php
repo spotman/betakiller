@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Daemon;
 
-use BetaKiller\Task\Daemon\Runner;
 use React\EventLoop\LoopInterface;
 
 final class DebugStopDelayDaemon extends AbstractDaemon
@@ -22,7 +21,7 @@ final class DebugStopDelayDaemon extends AbstractDaemon
     {
         // Test stop
         echo 'Delaying daemon stop (timeout guard check)';
-        sleep(Runner::STOP_TIMEOUT * 2);
+        sleep(AbstractDaemon::SHUTDOWN_TIMEOUT * 2);
         echo 'OK'.\PHP_EOL;
     }
 }
