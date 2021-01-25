@@ -96,11 +96,17 @@ class Api extends AbstractTask
             ':time' => \round(($end - $start) * 1000),
         ]);
 
-        echo json_encode($response->getData(), JSON_PRETTY_PRINT).PHP_EOL;
+        echo json_encode($response->getData(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT).PHP_EOL;
     }
 
     private function getCallArguments(): array
     {
+        $stdin = file_get_contents('php://stdin');
+
+        if ($stdin) {
+            return (array)json_decode($stdin, true, 5, \JSON_THROW_ON_ERROR);
+        }
+
         $names = [
             self::ARG_P1,
             self::ARG_P2,
