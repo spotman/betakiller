@@ -459,7 +459,7 @@ final class SupervisorDaemon extends AbstractDaemon
 
         $stopTimeout = AbstractDaemon::SHUTDOWN_TIMEOUT + 1;
 
-        $pollingTimer = $this->loop->addPeriodicTimer($stopTimeout,
+        $pollingTimer = $this->loop->addPeriodicTimer(0.5,
             function (TimerInterface $timer) use ($deferred, $process) {
                 if ($process->isRunning()) {
                     return;
