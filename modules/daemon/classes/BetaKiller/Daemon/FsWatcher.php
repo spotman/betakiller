@@ -4,9 +4,11 @@ declare(strict_types=1);
 namespace BetaKiller\Daemon;
 
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Helper\TextHelper;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use ReactFilesystemMonitor\FilesystemMonitorFactory;
+use Symfony\Component\Process\Process;
 
 final class FsWatcher
 {
@@ -96,9 +98,14 @@ final class FsWatcher
 
                 // Skip files in ignored directories
                 foreach (self::WATCH_IGNORE_DIRS as $ignoreDir) {
-                    if (strpos($path, DIRECTORY_SEPARATOR.$ignoreDir.DIRECTORY_SEPARATOR) !== false) {
+                    if (TextHelper::contains($path, DIRECTORY_SEPARATOR.$ignoreDir.DIRECTORY_SEPARATOR)) {
                         return;
                     }
+                }
+
+                // Skip removed files
+                if (!\file_exists($path)) {
+                    return;
                 }
 
                 $ext = pathinfo($path, PATHINFO_EXTENSION);
@@ -108,8 +115,13 @@ final class FsWatcher
                     return;
                 }
 
+                // Skip files with fatal errors to prevent restart with a broken code
+                if ($ext === 'php' && $this->hasFatalErrors($path)) {
+                    return;
+                }
+
                 $this->logger->debug('FS WATCHER :msg', [
-                    ':msg' => sprintf("%s:  %s%s\n", $event, $path, $isDir ? ' [dir]' : ''),
+                    ':msg' => sprintf("%s: %s\n", $event, $path),
                 ]);
 
                 if ($this->watchTimer) {
@@ -123,5 +135,17 @@ final class FsWatcher
             });
 
         $this->fsWatcher->start($loop);
+    }
+
+    private function hasFatalErrors(string $path): bool
+    {
+        /** @see https://stackoverflow.com/a/13224603 */
+        $cmd = [\PHP_BINARY, '-l', '-f', $path];
+
+        $process = new Process($cmd);
+
+        $process->mustRun();
+
+        return !TextHelper::contains($process->getOutput(), 'No syntax errors detected');
     }
 }

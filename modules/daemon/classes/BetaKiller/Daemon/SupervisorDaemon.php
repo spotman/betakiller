@@ -486,7 +486,7 @@ final class SupervisorDaemon extends AbstractDaemon
                         ':name' => $name,
                     ]);
 
-                    $this->setStatus($name, self::STATUS_RUNNING);
+                    // No signaling => failed
                     $deferred->reject();
                 }
             });
@@ -514,12 +514,26 @@ final class SupervisorDaemon extends AbstractDaemon
                 ':name' => $name,
             ]);
 
-            // No signaling => revert stopping
-            $this->setStatus($name, self::STATUS_RUNNING);
+            // No signaling => failed
             $deferred->reject();
         }
 
-        return $deferred->promise();
+        $promise = $deferred->promise();
+
+        $promise->done(function () use ($name) {
+            $this->setStatus($name, self::STATUS_STOPPED);
+        });
+
+        $promise->otherwise(function () use ($name) {
+            $this->setStatus($name, self::STATUS_FAILED);
+        });
+
+        $promise->always(function () use ($timeoutTimer, $pollingTimer) {
+            $this->loop->cancelTimer($pollingTimer);
+            $this->loop->cancelTimer($timeoutTimer);
+        });
+
+        return $promise;
     }
 
     private function getDefinedDaemons(): array
