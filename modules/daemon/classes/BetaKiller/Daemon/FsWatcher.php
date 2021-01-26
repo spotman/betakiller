@@ -144,8 +144,8 @@ final class FsWatcher
 
         $process = new Process($cmd);
 
-        $process->mustRun();
+        $process->run();
 
-        return !TextHelper::contains($process->getOutput(), 'No syntax errors detected');
+        return !$process->isSuccessful() || !TextHelper::contains($process->getOutput(), 'No syntax errors detected');
     }
 }
