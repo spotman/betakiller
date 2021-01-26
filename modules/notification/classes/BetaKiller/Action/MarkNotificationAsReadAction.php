@@ -8,6 +8,7 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\TextHelper;
 use BetaKiller\Model\NotificationLogInterface;
+use BetaKiller\Model\RoleInterface;
 use BetaKiller\Repository\NotificationLogRepositoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -37,7 +38,7 @@ final class MarkNotificationAsReadAction extends AbstractAction
         $ref = ServerRequestHelper::getHttpReferrer($request);
 
         // Prevent "read" marker to be set during logs check in admin zone
-        if ($ref && TextHelper::contains($ref, '/admin')) {
+        if ($ref && TextHelper::contains($ref, '/admin/')) {
             return $this->makePixel();
         }
 
@@ -46,6 +47,17 @@ final class MarkNotificationAsReadAction extends AbstractAction
 
         if (!$logRecord) {
             throw new BadRequestHttpException('Missing notification log record');
+        }
+
+        // Prevent processing foreign notifications
+        if (!ServerRequestHelper::isGuest($request)) {
+            $user = ServerRequestHelper::getUser($request);
+
+            $targetUserId = $logRecord->getTargetUserId();
+
+            if ($targetUserId && $targetUserId !== $user->getID()) {
+                return $this->makePixel();
+            }
         }
 
         if (!$logRecord->isRead()) {
