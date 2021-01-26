@@ -151,7 +151,7 @@ final class SupervisorDaemon extends AbstractDaemon
         // Watch status changes
         $this->loop->addPeriodicTimer(0.1, function () {
             // Prevent auto-restart
-            if (!$this->isRunning || $this->isStoppingDaemons || $this->isRestartingDaemons) {
+            if (!$this->isRunning || $this->isStoppingDaemons) {
                 return;
             }
 
@@ -243,16 +243,20 @@ final class SupervisorDaemon extends AbstractDaemon
         // Trying to restart failed daemons
         foreach ($this->filterStatus(self::STATUS_RUNNING) as $name) {
             // Start only after successful stop
-            $restartPromises[] = $this->stopSupervisedDaemon($name)->then(function () use ($name) {
-                return $this->startSupervisedDaemon($name, true);
-            });
+            $restartPromises[] = $this->stopSupervisedDaemon($name);
         }
 
         $allPromise = all($restartPromises);
 
         $allPromise->done(function () {
             $this->logger->info('All daemons are restarted');
+        });
 
+        $allPromise->otherwise(function () {
+            $this->logger->warning('Daemons restart failed');
+        });
+
+        $allPromise->always(function() {
             $this->isRestartingDaemons = false;
         });
 
@@ -280,7 +284,13 @@ final class SupervisorDaemon extends AbstractDaemon
 
         $allPromise->done(function () {
             $this->logger->info('All daemons are stopped');
+        });
 
+        $allPromise->otherwise(function () {
+            $this->logger->warning('Daemons stop failed');
+        });
+
+        $allPromise->always(function() {
             $this->isStoppingDaemons = false;
         });
 
@@ -522,10 +532,13 @@ final class SupervisorDaemon extends AbstractDaemon
 
         $promise->done(function () use ($name) {
             $this->setStatus($name, self::STATUS_STOPPED);
+
+            // Clear counter for a fresh next start
+            $this->failureCounters[$name] = 0;
         });
 
-        $promise->otherwise(function () use ($name) {
-            $this->setStatus($name, self::STATUS_FAILED);
+        $promise->otherwise(function () use ($process, $name) {
+            $this->setStatus($name, $process->isRunning() ? self::STATUS_RUNNING : self::STATUS_FAILED);
         });
 
         $promise->always(function () use ($timeoutTimer, $pollingTimer) {
