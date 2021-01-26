@@ -6,7 +6,9 @@ namespace BetaKiller\Daemon;
 use BetaKiller\Api\ApiFacade;
 use BetaKiller\Error\ExceptionService;
 use BetaKiller\Helper\LoggerHelper;
+use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Service\MaintenanceModeService;
 use BetaKiller\Wamp\WampClient;
 use BetaKiller\Wamp\WampClientBuilder;
 use BetaKiller\Wamp\WampClientHelper;
@@ -62,23 +64,31 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
     private LoggerInterface $logger;
 
     /**
-     * @param \BetaKiller\Wamp\WampClientBuilder $clientFactory
-     * @param \BetaKiller\Api\ApiFacade          $apiFacade
-     * @param \BetaKiller\Error\ExceptionService $exceptionService
-     * @param \BetaKiller\Wamp\WampClientHelper  $clientHelper
-     * @param \Psr\Log\LoggerInterface           $logger
+     * @var \BetaKiller\Service\MaintenanceModeService
+     */
+    private MaintenanceModeService $maintenance;
+
+    /**
+     * @param \BetaKiller\Wamp\WampClientBuilder         $clientFactory
+     * @param \BetaKiller\Api\ApiFacade                  $apiFacade
+     * @param \BetaKiller\Error\ExceptionService         $exceptionService
+     * @param \BetaKiller\Wamp\WampClientHelper          $clientHelper
+     * @param \BetaKiller\Service\MaintenanceModeService $maintenance
+     * @param \Psr\Log\LoggerInterface                   $logger
      */
     public function __construct(
         WampClientBuilder $clientFactory,
         ApiFacade $apiFacade,
         ExceptionService $exceptionService,
         WampClientHelper $clientHelper,
+        MaintenanceModeService $maintenance,
         LoggerInterface $logger
     ) {
         $this->clientBuilder    = $clientFactory;
         $this->apiFacade        = $apiFacade;
         $this->exceptionService = $exceptionService;
         $this->clientHelper     = $clientHelper;
+        $this->maintenance      = $maintenance;
         $this->logger           = $logger;
     }
 
@@ -143,6 +153,13 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
 
 //            $this->logger->debug('Indexed args are :value', [':value' => json_encode($indexedArgs)]);
 //            $this->logger->debug('Named args are :value', [':value' => json_encode($namedArgs)]);
+
+            // Prevent calling API methods during maintenance for non-developers
+            if (!$user->hasRoleName(RoleInterface::DEVELOPER) && $this->maintenance->isEnabled()) {
+                return [
+                    'error' => 'maintenance',
+                ];
+            }
 
             $arrayArgs = (array)$namedArgs;
 
