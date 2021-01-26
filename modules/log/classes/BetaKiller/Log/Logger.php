@@ -4,6 +4,7 @@ namespace BetaKiller\Log;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use Monolog\ErrorHandler;
+use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\SlackWebhookHandler;
 use Monolog\Handler\StreamHandler;
@@ -73,7 +74,7 @@ class Logger implements LoggerInterface
         $monolog
             ->pushProcessor(new KohanaPlaceholderProcessor())
             ->pushProcessor(new MemoryPeakUsageProcessor())
-            ->pushProcessor(new IntrospectionProcessor($monolog::WARNING, [], 2));
+            ->pushProcessor(new IntrospectionProcessor($monolog::WARNING, [], 3));
 
         // CLI mode logging
         if ($this->appEnv->isCli()) {
@@ -123,15 +124,21 @@ class Logger implements LoggerInterface
             );
             $slackHandler->pushProcessor(new ContextCleanupProcessor);
 
-// No flushing for daemons can be implemented so disable this
-//            $slackStorage = $this->appEnv->getTempPath('monolog-slack.storage');
-//
-//            $slackHandler = new DeduplicationHandler(
-//                $slackHandler,
-//                $slackStorage,
-//                \Monolog\Logger::NOTICE,
-//                60 // Repeat notification in 60 seconds
-//            );
+            // Remove duplicate errors in debugging mode
+            if ($isDebug) {
+                $slackStorage = $this->appEnv->getTempPath('monolog-slack.storage');
+
+                if (!\is_file($slackStorage)) {
+                    touch($slackStorage) && \chmod($slackStorage, 0660);
+                }
+
+                $slackHandler = new DeduplicationHandler(
+                    $slackHandler,
+                    $slackStorage,
+                    \Monolog\Logger::NOTICE,
+                    300 // Repeat notification in 5 minutes
+                );
+            }
 
             $monolog->pushHandler(new SkipExpectedExceptionsHandler($slackHandler));
         }
