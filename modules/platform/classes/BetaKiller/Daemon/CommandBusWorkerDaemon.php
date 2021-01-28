@@ -14,6 +14,8 @@ use Interop\Queue\Message;
 use Interop\Queue\Queue;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use React\Promise\PromiseInterface;
+use function React\Promise\resolve;
 
 final class CommandBusWorkerDaemon extends AbstractDaemon
 {
@@ -74,7 +76,7 @@ final class CommandBusWorkerDaemon extends AbstractDaemon
         $this->container    = $container;
     }
 
-    public function startDaemon(LoopInterface $loop): void
+    public function startDaemon(LoopInterface $loop): PromiseInterface
     {
         // Load all commands from config
         foreach ((array)$this->config->load(['commands']) as $commandClass => $handlerClass) {
@@ -117,11 +119,15 @@ final class CommandBusWorkerDaemon extends AbstractDaemon
 
             $this->markAsIdle();
         });
+
+        return resolve();
     }
 
-    public function stopDaemon(LoopInterface $loop): void
+    public function stopDaemon(LoopInterface $loop): PromiseInterface
     {
         $this->queueContext->close();
+
+        return resolve();
     }
 
     private function processQueueMessage(Message $queueMessage): bool

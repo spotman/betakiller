@@ -60,7 +60,7 @@ final class Start extends AbstractDaemonCommandTask
                 return;
             }
 
-            throw new TaskException('Daemon ":name" is already running', [
+            throw new TaskException('Daemon ":name" is already started', [
                 ':name' => $daemonName,
             ]);
         }
@@ -96,7 +96,7 @@ final class Start extends AbstractDaemonCommandTask
         ]);
 
         // Ensure daemon was started
-        $lock->waitForAcquire(AbstractDaemon::STARTUP_TIMEOUT + 1);
+        $lock->waitForAcquire(AbstractDaemon::STARTUP_TIMEOUT + 3);
 
         $this->logger->debug('Daemon ":name" was successfully started', [
             ':name' => $daemonName,

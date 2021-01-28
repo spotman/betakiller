@@ -8,8 +8,10 @@ use BetaKiller\Wamp\WampClient;
 use BetaKiller\Wamp\WampClientBuilder;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use React\Promise\PromiseInterface;
 use Thruway\ClientSession;
 use Thruway\Logging\Logger;
+use function React\Promise\resolve;
 
 final class WampPingDaemon extends AbstractDaemon
 {
@@ -44,7 +46,7 @@ final class WampPingDaemon extends AbstractDaemon
     /**
      * @inheritDoc
      */
-    public function startDaemon(LoopInterface $loop): void
+    public function startDaemon(LoopInterface $loop): PromiseInterface
     {
         Logger::set($this->logger);
 
@@ -68,14 +70,19 @@ final class WampPingDaemon extends AbstractDaemon
 //        });
 
         $this->wampClient->start(false);
+
+        return resolve();
     }
 
     /**
      * @inheritDoc
      */
-    public function stopDaemon(LoopInterface $loop): void
+    public function stopDaemon(LoopInterface $loop): PromiseInterface
     {
         // Stop client and disconnect
+        $this->wampClient->setAttemptRetry(false);
         $this->wampClient->onClose('Stopped');
+
+        return resolve();
     }
 }

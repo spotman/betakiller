@@ -16,6 +16,7 @@ use function React\Promise\reject;
 use Throwable;
 use Thruway\ClientSession;
 use Thruway\Logging\Logger;
+use function React\Promise\resolve;
 
 /**
  * Class WampEsbBridgeDaemon
@@ -66,16 +67,16 @@ final class WampEsbBridgeDaemon extends AbstractDaemon
         $this->logger        = $logger;
     }
 
-    public function startDaemon(LoopInterface $loop): void
+    public function startDaemon(LoopInterface $loop): PromiseInterface
     {
         Logger::set($this->logger);
 
-        // Restart every 24h coz of annoying memory leak
-        $loop->addTimer(60 * 1440, function () use ($loop) {
-            $this->logger->info('Stopping Wamp-to-ESB bridge worker to prevent memory leaks');
-            $this->stopDaemon($loop);
-            $loop->stop();
-        });
+//        // Restart every 24h coz of annoying memory leak
+//        $loop->addTimer(60 * 1440, function () use ($loop) {
+//            $this->logger->info('Stopping Wamp-to-ESB bridge worker to prevent memory leaks');
+//            $this->stopDaemon($loop);
+//            $loop->stop();
+//        });
 
         // Bind ESB event listener
         $this->transport->subscribeAnyOutbound(function (OutboundEventMessageInterface $event) {
@@ -139,14 +140,19 @@ final class WampEsbBridgeDaemon extends AbstractDaemon
         $this->wampClient->bindPingHandlers();
 
         $this->wampClient->start(false);
+
+        return resolve();
     }
 
-    public function stopDaemon(LoopInterface $loop): void
+    public function stopDaemon(LoopInterface $loop): PromiseInterface
     {
         $this->transport->stopConsuming($loop);
 
         // Stop client and disconnect
+        $this->wampClient->setAttemptRetry(false);
         $this->wampClient->onClose('Stopped');
+
+        return resolve();
     }
 
     private function forwardEvent(OutboundEventMessageInterface $event): PromiseInterface
@@ -200,7 +206,7 @@ final class WampEsbBridgeDaemon extends AbstractDaemon
         } catch (Throwable $e) {
             LoggerHelper::logRawException($this->logger, $e);
 
-            return reject();
+            return reject($e);
         }
     }
 }

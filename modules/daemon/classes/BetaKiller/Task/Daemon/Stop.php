@@ -21,6 +21,6 @@ final class Stop extends AbstractDaemonCommandTask
         $process->run();
 
         // Wait for daemon to be stopped
-        $lock->waitForRelease(AbstractDaemon::SHUTDOWN_TIMEOUT + 2);
+        $lock->waitForRelease(AbstractDaemon::SHUTDOWN_TIMEOUT + 3);
     }
 }

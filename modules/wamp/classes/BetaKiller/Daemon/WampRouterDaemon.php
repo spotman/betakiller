@@ -8,11 +8,13 @@ use BetaKiller\Wamp\InternalAuthProviderClient;
 use BetaKiller\Wamp\WampRouter;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use React\Promise\PromiseInterface;
 use Thruway\Authentication\AuthenticationManager;
 use Thruway\Authentication\WampCraAuthProvider;
 use Thruway\Authentication\WampCraUserDbInterface;
 use Thruway\Logging\Logger;
 use Thruway\Transport\RatchetTransportProvider;
+use function React\Promise\resolve;
 
 final class WampRouterDaemon extends AbstractDaemon
 {
@@ -53,7 +55,7 @@ final class WampRouterDaemon extends AbstractDaemon
         $this->logger     = $logger;
     }
 
-    public function startDaemon(LoopInterface $loop): void
+    public function startDaemon(LoopInterface $loop): PromiseInterface
     {
         Logger::set($this->logger);
 
@@ -80,19 +82,23 @@ final class WampRouterDaemon extends AbstractDaemon
         $intAuth = new InternalAuthProviderClient(['*'], $loop);
         $this->router->addInternalClient($intAuth);
 
-        // Restart every 24h coz of annoying memory leak
-        $loop->addTimer(60 * 1440, function () use ($loop) {
-            $this->logger->info('Stopping router to prevent memory leaks');
-            $this->stopDaemon($loop);
-            $loop->stop();
-        });
+//        // Restart every 24h coz of annoying memory leak
+//        $loop->addTimer(60 * 1440, function () use ($loop) {
+//            $this->logger->info('Stopping router to prevent memory leaks');
+//            $this->stopDaemon($loop);
+//            $loop->stop();
+//        });
 
         // Prepare to start (loop would be launched by the Runner task)
         $this->router->start(false);
+
+        return resolve();
     }
 
-    public function stopDaemon(LoopInterface $loop): void
+    public function stopDaemon(LoopInterface $loop): PromiseInterface
     {
         $this->router->stop(true);
+
+        return resolve();
     }
 }

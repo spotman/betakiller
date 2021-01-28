@@ -16,6 +16,8 @@ use Interop\Queue\Context;
 use Interop\Queue\Message;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use React\Promise\PromiseInterface;
+use function React\Promise\resolve;
 
 final class NotificationWorkerDaemon extends AbstractDaemon
 {
@@ -69,7 +71,7 @@ final class NotificationWorkerDaemon extends AbstractDaemon
         $this->logger         = $logger;
     }
 
-    public function startDaemon(LoopInterface $loop): void
+    public function startDaemon(LoopInterface $loop): PromiseInterface
     {
         $regularQueue  = $this->context->createQueue(NotificationFacade::QUEUE_NAME_REGULAR);
         $priorityQueue = $this->context->createQueue(NotificationFacade::QUEUE_NAME_PRIORITY);
@@ -89,6 +91,8 @@ final class NotificationWorkerDaemon extends AbstractDaemon
         });
 
         $this->subscribeForDismissibleEvents($loop);
+
+        return resolve();
     }
 
     private function processConsumer(Consumer $consumer): bool
@@ -220,10 +224,12 @@ final class NotificationWorkerDaemon extends AbstractDaemon
         $this->markAsIdle();
     }
 
-    public function stopDaemon(LoopInterface $loop): void
+    public function stopDaemon(LoopInterface $loop): PromiseInterface
     {
         $this->context->close();
 
         $this->eventTransport->stopConsuming($loop);
+
+        return resolve();
     }
 }

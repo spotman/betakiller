@@ -5,12 +5,14 @@ namespace BetaKiller\Daemon;
 
 use BetaKiller\Task\TaskException;
 use React\EventLoop\LoopInterface;
+use React\Promise\PromiseInterface;
+use function React\Promise\resolve;
 
 final class DebugFailingDaemon extends AbstractDaemon
 {
     public const CODENAME = 'DebugFailing';
 
-    public function startDaemon(LoopInterface $loop): void
+    public function startDaemon(LoopInterface $loop): PromiseInterface
     {
         // Test start
         echo 'Starting DebugFailing daemon...';
@@ -20,11 +22,13 @@ final class DebugFailingDaemon extends AbstractDaemon
         throw new TaskException('Failing daemon was obviously failed');
     }
 
-    public function stopDaemon(LoopInterface $loop): void
+    public function stopDaemon(LoopInterface $loop): PromiseInterface
     {
         // Test stop
         echo 'Stopping DebugFailing daemon...';
         sleep(1);
         echo 'OK'.\PHP_EOL;
+
+        return resolve();
     }
 }

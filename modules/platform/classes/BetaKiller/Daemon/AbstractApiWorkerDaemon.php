@@ -14,6 +14,7 @@ use BetaKiller\Wamp\WampClientBuilder;
 use BetaKiller\Wamp\WampClientHelper;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use React\Promise\PromiseInterface;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiResourceProxyInterface;
 use stdClass;
@@ -22,6 +23,7 @@ use Throwable;
 use Thruway\ClientSession;
 use Thruway\Logging\Logger;
 use Thruway\Registration;
+use function React\Promise\resolve;
 
 abstract class AbstractApiWorkerDaemon extends AbstractDaemon
 {
@@ -92,7 +94,7 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
         $this->logger           = $logger;
     }
 
-    public function startDaemon(LoopInterface $loop): void
+    public function startDaemon(LoopInterface $loop): PromiseInterface
     {
         Logger::set($this->logger);
 
@@ -133,12 +135,17 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
         $this->wampClient->bindPingHandlers();
 
         $this->wampClient->start(false);
+
+        return resolve();
     }
 
-    public function stopDaemon(LoopInterface $loop): void
+    public function stopDaemon(LoopInterface $loop): PromiseInterface
     {
         // Stop client and disconnect
+        $this->wampClient->setAttemptRetry(false);
         $this->wampClient->onClose('Stopped');
+
+        return resolve();
     }
 
     private function apiCallProcedure(array $indexedArgs, stdClass $namedArgs): array

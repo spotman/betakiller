@@ -20,6 +20,11 @@ use Database;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
+use React\Promise\Deferred;
+use React\Promise\PromiseInterface;
+use function Clue\React\Block\await;
+use function React\Promise\reject;
+use function React\Promise\Timer\timeout;
 
 final class Runner extends AbstractTask
 {
@@ -86,6 +91,21 @@ final class Runner extends AbstractTask
     private ?TimerInterface $memoryConsumptionTimer = null;
 
     /**
+     * @var \React\EventLoop\TimerInterface|null
+     */
+    private ?TimerInterface $pingDbTimer = null;
+
+    /**
+     * @var \React\EventLoop\TimerInterface|null
+     */
+    private ?TimerInterface $flushLogsTimer = null;
+
+    /**
+     * @var \React\EventLoop\TimerInterface|null
+     */
+    private ?TimerInterface $gcTimer = null;
+
+    /**
      * @var int
      */
     private int $maxMemoryIncrease;
@@ -103,6 +123,7 @@ final class Runner extends AbstractTask
      * @param \BetaKiller\Helper\AppEnvInterface   $appEnv
      * @param \BetaKiller\Daemon\FsWatcher         $fsWatcher
      * @param \BetaKiller\Dev\MemoryProfiler       $memProf
+     * @param \React\EventLoop\LoopInterface       $loop
      * @param \BetaKiller\Log\LoggerInterface      $logger
      */
     public function __construct(
@@ -111,6 +132,7 @@ final class Runner extends AbstractTask
         AppEnvInterface $appEnv,
         FsWatcher $fsWatcher,
         MemoryProfiler $memProf,
+        LoopInterface $loop,
         LoggerInterface $logger
     ) {
         $this->daemonFactory = $daemonFactory;
@@ -118,9 +140,9 @@ final class Runner extends AbstractTask
         $this->appEnv        = $appEnv;
         $this->fsWatcher     = $fsWatcher;
         $this->memProf       = $memProf;
+        $this->loop          = $loop;
         $this->logger        = $logger;
 
-        $this->loop = Factory::create();
 
         $this->maxMemoryIncrease = (int)$appEnv->getEnvVariable('DAEMON_MAX_MEMORY_USAGE', true);
 
@@ -151,13 +173,23 @@ final class Runner extends AbstractTask
         $this->lock = $this->lockFactory->create($this->codename);
 
         // Check if it is running already and exit if so
-        if ($this->lock->isAcquired()) {
+        if ($this->lock->isValid()) {
             $this->logger->warning('Daemon ":name" is already running', [
                 ':name' => $this->codename,
             ]);
 
             // It is not normal to have multiple instances
-            exit(1);
+            $this->shutdown(DaemonInterface::EXIT_CODE_FAILED);
+        }
+
+        if ($this->lock->isAcquired()) {
+            // Something went wrong on the daemon shutdown so we need to clear the lock
+            $this->lock->release();
+
+            // Warning for developers
+            $this->logger->warning('Lock ":name" had not been released by the daemon:runner task', [
+                ':name' => \basename($this->lock->getPath()),
+            ]);
         }
 
         if (!$this->lock->acquire(\getmypid())) {
@@ -169,7 +201,7 @@ final class Runner extends AbstractTask
         if (\gc_enabled()) {
             // Force GC to be called periodically
             // @see https://github.com/ratchetphp/Ratchet/issues/662
-            $this->loop->addPeriodicTimer(60, static function () {
+            $this->gcTimer = $this->loop->addPeriodicTimer(60, static function () {
                 \gc_collect_cycles();
                 \gc_mem_caches();
             });
@@ -182,7 +214,7 @@ final class Runner extends AbstractTask
         $this->pingDB();
 
         // Flush Monolog buffers to prevent memory leaks
-        $this->loop->addPeriodicTimer(10, function () {
+        $this->flushLogsTimer = $this->loop->addPeriodicTimer(10, function () {
             $this->logger->flushBuffers();
         });
 
@@ -192,35 +224,64 @@ final class Runner extends AbstractTask
 
         $this->startMemoryConsumptionGuard();
 
-        $this->start();
+        await($this->start(), Factory::create(), AbstractDaemon::STARTUP_TIMEOUT + 2);
 
         // Endless loop waiting for signals or exit()
         $this->loop->run();
 
         // Normal shutdown
-        $this->shutdown(0);
+        $this->shutdown(DaemonInterface::EXIT_CODE_OK);
     }
 
-    private function start(): void
+    private function start(): PromiseInterface
     {
+        // Prevent sequential start calls
+        if ($this->isStarting()) {
+            $this->logger->notice('Daemon ":name" is already starting, please wait', [
+                ':name' => $this->codename,
+            ]);
+
+            return reject();
+        }
+
         $this->setStatus(self::STATUS_STARTING);
 
-        try {
-            $this->daemon = $this->daemonFactory->create($this->codename);
+        $deferred = new Deferred();
+        $promise  = $deferred->promise();
 
-            $this->daemon->startDaemon($this->loop);
+        $promise->done(function () {
+            $this->setStatus(self::STATUS_RUNNING);
 
             $this->logger->debug('Daemon ":name" is started', [
                 ':name' => $this->codename,
             ]);
-        } catch (\Throwable $e) {
+        });
+
+        $promise->otherwise(function (\Throwable $e = null) {
+            $this->setStatus(self::STATUS_STOPPING);
+
             $this->processException($e);
+        });
+
+        try {
+            $this->daemon = $this->daemonFactory->create($this->codename);
+
+            $this->daemon->startDaemon($this->loop)->then(
+                static function () use ($deferred) {
+                    $deferred->resolve();
+                },
+                static function () use ($deferred) {
+                    $deferred->reject();
+                },
+            );
+        } catch (\Throwable $e) {
+            $deferred->reject($e);
         }
 
-        $this->setStatus(self::STATUS_RUNNING);
+        return $promise;
     }
 
-    private function stop(): void
+    private function stop(bool $isFailed): PromiseInterface
     {
         // Prevent sequential stop calls
         if ($this->isStopping()) {
@@ -228,22 +289,42 @@ final class Runner extends AbstractTask
                 ':name' => $this->codename,
             ]);
 
-            return;
+            return reject();
         }
 
         $this->setStatus(self::STATUS_STOPPING);
 
-        // Wait 5 seconds for daemon stop
-        $timeoutTimer = $this->loop->addTimer(AbstractDaemon::SHUTDOWN_TIMEOUT, function () {
+        $deferred = new Deferred();
+        $promise  = $deferred->promise();
+
+        $promise->done(function () use ($isFailed) {
+            $this->logger->debug('Daemon ":name" was stopped', [
+                ':name' => $this->codename,
+            ]);
+
+            $exitCode = $isFailed ? DaemonInterface::EXIT_CODE_FAILED : DaemonInterface::EXIT_CODE_OK;
+
+            // Daemon would be restarted by supervisor
+            $this->shutdown($exitCode);
+        });
+
+        $promise->otherwise(function (\Throwable $e = null) {
             $this->logger->alert('Daemon ":name" had not stopped, force exit applied', [
                 ':name' => $this->codename,
             ]);
 
             // Timeout => force kill + notify supervisor about problem via non-zero exit status
-            $this->shutdown(1);
+            $this->processException($e);
         });
 
-        $this->loop->addPeriodicTimer(0.5, function (TimerInterface $pollTimer) use ($timeoutTimer) {
+        $this->loop->addPeriodicTimer(0.5, function (TimerInterface $pollTimer) use ($deferred) {
+            // Race condition check
+            if (!$this->daemon) {
+                $deferred->reject();
+
+                return;
+            }
+
             if (!$this->daemon->isIdle()) {
                 return;
             }
@@ -251,29 +332,45 @@ final class Runner extends AbstractTask
             $this->loop->cancelTimer($pollTimer);
 
             try {
-                $this->daemon->stopDaemon($this->loop);
-
-                if ($this->memoryConsumptionTimer) {
-                    $this->loop->cancelTimer($this->memoryConsumptionTimer);
-                }
-
-                $this->logger->debug('Daemon ":name" was stopped', [
-                    ':name' => $this->codename,
-                ]);
+                $this->daemon->stopDaemon($this->loop)->then(
+                    static function () use ($deferred) {
+                        $deferred->resolve();
+                    },
+                    static function () use ($deferred) {
+                        $deferred->reject();
+                    }
+                );
             } catch (\Throwable $e) {
-                $this->processException($e);
-            } finally {
-                $this->loop->cancelTimer($timeoutTimer);
+                $deferred->reject($e);
             }
-
-            // Simply exit with OK status and daemon would be restarted by supervisor
-            $this->shutdown(0);
         });
+
+        return timeout($promise, AbstractDaemon::SHUTDOWN_TIMEOUT + 2, $this->loop);
     }
 
     private function shutdown(int $exitCode): void
     {
         $this->unlock();
+
+        // Stop garbage collection trigger
+        if ($this->gcTimer) {
+            $this->loop->cancelTimer($this->gcTimer);
+        }
+
+        // Stop memory usage monitor
+        if ($this->memoryConsumptionTimer) {
+            $this->loop->cancelTimer($this->memoryConsumptionTimer);
+        }
+
+        // Stop DB connection
+        if ($this->pingDbTimer) {
+            $this->loop->cancelTimer($this->pingDbTimer);
+        }
+
+        // Stop logger flusher
+        if ($this->flushLogsTimer) {
+            $this->loop->cancelTimer($this->flushLogsTimer);
+        }
 
         // Stop FS watcher if enabled
         $this->fsWatcher->stop();
@@ -286,15 +383,19 @@ final class Runner extends AbstractTask
         exit($exitCode);
     }
 
-    private function processException(\Throwable $e): void
+    private function processException(?\Throwable $e): void
     {
+        if (!$e) {
+            $this->shutdown(DaemonInterface::EXIT_CODE_FAILED);
+        }
+
         if ($e instanceof ShutdownDaemonException) {
             // Normal shutdown
-            $this->shutdown(0);
+            $this->shutdown(DaemonInterface::EXIT_CODE_OK);
         } else {
             // Something wrong is going on here
             LoggerHelper::logRawException($this->logger, $e);
-            $this->shutdown(1);
+            $this->shutdown(DaemonInterface::EXIT_CODE_FAILED);
         }
     }
 
@@ -308,7 +409,7 @@ final class Runner extends AbstractTask
                 ':name'  => $this->codename,
             ]);
 
-            $this->stop();
+            $this->stop(false);
         };
 
         /**
@@ -326,7 +427,7 @@ final class Runner extends AbstractTask
 
     private function pingDB(): void
     {
-        $this->loop->addPeriodicTimer(60, static function () {
+        $this->pingDbTimer = $this->loop->addPeriodicTimer(60, static function () {
             Database::pingAll();
         });
     }
@@ -334,7 +435,7 @@ final class Runner extends AbstractTask
     private function startMemoryConsumptionGuard(): void
     {
         $initialUsage = \memory_get_peak_usage(true);
-        $maxUsage = $initialUsage + $this->maxMemoryIncrease;
+        $maxUsage     = $initialUsage + $this->maxMemoryIncrease;
 
         $this->memoryConsumptionTimer = $this->loop->addPeriodicTimer(1, function () use ($maxUsage) {
             // Prevent calls on startup and kills during processing
@@ -358,7 +459,7 @@ final class Runner extends AbstractTask
                 ':name' => $this->codename,
             ]);
 
-            $this->stop();
+            $this->stop(true);
         });
     }
 
@@ -378,7 +479,7 @@ final class Runner extends AbstractTask
                     ':name' => $this->codename,
                 ]);
             } else {
-                $this->logger->debug('Daemon ":name" is not locked', [
+                $this->logger->notice('Daemon ":name" is not locked', [
                     ':name' => $this->codename,
                 ]);
             }
@@ -430,7 +531,7 @@ final class Runner extends AbstractTask
             ]);
 
             // Restart daemon (auto-restart after stop)
-            $this->stop();
+            $this->stop(false);
         });
     }
 }

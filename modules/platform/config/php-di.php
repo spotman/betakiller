@@ -47,6 +47,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Ramsey\Uuid\UuidFactory;
 use Ramsey\Uuid\UuidFactoryInterface;
+use React\EventLoop\Factory;
+use React\EventLoop\LoopInterface;
 use Spotman\Api\ApiLanguageDetectorInterface;
 use Spotman\Defence\Parameter\ParameterProviderFactoryInterface;
 use Zend\Diactoros\RequestFactory;
@@ -236,6 +238,11 @@ return [
         EventSerializerInterface::class => autowire(NativeEventSerializer::class),
 
         ScheduleTargetSpecInterface::class => autowire(UserScheduleTargetSpec::class),
+
+        // Single loop instance for simplicity
+        LoopInterface::class => factory(static function () {
+            return Factory::create();
+        }),
 
     ],
 
