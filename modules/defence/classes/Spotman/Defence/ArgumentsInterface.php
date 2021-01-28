@@ -28,6 +28,15 @@ interface ArgumentsInterface
      *
      * @return bool
      */
+    public function notEmpty(string $key): bool;
+
+    /**
+     * Returns true if current arguments set contains any value for provided key
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
     public function has(string $key): bool;
 
     /**

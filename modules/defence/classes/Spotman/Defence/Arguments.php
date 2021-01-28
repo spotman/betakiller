@@ -44,16 +44,20 @@ class Arguments implements ArgumentsInterface
     }
 
     /**
-     * Returns true if current arguments set contains non-null value for provided key
-     *
-     * @param string $key
-     *
-     * @return bool
+     * @inheritDoc
+     */
+    public function notEmpty(string $key): bool
+    {
+        return !empty($this->args[$key]);
+    }
+
+    /**
+     * @inheritDoc
      */
     public function has(string $key): bool
     {
-        // Check for non-null value also to simplify client logic
-        return isset($this->args[$key]);
+        //// NO Check for non-null value also to simplify client logic
+        return \array_key_exists($key, $this->args);
     }
 
     /**
