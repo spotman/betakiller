@@ -383,6 +383,10 @@ final class DaemonController
 
     private function restartDaemon(DaemonUnitInterface $unit, bool $clearCounter): PromiseInterface
     {
+        $this->logger->info('Daemon ":name" is restarting', [
+            ':name' => $unit->getName(),
+        ]);
+
         // Stop if daemon is running
         $stopPromise = $this->isCommandAllowed($unit, DaemonUnit::COMMAND_STOP)
             ? $this->stopDaemon($unit)
@@ -602,8 +606,9 @@ final class DaemonController
 
         $stopTimeout = AbstractDaemon::SHUTDOWN_TIMEOUT;
 
-        $pollingTimer = $this->loop->addPeriodicTimer(0.5, function (TimerInterface $timer) use ($deferred, $process) {
-            if ($process->isRunning()) {
+        $pollingTimer = $this->loop->addPeriodicTimer(0.5, function (TimerInterface $timer) use ($unit, $deferred) {
+            // Wait for an actual stop (set by "exit" Process event handler)
+            if (!$unit->inStatus(DaemonUnit::STATUS_STOPPED)) {
                 return;
             }
 
