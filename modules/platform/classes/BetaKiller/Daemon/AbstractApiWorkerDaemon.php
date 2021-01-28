@@ -132,8 +132,7 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
             );
         });
 
-        // Possible memory leak (adding handlers to each request)
-//        $this->wampClient->bindPingHandlers();
+        $this->wampClient->bindPingHandlers();
 
         $this->wampClient->start(false);
 
