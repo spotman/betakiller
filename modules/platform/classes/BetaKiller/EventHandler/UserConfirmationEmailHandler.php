@@ -33,6 +33,11 @@ final class UserConfirmationEmailHandler
     {
         $user = $event->getUser();
 
+        // Skip confirmation messages for
+        if ($user->isEmailConfirmed()) {
+            return;
+        }
+
         $token = $this->tokenService->create($user, new \DateInterval('P14D'));
 
         $emailData = [
