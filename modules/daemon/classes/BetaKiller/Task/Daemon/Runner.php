@@ -512,6 +512,11 @@ final class Runner extends AbstractTask
     private function startFsWatcher(LoopInterface $loop): void
     {
         $this->fsWatcher->start($loop, function (string $path) {
+            // Prevent calls during startup/shutdown
+            if (!$this->isRunning()) {
+                return;
+            }
+
             $ext = pathinfo($path, PATHINFO_EXTENSION);
 
             $isLoaded = in_array($path, \get_included_files(), true);
