@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
-use BetaKiller\Helper\TextHelper;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\I18nKeyModelInterface;
 use BetaKiller\Model\LanguageInterface;
@@ -89,23 +88,25 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
     ): self {
         $mode = $mode ?? self::SEARCH_STARTING;
 
-        $column = $this->getI18nValuesColumnName($orm);
-        $term   = mb_strtolower($term);
+        // Remove non-alphanumeric symbols
+        // @see https://stackoverflow.com/questions/8347655/regex-to-remove-non-alphanumeric-characters-from-utf8-strings#comment89304232_8347715
+        $term = \preg_replace('/[^\pL^\pN\s]+/u', '', $term);
 
-        $utfRegex   = $this->makeI18nFilterRegex($term, $mode);
-        $asciiRegex = $this->makeI18nFilterRegex(TextHelper::utf8ToAscii($term), $mode);
+        $column   = $this->getI18nValuesColumnName($orm);
+        $utfRegex = $this->makeI18nFilterRegex($term, $mode);
 
         if ($lang) {
-            $utfRegex   = sprintf('"%s"', $lang->getIsoCode()).$utfRegex;
-            $asciiRegex = sprintf('"%s"', $lang->getIsoCode()).$asciiRegex;
+            $utfRegex = sprintf('"%s"', $lang->getIsoCode()).$utfRegex;
         }
 
-        $orm->and_where_open();
+        // Case insensitive match for different encodings via COLLATE
+        $columnExpr = DB::expr(sprintf(
+            'REGEXP_LIKE(%s COLLATE utf8mb4_unicode_ci, \'%s\' COLLATE utf8mb4_unicode_ci)',
+            $column,
+            $utfRegex
+        ));
 
-        $orm->or_where(DB::expr('LOWER('.$column.')'), 'REGEXP', $utfRegex);
-        $orm->or_where(DB::expr('LOWER(CONVERT('.$column.' USING ascii))'), 'REGEXP', $asciiRegex);
-
-        $orm->and_where_close();
+        $orm->and_where($columnExpr, '=', 1);
 
         return $this;
     }
