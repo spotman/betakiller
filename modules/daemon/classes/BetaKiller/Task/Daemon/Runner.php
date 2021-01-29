@@ -218,13 +218,14 @@ final class Runner extends AbstractTask
             $this->logger->flushBuffers();
         });
 
-        if ($this->appEnv->inDevelopmentMode()) {
-            $this->startFsWatcher($this->loop);
-        }
-
         $this->startMemoryConsumptionGuard();
 
         await($this->start(), Factory::create(), AbstractDaemon::STARTUP_TIMEOUT + 2);
+
+        // Based on the included files
+        if ($this->appEnv->inDevelopmentMode()) {
+            $this->startFsWatcher($this->loop);
+        }
 
         // Endless loop waiting for signals or exit()
         $this->loop->run();
