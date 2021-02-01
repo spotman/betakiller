@@ -214,7 +214,7 @@ final class Runner extends AbstractTask
         $this->pingDB();
 
         // Flush Monolog buffers to prevent memory leaks
-        $this->flushLogsTimer = $this->loop->addPeriodicTimer(10, function () {
+        $this->flushLogsTimer = $this->loop->addPeriodicTimer(5, function () {
             $this->logger->flushBuffers();
         });
 
