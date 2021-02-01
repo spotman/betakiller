@@ -41,7 +41,7 @@
     "jakeasmith/http_build_url": "^1",
     "middlewares/negotiation": "^1.1",
     "mmamedov/page-cache": "^2.0",
-    "monolog/monolog": "^1",
+    "monolog/monolog": "^2.2",
     "ocramius/proxy-manager": "^2.1",
     "pcelta/doctrine-cache-factory": "^0.1.0",
     "php-console/php-console": "^3.1",
