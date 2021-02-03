@@ -124,36 +124,36 @@ final class QueryCondition implements QueryConditionInterface
 //        d(
 //            $location->toArray(),
 //            $this->hasBuilding($location),
-//            $this->hasCity($location),
+//            $this->hasLocality($location),
 //            $this->hasRegion($location),
 //            $this->hasCountry($location)
 //        );
 
         switch ($this->type) {
             case self::TYPE_BUILDING:
-                return $this->hasBuilding($location)
+                return $this->hasBuilding($location);
 // No city check for now (Prague addresses returns empty locality)
-//                    && $this->hasCity($location)
-                    && $this->hasRegion($location)
-                    && $this->hasCountry($location);
+//                    && $this->hasLocality($location)
+//                    && $this->hasRegion($location)
+//                    && $this->hasCountry($location);
 
             case self::TYPE_CITY:
                 return !$this->hasBuilding($location)
-                    && $this->hasCity($location)
+                    && $this->hasLocality($location);
                         // No region check (Zagreb has no region)
 //                    && (self::isBothRegionAndCity($location) || $this->hasRegion($location))
-                    && $this->hasCountry($location);
+//                    && $this->hasCountry($location);
 
             case self::TYPE_REGION:
                 return !$this->hasBuilding($location)
-                    && (self::isBothRegionAndCity($location) || !$this->hasCity($location))
-                    && $this->hasRegion($location)
-                    && $this->hasCountry($location);
+                    && (self::isBothRegionAndCity($location) || !$this->hasLocality($location))
+                    && $this->hasRegion($location);
+//                    && $this->hasCountry($location);
 
             case self::TYPE_COUNTRY:
                 return !$this->hasBuilding($location)
-                    && !$this->hasCity($location)
-                    && !$this->hasRegion($location)
+                    && !$this->hasLocality($location)
+//                    && !$this->hasRegion($location)
                     && $this->hasCountry($location);
 
             default:
@@ -187,7 +187,7 @@ final class QueryCondition implements QueryConditionInterface
         return $location->getStreetName() && $location->getStreetNumber();
     }
 
-    private function hasCity(Location $location): bool
+    private function hasLocality(Location $location): bool
     {
         return (bool)$location->getLocality();
     }
