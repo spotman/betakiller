@@ -530,8 +530,8 @@ task('deploy', [
     'sitemap:generate',
     'cache:warmup',
 
-    // Restart daemons and workers
-    'daemon:supervisor:restart',
+    // Restart daemons and workers from new directory
+    'daemon:supervisor:kill',
 
     // Switch to new version
     'deploy:symlink',
