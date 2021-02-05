@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Api\Method;
 
+use BetaKiller\Factory\RepositoryFactoryInterface;
+use BetaKiller\IdentityConverterInterface;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Repository\RepositoryInterface;
 use Spotman\Api\ApiMethodException;
@@ -11,21 +13,20 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
 {
     /**
      * @Inject
-     * @var \BetaKiller\Factory\RepositoryFactory
+     * @var \BetaKiller\Factory\RepositoryFactoryInterface
      */
-    private $repositoryFactory;
+    private RepositoryFactoryInterface $repositoryFactory;
 
     /**
      * @Inject
      * @var \BetaKiller\IdentityConverterInterface
      */
-    private $converter;
+    private IdentityConverterInterface $converter;
 
     /**
-     * @var \BetaKiller\Repository\RepositoryInterface
+     * @var \BetaKiller\Repository\RepositoryInterface|null
      */
-    private $repository;
-
+    private ?RepositoryInterface $repository = null;
 
     /**
      * @param \Spotman\Defence\ArgumentsInterface $arguments

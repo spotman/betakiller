@@ -3,22 +3,22 @@ declare(strict_types=1);
 
 namespace BetaKiller;
 
-use BetaKiller\Factory\RepositoryFactory;
+use BetaKiller\Factory\RepositoryFactoryInterface;
 use BetaKiller\Model\AbstractEntityInterface;
 
 class EntityManager
 {
     /**
-     * @var \BetaKiller\Factory\RepositoryFactory
+     * @var \BetaKiller\Factory\RepositoryFactoryInterface
      */
-    private $repositoryFactory;
+    private RepositoryFactoryInterface $repositoryFactory;
 
     /**
      * EntityManager constructor.
      *
-     * @param \BetaKiller\Factory\RepositoryFactory $repositoryFactory
+     * @param \BetaKiller\Factory\RepositoryFactoryInterface $repositoryFactory
      */
-    public function __construct(RepositoryFactory $repositoryFactory)
+    public function __construct(RepositoryFactoryInterface $repositoryFactory)
     {
         $this->repositoryFactory = $repositoryFactory;
     }

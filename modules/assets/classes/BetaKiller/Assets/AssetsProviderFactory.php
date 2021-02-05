@@ -5,7 +5,8 @@ use BetaKiller\Assets\Exception\AssetsProviderException;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
-use BetaKiller\Factory\RepositoryFactory;
+use BetaKiller\Factory\NamespaceBasedFactoryInterface;
+use BetaKiller\Factory\RepositoryFactoryInterface;
 
 /**
  * Class AssetsProviderFactory
@@ -17,17 +18,17 @@ class AssetsProviderFactory
     /**
      * @var \BetaKiller\Config\ConfigProviderInterface
      */
-    private $config;
+    private ConfigProviderInterface $config;
 
     /**
-     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface
      */
-    private $factory;
+    private NamespaceBasedFactoryInterface $factory;
 
     /**
-     * @var \BetaKiller\Factory\RepositoryFactory
+     * @var \BetaKiller\Factory\RepositoryFactoryInterface
      */
-    private $repositoryFactory;
+    private RepositoryFactoryInterface $repositoryFactory;
 
     /**
      * @var \BetaKiller\Assets\AssetsStorageFactory
@@ -54,7 +55,7 @@ class AssetsProviderFactory
      *
      * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      * @param \BetaKiller\Config\ConfigProviderInterface       $config
-     * @param \BetaKiller\Factory\RepositoryFactory            $repositoryFactory
+     * @param \BetaKiller\Factory\RepositoryFactoryInterface   $repositoryFactory
      * @param \BetaKiller\Assets\AssetsStorageFactory          $storageFactory
      * @param \BetaKiller\Assets\AssetsPathStrategyFactory     $pathStrategyFactory
      * @param \BetaKiller\Assets\AssetsHandlerFactory          $handlerFactory
@@ -64,7 +65,7 @@ class AssetsProviderFactory
     public function __construct(
         NamespaceBasedFactoryBuilder $factoryBuilder,
         ConfigProviderInterface $config,
-        RepositoryFactory $repositoryFactory,
+        RepositoryFactoryInterface $repositoryFactory,
         AssetsStorageFactory $storageFactory,
         AssetsPathStrategyFactory $pathStrategyFactory,
         AssetsHandlerFactory $handlerFactory

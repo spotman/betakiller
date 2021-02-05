@@ -12,17 +12,17 @@ class NamespaceBasedFactoryBuilder
     /**
      * @var \BetaKiller\DI\ContainerInterface
      */
-    private $container;
+    private ContainerInterface $container;
 
     /**
      * @var \BetaKiller\Config\AppConfigInterface
      */
-    private $appConfig;
+    private AppConfigInterface $appConfig;
 
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
-    private $appEnv;
+    private AppEnvInterface $appEnv;
 
     /**
      * NamespaceBasedFactoryBuilder constructor.
@@ -39,10 +39,10 @@ class NamespaceBasedFactoryBuilder
     }
 
     /**
-     * @return \BetaKiller\Factory\NamespaceBasedFactory
+     * @return \BetaKiller\Factory\NamespaceBasedFactoryInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function createFactory(): NamespaceBasedFactory
+    public function createFactory(): NamespaceBasedFactoryInterface
     {
         // Always create new instance coz client code is configuring this instance
         try {

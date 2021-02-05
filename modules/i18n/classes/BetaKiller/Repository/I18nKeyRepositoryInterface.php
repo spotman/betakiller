@@ -14,12 +14,13 @@ use BetaKiller\Model\LanguageInterface;
 interface I18nKeyRepositoryInterface extends DispatchableRepositoryInterface // All keys would be editable via web UI
 {
     /**
-     * @param string                              $value
-     * @param \BetaKiller\Model\LanguageInterface $lang
+     * @param string                                   $value
+     * @param \BetaKiller\Model\LanguageInterface|null $lang
+     * @param string|null                              $mode
      *
      * @return \BetaKiller\Model\I18nKeyModelInterface|null
      */
-    public function findByI18nValue(string $value, LanguageInterface $lang = null): ?I18nKeyModelInterface;
+    public function findByI18nValue(string $value, LanguageInterface $lang = null, string $mode = null): ?I18nKeyModelInterface;
 
     /**
      * @param \BetaKiller\Model\LanguageInterface $lang

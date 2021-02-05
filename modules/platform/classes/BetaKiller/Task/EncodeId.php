@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task;
 
-use BetaKiller\Factory\RepositoryFactory;
+use BetaKiller\Factory\RepositoryFactoryInterface;
 use BetaKiller\IdentityConverterInterface;
 
 final class EncodeId extends AbstractTask
@@ -17,17 +17,17 @@ final class EncodeId extends AbstractTask
     private IdentityConverterInterface $identityConverter;
 
     /**
-     * @var \BetaKiller\Factory\RepositoryFactory
+     * @var \BetaKiller\Factory\RepositoryFactoryInterface
      */
-    private RepositoryFactory $repoFactory;
+    private RepositoryFactoryInterface $repoFactory;
 
     /**
      * DecodeId constructor.
      *
-     * @param \BetaKiller\Factory\RepositoryFactory  $repoFactory
-     * @param \BetaKiller\IdentityConverterInterface $identityConverter
+     * @param \BetaKiller\Factory\RepositoryFactoryInterface $repoFactory
+     * @param \BetaKiller\IdentityConverterInterface         $identityConverter
      */
-    public function __construct(RepositoryFactory $repoFactory, IdentityConverterInterface $identityConverter)
+    public function __construct(RepositoryFactoryInterface $repoFactory, IdentityConverterInterface $identityConverter)
     {
         parent::__construct();
 

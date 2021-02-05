@@ -10,6 +10,8 @@ use BetaKiller\DummyIdentityConverter;
 use BetaKiller\Exception;
 use BetaKiller\Factory\EntityFactory;
 use BetaKiller\Factory\EntityFactoryInterface;
+use BetaKiller\Factory\RepositoryFactory;
+use BetaKiller\Factory\RepositoryFactoryInterface;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\LoggerHelper;
@@ -217,6 +219,8 @@ return [
             return $factory->createContext();
         }),
 
+        RepositoryFactoryInterface::class => autowire(RepositoryFactory::class),
+
         UserRepositoryInterface::class  => autowire(UserRepository::class),
         RoleRepositoryInterface::class  => autowire(RoleRepository::class),
         TokenRepositoryInterface::class => autowire(TokenRepository::class),
@@ -240,7 +244,7 @@ return [
         ScheduleTargetSpecInterface::class => autowire(UserScheduleTargetSpec::class),
 
         // Single loop instance for simplicity
-        LoopInterface::class => factory(static function () {
+        LoopInterface::class               => factory(static function () {
             return Factory::create();
         }),
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller;
 
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryInterface;
 use Spotman\Defence\Parameter\ParameterProviderFactoryInterface;
 use Spotman\Defence\Parameter\ParameterProviderInterface;
 use Spotman\Defence\ParameterArgumentDefinitionInterface;
@@ -12,9 +13,9 @@ use Spotman\Defence\ArgumentDefinitionInterface;
 class DefenceParameterProviderFactory implements ParameterProviderFactoryInterface
 {
     /**
-     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface
      */
-    private Factory\NamespaceBasedFactory $factory;
+    private NamespaceBasedFactoryInterface $factory;
 
     /**
      * DefenceParameterProviderFactory constructor.

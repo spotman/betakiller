@@ -2,6 +2,7 @@
 namespace BetaKiller\Url;
 
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryInterface;
 use BetaKiller\Factory\RepositoryFactory;
 
 /**
@@ -11,20 +12,19 @@ use BetaKiller\Factory\RepositoryFactory;
  */
 class UrlDataSourceFactory
 {
-    private $factory;
+    private NamespaceBasedFactoryInterface $factory;
 
     /**
      * UrlDataSourceFactory constructor.
      *
      * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
-     * @param \BetaKiller\Factory\RepositoryFactory            $repositoryFactory
      */
-    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder, RepositoryFactory $repositoryFactory)
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
     {
         $this->factory = $factoryBuilder->createFactory();
 
         // Using the same definitions as the RepositoryFactory does
-        $repositoryFactory->injectDefinitions($this->factory);
+        RepositoryFactory::injectDefinitions($this->factory);
 
         // Override repository definition
         $this->factory->setExpectedInterface(UrlDataSourceInterface::class);
@@ -36,7 +36,7 @@ class UrlDataSourceFactory
      * @return \BetaKiller\Url\UrlDataSourceInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function create($codename): UrlDataSourceInterface
+    public function create(string $codename): UrlDataSourceInterface
     {
         return $this->factory->create($codename);
     }

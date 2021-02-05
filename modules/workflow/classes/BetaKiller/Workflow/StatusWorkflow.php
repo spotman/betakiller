@@ -4,7 +4,7 @@ namespace BetaKiller\Workflow;
 use BetaKiller\Acl\EntityPermissionResolverInterface;
 use BetaKiller\Config\WorkflowConfigInterface;
 use BetaKiller\Exception\NotImplementedHttpException;
-use BetaKiller\Factory\RepositoryFactory;
+use BetaKiller\Factory\RepositoryFactoryInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\WorkflowStateRepositoryInterface;
 
@@ -13,29 +13,29 @@ final class StatusWorkflow implements StatusWorkflowInterface
     /**
      * @var \BetaKiller\Config\WorkflowConfigInterface
      */
-    private $config;
+    private WorkflowConfigInterface $config;
 
     /**
-     * @var \BetaKiller\Factory\RepositoryFactory
+     * @var \BetaKiller\Factory\RepositoryFactoryInterface
      */
-    private $repoFactory;
+    private RepositoryFactoryInterface $repoFactory;
 
     /**
      * @var \BetaKiller\Acl\EntityPermissionResolverInterface
      */
-    private $permissionResolver;
+    private EntityPermissionResolverInterface $permissionResolver;
 
     /**
      * StatusWorkflow constructor.
      *
      * @param \BetaKiller\Config\WorkflowConfigInterface        $config
      * @param \BetaKiller\Acl\EntityPermissionResolverInterface $permissionResolver
-     * @param \BetaKiller\Factory\RepositoryFactory             $repoFactory
+     * @param \BetaKiller\Factory\RepositoryFactoryInterface    $repoFactory
      */
     public function __construct(
         WorkflowConfigInterface $config,
         EntityPermissionResolverInterface $permissionResolver,
-        RepositoryFactory $repoFactory
+        RepositoryFactoryInterface $repoFactory
     ) {
         $this->config             = $config;
         $this->repoFactory        = $repoFactory;

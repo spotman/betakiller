@@ -5,69 +5,69 @@ use BetaKiller\DI\ContainerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 
-final class NamespaceBasedFactory
+final class NamespaceBasedFactory implements NamespaceBasedFactoryInterface
 {
     public const CACHE_TTL = 86400; // 1 day
 
     /**
      * @var mixed[]
      */
-    private static $instances = [];
+    private static array $instances = [];
 
     /**
      * @var \BetaKiller\DI\ContainerInterface
      */
-    private $container;
+    private ContainerInterface $container;
 
     /**
      * @var array
      */
-    private $rootNamespaces = [];
+    private array $rootNamespaces = [];
 
     /**
      * @var string[]
      */
-    private $classNamespaces = [];
+    private array $classNamespaces = [];
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $classSuffix;
+    private ?string $classSuffix = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $expectedInterface;
+    private ?string $expectedInterface = null;
 
     /**
      * @var bool
      */
-    private $useInterface = false;
+    private bool $useInterface = false;
 
     /**
      * @var bool
      */
-    private $legacyNaming = false;
+    private bool $legacyNaming = false;
 
     /**
      * @var bool
      */
-    private $instanceCachingEnabled = false;
+    private bool $instanceCachingEnabled = false;
 
     /**
-     * @var callable
+     * @var callable|null
      */
     private $prepareArgumentsCallback;
 
     /**
      * @var \Psr\SimpleCache\CacheInterface
      */
-    private $classNamesCache;
+    private CacheInterface $classNamesCache;
 
     /**
      * @var bool
      */
-    private $rawInstance;
+    private bool $rawInstance = false;
 
     /**
      *
@@ -80,7 +80,7 @@ final class NamespaceBasedFactory
         $this->classNamesCache = $cache;
     }
 
-    public function setExpectedInterface($interfaceName): NamespaceBasedFactory
+    public function setExpectedInterface($interfaceName): NamespaceBasedFactoryInterface
     {
         $this->expectedInterface = (string)$interfaceName;
 
@@ -92,7 +92,7 @@ final class NamespaceBasedFactory
      *
      * @return $this
      */
-    public function setClassNamespaces(string ...$namespaces): NamespaceBasedFactory
+    public function setClassNamespaces(string ...$namespaces): NamespaceBasedFactoryInterface
     {
         $this->classNamespaces = $namespaces;
 
@@ -104,7 +104,7 @@ final class NamespaceBasedFactory
      *
      * @return $this
      */
-    public function setClassSuffix(string $suffix): NamespaceBasedFactory
+    public function setClassSuffix(string $suffix): NamespaceBasedFactoryInterface
     {
         $this->classSuffix = $suffix;
 
@@ -116,7 +116,7 @@ final class NamespaceBasedFactory
      *
      * @return $this
      */
-    public function addRootNamespace(string $ns): NamespaceBasedFactory
+    public function addRootNamespace(string $ns): NamespaceBasedFactoryInterface
     {
         $this->rootNamespaces[] = $ns;
 
@@ -126,7 +126,7 @@ final class NamespaceBasedFactory
     /**
      * @return $this
      */
-    public function cacheInstances(): NamespaceBasedFactory
+    public function cacheInstances(): NamespaceBasedFactoryInterface
     {
         $this->instanceCachingEnabled = true;
 
@@ -138,7 +138,7 @@ final class NamespaceBasedFactory
      *
      * @return $this
      */
-    public function prepareArgumentsWith(callable $func): NamespaceBasedFactory
+    public function prepareArgumentsWith(callable $func): NamespaceBasedFactoryInterface
     {
         $this->prepareArgumentsCallback = $func;
 
@@ -148,7 +148,7 @@ final class NamespaceBasedFactory
     /**
      * @return $this
      */
-    public function rawInstances(): NamespaceBasedFactory
+    public function rawInstances(): NamespaceBasedFactoryInterface
     {
         $this->rawInstance = true;
 
@@ -158,7 +158,7 @@ final class NamespaceBasedFactory
     /**
      * @return $this
      */
-    public function useInterface(): NamespaceBasedFactory
+    public function useInterface(): NamespaceBasedFactoryInterface
     {
         $this->useInterface = true;
 
@@ -168,7 +168,7 @@ final class NamespaceBasedFactory
     /**
      * @return $this
      */
-    public function legacyNaming(): NamespaceBasedFactory
+    public function legacyNaming(): NamespaceBasedFactoryInterface
     {
         $this->legacyNaming = true;
 
@@ -176,11 +176,7 @@ final class NamespaceBasedFactory
     }
 
     /**
-     * @param string $codename
-     * @param array  $arguments
-     *
-     * @return mixed
-     * @throws \BetaKiller\Factory\FactoryException
+     * @inheritDoc
      */
     public function create(string $codename, array $arguments = null)
     {

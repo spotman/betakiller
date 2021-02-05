@@ -3,7 +3,7 @@ namespace BetaKiller\Factory;
 
 use BetaKiller\Repository\RepositoryInterface;
 
-class RepositoryFactory
+class RepositoryFactory implements RepositoryFactoryInterface
 {
     /**
      * @var \BetaKiller\Factory\NamespaceBasedFactory
@@ -19,10 +19,10 @@ class RepositoryFactory
     {
         $this->factory = $factoryBuilder->createFactory();
 
-        $this->injectDefinitions($this->factory);
+        self::injectDefinitions($this->factory);
     }
 
-    public function injectDefinitions(NamespaceBasedFactory $factory): void
+    public static function injectDefinitions(NamespaceBasedFactoryInterface $factory): void
     {
         $factory
             ->cacheInstances()

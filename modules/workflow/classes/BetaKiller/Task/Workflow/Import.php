@@ -5,7 +5,7 @@ namespace BetaKiller\Task\Workflow;
 
 use BetaKiller\Config\WorkflowConfigInterface;
 use BetaKiller\Factory\EntityFactoryInterface;
-use BetaKiller\Factory\RepositoryFactory;
+use BetaKiller\Factory\RepositoryFactoryInterface;
 use BetaKiller\Repository\WorkflowStateRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Workflow\WorkflowStateException;
@@ -17,34 +17,34 @@ class Import extends AbstractTask
     /**
      * @var \BetaKiller\Config\WorkflowConfigInterface
      */
-    private $config;
+    private WorkflowConfigInterface $config;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
-     * @var \BetaKiller\Factory\RepositoryFactory
+     * @var \BetaKiller\Factory\RepositoryFactoryInterface
      */
-    private $repoFactory;
+    private RepositoryFactoryInterface $repoFactory;
 
     /**
      * @var \BetaKiller\Factory\EntityFactoryInterface
      */
-    private $entityFactory;
+    private EntityFactoryInterface $entityFactory;
 
     /**
      * Import constructor.
      *
-     * @param \BetaKiller\Config\WorkflowConfigInterface $config
-     * @param \BetaKiller\Factory\RepositoryFactory      $repoFactory
-     * @param \BetaKiller\Factory\EntityFactoryInterface $entityFactory
-     * @param \Psr\Log\LoggerInterface                   $logger
+     * @param \BetaKiller\Config\WorkflowConfigInterface     $config
+     * @param \BetaKiller\Factory\RepositoryFactoryInterface $repoFactory
+     * @param \BetaKiller\Factory\EntityFactoryInterface     $entityFactory
+     * @param \Psr\Log\LoggerInterface                       $logger
      */
     public function __construct(
         WorkflowConfigInterface $config,
-        RepositoryFactory $repoFactory,
+        RepositoryFactoryInterface $repoFactory,
         EntityFactoryInterface $entityFactory,
         LoggerInterface $logger
     ) {

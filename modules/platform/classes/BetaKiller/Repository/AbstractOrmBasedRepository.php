@@ -7,6 +7,7 @@ use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Search\SearchResultsInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
+use BetaKiller\Utils\Kohana\ORM\OrmQueryBuilderInterface;
 use ORM\PaginateHelper;
 
 abstract class AbstractOrmBasedRepository extends AbstractRepository
@@ -323,6 +324,17 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         }
 
         $orm->filter_related_multiple($relationName, $relatedModels);
+
+        return $this;
+    }
+
+    protected function filterWithSoundex(OrmQueryBuilderInterface $orm, string $col, string $term): self
+    {
+        $orm->where(
+            \DB::expr(sprintf('MATCH (%s)', $col)),
+            '',
+            \DB::expr(sprintf('AGAINST ("%s")', $term)),
+        );
 
         return $this;
     }

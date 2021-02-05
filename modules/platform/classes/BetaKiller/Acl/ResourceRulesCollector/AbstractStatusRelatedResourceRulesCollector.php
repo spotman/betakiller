@@ -3,7 +3,7 @@ namespace BetaKiller\Acl\ResourceRulesCollector;
 
 use BetaKiller\Acl\Resource\HasWorkflowStateAclResourceInterface;
 use BetaKiller\Config\WorkflowConfigInterface;
-use BetaKiller\Factory\RepositoryFactory;
+use BetaKiller\Factory\RepositoryFactoryInterface;
 use BetaKiller\Repository\RepositoryException;
 use BetaKiller\Repository\WorkflowStateRepositoryInterface;
 use BetaKiller\Workflow\WorkflowStateException;
@@ -15,20 +15,20 @@ abstract class AbstractStatusRelatedResourceRulesCollector extends AbstractResou
     /**
      * @var \BetaKiller\Config\WorkflowConfigInterface
      */
-    private $config;
+    private WorkflowConfigInterface $config;
 
     /**
-     * @var \BetaKiller\Factory\RepositoryFactory
+     * @var \BetaKiller\Factory\RepositoryFactoryInterface
      */
-    private $repoFactory;
+    private RepositoryFactoryInterface $repoFactory;
 
     /**
-     * ContentPostResourceRulesCollector constructor.
+     * AbstractStatusRelatedResourceRulesCollector constructor.
      *
-     * @param \BetaKiller\Config\WorkflowConfigInterface $config
-     * @param \BetaKiller\Factory\RepositoryFactory      $repoFactory
+     * @param \BetaKiller\Config\WorkflowConfigInterface     $config
+     * @param \BetaKiller\Factory\RepositoryFactoryInterface $repoFactory
      */
-    public function __construct(WorkflowConfigInterface $config, RepositoryFactory $repoFactory)
+    public function __construct(WorkflowConfigInterface $config, RepositoryFactoryInterface $repoFactory)
     {
         $this->config      = $config;
         $this->repoFactory = $repoFactory;

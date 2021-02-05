@@ -6,6 +6,7 @@ namespace BetaKiller\Repository;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\I18nKeyModelInterface;
 use BetaKiller\Model\LanguageInterface;
+use BetaKiller\Utils\Kohana\ORM\OrmQueryBuilderInterface;
 use DB;
 
 abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRepository implements
@@ -13,21 +14,26 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
 {
     protected const SEARCH_EXACT    = 'exact';
     protected const SEARCH_STARTING = 'starting';
-    protected const SEARCH_CONTAINS = 'weak';
+    protected const SEARCH_CONTAINS = 'contains';
+    protected const SEARCH_SOUNDEX  = 'soundex';
 
     /**
      * @param string                                   $value
      *
      * @param \BetaKiller\Model\LanguageInterface|null $lang
+     * @param string|null                              $mode
      *
      * @return \BetaKiller\Model\I18nKeyModelInterface|null
      */
-    public function findByI18nValue(string $value, LanguageInterface $lang = null): ?I18nKeyModelInterface
-    {
+    public function findByI18nValue(
+        string $value,
+        LanguageInterface $lang = null,
+        string $mode = null
+    ): ?I18nKeyModelInterface {
         $orm = $this->getOrmInstance();
 
         return $this
-            ->filterI18nValue($orm, $value, $lang, self::SEARCH_EXACT)
+            ->filterI18nValue($orm, $value, $lang, $mode ?? self::SEARCH_EXACT)
             ->findOne($orm);
     }
 
@@ -92,7 +98,31 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
         // @see https://stackoverflow.com/questions/8347655/regex-to-remove-non-alphanumeric-characters-from-utf8-strings#comment89304232_8347715
         $term = \preg_replace('/[^\pL^\pN\s]+/u', '', $term);
 
-        $column   = $this->getI18nValuesColumnName($orm);
+        $column = $this->getI18nValuesColumnName($orm);
+
+        switch ($mode) {
+            case self::SEARCH_STARTING:
+            case self::SEARCH_CONTAINS:
+            case self::SEARCH_EXACT:
+                return $this->filterWithRegex($orm, $column, $term, $mode, $lang);
+
+            case self::SEARCH_SOUNDEX:
+                return $this->filterWithSoundex($orm, $column, $term);
+
+            default:
+                throw new RepositoryException('Unknown i18n search mode ":mode"', [
+                    ':mode' => $mode,
+                ]);
+        }
+    }
+
+    private function filterWithRegex(
+        OrmQueryBuilderInterface $orm,
+        string $col,
+        string $term,
+        string $mode,
+        ?LanguageInterface $lang
+    ): self {
         $utfRegex = $this->makeI18nFilterRegex($term, $mode);
 
         if ($lang) {
@@ -102,7 +132,7 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
         // Case insensitive match for different encodings via COLLATE
         $columnExpr = DB::expr(sprintf(
             'REGEXP_LIKE(%s COLLATE utf8mb4_unicode_ci, \'%s\' COLLATE utf8mb4_unicode_ci)',
-            $column,
+            $col,
             $utfRegex
         ));
 

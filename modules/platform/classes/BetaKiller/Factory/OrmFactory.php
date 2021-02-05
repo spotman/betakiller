@@ -24,7 +24,7 @@ class OrmFactory
         $this->injectDefinitions($this->factory);
     }
 
-    public function injectDefinitions(NamespaceBasedFactory $factory): void
+    public function injectDefinitions(NamespaceBasedFactoryInterface $factory): void
     {
         $factory
             ->setExpectedInterface(ExtendedOrmInterface::class)
