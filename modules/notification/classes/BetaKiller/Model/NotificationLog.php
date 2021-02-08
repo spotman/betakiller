@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Model;
 
 use BetaKiller\Exception\DomainException;
+use BetaKiller\Helper\TextHelper;
 use BetaKiller\Notification\MessageTargetEmail;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\TransportInterface;
@@ -190,7 +191,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     }
 
     /**
-     * @return \BetaKiller\Notification\MessageTargetInterface
+     * @return string
      * @throws \Kohana_Exception
      */
     public function getTargetString(): string
@@ -317,7 +318,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     public function isRetryAvailable(): bool
     {
         return !$this->isSucceeded()
-            && $this->getTargetUserId()
-            && $this->getBody();
+            && $this->getBody()
+            && ($this->getTargetUserId() || TextHelper::contains($this->getTargetString(), '<'));
     }
 }

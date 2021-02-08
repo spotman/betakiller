@@ -5,6 +5,7 @@ use BetaKiller\Config\NotificationConfigInterface;
 use BetaKiller\Exception;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Helper\LoggerHelper;
+use BetaKiller\Helper\TextHelper;
 use BetaKiller\Model\NotificationFrequency;
 use BetaKiller\Model\NotificationFrequencyInterface;
 use BetaKiller\Model\NotificationGroupInterface;
@@ -314,14 +315,15 @@ final class NotificationFacade
             ]);
         }
 
-        $userId = $logRecord->getTargetUserId();
-        $body   = $logRecord->getBody();
+        $target = $this->detectLogRecordTarget($logRecord);
 
-        if (!$userId) {
+        if (!$target) {
             throw new NotificationException('Can not retry message without target User ID; hash ":hash"', [
                 ':hash' => $logRecord->getHash(),
             ]);
         }
+
+        $body   = $logRecord->getBody();
 
         if (!$body) {
             throw new NotificationException('Can not retry message without a body; hash ":hash"', [
@@ -330,8 +332,6 @@ final class NotificationFacade
         }
 
         try {
-            $target = $this->userRepo->getById($userId);
-
             $transportName = $logRecord->getTransportName();
 
             $message   = $this->messageFactory->create($logRecord->getMessageName(), $target, $transportName, true);
@@ -678,5 +678,24 @@ final class NotificationFacade
         }
 
         return $transport;
+    }
+
+    private function detectLogRecordTarget(NotificationLogInterface $log): ?MessageTargetInterface
+    {
+        $userId = $log->getTargetUserId();
+
+        if ($userId) {
+            return $this->userRepo->getById($userId);
+        }
+
+        $targetString = $log->getTargetString();
+
+        if (!TextHelper::contains($targetString, '<')) {
+            return null;
+        }
+
+        list($name, $email) = explode('<', trim($targetString, '>'));
+
+        return new MessageTargetEmail($email, $name, $log->getLanguageIsoCode());
     }
 }

@@ -91,7 +91,7 @@ interface NotificationLogInterface extends DispatchableEntityInterface
     public function getMessageName(): string;
 
     /**
-     * @return \BetaKiller\Notification\MessageTargetInterface
+     * @return string
      */
     public function getTargetString(): string;
 
