@@ -79,7 +79,12 @@ final class NotificationWorkerDaemon extends AbstractDaemon
         $regularConsumer  = $this->context->createConsumer($regularQueue);
         $priorityConsumer = $this->context->createConsumer($priorityQueue);
 
-        $loop->addPeriodicTimer(0.5, function () use ($regularConsumer, $priorityConsumer) {
+        $loop->addPeriodicTimer(1, function () use ($regularConsumer, $priorityConsumer) {
+            // Prevent subsequent calls upon processing
+            if (!$this->isIdle()) {
+                return;
+            }
+
             $this->markAsProcessing();
 
             // Process priority messages first
