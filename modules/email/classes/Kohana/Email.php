@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
+<?php defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * Email module
@@ -14,9 +14,6 @@
  */
 class Kohana_Email
 {
-
-    //  instance
-
     /**
      * @var Swift_Mailer
      */
@@ -44,33 +41,40 @@ class Kohana_Email
         // Load default configuration
         ($config === null) and ($config = static::config());
 
-        $driver = $config['driver'];
+        $driver  = $config['driver'];
+        $options = $config['options'];
 
         switch ($driver) {
             case 'smtp':
-                // Set port
-                $port = empty($config['options']['port']) ? 25 : (int)$config['options']['port'];
-
                 // Create SMTP Transport
-                $transport = new Swift_SmtpTransport($config['options']['hostname'], $port);
+                $transport = new Swift_SmtpTransport($options['hostname'], $options['port'] ?? 25);
 
-                if (!empty($config['options']['encryption'])) {
-                    // Set encryption
-                    $transport->setEncryption($config['options']['encryption']);
+                $encryption = $options['encryption'] ?? null;
+                $username = $options['username'] ?? null;
+                $password = $options['password'] ?? null;
+
+                // Set encryption
+                if ($encryption) {
+                    $transport->setEncryption($encryption);
                 }
 
                 // Do authentication, if part of the DSN
-                empty($config['options']['username']) or $transport->setUsername($config['options']['username']);
-                empty($config['options']['password']) or $transport->setPassword($config['options']['password']);
+                if ($username) {
+                    $transport->setUsername($username);
+                }
+
+                if ($password) {
+                    $transport->setPassword($password);
+                }
 
                 // Set the timeout to 5 seconds
-                $transport->setTimeout(empty($config['options']['timeout']) ? 5 : (int)$config['options']['timeout']);
+                $transport->setTimeout($options['timeout'] ?? 5);
                 break;
             case 'sendmail':
                 // Create a sendmail connection
-                $transport = new Swift_SendmailTransport(empty($config['options'])
+                $transport = new Swift_SendmailTransport(empty($options)
                     ? '/usr/sbin/sendmail -bs'
-                    : $config['options']);
+                    : $options);
 
                 break;
             default:
@@ -97,11 +101,11 @@ class Kohana_Email
      * @param string       $subject message subject
      * @param string       $body    message body
      * @param bool         $html    send email as HTML
-     * @param string|array $attach  attach filename
+     * @param array|null $attach  attach filenames
      *
      * @return int                      number of emails sent
      */
-    public static function send($from, $to, $subject, $body, $html = false, $attach = null)
+    public static function send($from, $to, string $subject, string $body, bool $html = null, array $attach = null)
     {
         // Connect to SwiftMailer
         (static::$mail === null) and self::connect();
@@ -110,12 +114,10 @@ class Kohana_Email
         static::$mail->getTransport()->start();
 
         // Determine the message type
-        $content_type = ($html === true) ? 'text/html' : 'text/plain';
+        $contentType = ($html === true) ? 'text/html' : 'text/plain';
 
         // Create the message
-
-        /** @var Swift_Message $msg */
-        $msg = new Swift_Message($subject, $body, $content_type, 'utf-8');
+        $msg = new Swift_Message($subject, $body, $contentType, 'utf-8');
 
         if (is_string($to)) {
             // Single recipient
@@ -155,16 +157,14 @@ class Kohana_Email
         // From
         if (is_string($from)) {
             // From without a name
-            $msg->setFrom($from);
-
             // Set Reply-To header email only
-            $msg->setReplyTo($from);
+            $msg->setFrom($from)->setReplyTo($from);
         } elseif (is_array($from)) {
-            // From with a name
-            $msg->setFrom($from[0], $from[1]);
+            list($fromAddress, $fromName) = $from;
 
+            // From with a name
             // Set Reply-To header email with name
-            $msg->setReplyTo($from[0], $from[1]);
+            $msg->setFrom($fromAddress, $fromName)->setReplyTo($fromAddress, $fromName);
         }
 
         // Sender
@@ -172,14 +172,14 @@ class Kohana_Email
             // From without a name
             $msg->setSender($sender);
         } elseif (is_array($sender)) {
+            list($senderAddress, $senderName) = $sender;
+
             // Set Reply-To header email with name
-            $msg->setSender($sender[0], $sender[1]);
+            $msg->setSender($senderAddress, $senderName);
         }
 
         // Attachments
         if ($attach) {
-            $attach = (array)$attach;
-
             foreach ($attach as $item) {
                 $msg->attach(Swift_Attachment::fromPath($item));
             }
