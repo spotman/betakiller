@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace BetaKiller;
 
-use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
 use BetaKiller\Factory\NamespaceBasedFactoryInterface;
+use Spotman\Defence\ArgumentDefinitionInterface;
 use Spotman\Defence\Parameter\ParameterProviderFactoryInterface;
 use Spotman\Defence\Parameter\ParameterProviderInterface;
 use Spotman\Defence\ParameterArgumentDefinitionInterface;
-use Spotman\Defence\ArgumentDefinitionInterface;
 
 class DefenceParameterProviderFactory implements ParameterProviderFactoryInterface
 {
@@ -20,11 +20,11 @@ class DefenceParameterProviderFactory implements ParameterProviderFactoryInterfa
     /**
      * DefenceParameterProviderFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $builder
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface $builder
      *
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function __construct(NamespaceBasedFactoryBuilder $builder)
+    public function __construct(NamespaceBasedFactoryBuilderInterface $builder)
     {
         $this->factory = $builder->createFactory()
             ->cacheInstances()

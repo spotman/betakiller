@@ -5,21 +5,25 @@ namespace BetaKiller\Acl;
 
 use BetaKiller\Acl\Spec\EntityAclSpecInterface;
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
+use BetaKiller\Factory\NamespaceBasedFactoryInterface;
 use BetaKiller\Model\EntityWithAclSpecInterface;
 
 final class EntityAclSpecFactory
 {
     /**
-     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface
      */
-    private $factory;
+    private NamespaceBasedFactoryInterface $factory;
 
     /**
      * EntityAclSpecFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $builder
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface $builder
+     *
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    public function __construct(NamespaceBasedFactoryBuilder $builder)
+    public function __construct(NamespaceBasedFactoryBuilderInterface $builder)
     {
         $this->factory = $builder->createFactory()
             ->setClassNamespaces('Acl', 'Spec')

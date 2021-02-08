@@ -3,16 +3,17 @@ declare(strict_types=1);
 
 namespace BetaKiller\MessageBus;
 
-use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
+use BetaKiller\Factory\NamespaceBasedFactoryInterface;
 
 class CommandFactory
 {
     /**
-     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface
      */
-    private $factory;
+    private NamespaceBasedFactoryInterface $factory;
 
-    public function __construct(NamespaceBasedFactoryBuilder $builder)
+    public function __construct(NamespaceBasedFactoryBuilderInterface $builder)
     {
         $this->factory = $builder->createFactory()
             ->setClassNamespaces('Command')

@@ -3,20 +3,21 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Behaviour;
 
-use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
+use BetaKiller\Factory\NamespaceBasedFactoryInterface;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Url\UrlElementInterface;
 
 class UrlBehaviourFactory
 {
-    public const BEHAVIOUR_SINGLE   = 'Single';
+    public const BEHAVIOUR_SINGLE = 'Single';
     public const BEHAVIOUR_MULTIPLE = 'Multiple';
-    public const BEHAVIOUR_TREE     = 'Tree';
+    public const BEHAVIOUR_TREE = 'Tree';
 
     /**
-     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface
      */
-    private $factory;
+    private NamespaceBasedFactoryInterface $factory;
 
     /**
      * @var \BetaKiller\Factory\UrlHelperFactory
@@ -26,12 +27,15 @@ class UrlBehaviourFactory
     /**
      * UrlBehaviourFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface $factoryBuilder
+     * @param \BetaKiller\Factory\UrlHelperFactory                      $urlHelperFactory
      *
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder, UrlHelperFactory $urlHelperFactory)
-    {
+    public function __construct(
+        NamespaceBasedFactoryBuilderInterface $factoryBuilder,
+        UrlHelperFactory $urlHelperFactory
+    ) {
         $this->factory = $factoryBuilder
             ->createFactory()
             ->setExpectedInterface(UrlBehaviourInterface::class)

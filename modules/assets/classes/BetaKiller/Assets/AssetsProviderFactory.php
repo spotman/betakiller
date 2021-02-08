@@ -4,7 +4,7 @@ namespace BetaKiller\Assets;
 use BetaKiller\Assets\Exception\AssetsProviderException;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Config\ConfigProviderInterface;
-use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
 use BetaKiller\Factory\NamespaceBasedFactoryInterface;
 use BetaKiller\Factory\RepositoryFactoryInterface;
 
@@ -53,17 +53,17 @@ class AssetsProviderFactory
     /**
      * AssetsProviderFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
-     * @param \BetaKiller\Config\ConfigProviderInterface       $config
-     * @param \BetaKiller\Factory\RepositoryFactoryInterface   $repositoryFactory
-     * @param \BetaKiller\Assets\AssetsStorageFactory          $storageFactory
-     * @param \BetaKiller\Assets\AssetsPathStrategyFactory     $pathStrategyFactory
-     * @param \BetaKiller\Assets\AssetsHandlerFactory          $handlerFactory
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface $factoryBuilder
+     * @param \BetaKiller\Config\ConfigProviderInterface                $config
+     * @param \BetaKiller\Factory\RepositoryFactoryInterface            $repositoryFactory
+     * @param \BetaKiller\Assets\AssetsStorageFactory                   $storageFactory
+     * @param \BetaKiller\Assets\AssetsPathStrategyFactory              $pathStrategyFactory
+     * @param \BetaKiller\Assets\AssetsHandlerFactory                   $handlerFactory
      *
      * @throws \BetaKiller\Factory\FactoryException
      */
     public function __construct(
-        NamespaceBasedFactoryBuilder $factoryBuilder,
+        NamespaceBasedFactoryBuilderInterface $factoryBuilder,
         ConfigProviderInterface $config,
         RepositoryFactoryInterface $repositoryFactory,
         AssetsStorageFactory $storageFactory,

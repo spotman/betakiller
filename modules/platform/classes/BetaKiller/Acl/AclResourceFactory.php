@@ -1,23 +1,24 @@
 <?php
 namespace BetaKiller\Acl;
 
-use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
+use BetaKiller\Factory\NamespaceBasedFactoryInterface;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
 use Spotman\Acl\ResourceInterface;
 
 class AclResourceFactory implements AclResourceFactoryInterface
 {
     /**
-     * @var \BetaKiller\Factory\NamespaceBasedFactory;
+     * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface
      */
-    private $factory;
+    private NamespaceBasedFactoryInterface $factory;
 
     /**
      * AclResourceFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface $factoryBuilder
      */
-    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
+    public function __construct(NamespaceBasedFactoryBuilderInterface $factoryBuilder)
     {
         $this->factory = $factoryBuilder
             ->createFactory()

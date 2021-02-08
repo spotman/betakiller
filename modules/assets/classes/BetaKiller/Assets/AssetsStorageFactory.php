@@ -3,27 +3,30 @@ namespace BetaKiller\Assets;
 
 use BetaKiller\Assets\Storage\AssetsStorageInterface;
 use BetaKiller\Config\ConfigProviderInterface;
-use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
+use BetaKiller\Factory\NamespaceBasedFactoryInterface;
 
 class AssetsStorageFactory
 {
     /**
-     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface
      */
-    private $factory;
+    private NamespaceBasedFactoryInterface $factory;
 
     /**
      * @var \BetaKiller\Config\ConfigProviderInterface
      */
-    private $config;
+    private ConfigProviderInterface $config;
 
     /**
      * AssetsStorageFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
-     * @param \BetaKiller\Config\ConfigProviderInterface       $config
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface $factoryBuilder
+     * @param \BetaKiller\Config\ConfigProviderInterface                $config
+     *
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder, ConfigProviderInterface $config)
+    public function __construct(NamespaceBasedFactoryBuilderInterface $factoryBuilder, ConfigProviderInterface $config)
     {
         $this->factory = $factoryBuilder
             ->createFactory()

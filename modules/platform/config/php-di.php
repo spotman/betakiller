@@ -10,6 +10,8 @@ use BetaKiller\DummyIdentityConverter;
 use BetaKiller\Exception;
 use BetaKiller\Factory\EntityFactory;
 use BetaKiller\Factory\EntityFactoryInterface;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
 use BetaKiller\Factory\RepositoryFactory;
 use BetaKiller\Factory\RepositoryFactoryInterface;
 use BetaKiller\Helper\AppEnvInterface;
@@ -218,6 +220,8 @@ return [
 
             return $factory->createContext();
         }),
+
+        NamespaceBasedFactoryBuilderInterface::class => autowire(NamespaceBasedFactoryBuilder::class),
 
         RepositoryFactoryInterface::class => autowire(RepositoryFactory::class),
 

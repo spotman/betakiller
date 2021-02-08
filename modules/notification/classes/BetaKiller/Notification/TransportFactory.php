@@ -3,23 +3,24 @@ declare(strict_types=1);
 
 namespace BetaKiller\Notification;
 
-use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
+use BetaKiller\Factory\NamespaceBasedFactoryInterface;
 
 final class TransportFactory
 {
     /**
-     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface
      */
-    private $factory;
+    private NamespaceBasedFactoryInterface $factory;
 
     /**
      * TransportFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $builder
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface $builder
      *
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function __construct(NamespaceBasedFactoryBuilder $builder)
+    public function __construct(NamespaceBasedFactoryBuilderInterface $builder)
     {
         $this->factory = $builder->createFactory()
             ->cacheInstances()

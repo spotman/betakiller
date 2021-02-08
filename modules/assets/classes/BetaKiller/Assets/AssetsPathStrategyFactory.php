@@ -2,22 +2,25 @@
 namespace BetaKiller\Assets;
 
 use BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface;
-use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
+use BetaKiller\Factory\NamespaceBasedFactoryInterface;
 use BetaKiller\Repository\RepositoryInterface;
 
 class AssetsPathStrategyFactory
 {
     /**
-     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface
      */
-    private $factory;
+    private NamespaceBasedFactoryInterface $factory;
 
     /**
      * AssetsPathStrategyFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface $factoryBuilder
+     *
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
+    public function __construct(NamespaceBasedFactoryBuilderInterface $factoryBuilder)
     {
         $this->factory = $factoryBuilder
             ->createFactory()

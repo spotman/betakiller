@@ -3,15 +3,16 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task;
 
-use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
+use BetaKiller\Factory\NamespaceBasedFactoryInterface;
 use BetaKiller\Helper\UserDetector;
 
 class TaskFactory
 {
     /**
-     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface
      */
-    private $factory;
+    private NamespaceBasedFactoryInterface $factory;
 
     /**
      * @var \BetaKiller\Helper\UserDetector
@@ -21,12 +22,12 @@ class TaskFactory
     /**
      * TaskFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
-     * @param \BetaKiller\Helper\UserDetector                  $userDetector
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface $factoryBuilder
+     * @param \BetaKiller\Helper\UserDetector                           $userDetector
      *
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder, UserDetector $userDetector)
+    public function __construct(NamespaceBasedFactoryBuilderInterface $factoryBuilder, UserDetector $userDetector)
     {
         $this->factory = $factoryBuilder
             ->createFactory()

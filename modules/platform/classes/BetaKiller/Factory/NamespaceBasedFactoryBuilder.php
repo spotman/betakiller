@@ -7,7 +7,7 @@ use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\DI\ContainerInterface;
 use BetaKiller\Helper\AppEnvInterface;
 
-class NamespaceBasedFactoryBuilder
+class NamespaceBasedFactoryBuilder implements NamespaceBasedFactoryBuilderInterface
 {
     /**
      * @var \BetaKiller\DI\ContainerInterface

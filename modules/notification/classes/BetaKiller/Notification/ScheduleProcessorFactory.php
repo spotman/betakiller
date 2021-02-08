@@ -3,30 +3,31 @@ declare(strict_types=1);
 
 namespace BetaKiller\Notification;
 
-use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
+use BetaKiller\Factory\NamespaceBasedFactoryInterface;
 use BetaKiller\Notification\ScheduleProcessor\ScheduleProcessorInterface;
 
 final class ScheduleProcessorFactory
 {
     /**
-     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface
      */
-    private $factory;
+    private NamespaceBasedFactoryInterface $factory;
 
     /**
      * ScheduleProcessorFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $builder
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface $builder
      *
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function __construct(NamespaceBasedFactoryBuilder $builder)
+    public function __construct(NamespaceBasedFactoryBuilderInterface $builder)
     {
         $this->factory = $builder->createFactory()
             ->cacheInstances()
             ->setClassNamespaces('Notification', 'ScheduleProcessor')
             ->setClassSuffix('Processor')
-        ->setExpectedInterface(ScheduleProcessorInterface::class);
+            ->setExpectedInterface(ScheduleProcessorInterface::class);
     }
 
     public function create(string $messageCodename): ScheduleProcessorInterface
