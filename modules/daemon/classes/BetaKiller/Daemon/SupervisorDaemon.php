@@ -85,4 +85,13 @@ final class SupervisorDaemon extends AbstractDaemon
 
         return $stopPromise;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function isRestartOnFsChangesAllowed(): bool
+    {
+        // Keep Supervisor running, restart manually if required
+        return false;
+    }
 }

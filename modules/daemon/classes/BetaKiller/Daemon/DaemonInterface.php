@@ -33,4 +33,11 @@ interface DaemonInterface
      * @return bool
      */
     public function isIdle(): bool;
+
+    /**
+     * Must return true if daemon allows to be restarted after filesystem changes
+     *
+     * @return bool
+     */
+    public function isRestartOnFsChangesAllowed(): bool;
 }

@@ -3,11 +3,14 @@ declare(strict_types=1);
 
 namespace BetaKiller\Daemon;
 
+use BetaKiller\Exception;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\TextHelper;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use React\EventLoop\TimerInterface;
 use ReactFilesystemMonitor\FilesystemMonitorFactory;
+use ReactFilesystemMonitor\FilesystemMonitorInterface;
 use Symfony\Component\Process\Process;
 
 final class FsWatcher
@@ -16,7 +19,7 @@ final class FsWatcher
         'php', // All
         'twig', // Compiled templates
         'xml', // Configs
-        'yml',
+        'yml', // I18n
     ];
 
     private const WATCH_IGNORE_DIRS = [
@@ -28,22 +31,22 @@ final class FsWatcher
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
-    private $appEnv;
+    private AppEnvInterface $appEnv;
 
     /**
      * @var \ReactFilesystemMonitor\FilesystemMonitorInterface|null
      */
-    private $fsWatcher;
+    private ?FilesystemMonitorInterface $fsWatcher = null;
 
     /**
      * @var \React\EventLoop\TimerInterface|null
      */
-    private $watchTimer;
+    private ?TimerInterface $watchTimer = null;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * FsWatcher constructor.
@@ -60,6 +63,12 @@ final class FsWatcher
     public function start(LoopInterface $loop, callable $onChange): void
     {
         $appPath = $this->appEnv->getAppRootPath();
+
+        if ($this->fsWatcher) {
+            throw new Exception('Watcher is already started for :path', [
+                ':path' => $appPath,
+            ]);
+        }
 
         $this->watchDir($appPath, $loop, $onChange);
     }

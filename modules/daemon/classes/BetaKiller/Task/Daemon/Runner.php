@@ -170,7 +170,8 @@ final class Runner extends AbstractTask
             throw new \LogicException('Daemon codename is not defined');
         }
 
-        $this->lock = $this->lockFactory->create($this->codename);
+        $this->daemon = $this->daemonFactory->create($this->codename);
+        $this->lock   = $this->lockFactory->create($this->codename);
 
         // Check if it is running already and exit if so
         if ($this->lock->isValid()) {
@@ -223,7 +224,7 @@ final class Runner extends AbstractTask
         await($this->start(), Factory::create(), AbstractDaemon::STARTUP_TIMEOUT + 2);
 
         // Based on the included files
-        if ($this->appEnv->inDevelopmentMode()) {
+        if ($this->appEnv->inDevelopmentMode() && $this->daemon->isRestartOnFsChangesAllowed()) {
             $this->startFsWatcher($this->loop);
         }
 
@@ -265,8 +266,6 @@ final class Runner extends AbstractTask
         });
 
         try {
-            $this->daemon = $this->daemonFactory->create($this->codename);
-
             $this->daemon->startDaemon($this->loop)->then(
                 static function () use ($deferred) {
                     $deferred->resolve();

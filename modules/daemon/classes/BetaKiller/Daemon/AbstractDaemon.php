@@ -39,4 +39,13 @@ abstract class AbstractDaemon implements DaemonInterface
             );
         }
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function isRestartOnFsChangesAllowed(): bool
+    {
+        // Alloweb by default
+        return true;
+    }
 }
