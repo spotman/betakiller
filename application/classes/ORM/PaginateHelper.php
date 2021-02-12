@@ -11,6 +11,7 @@ namespace ORM;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Search\SearchResults;
 use BetaKiller\Search\SearchResultsInterface;
+use Webmozart\Assert\Assert;
 
 class PaginateHelper
 {
@@ -62,6 +63,9 @@ class PaginateHelper
      */
     protected function __construct(ExtendedOrmInterface $model, int $currentPage, int $itemsPerPage)
     {
+        Assert::greaterThan($currentPage, 0, 'PaginateHelper: current page must be greater than zero');
+        Assert::greaterThan($itemsPerPage, 0, 'PaginateHelper: items per page must be greater than zero');
+
         $this->paginate     = \Paginate::factory($model);
         $this->currentPage  = $currentPage;
         $this->itemsPerPage = $itemsPerPage;
