@@ -127,6 +127,12 @@ class Cron extends AbstractTask
      */
     public function run(): void
     {
+        if ($this->maintenanceMode->isEnabled()) {
+            $this->logger->debug('CRON jobs would not be processed coz of maintenance mode');
+
+            return;
+        }
+
         $this->isHuman      = $this->getOption('human') !== false;
         $this->currentStage = $this->env->getModeName();
 
@@ -266,19 +272,9 @@ class Cron extends AbstractTask
         $pool = new PriorityPool();
         $pool->setMaxSimultaneous(5);
 
-        $tasks = $this->queue->getReadyToStart();
-
-        if ($tasks && $this->maintenanceMode->isEnabled()) {
-            $this->logger->info('CRON jobs (:count) enqueued but not processed coz of maintenance mode', [
-                ':count' => count($tasks),
-            ]);
-
-            return;
-        }
-
         // Select queued tasks where start_at >= current time, limit 5
         // It allows to postpone failed tasks for 5 minutes
-        foreach ($tasks as $task) {
+        foreach ($this->queue->getReadyToStart() as $task) {
             $pool->add($this->makeTaskRun($task));
         }
 
