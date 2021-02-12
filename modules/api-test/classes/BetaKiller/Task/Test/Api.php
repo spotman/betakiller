@@ -101,7 +101,10 @@ class Api extends AbstractTask
 
     private function getCallArguments(): array
     {
-        $stdin = file_get_contents('php://stdin');
+        /** @see https://stackoverflow.com/a/30740680 */
+        $fh = fopen('php://stdin', 'rb');
+        stream_set_blocking($fh, false);
+        $stdin = fgets($fh);
 
         if ($stdin) {
             return (array)json_decode($stdin, true, 5, \JSON_THROW_ON_ERROR);
