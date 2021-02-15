@@ -79,7 +79,8 @@ final class SupervisorDaemon extends AbstractDaemon
         // Wait for all sub-processes
         $stopPromise = $this->controller->stopAll();
 
-        $stopPromise->done(function () {
+        // Prevent failed promise exception
+        $stopPromise->then(function () {
             $this->logger->info('Supervisor is shutting down');
         });
 
