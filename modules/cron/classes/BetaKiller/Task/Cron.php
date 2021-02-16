@@ -400,9 +400,8 @@ class Cron extends AbstractTask
             $till = (new \DateTimeImmutable)->add(new \DateInterval('PT15M'));
             $task->postpone($till);
 
-            $this->logger->warning('Task [:name] is failed and postponed till :time', [
+            $this->logger->warning('Task [:name] is failed and postponed', [
                 ':name' => $task->getName(),
-                ':time' => $till->format('H:i:s d.m.Y'),
             ]);
 
             // TODO Real enqueue and postpone (use ESB command queue)
@@ -507,6 +506,7 @@ class Cron extends AbstractTask
                 $this->logger->warning('Cron task ":name" is not locked, release skipped', [
                     ':name' => $task->getName(),
                 ]);
+
                 return;
             }
 
