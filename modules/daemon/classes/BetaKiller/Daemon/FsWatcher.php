@@ -49,6 +49,11 @@ final class FsWatcher
     private LoggerInterface $logger;
 
     /**
+     * @var string[]
+     */
+    private array $brokenPhpFiles = [];
+
+    /**
      * FsWatcher constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface $appEnv
@@ -112,8 +117,15 @@ final class FsWatcher
                     }
                 }
 
+                $isStored = isset($this->brokenPhpFiles[$path]);
+
                 // Skip removed files
                 if (!\file_exists($path)) {
+                    if ($isStored) {
+                        // Exclude removed file
+                        unset($this->brokenPhpFiles[$path]);
+                    }
+
                     return;
                 }
 
@@ -125,7 +137,28 @@ final class FsWatcher
                 }
 
                 // Skip files with fatal errors to prevent restart with a broken code
-                if ($ext === 'php' && $this->hasFatalErrors($path)) {
+                if ($ext === 'php') {
+                    $isBroken = $this->hasFatalErrors($path);
+
+                    // No action on broken files changes
+                    if ($isBroken) {
+                        // Store broken file
+                        if (!$isStored) {
+                            $this->brokenPhpFiles[$path] = time();
+                        }
+
+                        return;
+                    }
+
+                    // Stored but not broken
+                    if ($isStored) {
+                        // Remove fixed file
+                        unset($this->brokenPhpFiles[$path]);
+                    }
+                }
+
+                // Prevent restart until all broken files are resolved
+                if ($this->brokenPhpFiles) {
                     return;
                 }
 
