@@ -203,8 +203,14 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         return null;
     }
 
-    private function addRelated(string $relationName, OrmInterface $model): void
+    protected function addRelated(string $relationName, $model): void
     {
+        if (!$model instanceof OrmInterface) {
+            throw new LogicException(
+                sprintf('Model %s must implement OrmInterface for using ORM::removeRalted()', get_class($model))
+            );
+        }
+
         if (isset($this->_belongs_to[$relationName])) {
             $foreignKey = $this->_belongs_to[$relationName]['foreign_key'];
 
@@ -235,8 +241,14 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         }
     }
 
-    private function removeRelated(string $relationName, OrmInterface $model): void
+    protected function removeRelated(string $relationName, $model): void
     {
+        if (!$model instanceof OrmInterface) {
+            throw new LogicException(
+                sprintf('Model %s must implement OrmInterface for using ORM::removeRalted()', get_class($model))
+            );
+        }
+
         if (isset($this->_belongs_to[$relationName])) {
             $model->delete(); // $this model may be deleted by SQL constraints after that
         } elseif (isset($this->_has_one[$relationName])) {

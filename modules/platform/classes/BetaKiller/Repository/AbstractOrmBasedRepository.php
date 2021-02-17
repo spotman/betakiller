@@ -280,6 +280,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      * @param string                                    $relationName
      * @param \BetaKiller\Model\AbstractEntityInterface $relatedModel
+     * @param bool|null                                 $or
      *
      * @return \BetaKiller\Repository\AbstractOrmBasedRepository
      * @throws \BetaKiller\Repository\RepositoryException
@@ -287,7 +288,8 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     protected function filterRelated(
         OrmInterface $orm,
         string $relationName,
-        AbstractEntityInterface $relatedModel
+        AbstractEntityInterface $relatedModel,
+        bool $or = null
     ): self {
         if (!$relatedModel instanceof OrmInterface) {
             throw new RepositoryException('Related model :name must implement :must', [
@@ -296,7 +298,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
             ]);
         }
 
-        $orm->filter_related($relationName, $relatedModel);
+        $orm->filter_related($relationName, $relatedModel, $or);
 
         return $this;
     }
