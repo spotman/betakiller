@@ -179,7 +179,9 @@ final class QueryCondition implements QueryConditionInterface
 
         \similar_text($cityName, $regionName, $similarity);
 
-        return $similarity >= 90 || TextHelper::contains($regionName, $cityName);
+        return $similarity >= 90
+            || TextHelper::contains($regionName, $cityName)
+            || TextHelper::contains($cityName, $regionName);
     }
 
     private function hasBuilding(Location $location): bool
