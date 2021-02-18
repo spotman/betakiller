@@ -419,8 +419,8 @@ final class Runner extends AbstractTask
         $this->loop->addSignal(\SIGINT, $signalCallable);
         $this->loop->addSignal(\SIGQUIT, $signalCallable);
         $this->loop->addSignal(\SIGTERM, $signalCallable);
-        $this->loop->addSignal(\SIGUSR1, $signalCallable);
-        $this->loop->addSignal(\SIGUSR2, $signalCallable);
+//        $this->loop->addSignal(\SIGUSR1, $signalCallable);
+//        $this->loop->addSignal(\SIGUSR2, $signalCallable);
 
         $this->loop->addSignal(self::SIGNAL_PROFILE, function () {
             $this->dumpMemory();
