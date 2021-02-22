@@ -45,7 +45,7 @@ class UserRepository extends AbstractHasWorkflowStateRepository implements UserR
     /**
      * @param string $relName
      *
-     * @return \Database_Expression[]
+     * @return \Database_Expression[]|string[]
      */
     public static function makeSearchExpressions(string $relName): array
     {
