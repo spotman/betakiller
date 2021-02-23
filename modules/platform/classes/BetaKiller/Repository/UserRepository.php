@@ -37,8 +37,8 @@ class UserRepository extends AbstractHasWorkflowStateRepository implements UserR
     {
         return \DB::expr(sprintf(
             'CONCAT(`%s`, " ", `%s`)',
-            $relName.ORM::COL_SEP.User::COL_FIRST_NAME,
-            $relName.ORM::COL_SEP.User::COL_LAST_NAME
+            $relName.ORM::REL_SEP.User::COL_FIRST_NAME,
+            $relName.ORM::REL_SEP.User::COL_LAST_NAME
         ));
     }
 
