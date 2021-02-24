@@ -57,27 +57,25 @@ final class UrlElementAccessResolver implements UrlElementAccessResolverInterfac
         UrlElementInterface $urlElement,
         ?UrlContainerInterface $params = null
     ): bool {
+        $zoneSpec     = $this->specFactory->createFromUrlElement($urlElement);
+        $zoneAclRules = $zoneSpec->getAclRules();
+        $zoneRoles    = $zoneSpec->getRolesNames();
+
+        // Check zone roles if defined
+        if ($zoneRoles && !$user->hasAnyOfRolesNames($zoneRoles)) {
+            return false;
+        }
+
+        // Check zone rules if defined
+        if ($zoneAclRules && !$this->checkCustomAclRules($zoneAclRules, $user, $params)) {
+            return false;
+        }
+
         $urlElementCustomRules = $urlElement->getAdditionalAclRules();
 
-        // Check DataSource item access
-        if ($urlElement->hasDynamicUrl()) {
-            $prototype = $this->prototypeService->createPrototypeFromUrlElement($urlElement);
-
-            if (!$prototype->isRawParameter()) {
-                $entityName = $prototype->getDataSourceName();
-
-                // Default is READ, everything else can be defined in "aclRules" section of UrlElement config
-                $actionName = CrudlsActionsInterface::ACTION_READ;
-
-                // Use bound action name if UrlElement Entity is used in URL prototype
-                if ($urlElement instanceof EntityLinkedUrlElementInterface && $urlElement->getEntityModelName() === $entityName) {
-                    $actionName = $urlElement->getEntityActionName();
-                }
-
-                if (!$this->checkUrlElementEntityPermissions($urlElement, $params, $entityName, $actionName, $user)) {
-                    return false;
-                }
-            }
+        // Check UrlElement custom rules (process after zone checks, skip zone-related entities if zone is not allowed)
+        if (!$this->checkCustomAclRules($urlElementCustomRules, $user, $params)) {
+            return false;
         }
 
         // Custom ACL rules => protection defined
@@ -98,23 +96,25 @@ final class UrlElementAccessResolver implements UrlElementAccessResolverInterfac
             }
         }
 
-        $zoneSpec     = $this->specFactory->createFromUrlElement($urlElement);
-        $zoneAclRules = $zoneSpec->getAclRules();
-        $zoneRoles    = $zoneSpec->getRolesNames();
+        // Check DataSource item access
+        if ($urlElement->hasDynamicUrl()) {
+            $prototype = $this->prototypeService->createPrototypeFromUrlElement($urlElement);
 
-        // Check zone roles if defined
-        if ($zoneRoles && !$user->hasAnyOfRolesNames($zoneRoles)) {
-            return false;
-        }
+            if (!$prototype->isRawParameter()) {
+                $entityName = $prototype->getDataSourceName();
 
-        // Check zone rules if defined
-        if ($zoneAclRules && !$this->checkCustomAclRules($zoneAclRules, $user, $params)) {
-            return false;
-        }
+                // Default is READ, everything else can be defined in "aclRules" section of UrlElement config
+                $actionName = CrudlsActionsInterface::ACTION_READ;
 
-        // Check UrlElement custom rules (process after zone checks, skip zone-related entities if zone is not allowed)
-        if (!$this->checkCustomAclRules($urlElementCustomRules, $user, $params)) {
-            return false;
+                // Use bound action name if UrlElement Entity is used in URL prototype
+                if ($urlElement instanceof EntityLinkedUrlElementInterface && $urlElement->getEntityModelName() === $entityName) {
+                    $actionName = $urlElement->getEntityActionName();
+                }
+
+                if (!$this->checkUrlElementEntityPermissions($urlElement, $params, $entityName, $actionName, $user)) {
+                    return false;
+                }
+            }
         }
 
         // Allow access to non-protected zones by default if nor entity or custom rules were not defined
