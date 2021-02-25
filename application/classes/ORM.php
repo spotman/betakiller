@@ -116,7 +116,7 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         return $entity;
     }
 
-    protected function hasRelatedEntity(string $alias)
+    protected function hasRelatedEntity(string $alias): bool
     {
         return $this->getRelation($alias)->loaded();
     }
@@ -152,6 +152,11 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     protected function countAllRelated(string $name): int
     {
         return $this->getRelation($name)->count_all();
+    }
+
+    protected function hasRelatedRecords(string $name): bool
+    {
+        return $this->countAllRelated($name) > 0;
     }
 
     /**
