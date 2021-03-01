@@ -250,7 +250,7 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     {
         if (!$model instanceof OrmInterface) {
             throw new LogicException(
-                sprintf('Model %s must implement OrmInterface for using ORM::removeRalted()', get_class($model))
+                sprintf('Model %s must implement OrmInterface for using ORM::removeRelated()', get_class($model))
             );
         }
 
@@ -270,6 +270,38 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
                 ':class'    => get_class($this),
             ]);
         }
+    }
+
+    protected function hasRelated(string $relationName, $model): bool
+    {
+        if (!$model instanceof OrmInterface) {
+            throw new LogicException(
+                sprintf('Model %s must implement OrmInterface for using ORM::hasRelated()', get_class($model))
+            );
+        }
+
+        if (isset($this->_belongs_to[$relationName]) || isset($this->_has_one[$relationName])) {
+            $related = $this->getRelatedEntity($relationName, true);
+
+            return $related && $related->isEqualTo($model);
+        }
+
+        // Has_many "through" relationship
+        if (isset($this->_has_many[$relationName]['through'])) {
+            return $this->has($relationName, $model);
+        }
+
+        // Simple has_many relationship, target model's foreign key is this model's primary key
+        if (isset($this->_has_many[$relationName])) {
+            return (bool)$this->getRelation($relationName)
+                ->where($relationName.self::COL_SEP.$model->primary_key(), '=', $model->pk())
+                ->find();
+        }
+
+        throw new \Kohana_Exception('The related alias ":property" does not exist in the :class class', [
+            ':property' => $relationName,
+            ':class'    => get_class($this),
+        ]);
     }
 
     /**
