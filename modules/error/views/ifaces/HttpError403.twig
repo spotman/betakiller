@@ -25,6 +25,12 @@
               </button>
             </p>
           </div>
+
+          {% if email %}
+          <div class="card-footer">
+            <p>{{ "iface.error.403.email"|i18n({email: email}) }}</p>
+          </div>
+          {% endif %}
         </div>
 
       </div>
