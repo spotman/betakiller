@@ -96,7 +96,7 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
 
         // Remove non-alphanumeric symbols
         // @see https://stackoverflow.com/questions/8347655/regex-to-remove-non-alphanumeric-characters-from-utf8-strings#comment89304232_8347715
-        $term = \preg_replace('/[^\pL^\pN\s\\\/-]+/u', '', $term);
+        $term = \preg_replace('/[^\pL^\pN\s\\\/\-]+/u', '', $term);
 
         $column = $this->getI18nValuesColumnName($orm);
 
