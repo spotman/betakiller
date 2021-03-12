@@ -157,11 +157,15 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
         $term = \str_replace(
             [
                 '+',
+                '#',
+                '&',
                 '/',
                 '\\',
             ],
             [
                 '\\+',
+                '\\#',
+                '\\&',
                 '\\/',
                 '\\\\',
             ],
