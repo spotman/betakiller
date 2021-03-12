@@ -96,7 +96,7 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
 
         // Remove non-alphanumeric symbols
         // @see https://stackoverflow.com/questions/8347655/regex-to-remove-non-alphanumeric-characters-from-utf8-strings#comment89304232_8347715
-        $term = \preg_replace('/[^\pL^\pN\s\\\/\-]+/u', '', $term);
+        $term = \preg_replace('/[^\pL\pN\pS\pP\s]+/u', '', $term);
 
         $column = $this->getI18nValuesColumnName($orm);
 
@@ -129,21 +129,44 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
             $utfRegex = sprintf('"%s"', $lang->getIsoCode()).$utfRegex;
         }
 
-        // Case insensitive match for different encodings via COLLATE
-        $columnExpr = DB::expr(sprintf(
-            'REGEXP_LIKE(%s COLLATE utf8mb4_unicode_ci, \'%s\' COLLATE utf8mb4_unicode_ci)',
-            $col,
-            $utfRegex
-        ));
+//        $columnExpr = DB::expr(sprintf(
+////            'REGEXP_LIKE(%s COLLATE utf8mb4_unicode_ci, \'%s\' COLLATE utf8mb4_unicode_ci)',
+//            '%s COLLATE utf8mb4_unicode_ci REGEXP \'%s\' COLLATE utf8mb4_unicode_ci',
+//            $col,
+//            $utfRegex
+//        ));
+//        $orm->and_where($columnExpr, '=', 1);
 
-        $orm->and_where($columnExpr, '=', 1);
+        // Case insensitive match for different encodings via COLLATE
+        $orm->and_where(
+            DB::expr(sprintf('%s COLLATE utf8mb4_unicode_ci', $col)),
+            'REGEXP',
+            DB::expr(sprintf('\'%s\' COLLATE utf8mb4_unicode_ci', $utfRegex))
+        );
 
         return $this;
     }
 
     private function makeI18nFilterRegex(string $term, string $mode): string
     {
-        $term = preg_quote($term, '/');
+        // I18n data is stored in JSON columns so apply JSON escaping strategy and remove quotes
+        $term = trim(json_encode($term, \JSON_THROW_ON_ERROR), '"');
+
+        // Double slash for special characters
+        // @see https://dev.mysql.com/doc/refman/8.0/en/regexp.html#regexp-syntax
+        $term = \str_replace(
+            [
+                '+',
+                '/',
+                '\\',
+            ],
+            [
+                '\\+',
+                '\\/',
+                '\\\\',
+            ],
+            $term
+        );
 
         switch ($mode) {
             case self::SEARCH_EXACT:

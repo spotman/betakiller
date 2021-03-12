@@ -335,7 +335,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         $orm->where(
             \DB::expr(sprintf('MATCH (%s)', $col)),
             '',
-            \DB::expr(sprintf('AGAINST ("%s")', $term)),
+            \DB::expr(sprintf('AGAINST (\'%s\')', $term)), //  WITH QUERY EXPANSION
         );
 
         return $this;
