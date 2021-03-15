@@ -28,7 +28,8 @@ use function React\Promise\Timer\timeout;
 
 final class Runner extends AbstractTask
 {
-    public const SIGNAL_PROFILE = \SIGPROF;
+    public const SIGNAL_PROFILE  = \SIGPROF;
+    public const SIGNAL_SHUTDOWN = \SIGUSR1;
 
     private const STATUS_LOADING  = 'loading';
     private const STATUS_STARTING = 'starting';
@@ -418,9 +419,19 @@ final class Runner extends AbstractTask
         $this->loop->addSignal(\SIGHUP, $signalCallable);
         $this->loop->addSignal(\SIGINT, $signalCallable);
         $this->loop->addSignal(\SIGQUIT, $signalCallable);
-        $this->loop->addSignal(\SIGTERM, $signalCallable);
-//        $this->loop->addSignal(\SIGUSR1, $signalCallable);
-//        $this->loop->addSignal(\SIGUSR2, $signalCallable);
+
+        if ($this->daemon->isShutdownOnSigTermAllowed()) {
+            // Stop on SIGTERM
+            $this->loop->addSignal(\SIGTERM, $signalCallable);
+        } else {
+            // Install no-op handler instead
+            $this->loop->addSignal(\SIGTERM, static function () {
+                // NO OP
+            });
+
+            // Shutdown on default signal
+            $this->loop->addSignal(self::SIGNAL_SHUTDOWN, $signalCallable);
+        }
 
         $this->loop->addSignal(self::SIGNAL_PROFILE, function () {
             $this->dumpMemory();

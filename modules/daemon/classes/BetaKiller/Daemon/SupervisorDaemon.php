@@ -95,4 +95,13 @@ final class SupervisorDaemon extends AbstractDaemon
         // Keep Supervisor running, restart manually if required
         return false;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function isShutdownOnSigTermAllowed(): bool
+    {
+        // Supervisor will react to system reboot and shut down all daemons
+        return true;
+    }
 }

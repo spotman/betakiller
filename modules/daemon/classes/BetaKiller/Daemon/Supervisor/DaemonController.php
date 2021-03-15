@@ -9,6 +9,7 @@ use BetaKiller\Daemon\DaemonException;
 use BetaKiller\Daemon\DaemonInterface;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
+use BetaKiller\Task\Daemon\Runner;
 use Psr\Log\LoggerInterface;
 use React\ChildProcess\Process;
 use React\EventLoop\LoopInterface;
@@ -664,7 +665,7 @@ final class DaemonController
         ]);
 
         // Send stop signal to the daemon
-        if (!$process->terminate(\SIGTERM)) {
+        if (!$process->terminate(Runner::SIGNAL_SHUTDOWN)) {
             $this->logger->warning('Daemon ":name" had not been stopped (signaling failed)', [
                 ':name' => $name,
             ]);

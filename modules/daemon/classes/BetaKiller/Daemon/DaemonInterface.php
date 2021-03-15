@@ -40,4 +40,11 @@ interface DaemonInterface
      * @return bool
      */
     public function isRestartOnFsChangesAllowed(): bool;
+
+    /**
+     * Must return true if daemon needs to be shut down on SIGTERM signal
+     *
+     * @return bool
+     */
+    public function isShutdownOnSigTermAllowed(): bool;
 }
