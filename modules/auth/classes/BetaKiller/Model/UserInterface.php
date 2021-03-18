@@ -248,6 +248,18 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     public function hasPhoneDefined(): bool;
 
     /**
+     * Mark phone number as verified
+     */
+    public function markPhoneAsVerified(): void;
+
+    /**
+     * Returns true if phone is verified
+     *
+     * @return bool
+     */
+    public function isPhoneVerified(): bool;
+
+    /**
      * @return string
      */
     public function getAccessControlIdentity(): string;

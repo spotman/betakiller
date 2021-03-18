@@ -18,23 +18,24 @@ class User extends \ORM implements UserInterface
 {
     use HasWorkflowStateModelOrmTrait;
 
-    public const TABLE_NAME          = 'users';
-    public const COL_ID              = 'id';
-    public const COL_STATUS_ID       = 'status_id';
-    public const COL_CREATED_AT      = 'created_at';
-    public const COL_USERNAME        = 'username';
-    public const COL_PASSWORD        = 'password';
-    public const COL_LANGUAGE_ID     = 'language_id';
-    public const COL_FIRST_NAME      = 'first_name';
-    public const COL_LAST_NAME       = 'last_name';
-    public const COL_MIDDLE_NAME     = 'middle_name';
-    public const COL_EMAIL           = 'email';
-    public const COL_PHONE           = 'phone';
-    public const COL_NOTIFY_BY_EMAIL = 'notify_by_email';
-    public const COL_LOGINS          = 'logins';
-    public const COL_LAST_LOGIN      = 'last_login';
-    public const COL_CREATED_FROM_IP = 'created_from_ip';
-    public const COL_IS_CLAIMED      = 'is_reg_claimed';
+    public const TABLE_NAME            = 'users';
+    public const COL_ID                = 'id';
+    public const COL_STATUS_ID         = 'status_id';
+    public const COL_CREATED_AT        = 'created_at';
+    public const COL_USERNAME          = 'username';
+    public const COL_PASSWORD          = 'password';
+    public const COL_LANGUAGE_ID       = 'language_id';
+    public const COL_FIRST_NAME        = 'first_name';
+    public const COL_LAST_NAME         = 'last_name';
+    public const COL_MIDDLE_NAME       = 'middle_name';
+    public const COL_EMAIL             = 'email';
+    public const COL_PHONE             = 'phone';
+    public const COL_IS_PHONE_VERIFIED = 'is_phone_verified';
+    public const COL_NOTIFY_BY_EMAIL   = 'notify_by_email';
+    public const COL_LOGINS            = 'logins';
+    public const COL_LAST_LOGIN        = 'last_login';
+    public const COL_CREATED_FROM_IP   = 'created_from_ip';
+    public const COL_IS_CLAIMED        = 'is_reg_claimed';
 
     public const  REL_LANGUAGE = 'language';
 
@@ -561,6 +562,11 @@ class User extends \ORM implements UserInterface
      */
     public function setPhone(string $number): UserInterface
     {
+        if ($this->hasPhoneDefined() && $this->getPhone() !== $number) {
+            // Changed phone => needs verification
+            $this->set(self::COL_IS_PHONE_VERIFIED, false);
+        }
+
         return $this->set(self::COL_PHONE, $number);
     }
 
@@ -580,6 +586,22 @@ class User extends \ORM implements UserInterface
     public function getPhone(): string
     {
         return (string)$this->get(self::COL_PHONE);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function markPhoneAsVerified(): void
+    {
+        $this->set(self::COL_IS_PHONE_VERIFIED, true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isPhoneVerified(): bool
+    {
+        return (bool)$this->get(self::COL_IS_PHONE_VERIFIED);
     }
 
     /**
