@@ -39,7 +39,7 @@ class CommandBus extends AbstractMessageBus implements CommandBusInterface
     {
         $this->queueContext = $context;
         $this->queue        = $this->queueContext->createQueue(CommandBusWorkerDaemon::QUEUE_NAME);
-        $this->logger = $logger;
+        $this->logger       = $logger;
     }
 
     /**
