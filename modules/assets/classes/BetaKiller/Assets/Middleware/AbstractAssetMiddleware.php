@@ -13,6 +13,7 @@ use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\Model\HasPreviewAssetsModelInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\HasPreviewProviderInterface;
+use BetaKiller\Auth\AuthorizationRequiredException;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Exception\FoundHttpException;
@@ -207,11 +208,15 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
         }
 
         if (!$this->isActionAllowed($action, $user, $model)) {
-            throw new SecurityException('Assets provider ":prov" action ":act" is not allowed to ":who"', [
-                ':prov' => $this->provider->getCodename(),
-                ':act'  => $action,
-                ':who'  => !$user->isGuest() ? $user->getID() : 'Guest',
-            ]);
+            if ($user->isGuest()) {
+                throw new AuthorizationRequiredException;
+            } else {
+                throw new SecurityException('Assets provider ":prov" action ":act" is not allowed to ":who"', [
+                    ':prov' => $this->provider->getCodename(),
+                    ':act'  => $action,
+                    ':who'  => !$user->isGuest() ? $user->getID() : 'Guest',
+                ]);
+            }
         }
     }
 
