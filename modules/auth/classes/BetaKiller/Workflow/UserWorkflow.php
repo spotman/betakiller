@@ -8,6 +8,7 @@ use BetaKiller\Event\UserConfirmationEmailRequestedEvent;
 use BetaKiller\Event\UserCreatedEvent;
 use BetaKiller\Event\UserEmailChangedEvent;
 use BetaKiller\Event\UserEmailConfirmedEvent;
+use BetaKiller\Event\UserPhoneConfirmedEvent;
 use BetaKiller\Event\UserRegistrationClaimedEvent;
 use BetaKiller\Event\UserResumedEvent;
 use BetaKiller\Event\UserSuspendedEvent;
@@ -149,6 +150,15 @@ final class UserWorkflow
         $this->userRepo->save($user);
 
         $this->eventBus->emit(new UserEmailConfirmedEvent($user));
+    }
+
+    public function confirmPhone(UserInterface $user): void
+    {
+        $user->markPhoneAsVerified();
+
+        $this->userRepo->save($user);
+
+        $this->eventBus->emit(new UserPhoneConfirmedEvent($user));
     }
 
     public function changeEmail(UserInterface $user, string $email): void
