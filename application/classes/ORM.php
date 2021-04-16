@@ -171,7 +171,6 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         // Remove unused first to prevent FK warnings
         foreach ($oldModels as $old) {
             if (!$this->findModelInList($old, $newModels)) {
-                // Add absent
                 $this->removeRelated($name, $old);
             }
         }
