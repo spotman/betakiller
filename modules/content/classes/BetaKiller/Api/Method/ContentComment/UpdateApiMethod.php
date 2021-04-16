@@ -30,7 +30,7 @@ final class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     /**
      * Override this method
      *
-     * @param \BetaKiller\Model\AbstractEntityInterface $model
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
      * @param \Spotman\Defence\ArgumentsInterface       $arguments
      * @param \BetaKiller\Model\UserInterface           $user
      *
@@ -38,25 +38,25 @@ final class UpdateApiMethod extends AbstractEntityUpdateApiMethod
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function processUpdate(AbstractEntityInterface $model, ArgumentsInterface $arguments, UserInterface $user): ?AbstractEntityInterface
+    protected function processUpdate(AbstractEntityInterface $entity, ArgumentsInterface $arguments, UserInterface $user): ?AbstractEntityInterface
     {
-        if (!$model instanceof ContentCommentInterface) {
+        if (!$entity instanceof ContentCommentInterface) {
             throw new \LogicException;
         }
 
         $data = $arguments->getArray(self::ARG_DATA);
 
         if (isset($data[self::ARG_AUTHOR_NAME])) {
-            $model->setGuestAuthorName($data[self::ARG_AUTHOR_NAME]);
+            $entity->setGuestAuthorName($data[self::ARG_AUTHOR_NAME]);
         }
 
         if (isset($data[self::ARG_MESSAGE])) {
-            $model->setMessage($data[self::ARG_MESSAGE]);
+            $entity->setMessage($data[self::ARG_MESSAGE]);
         }
 
-        $this->saveEntity($model);
+        $this->saveEntity($entity);
 
         // Return updated model data
-        return $model;
+        return $entity;
     }
 }

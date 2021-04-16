@@ -53,7 +53,7 @@ final class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     /**
      * Override this method
      *
-     * @param \BetaKiller\Model\AbstractEntityInterface $model
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
      * @param \Spotman\Defence\ArgumentsInterface       $arguments
      * @param \BetaKiller\Model\UserInterface           $user
      *
@@ -63,7 +63,7 @@ final class UpdateApiMethod extends AbstractEntityUpdateApiMethod
      * @throws \Spotman\Api\ApiMethodException
      */
     protected function processUpdate(
-        AbstractEntityInterface $model,
+        AbstractEntityInterface $entity,
         ArgumentsInterface $arguments,
         UserInterface $user
     ): ?AbstractEntityInterface {
@@ -77,11 +77,11 @@ final class UpdateApiMethod extends AbstractEntityUpdateApiMethod
                     ->setUrl($url);
             }
 
-            $model->setRedirect($targetModel);
+            $entity->setRedirect($targetModel);
 
-            $this->saveEntity($model);
+            $this->saveEntity($entity);
 
-            return $model;
+            return $entity;
         }
 
         return null;

@@ -40,7 +40,7 @@ final class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     /**
      * Override this method
      *
-     * @param \BetaKiller\Model\AbstractEntityInterface $model
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
      * @param \Spotman\Defence\ArgumentsInterface       $arguments
      * @param \BetaKiller\Model\UserInterface           $user
      *
@@ -48,39 +48,39 @@ final class UpdateApiMethod extends AbstractEntityUpdateApiMethod
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function processUpdate(AbstractEntityInterface $model, ArgumentsInterface $arguments, UserInterface $user): ?AbstractEntityInterface
+    protected function processUpdate(AbstractEntityInterface $entity, ArgumentsInterface $arguments, UserInterface $user): ?AbstractEntityInterface
     {
-        if (!$model instanceof ContentPostInterface) {
+        if (!$entity instanceof ContentPostInterface) {
             throw new \LogicException;
         }
 
         $data = $arguments->getArray(self::ARG_DATA);
 
         if (isset($data[self::ARG_LABEL])) {
-            $model->setLabel($data[self::ARG_LABEL]);
+            $entity->setLabel($data[self::ARG_LABEL]);
         }
 
-        if (isset($data[self::ARG_URI]) && $data[self::ARG_URI] !== $model->getUri()) {
+        if (isset($data[self::ARG_URI]) && $data[self::ARG_URI] !== $entity->getUri()) {
             // TODO deal with url change
-            $model->setUri($data[self::ARG_URI]);
+            $entity->setUri($data[self::ARG_URI]);
         }
 
         if (isset($data[self::ARG_TITLE])) {
-            $model->setTitle($data[self::ARG_TITLE]);
+            $entity->setTitle($data[self::ARG_TITLE]);
         }
 
         if (isset($data[self::ARG_DESC])) {
-            $model->setDescription($data[self::ARG_DESC]);
+            $entity->setDescription($data[self::ARG_DESC]);
         }
 
         if (isset($data[self::ARG_CONTENT])) {
-            $model->setContent($data[self::ARG_CONTENT]);
+            $entity->setContent($data[self::ARG_CONTENT]);
         }
 
-        $model->injectNewRevisionAuthor($user);
+        $entity->injectNewRevisionAuthor($user);
 
-        $this->saveEntity($model);
+        $this->saveEntity($entity);
 
-        return $model;
+        return $entity;
     }
 }

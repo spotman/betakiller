@@ -39,7 +39,7 @@ abstract class AbstractEntityUpdateApiMethod extends AbstractEntityBasedApiMetho
      * @return \BetaKiller\Model\AbstractEntityInterface|null
      */
     abstract protected function processUpdate(
-        AbstractEntityInterface $model,
+        AbstractEntityInterface $entity,
         ArgumentsInterface $arguments,
         UserInterface $user
     ): ?AbstractEntityInterface;
