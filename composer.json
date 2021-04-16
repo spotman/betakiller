@@ -10,6 +10,7 @@
     "ext-gd": "*",
     "ext-intl": "*",
     "ext-json": "*",
+    "ext-libxml": "*",
     "ext-mbstring": "*",
     "ext-mysqli": "*",
     "ext-pcntl": "*",
