@@ -67,7 +67,16 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
      */
     private function loadXmlConfig(string $file): void
     {
+        \libxml_use_internal_errors(true);
         $sxo = simplexml_load_string(file_get_contents($file));
+        \libxml_use_internal_errors(false);
+
+        if (!$sxo) {
+            throw new UrlElementException('Can not parse XML file :path', [
+                ':path' => $file,
+            ]);
+        }
+
         $this->parseXmlBranch($sxo);
     }
 
