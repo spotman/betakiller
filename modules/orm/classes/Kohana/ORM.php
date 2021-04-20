@@ -901,6 +901,11 @@ class Kohana_ORM extends Model implements Serializable {
 		// Add to with_applied to prevent duplicate joins
 		$this->_with_applied[$target_path] = TRUE;
 
+        if (isset($parent->_has_many[$target_alias])) {
+            // Temporary skip *-to-many aliases, they are processed only in find_all() method
+            return $this;
+        }
+
 		// Use the keys of the empty object to determine the columns
 		foreach (array_keys($target->_object) as $column)
 		{
@@ -917,7 +922,7 @@ class Kohana_ORM extends Model implements Serializable {
 			$join_col1 = $target_path.'.'.$target->_primary_key;
 			$join_col2 = $parent_path.'.'.$parent->_belongs_to[$target_alias]['foreign_key'];
 		}
-		else
+		else if (isset($parent->_has_one[$target_alias]))
 		{
 			// Parent has_one target, use parent's primary key as target's foreign key
 			$join_col1 = $parent_path.'.'.$parent->_primary_key;
@@ -2380,4 +2385,9 @@ class Kohana_ORM extends Model implements Serializable {
 
 		return ( ! $model->loaded());
 	}
+
+    protected function isToManyAlias(string $alias): bool
+    {
+        return isset($this->_has_many[$alias]);
+    }
 } // End ORM

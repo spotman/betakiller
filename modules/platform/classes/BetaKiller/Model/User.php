@@ -38,6 +38,7 @@ class User extends \ORM implements UserInterface
     public const COL_IS_CLAIMED        = 'is_reg_claimed';
 
     public const  REL_LANGUAGE = 'language';
+    public const  REL_ROLES = 'roles';
 
     protected array $allUserRolesNames = [];
 
@@ -69,6 +70,7 @@ class User extends \ORM implements UserInterface
 
         $this->load_with([
             self::REL_LANGUAGE,
+            self::REL_ROLES,
         ]);
     }
 
