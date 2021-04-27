@@ -65,6 +65,8 @@ final class TwigExtension extends AbstractExtension
      */
     private I18nFacade $i18n;
 
+    private array $entryPointsJson = [];
+
     /**
      * TwigExtension constructor.
      *
@@ -248,36 +250,38 @@ final class TwigExtension extends AbstractExtension
                     }
 
                     $assets = $this->getStaticAssets($context);
-
                     $fileName = $distDir.\DIRECTORY_SEPARATOR.'entrypoints.json';
-                    $fullPath = $assets->findFile($fileName);
 
-                    if (!$fullPath) {
-                        throw new Exception('Missing file ":path", check webpack build and "dist_dir" variable', [
-                            ':path' => $fileName,
-                        ]);
+                    if (!$this->entryPointsJson) {
+                        $fullPath = $assets->findFile($fileName);
+
+                        if (!$fullPath) {
+                            throw new Exception('Missing file ":path", check webpack build and "dist_dir" variable', [
+                                ':path' => $fileName,
+                            ]);
+                        }
+
+                        $fileContent = \file_get_contents($fullPath);
+
+                        if (!$fileContent) {
+                            throw new Exception('Empty file ":path", check webpack build and "dist_dir" variable', [
+                                ':path' => $fullPath,
+                            ]);
+                        }
+
+                        $this->entryPointsJson = \json_decode($fileContent, true, 20, JSON_THROW_ON_ERROR);
                     }
 
-                    $fileContent = \file_get_contents($fullPath);
-
-                    if (!$fileContent) {
-                        throw new Exception('Empty file ":path", check webpack build and "dist_dir" variable', [
-                            ':path' => $fullPath,
-                        ]);
-                    }
-
-                    $fileData = \json_decode($fileContent, true, 20, JSON_THROW_ON_ERROR);
-
-                    $config = $fileData['entrypoints'][$entryPoint] ?? null;
+                    $config = $this->entryPointsJson['entrypoints'][$entryPoint] ?? null;
 
                     if (!$config) {
                         throw new Exception('Missing entry ":name" in file ":path"', [
-                            ':path' => $fullPath,
+                            ':path' => $fileName,
                             ':name' => $entryPoint,
                         ]);
                     }
 
-                    $integrityHashes = $fileData['integrity'] ?? null;
+                    $integrityHashes = $this->entryPointsJson['integrity'] ?? null;
 
                     $baseUrl = $assets->getBaseUrl();
 
