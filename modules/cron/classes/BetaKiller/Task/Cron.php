@@ -358,8 +358,15 @@ class Cron extends AbstractTask
                 return;
             }
 
+            $pid = $process->getPid();
+
+            // Already stopped/failed => skip
+            if (!$pid) {
+                return;
+            }
+
             // Store PID in CronTask record
-            $task->started($process->getPid());
+            $task->started($pid);
 
             // Lock ASAP
             $this->acquireLock($task);
