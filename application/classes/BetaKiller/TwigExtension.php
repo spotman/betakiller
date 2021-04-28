@@ -252,7 +252,7 @@ final class TwigExtension extends AbstractExtension
                     $assets = $this->getStaticAssets($context);
                     $fileName = $distDir.\DIRECTORY_SEPARATOR.'entrypoints.json';
 
-                    if (!$this->entryPointsJson) {
+                    if (!isset($this->entryPointsJson[$fileName])) {
                         $fullPath = $assets->findFile($fileName);
 
                         if (!$fullPath) {
@@ -269,10 +269,10 @@ final class TwigExtension extends AbstractExtension
                             ]);
                         }
 
-                        $this->entryPointsJson = \json_decode($fileContent, true, 20, JSON_THROW_ON_ERROR);
+                        $this->entryPointsJson[$fileName] = \json_decode($fileContent, true, 20, JSON_THROW_ON_ERROR);
                     }
 
-                    $config = $this->entryPointsJson['entrypoints'][$entryPoint] ?? null;
+                    $config = $this->entryPointsJson[$fileName]['entrypoints'][$entryPoint] ?? null;
 
                     if (!$config) {
                         throw new Exception('Missing entry ":name" in file ":path"', [
@@ -281,7 +281,7 @@ final class TwigExtension extends AbstractExtension
                         ]);
                     }
 
-                    $integrityHashes = $this->entryPointsJson['integrity'] ?? null;
+                    $integrityHashes = $this->entryPointsJson[$fileName]['integrity'] ?? null;
 
                     $baseUrl = $assets->getBaseUrl();
 
