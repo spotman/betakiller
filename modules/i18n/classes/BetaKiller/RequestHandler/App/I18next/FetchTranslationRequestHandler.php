@@ -73,6 +73,9 @@ class FetchTranslationRequestHandler implements RequestHandlerInterface
 
         RequestProfiler::end($p);
 
+//        // Marker for frontend checks
+//        $data['__loaded__'] = 'true';
+
         return ResponseHelper::json($data);
     }
 }
