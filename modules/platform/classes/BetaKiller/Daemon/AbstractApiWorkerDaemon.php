@@ -31,6 +31,7 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
 
     public const PROCEDURE_API = 'api';
 
+    public const KEY_API_SOURCE   = 'source';
     public const KEY_API_RESOURCE = 'resource';
     public const KEY_API_METHOD   = 'method';
     public const KEY_API_DATA     = 'data';
@@ -173,13 +174,24 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
             $resource  = ucfirst($arrayArgs[self::KEY_API_RESOURCE]);
             $method    = $arrayArgs[self::KEY_API_METHOD];
             $arguments = (array)$arrayArgs[self::KEY_API_DATA];
+            $source    = $arrayArgs[self::KEY_API_SOURCE] ?? null;
 
-            $this->logger->debug('User is ":name"', [':name' => $user->getID()]);
+            $this->logger->debug('User is ":name"', [
+                ':name' => $user->getID(),
+            ]);
+
+            $this->logger->debug('Source is ":source"', [
+                ':source' => $source,
+            ]);
+
             $this->logger->debug('Resource/method are :resource.:method', [
                 ':resource' => $resource,
                 ':method'   => $method,
             ]);
-            $this->logger->debug('Arguments are :value', [':value' => json_encode($arguments)]);
+
+            $this->logger->debug('Arguments are :value', [
+                ':value' => json_encode($arguments),
+            ]);
 
             $result = $this->callApiMethod($resource, $method, $arguments, $user)->jsonSerialize();
 
