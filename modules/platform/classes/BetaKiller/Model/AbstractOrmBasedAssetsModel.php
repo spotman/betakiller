@@ -18,6 +18,8 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
 {
     public const COL_UPLOADED_BY = 'uploaded_by';
 
+    private const MAX_LENGTH_ORIGINAL_NAME = 64;
+
     protected function configure(): void
     {
         $this->belongs_to([
@@ -47,6 +49,14 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
      */
     public function setOriginalName(string $name): AssetsModelInterface
     {
+        $pathName = \pathinfo($name, \PATHINFO_FILENAME);
+        $pathExt = \pathinfo($name, \PATHINFO_EXTENSION);
+
+        $maxLength = self::MAX_LENGTH_ORIGINAL_NAME - \mb_strlen($pathExt) - 1; // minus "dot" symbol
+
+        // Shrink too long name to prevent DB errors
+        $name = substr($pathName, 0, $maxLength).'.'.$pathExt;
+
         $this->setOnce('original_name', $name);
 
         return $this;
