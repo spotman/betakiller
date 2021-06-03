@@ -38,7 +38,8 @@ class User extends \ORM implements UserInterface
     public const COL_IS_CLAIMED        = 'is_reg_claimed';
 
     public const  REL_LANGUAGE = 'language';
-    public const  REL_ROLES = 'roles';
+    public const  REL_ROLES    = 'roles';
+    public const  REL_SESSIONS = 'sessions';
 
     protected array $allUserRolesNames = [];
 
@@ -55,14 +56,16 @@ class User extends \ORM implements UserInterface
         ]);
 
         $this->has_many([
-            'sessions' => [
-                'model'       => 'UserSession',
+            self::REL_SESSIONS => [
+                'model'       => UserSession::getModelName(),
                 'foreign_key' => 'user_id',
             ],
-            'roles'    => [
-                'model'       => 'Role',
+
+            self::REL_ROLES => [
+                'model'       => Role::getModelName(),
                 'through'     => 'roles_users',
                 'foreign_key' => 'user_id',
+                'far_key'     => 'role_id',
             ],
         ]);
 
@@ -660,7 +663,7 @@ class User extends \ORM implements UserInterface
      */
     public function getAccessControlRoles(): array
     {
-        return $this->getRolesRelation()->get_all();
+        return $this->getAllRelated(self::REL_ROLES);
     }
 
     /**

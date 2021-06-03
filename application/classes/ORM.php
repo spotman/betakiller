@@ -146,6 +146,11 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
      */
     protected function getAllRelated(string $name): array
     {
+        // Return preloaded data
+        if (array_key_exists($name, $this->_related_has_many)) {
+            return $this->_related_has_many[$name];
+        }
+
         return $this->getRelation($name)->get_all();
     }
 

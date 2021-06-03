@@ -31,7 +31,9 @@ class Kohana_Database_Query {
 	// Parameters for __construct when using object results
 	protected $_object_params = array();
 
-	/**
+    private static int $queryCounter = 0;
+
+    /**
 	 * Creates a new SQL query of the specified type.
 	 *
 	 * @param   integer  $type  query type: Database::SELECT, Database::INSERT, etc
@@ -43,7 +45,17 @@ class Kohana_Database_Query {
 		$this->_sql = $sql;
 	}
 
-	/**
+    public static function getQueryCount(): int
+    {
+        return self::$queryCounter;
+    }
+
+    public static function resetQueryCount(): void
+    {
+        self::$queryCounter = 0;
+    }
+
+    /**
 	 * Return the SQL query string.
 	 *
 	 * @return  string
@@ -246,6 +258,8 @@ class Kohana_Database_Query {
 
 		// Execute the query
 		$result = $db->query($this->_type, $sql, $as_object, $object_params);
+
+        self::$queryCounter++;
 
 		if (isset($cache_key) AND $this->_lifetime > 0)
 		{

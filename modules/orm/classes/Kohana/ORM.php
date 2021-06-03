@@ -15,7 +15,13 @@
  */
 class Kohana_ORM extends Model implements Serializable {
 
-	/**
+    /**
+     * Feature Flag to enable data preloading of "has_many" relations in one SQL request
+     * @var bool
+     */
+    public static bool $loadWithHasMany = false;
+
+    /**
 	 * Stores column information for ORM models
 	 * @var array
 	 */
@@ -96,6 +102,11 @@ class Kohana_ORM extends Model implements Serializable {
 	 * @var array
 	 */
 	protected $_related = array();
+
+	/**
+	 * @var array[]
+	 */
+	protected $_related_has_many = array();
 
 	/**
 	 * @var bool
@@ -469,7 +480,7 @@ class Kohana_ORM extends Model implements Serializable {
 		$values = array_combine(array_keys($this->_table_columns), array_fill(0, count($this->_table_columns), NULL));
 
 		// Replace the object and reset the object status
-		$this->_object = $this->_changed = $this->_related = $this->_original_values = array();
+		$this->_object = $this->_changed = $this->_related = $this->_related_has_many = $this->_original_values = array();
 
 		// Replace the current object with an empty one
 		$this->_load_values($values);
@@ -517,6 +528,7 @@ class Kohana_ORM extends Model implements Serializable {
 	{
 		return (isset($this->_object[$column]) OR
 			isset($this->_related[$column]) OR
+			isset($this->_related_has_many[$column]) OR
 			isset($this->_has_one[$column]) OR
 			isset($this->_belongs_to[$column]) OR
 			isset($this->_has_many[$column]));
@@ -530,7 +542,12 @@ class Kohana_ORM extends Model implements Serializable {
 	 */
 	public function __unset($column)
 	{
-		unset($this->_object[$column], $this->_changed[$column], $this->_related[$column]);
+		unset(
+		    $this->_object[$column],
+            $this->_changed[$column],
+            $this->_related[$column],
+            $this->_related_has_many[$column]
+        );
 	}
 
 	/**
@@ -1017,10 +1034,107 @@ class Kohana_ORM extends Model implements Serializable {
 			}
 		}
 
-		$this->_build(Database::SELECT);
+        $this->_build(Database::SELECT);
 
-		return $this->_load_result(TRUE);
+		/** @var \Database_Result $result */
+		$result = $this->_load_result(TRUE);
+
+		// Skip preloading when small amount of records fetched
+		if (!self::$loadWithHasMany || $result->count() === 1) {
+		    return $result;
+        }
+
+        /** @var self[] $resultData */
+		$resultData = $result->as_array($this->primary_key());
+		$ids = array_keys($resultData);
+
+		// If current model must be loaded with "has_many" relations
+        foreach ($this->_load_with as $alias)
+        {
+            // Skip non-has-many aliases
+            if (!isset($this->_has_many[$alias])) {
+                continue;
+            }
+
+            $hasManyModel = ORM::factory($this->_has_many[$alias]['model']);
+
+            // Preload alias data (IN ids)
+            /** @var self[][] $relData */
+            $relData = [];
+
+            if (isset($this->_has_many[$alias]['through']))
+            {
+                // Grab has_many "through" relationship table
+                $through = $this->_has_many[$alias]['through'];
+                $foreignKeyCol = $this->_has_many[$alias]['foreign_key'];
+                $farKeyCol = $this->_has_many[$alias]['far_key'];
+
+                // Join on through model's target foreign key (far_key) and target model's primary key
+                $farKeyFullCol = $through.'.'.$farKeyCol;
+                $relPkFullCol = $hasManyModel->object_name().'.'.$hasManyModel->primary_key();
+
+                $hasManyModel->join($through)->on($farKeyFullCol, '=', $relPkFullCol);
+
+                // Through table's source foreign key (foreign_key) should be this model's primary key
+                $fkCol = $through.'.'.$foreignKeyCol;
+
+                /** @var self[] $hasManyData */
+                $hasManyData = $hasManyModel
+                    ->where($fkCol, 'IN', $ids)
+                    ->group_by_primary_key()
+                    ->find_all()
+                    ->as_array($hasManyModel->primary_key());
+
+                // Detect source <=> target relations
+                $throughResult = DB::select($foreignKeyCol, $farKeyCol)
+                    ->from($through)
+                    ->where($foreignKeyCol, 'IN', $ids)
+                    ->order_by($foreignKeyCol)
+                    ->order_by($farKeyCol)
+                    ->execute($this->_db)
+                    ->as_array();
+
+                foreach ($throughResult as $throughResultRow) {
+                    $rowFk = $throughResultRow[$foreignKeyCol];
+                    $rowFarKey = $throughResultRow[$farKeyCol];
+
+                    // Many-to-many needs array init
+                    $relData[$rowFk] = $relData[$rowFk] ?? [];
+
+                    $relData[$rowFk][] = $hasManyData[$rowFarKey];
+                }
+            }
+            else
+            {
+                // Simple has_many relationship, search where target model's foreign key is this model's primary key
+                $fkCol = $this->_has_many[$alias]['foreign_key'];
+                $col = $hasManyModel->object_name().'.'.$fkCol;
+
+                /** @var self[] $hasManyData */
+                $hasManyData = $hasManyModel
+                    ->where($col, 'IN', $ids)
+                    ->find_all()
+                    ->as_array($fkCol);
+
+                // Detect source <=> target relations
+                foreach ($hasManyData as $fk => $hasManyItem) {
+                    $relData[$fk] = [$hasManyItem];
+                }
+            }
+
+            // Inject data in result models
+            foreach ($resultData as $pk => $resultItem) {
+                $resultItem->presetHasManyData($alias, $relData[$pk] ?? []);
+            }
+        }
+
+        return new Database_Result_Cached(array_values($resultData), $this->last_query(), get_class($this));
 	}
+
+	protected function presetHasManyData(string $alias, array $hasManyItems): void
+    {
+        $this->_related_has_many[$alias] = $hasManyItems;
+    }
 
 	/**
 	 * Returns an array of columns to include in the select query. This method
@@ -1145,7 +1259,7 @@ class Kohana_ORM extends Model implements Serializable {
 			else
 			{
 				// Column belongs to a related model
-				list ($prefix, $column) = explode(':', $column, 2);
+				[$prefix, $column] = explode(':', $column, 2);
 
 				$related[$prefix][$column] = $value;
 			}
@@ -1238,7 +1352,7 @@ class Kohana_ORM extends Model implements Serializable {
 			else
 			{
 				// Split the class and method of the rule
-				list($class, $method) = explode('::', $filter, 2);
+				[$class, $method] = explode('::', $filter, 2);
 
 				// Use a static method call
 				$method = new ReflectionMethod($class, $method);

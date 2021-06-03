@@ -49,7 +49,7 @@ class Logger implements LoggerInterface
         $monolog = new \Monolog\Logger('default');
 
         $errorHandler = new ErrorHandler($monolog);
-        $errorHandler->registerErrorHandler([], false);
+        $errorHandler->registerErrorHandler([], $this->appEnv->isCli());
         $errorHandler->registerFatalHandler();
 
         // Do not register Monolog exception handler coz it calls exit()
