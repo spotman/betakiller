@@ -6,7 +6,7 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
     abstract protected function getTreeModelThroughTableName();
 
     protected const REL_PARENTS = 'parents';
-    protected const REL_CHILDS = 'childs';
+    protected const REL_CHILDS  = 'childs';
 
     protected function configure(): void
     {
@@ -121,22 +121,6 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
     }
 
     /**
-     * @return $this
-     */
-    protected function getParentsRelation(): self
-    {
-        return $this->get('parents');
-    }
-
-    /**
-     * @return $this
-     */
-    protected function getChildsRelation(): self
-    {
-        return $this->get('childs');
-    }
-
-    /**
      * @param array|null $parentIDs
      *
      * @throws \Kohana_Exception
@@ -145,7 +129,7 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
     {
         $parentsTableNameAlias = $this->table_name().'_parents';
 
-        $this->join_related('parents', $parentsTableNameAlias);
+        $this->join_related(self::REL_PARENTS, $parentsTableNameAlias);
 
         $parentIdCol = $parentsTableNameAlias.'.'.$this->getParentIdColumnName();
 
@@ -163,7 +147,7 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
      */
     public function addParent(MultipleParentsTreeModelInterface $parent): void
     {
-        $this->add('parents', $parent);
+        $this->add(self::REL_PARENTS, $parent);
     }
 
     /**
@@ -173,7 +157,7 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
      */
     public function removeParent(MultipleParentsTreeModelInterface $parent): void
     {
-        $this->remove('parents', $parent);
+        $this->remove(self::REL_PARENTS, $parent);
     }
 
     /**
@@ -183,7 +167,7 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
      */
     public function hasParent(MultipleParentsTreeModelInterface $parent): bool
     {
-        return $this->has('parents', $parent);
+        return $this->has(self::REL_PARENTS, $parent);
     }
 
     /**
