@@ -242,6 +242,9 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
             // External column
             $model->set($foreignKey, $this->getID());
             $model->save();
+
+            // Clear cached data (force DB query on next fetch)
+            $this->resetHasManyData($relationName);
         } else {
             throw new \Kohana_Exception('The related alias ":property" does not exist in the :class class', [
                 ':property' => $relationName,
