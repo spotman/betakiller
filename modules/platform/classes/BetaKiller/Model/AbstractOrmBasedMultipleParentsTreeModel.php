@@ -26,9 +26,9 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
             ],
         ]);
 
-        $this->load_with([
-            self::REL_PARENTS,
-        ]);
+//        $this->load_with([
+//            self::REL_PARENTS,
+//        ]);
     }
 
     protected function getChildIdColumnName(): string
