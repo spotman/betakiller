@@ -1017,7 +1017,7 @@ class Kohana_ORM extends Model implements Serializable
         $result = $this->_load_result(true);
 
         // Skip preloading when small amount of records fetched
-        if (!self::$loadWithHasMany || $result->count() === 1) {
+        if (!self::$loadWithHasMany || $result->count() < 2) {
             return $result;
         }
 
