@@ -5,22 +5,29 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
 {
     abstract protected function getTreeModelThroughTableName();
 
+    protected const REL_PARENTS = 'parents';
+    protected const REL_CHILDS = 'childs';
+
     protected function configure(): void
     {
         $this->has_many([
-            'parents' => [
+            self::REL_PARENTS => [
                 'model'       => static::getModelName(),
                 'foreign_key' => $this->getChildIdColumnName(),
                 'far_key'     => $this->getParentIdColumnName(),
                 'through'     => $this->getTreeModelThroughTableName(),
             ],
 
-            'childs' => [
+            self::REL_CHILDS => [
                 'model'       => static::getModelName(),
                 'foreign_key' => $this->getParentIdColumnName(),
                 'far_key'     => $this->getChildIdColumnName(),
                 'through'     => $this->getTreeModelThroughTableName(),
             ],
+        ]);
+
+        $this->load_with([
+            self::REL_PARENTS,
         ]);
     }
 
@@ -42,7 +49,7 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
      */
     public function getParents(): array
     {
-        return $this->getParentsRelation()->find_all()->as_array();
+        return $this->getAllRelated(self::REL_PARENTS);
     }
 
     /**
@@ -52,7 +59,7 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
      */
     public function getChilds(): array
     {
-        return $this->getChildsRelation()->find_all()->as_array();
+        return $this->getAllRelated(self::REL_CHILDS);
     }
 
     /**
