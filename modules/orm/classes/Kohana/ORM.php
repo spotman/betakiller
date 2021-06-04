@@ -1114,6 +1114,11 @@ class Kohana_ORM extends Model implements Serializable
         $this->_related_has_many[$alias] = $hasManyItems;
     }
 
+    protected function resetHasManyData(string $alias): void
+    {
+        unset($this->_related_has_many[$alias]);
+    }
+
     /**
      * Returns an array of columns to include in the select query. This method
      * can be overridden to change the default select behavior.
@@ -1667,6 +1672,9 @@ class Kohana_ORM extends Model implements Serializable
 
         $query->execute($this->_db);
 
+        // Clear cached data (force DB query on next fetch)
+        $this->resetHasManyData($alias);
+
         return $this;
     }
 
@@ -1700,6 +1708,9 @@ class Kohana_ORM extends Model implements Serializable
         }
 
         $query->execute($this->_db);
+
+        // Clear cached data (force DB query on next fetch)
+        $this->resetHasManyData($alias);
 
         return $this;
     }
