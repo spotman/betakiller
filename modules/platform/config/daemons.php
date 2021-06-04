@@ -1,9 +1,12 @@
 <?php
 declare(strict_types=1);
 
+use BetaKiller\Daemon\ApiWorkerEightDaemon;
 use BetaKiller\Daemon\ApiWorkerFiveDaemon;
 use BetaKiller\Daemon\ApiWorkerFourDaemon;
 use BetaKiller\Daemon\ApiWorkerOneDaemon;
+use BetaKiller\Daemon\ApiWorkerSevenDaemon;
+use BetaKiller\Daemon\ApiWorkerSixDaemon;
 use BetaKiller\Daemon\ApiWorkerThreeDaemon;
 use BetaKiller\Daemon\ApiWorkerTwoDaemon;
 use BetaKiller\Daemon\CommandBusWorkerDaemon;
@@ -16,6 +19,9 @@ return [
     ApiWorkerThreeDaemon::CODENAME,
     ApiWorkerFourDaemon::CODENAME,
     ApiWorkerFiveDaemon::CODENAME,
+    ApiWorkerSixDaemon::CODENAME,
+    ApiWorkerSevenDaemon::CODENAME,
+    ApiWorkerEightDaemon::CODENAME,
 
     WampEsbBridgeDaemon::CODENAME,
     CommandBusWorkerDaemon::CODENAME,
