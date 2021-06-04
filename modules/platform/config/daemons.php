@@ -4,9 +4,11 @@ declare(strict_types=1);
 use BetaKiller\Daemon\ApiWorkerEightDaemon;
 use BetaKiller\Daemon\ApiWorkerFiveDaemon;
 use BetaKiller\Daemon\ApiWorkerFourDaemon;
+use BetaKiller\Daemon\ApiWorkerNineDaemon;
 use BetaKiller\Daemon\ApiWorkerOneDaemon;
 use BetaKiller\Daemon\ApiWorkerSevenDaemon;
 use BetaKiller\Daemon\ApiWorkerSixDaemon;
+use BetaKiller\Daemon\ApiWorkerTenDaemon;
 use BetaKiller\Daemon\ApiWorkerThreeDaemon;
 use BetaKiller\Daemon\ApiWorkerTwoDaemon;
 use BetaKiller\Daemon\CommandBusWorkerDaemon;
@@ -22,6 +24,8 @@ return [
     ApiWorkerSixDaemon::CODENAME,
     ApiWorkerSevenDaemon::CODENAME,
     ApiWorkerEightDaemon::CODENAME,
+    ApiWorkerNineDaemon::CODENAME,
+    ApiWorkerTenDaemon::CODENAME,
 
     WampEsbBridgeDaemon::CODENAME,
     CommandBusWorkerDaemon::CODENAME,
