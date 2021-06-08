@@ -58,7 +58,7 @@ class AclRolesCollector implements AclRolesCollectorInterface
 
     protected function addRoleWithParents(AclInterface $acl, RoleInterface $role): void
     {
-        $parentRoles           = $this->getRoleParents($role);
+        $parentRoles      = $this->getRoleParents($role);
         $parentIdentities = [];
 
         foreach ($parentRoles as $parentRole) {
@@ -81,7 +81,7 @@ class AclRolesCollector implements AclRolesCollectorInterface
      */
     protected function getRoleParents(RoleInterface $role): array
     {
-        return array_map(function($id) {
+        return array_map(function ($id) {
             return $this->roles[$id];
         }, $this->pairs[$role->getID()] ?? []);
     }
