@@ -92,6 +92,33 @@ class RoleRepository extends AbstractOrmBasedMultipleParentsTreeRepository imple
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getChildParentsPairs(): array
+    {
+        $childCol = Role::getChildIdColumnName();
+        $parentCol = Role::getParentIdColumnName();
+
+        $data = \DB::select($childCol, $parentCol)
+            ->from(Role::INHERITANCE_TABLE_NAME)
+            ->execute()
+            ->as_array();
+
+        $pairs = [];
+
+        foreach ($data as $row) {
+            $childId = $row[$childCol];
+            $parentId = $row[$parentCol];
+
+            $pairs[$childId] = $pairs[$childId] ?? [];
+
+            $pairs[$childId][] = $parentId;
+        }
+
+        return $pairs;
+    }
+
+    /**
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
      * @param string                                 $name
      *

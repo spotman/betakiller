@@ -3,7 +3,7 @@ namespace BetaKiller\Model;
 
 abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements MultipleParentsTreeModelInterface
 {
-    abstract protected function getTreeModelThroughTableName();
+    abstract protected function getTreeModelThroughTableName(): string;
 
     protected const REL_PARENTS = 'parents';
     protected const REL_CHILDS  = 'childs';
@@ -13,15 +13,15 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
         $this->has_many([
             self::REL_PARENTS => [
                 'model'       => static::getModelName(),
-                'foreign_key' => $this->getChildIdColumnName(),
-                'far_key'     => $this->getParentIdColumnName(),
+                'foreign_key' => static::getChildIdColumnName(),
+                'far_key'     => static::getParentIdColumnName(),
                 'through'     => $this->getTreeModelThroughTableName(),
             ],
 
             self::REL_CHILDS => [
                 'model'       => static::getModelName(),
-                'foreign_key' => $this->getParentIdColumnName(),
-                'far_key'     => $this->getChildIdColumnName(),
+                'foreign_key' => static::getParentIdColumnName(),
+                'far_key'     => static::getChildIdColumnName(),
                 'through'     => $this->getTreeModelThroughTableName(),
             ],
         ]);
@@ -31,12 +31,12 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
 //        ]);
     }
 
-    protected function getChildIdColumnName(): string
+    public static function getChildIdColumnName(): string
     {
         return 'child_id';
     }
 
-    protected function getParentIdColumnName(): string
+    public static function getParentIdColumnName(): string
     {
         return 'parent_id';
     }
@@ -131,7 +131,7 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
 
         $this->join_related(self::REL_PARENTS, $parentsTableNameAlias);
 
-        $parentIdCol = $parentsTableNameAlias.'.'.$this->getParentIdColumnName();
+        $parentIdCol = $parentsTableNameAlias.'.'.static::getParentIdColumnName();
 
         if ($parentIDs) {
             $this->where($parentIdCol, 'IN', $parentIDs);

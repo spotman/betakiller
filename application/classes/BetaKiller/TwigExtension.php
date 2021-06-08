@@ -9,8 +9,10 @@ use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\SessionHelper;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\LanguageInterface;
+use BetaKiller\Model\RoleInterface;
 use BetaKiller\Security\SecurityConfigInterface;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;
@@ -460,7 +462,9 @@ final class TwigExtension extends AbstractExtension
                         return false;
                     }
 
-                    return ServerRequestHelper::getUser($request)->hasAdminRole();
+                    $session = ServerRequestHelper::getSession($request);
+
+                    return SessionHelper::hasRoleName($session, RoleInterface::ADMIN_PANEL);
                 },
                 ['needs_context' => true]
             ),

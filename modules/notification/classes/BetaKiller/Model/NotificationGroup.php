@@ -173,17 +173,6 @@ class NotificationGroup extends ORM implements NotificationGroupInterface
     /**
      * @param \BetaKiller\Model\UserInterface $user
      *
-     * @return bool
-     */
-    public function isAllowedToUser(UserInterface $user): bool
-    {
-        // User has any of group roles => allowed
-        return $user->hasAnyOfRoles($this->getRoles());
-    }
-
-    /**
-     * @param \BetaKiller\Model\UserInterface $user
-     *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
     public function enableForUser(UserInterface $user): NotificationGroupInterface

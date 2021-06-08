@@ -101,23 +101,6 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     public function isGuest(): bool;
 
     /**
-     * @return bool
-     */
-    public function hasAdminRole(): bool;
-
-    /**
-     * @return bool
-     */
-    public function hasDeveloperRole(): bool;
-
-    /**
-     * @param RoleInterface $role
-     *
-     * @return bool
-     */
-    public function hasRole(RoleInterface $role): bool;
-
-    /**
      * @param string $role
      *
      * @return bool
@@ -150,11 +133,25 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     public function addRole(RoleInterface $role): UserInterface;
 
     /**
+     * Get all user`s roles objects (direct only, exclude parent roles)
+     *
+     * @return \BetaKiller\Model\RoleInterface[]
+     */
+    public function getRoles(): array;
+
+    /**
+     * Get all user`s roles objects (include parent roles)
+     *
+     * @return \BetaKiller\Model\RoleInterface[]
+     */
+    public function getAllRoles(): array;
+
+    /**
      * Get all user`s roles names (include parent roles)
      *
      * @return string[]
      */
-    public function getAllUserRolesNames(): array;
+    public function getAllRolesNames(): array;
 
     /**
      * @param \BetaKiller\Model\LanguageInterface $languageModel

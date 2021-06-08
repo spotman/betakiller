@@ -56,7 +56,7 @@ class SetGroupFrequencyApiMethod extends AbstractApiMethod
 
         $group = $this->notification->getGroupByCodename($groupCodename);
 
-        if (!$group->isAllowedToUser($user)) {
+        if (!$this->notification->isGroupAllowedToUser($group, $user)) {
             throw new ApiAccessViolationException('User ":user" is trying to config notification group ":group"', [
                 ':user'  => $user->getID(),
                 ':group' => $group->getCodename(),

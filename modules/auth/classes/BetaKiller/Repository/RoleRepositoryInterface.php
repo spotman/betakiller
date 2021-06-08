@@ -48,4 +48,11 @@ interface RoleRepositoryInterface extends MultipleParentsTreeRepositoryInterface
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function findByName(string $name): ?RoleInterface;
+
+    /**
+     * Returns "child ID" => "array of parents` IDs" pairs
+     *
+     * @return string[][]
+     */
+    public function getChildParentsPairs(): array;
 }

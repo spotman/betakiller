@@ -5,7 +5,6 @@ namespace BetaKiller\Auth;
 
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\AuthService;
 use Psr\Http\Message\ServerRequestInterface;
@@ -57,14 +56,6 @@ final class RequestUserProvider
         $u    = RequestProfiler::begin($request, 'Fetch User from Session');
         $user = $this->auth->getSessionUser($session);
         RequestProfiler::end($u);
-
-        // Prefetch all roles
-        $r     = RequestProfiler::begin($request, 'Fetch User roles');
-        $roles = $user->getAllUserRolesNames();
-        RequestProfiler::end($r);
-
-        // Store roles names in session for further usage
-        SessionHelper::setRolesNames($session, $roles);
 
         return $user;
     }

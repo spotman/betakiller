@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Service;
 
+use BetaKiller\Acl\Resource\UserResource;
 use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\Auth\SessionConfig;
 use BetaKiller\Auth\UserBlockedException;
@@ -11,10 +12,11 @@ use BetaKiller\Event\UserPasswordChangeRequestedEvent;
 use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\MessageBus\EventBusInterface;
+use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Repository\RoleRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Session\SessionStorageInterface;
+use Spotman\Acl\AclInterface;
 use Zend\Expressive\Session\SessionInterface;
 
 class AuthService
@@ -33,11 +35,6 @@ class AuthService
     private $userRepo;
 
     /**
-     * @var \BetaKiller\Repository\RoleRepositoryInterface
-     */
-    private $roleRepo;
-
-    /**
      * @var \BetaKiller\Session\SessionStorageInterface
      */
     private $sessionStorage;
@@ -53,13 +50,18 @@ class AuthService
     private $eventBus;
 
     /**
+     * @var \Spotman\Acl\AclInterface
+     */
+    private AclInterface $acl;
+
+    /**
      * AuthService constructor.
      *
      * @param \BetaKiller\Auth\SessionConfig                 $config
      * @param \BetaKiller\Session\SessionStorageInterface    $sessionStorage
      * @param \BetaKiller\Factory\GuestUserFactory           $guestUserFactory
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
-     * @param \BetaKiller\Repository\RoleRepositoryInterface $roleRepo
+     * @param \Spotman\Acl\AclInterface                      $acl
      * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
     public function __construct(
@@ -67,14 +69,14 @@ class AuthService
         SessionStorageInterface $sessionStorage,
         GuestUserFactory $guestUserFactory,
         UserRepositoryInterface $userRepo,
-        RoleRepositoryInterface $roleRepo,
+        AclInterface $acl,
         EventBusInterface $eventBus
     ) {
         $this->config           = $config;
         $this->sessionStorage   = $sessionStorage;
         $this->guestUserFactory = $guestUserFactory;
         $this->userRepo         = $userRepo;
-        $this->roleRepo         = $roleRepo;
+        $this->acl              = $acl;
         $this->eventBus         = $eventBus;
     }
 
@@ -135,10 +137,10 @@ class AuthService
             throw new UserBlockedException();
         }
 
-        $loginRole = $this->roleRepo->getLoginRole();
+        $userResource = $this->acl->getResource(User::getModelName());
 
         // No login role => user is not allowed to login
-        if (!$user->hasRole($loginRole)) {
+        if (!$this->acl->isAllowedToUser($userResource, UserResource::ACTION_LOGIN, $user)) {
             throw new AccessDeniedException();
         }
 
@@ -148,6 +150,12 @@ class AuthService
 
         // Store user in session
         SessionHelper::setUserID($session, $user);
+
+        // Prefetch all roles
+        $roles = $user->getAllRolesNames();
+
+        // Store roles names in session for further usage
+        SessionHelper::setRolesNames($session, $roles);
 
         // Always create new session on successful login to prevent stale sessions
         $session->regenerate();

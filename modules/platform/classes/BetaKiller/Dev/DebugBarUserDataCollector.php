@@ -62,13 +62,7 @@ class DebugBarUserDataCollector extends DataCollector implements Renderable
 
     private function getAssignedRoles(): array
     {
-        $names = [];
-
-        foreach ($this->user->getAccessControlRoles() as $role) {
-            $names[] = $role->getName();
-        }
-
-        return $names;
+        return $this->user->getAllRolesNames();
     }
 
     /**

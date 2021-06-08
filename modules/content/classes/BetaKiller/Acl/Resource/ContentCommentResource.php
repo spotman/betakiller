@@ -6,6 +6,8 @@ use BetaKiller\Model\RoleInterface;
 
 final class ContentCommentResource extends AbstractHasWorkflowStateAclResource
 {
+    public const FLAG_SKIP_NOTIFY_AUTHOR_APPROVE = 'notify-author-approve';
+
     /**
      * Provides array of roles` names which are allowed to create entities
      *
@@ -41,6 +43,15 @@ final class ContentCommentResource extends AbstractHasWorkflowStateAclResource
     {
         return [
             ContentHelper::ROLE_CONTENT_MODERATOR,
+        ];
+    }
+
+    protected function getAdditionalAccessList(): array
+    {
+        return [
+            self::FLAG_SKIP_NOTIFY_AUTHOR_APPROVE => [
+                ContentHelper::ROLE_CONTENT_MODERATOR,
+            ],
         ];
     }
 }

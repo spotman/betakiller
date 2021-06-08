@@ -9,8 +9,10 @@ use BetaKiller\Exception\SeeOtherHttpException;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\Hit;
 use BetaKiller\Model\HitInterface;
+use BetaKiller\Model\RoleInterface;
 use BetaKiller\Repository\HitRepositoryInterface;
 use BetaKiller\Service\HitService;
 use InvalidArgumentException;
@@ -89,11 +91,11 @@ class HitStatMiddleware implements MiddlewareInterface
     {
         $i = RequestProfiler::begin($request, 'Hit stat (init)');
 
-        $user = ServerRequestHelper::getUser($request);
+        $session = ServerRequestHelper::getSession($request);
 
         // Skip processing for admins
         // Skip calls like "cache warmup" from CLI mode
-        if ($this->appEnv->isInternalWebServer() || $user->hasAdminRole()) {
+        if ($this->appEnv->isInternalWebServer() || SessionHelper::hasRoleName($session, RoleInterface::ADMIN_PANEL)) {
             RequestProfiler::end($i);
 
             return $handler->handle($request);

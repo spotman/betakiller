@@ -1,11 +1,14 @@
 <?php
 namespace BetaKiller\Workflow;
 
+use BetaKiller\Acl\Resource\ContentCommentResource;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
+use BetaKiller\Model\ContentComment;
 use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\ContentCommentStateRepositoryInterface;
+use Spotman\Acl\AclInterface;
 
 class ContentCommentWorkflow
 {
@@ -39,23 +42,31 @@ class ContentCommentWorkflow
     private $stateRepo;
 
     /**
+     * @var \Spotman\Acl\AclInterface
+     */
+    private AclInterface $acl;
+
+    /**
      * ContentCommentWorkflow constructor.
      *
      * @param \BetaKiller\Helper\NotificationHelper                         $notificationHelper
      * @param \BetaKiller\Factory\UrlHelperFactory                          $urlHelperFactory
      * @param \BetaKiller\Workflow\StatusWorkflowInterface                  $statusWorkflow
      * @param \BetaKiller\Repository\ContentCommentStateRepositoryInterface $stateRepo
+     * @param \Spotman\Acl\AclInterface                                     $acl
      */
     public function __construct(
         NotificationHelper $notificationHelper,
         UrlHelperFactory $urlHelperFactory,
         StatusWorkflowInterface $statusWorkflow,
-        ContentCommentStateRepositoryInterface $stateRepo
+        ContentCommentStateRepositoryInterface $stateRepo,
+        AclInterface $acl
     ) {
         $this->notification = $notificationHelper;
         $this->urlHelper    = $urlHelperFactory->create();
         $this->status       = $statusWorkflow;
         $this->stateRepo    = $stateRepo;
+        $this->acl          = $acl;
     }
 
     /**
@@ -125,8 +136,18 @@ class ContentCommentWorkflow
         $authorUser = $comment->getAuthorUser();
 
         // Skip notification for moderators
-        if ($authorUser && $authorUser->hasAdminRole()) {
-            return;
+        if ($authorUser) {
+            $resource = $this->acl->getResource(ContentComment::getModelName());
+
+            $skipNotify = $this->acl->isAllowedToUser(
+                $resource,
+                ContentCommentResource::FLAG_SKIP_NOTIFY_AUTHOR_APPROVE,
+                $authorUser
+            );
+
+            if ($skipNotify) {
+                return;
+            }
         }
 
         $email = $comment->getAuthorEmail();

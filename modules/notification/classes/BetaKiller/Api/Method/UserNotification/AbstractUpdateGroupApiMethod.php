@@ -5,6 +5,7 @@ namespace BetaKiller\Api\Method\UserNotification;
 
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Repository\NotificationGroupRepository;
 use Spotman\Api\ApiAccessViolationException;
 use Spotman\Api\ApiMethodResponse;
@@ -19,16 +20,23 @@ abstract class AbstractUpdateGroupApiMethod extends AbstractApiMethod
     /**
      * @var \BetaKiller\Repository\NotificationGroupRepository
      */
-    private $repo;
+    private NotificationGroupRepository $repo;
+
+    /**
+     * @var \BetaKiller\Notification\NotificationFacade
+     */
+    private NotificationFacade $notification;
 
     /**
      * AbstractUpdateGroupApiMethod constructor.
      *
      * @param \BetaKiller\Repository\NotificationGroupRepository $repo
+     * @param \BetaKiller\Notification\NotificationFacade        $notification
      */
-    public function __construct(NotificationGroupRepository $repo)
+    public function __construct(NotificationGroupRepository $repo, NotificationFacade $notification)
     {
         $this->repo = $repo;
+        $this->notification = $notification;
     }
 
     /**
@@ -54,7 +62,7 @@ abstract class AbstractUpdateGroupApiMethod extends AbstractApiMethod
 
         $group = $this->repo->getByCodename($codename);
 
-        if (!$group->isAllowedToUser($user)) {
+        if (!$this->notification->isGroupAllowedToUser($group, $user)) {
             throw new ApiAccessViolationException('User ":user" is trying to enable notification group ":group"', [
                 ':user'  => $user->getID(),
                 ':group' => $group->getCodename(),

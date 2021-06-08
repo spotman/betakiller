@@ -18,13 +18,11 @@ final class DisableDebugAction extends AbstractAction
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $user = ServerRequestHelper::getUser($request);
+        $session = ServerRequestHelper::getSession($request);
 
-        if (!$user->hasRoleName(RoleInterface::DEVELOPER)) {
+        if (!SessionHelper::hasRoleName($session, RoleInterface::DEVELOPER)) {
             throw new AccessDeniedException('Unauthorized debug mode');
         }
-
-        $session = ServerRequestHelper::getSession($request);
 
         SessionHelper::disableDebug($session);
 

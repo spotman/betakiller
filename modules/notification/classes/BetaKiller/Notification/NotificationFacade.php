@@ -506,6 +506,20 @@ final class NotificationFacade
         $this->groupRepo->save($group);
     }
 
+    /**
+     * Returns true if group is allowed for provided user (complex check with roles intersection)
+     *
+     * @param \BetaKiller\Model\NotificationGroupInterface $group
+     * @param \BetaKiller\Model\UserInterface              $user
+     *
+     * @return bool
+     */
+    public function isGroupAllowedToUser(NotificationGroupInterface $group, UserInterface $user): bool
+    {
+        // User has any of group roles => allowed
+        return $user->hasAnyOfRoles($group->getRoles());
+    }
+
     public function getGroupUserConfig(
         NotificationGroupInterface $group,
         UserInterface $user
@@ -610,7 +624,7 @@ final class NotificationFacade
             return false;
         }
 
-        if (!$group->isAllowedToUser($target)) {
+        if (!$this->isGroupAllowedToUser($group, $target)) {
             throw new DomainException('User ":user" is not allowed for notification group ":group"', [
                 ':user'  => $target->getID(),
                 ':group' => $group->getCodename(),
@@ -694,7 +708,7 @@ final class NotificationFacade
             return null;
         }
 
-        list($name, $email) = explode('<', trim($targetString, '>'));
+        [$name, $email] = explode('<', trim($targetString, '>'));
 
         return new MessageTargetEmail($email, $name, $log->getLanguageIsoCode());
     }

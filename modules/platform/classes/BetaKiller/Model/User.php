@@ -288,14 +288,6 @@ class User extends \ORM implements UserInterface
     }
 
     /**
-     * @return \BetaKiller\Model\Role
-     */
-    protected function getRolesRelation(): Role
-    {
-        return $this->get('roles');
-    }
-
-    /**
      * Returns true if current user is guest
      *
      * @return bool
@@ -306,42 +298,13 @@ class User extends \ORM implements UserInterface
     }
 
     /**
-     * @return bool
-     */
-    public function hasAdminRole(): bool
-    {
-        // This role is not assigned directly but through inheritance
-        return $this->hasRoleName(RoleInterface::ADMIN_PANEL);
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasDeveloperRole(): bool
-    {
-        return $this->hasRoleName(RoleInterface::DEVELOPER);
-    }
-
-    /**
-     * @param RoleInterface $role
-     *
-     * @return bool
-     * @todo Переписать на кешированный ACL ибо слишком затратно делать запрос в БД на проверку роли
-     *
-     */
-    public function hasRole(RoleInterface $role): bool
-    {
-        return $this->hasRoleName($role->getName());
-    }
-
-    /**
      * @param string $role
      *
      * @return bool
      */
     public function hasRoleName(string $role): bool
     {
-        foreach ($this->getAllUserRolesNames() as $name) {
+        foreach ($this->getAllRolesNames() as $name) {
             if ($role === $name) {
                 return true;
             }
@@ -359,7 +322,7 @@ class User extends \ORM implements UserInterface
      */
     public function hasAnyOfRolesNames(array $roles): bool
     {
-        return (bool)\array_intersect($this->getAllUserRolesNames(), $roles);
+        return (bool)\array_intersect($this->getAllRolesNames(), $roles);
     }
 
     /**
@@ -393,7 +356,7 @@ class User extends \ORM implements UserInterface
      *
      * @return string[]
      */
-    public function getAllUserRolesNames(): array
+    public function getAllRolesNames(): array
     {
         // Caching coz it is very heavy operation without MPTT
         if (!$this->allUserRolesNames) {
@@ -403,11 +366,44 @@ class User extends \ORM implements UserInterface
         return $this->allUserRolesNames;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getRoles(): array
+    {
+        return $this->getAllRelated(self::REL_ROLES);
+    }
+
+    /**
+     * @inheritDoc
+     * @todo Rewrite to ORM MPTT call
+     */
+    public function getAllRoles(): array
+    {
+        $roles = [];
+
+        foreach ($this->getRoles() as $role) {
+            $roles[$role->getName()] = $role;
+
+            /** @var \BetaKiller\Model\RoleInterface $parent */
+            foreach ($role->getAllParents() as $parent) {
+                $roles[$parent->getName()] = $parent;
+            }
+        }
+
+        return \array_values($roles);
+    }
+
+    /**
+     * @return array
+     * @throws \Kohana_Exception
+     * @todo Rewrite to ORM MPTT call
+     */
     protected function fetchAllUserRolesNames(): array
     {
         $rolesNames = [];
 
-        foreach ($this->getRolesRelation()->get_all() as $role) {
+        foreach ($this->getRoles() as $role) {
             $rolesNames[] = $role->getName();
 
             /** @var \BetaKiller\Model\RoleInterface $parent */
@@ -416,7 +412,7 @@ class User extends \ORM implements UserInterface
             }
         }
 
-        return array_unique($rolesNames);
+        return \array_unique($rolesNames);
     }
 
     /**

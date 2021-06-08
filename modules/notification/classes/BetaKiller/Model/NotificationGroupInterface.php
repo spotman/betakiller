@@ -45,15 +45,6 @@ interface NotificationGroupInterface extends DispatchableEntityInterface, HasI18
     public function setDescription(string $value): NotificationGroupInterface;
 
     /**
-     * Returns true if current group is allowed for provided user (complex check with roles intersection)
-     *
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @return bool
-     */
-    public function isAllowedToUser(UserInterface $user): bool;
-
-    /**
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return bool

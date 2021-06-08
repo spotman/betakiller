@@ -6,12 +6,12 @@ namespace BetaKiller\Model;
 class Role extends AbstractOrmBasedMultipleParentsTreeModel implements RoleInterface
 {
     public const TABLE_NAME              = 'roles';
-    public const TABLE_FIELD_NAME        = 'name';
-    public const TABLE_FIELD_DESCRIPTION = 'description';
+    public const COL_NAME        = 'name';
+    public const COL_DESCRIPTION = 'description';
 
     public const INHERITANCE_TABLE_NAME = 'roles_inheritance';
 
-    protected function getTreeModelThroughTableName()
+    protected function getTreeModelThroughTableName(): string
     {
         return self::INHERITANCE_TABLE_NAME;
     }
@@ -32,12 +32,12 @@ class Role extends AbstractOrmBasedMultipleParentsTreeModel implements RoleInter
     public function rules(): array
     {
         return [
-            self::TABLE_FIELD_NAME        => [
+            self::COL_NAME => [
                 ['not_empty'],
                 ['min_length', [':value', 3]],
                 ['max_length', [':value', 32]],
             ],
-            self::TABLE_FIELD_DESCRIPTION => [
+            self::COL_DESCRIPTION => [
                 ['max_length', [':value', 255]],
             ],
         ];
@@ -51,7 +51,7 @@ class Role extends AbstractOrmBasedMultipleParentsTreeModel implements RoleInter
     public function setName(string $value): RoleInterface
     {
         $value = trim($value);
-        $this->set(self::TABLE_FIELD_NAME, $value);
+        $this->set(self::COL_NAME, $value);
 
         return $this;
     }
@@ -61,7 +61,7 @@ class Role extends AbstractOrmBasedMultipleParentsTreeModel implements RoleInter
      */
     public function getName(): string
     {
-        return $this->get(self::TABLE_FIELD_NAME);
+        return $this->get(self::COL_NAME);
     }
 
     /**
@@ -69,7 +69,7 @@ class Role extends AbstractOrmBasedMultipleParentsTreeModel implements RoleInter
      */
     public function getDescription(): string
     {
-        return (string)$this->get(self::TABLE_FIELD_DESCRIPTION);
+        return (string)$this->get(self::COL_DESCRIPTION);
     }
 
     /**
@@ -80,7 +80,7 @@ class Role extends AbstractOrmBasedMultipleParentsTreeModel implements RoleInter
     public function setDescription(string $value): RoleInterface
     {
         $value = trim($value);
-        $this->set(self::TABLE_FIELD_DESCRIPTION, $value);
+        $this->set(self::COL_DESCRIPTION, $value);
 
         return $this;
     }
