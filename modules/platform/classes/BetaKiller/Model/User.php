@@ -348,7 +348,7 @@ class User extends \ORM implements UserInterface
      */
     public function addRole(RoleInterface $role): UserInterface
     {
-        return $this->add('roles', $role);
+        return $this->add(self::REL_ROLES, $role);
     }
 
     /**
@@ -440,7 +440,7 @@ class User extends \ORM implements UserInterface
      */
     public function getLanguage(): LanguageInterface
     {
-        return $this->getRelatedEntity('language');
+        return $this->getRelatedEntity(self::REL_LANGUAGE);
     }
 
     /**
