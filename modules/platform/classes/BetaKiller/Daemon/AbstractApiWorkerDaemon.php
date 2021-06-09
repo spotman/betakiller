@@ -7,7 +7,6 @@ use Beberlei\Metrics\Collector\Collector;
 use BetaKiller\Api\ApiFacade;
 use BetaKiller\Error\ExceptionService;
 use BetaKiller\Helper\LoggerHelper;
-use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\MaintenanceModeService;
 use BetaKiller\Wamp\WampClient;
@@ -19,7 +18,6 @@ use React\Promise\PromiseInterface;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiResourceProxyInterface;
 use stdClass;
-use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
 use Thruway\ClientSession;
 use Thruway\Logging\Logger;
@@ -101,7 +99,7 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
         $this->clientHelper     = $clientHelper;
         $this->maintenance      = $maintenance;
         $this->logger           = $logger;
-        $this->metrics = $metrics;
+        $this->metrics          = $metrics;
     }
 
     public function startDaemon(LoopInterface $loop): PromiseInterface
@@ -113,6 +111,10 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
             $this->logger->info('Stopping API worker to prevent memory leaks');
             $this->stopDaemon($loop);
             $loop->stop();
+        });
+
+        $loop->addTimer(5, function () {
+            $this->metrics->flush();
         });
 
         // Use internal auth and connection coz it is an internal worker
