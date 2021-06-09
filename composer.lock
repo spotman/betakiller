@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c7004f7201a9315b65da5952bad3355e",
+    "content-hash": "f6f08e122e709691106a03de1ebe59b0",
     "packages": [
         {
             "name": "aidantwoods/secureheaders",
@@ -126,6 +126,78 @@
             },
             "abandoned": "twig/cache-extension",
             "time": "2020-01-01T20:47:37+00:00"
+        },
+        {
+            "name": "beberlei/metrics",
+            "version": "v2.8.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/beberlei/metrics.git",
+                "reference": "739917970828ab67b80021d91eb8e129a8017ca1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/beberlei/metrics/zipball/739917970828ab67b80021d91eb8e129a8017ca1",
+                "reference": "739917970828ab67b80021d91eb8e129a8017ca1",
+                "shasum": ""
+            },
+            "require": {
+                "psr/log": "~1.0"
+            },
+            "require-dev": {
+                "corley/influxdb-sdk": "^0.5.1",
+                "doctrine/dbal": "~2.0",
+                "jimdo/prometheus_client_php": "^0.5",
+                "kriswallsmith/buzz": "*",
+                "okitsu/zabbix-sender": "*@dev",
+                "symfony/config": "~3.3 || ~4.0",
+                "symfony/dependency-injection": "~3.3 || ~4.0",
+                "symfony/http-kernel": "~3.3 || ~4.0"
+            },
+            "suggest": {
+                "corley/influxdb-sdk": "For InfluxDB integration",
+                "jimdo/prometheus_client_php": "For Prometheus integration",
+                "kriswallsmith/buzz": "For Librato integration",
+                "okitsu/zabbix-sender": "For zabbix integration"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Beberlei\\Metrics\\": "src/Beberlei/Metrics",
+                    "Beberlei\\Bundle\\MetricsBundle\\": "src/Beberlei/Bundle/MetricsBundle"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de",
+                    "role": "Project Founder"
+                },
+                {
+                    "name": "Grégoire Pineau",
+                    "email": "lyrixx@lyrixx.info",
+                    "role": "Lead Developer"
+                }
+            ],
+            "description": "Simple library to talk to metrics collector services.",
+            "keywords": [
+                "Metrics",
+                "logging"
+            ],
+            "support": {
+                "issues": "https://github.com/beberlei/metrics/issues",
+                "source": "https://github.com/beberlei/metrics/tree/master"
+            },
+            "time": "2019-12-12T16:18:32+00:00"
         },
         {
             "name": "bramus/ansi-php",
@@ -1732,65 +1804,6 @@
             "homepage": "http://geocoder-php.org/Geocoder/",
             "support": {
                 "source": "https://github.com/geocoder-php/google-maps-provider/tree/4.6.0"
-            },
-            "time": "2020-12-21T16:41:18+00:00"
-        },
-        {
-            "name": "geocoder-php/yandex-provider",
-            "version": "4.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/geocoder-php/yandex-provider.git",
-                "reference": "5f5db45a89f2af28198144e92dbf267ffe0170de"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/geocoder-php/yandex-provider/zipball/5f5db45a89f2af28198144e92dbf267ffe0170de",
-                "reference": "5f5db45a89f2af28198144e92dbf267ffe0170de",
-                "shasum": ""
-            },
-            "require": {
-                "geocoder-php/common-http": "^4.0",
-                "php": "^7.3 || ^8.0",
-                "willdurand/geocoder": "^4.0"
-            },
-            "provide": {
-                "geocoder-php/provider-implementation": "1.0"
-            },
-            "require-dev": {
-                "geocoder-php/provider-integration-tests": "^1.0",
-                "php-http/curl-client": "^2.2",
-                "php-http/message": "^1.0",
-                "phpunit/phpunit": "^9.5"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "4.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Geocoder\\Provider\\Yandex\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "William Durand",
-                    "email": "william.durand1@gmail.com"
-                }
-            ],
-            "description": "Geocoder Yandex adapter",
-            "homepage": "http://geocoder-php.org/Geocoder/",
-            "support": {
-                "source": "https://github.com/geocoder-php/yandex-provider/tree/4.4.0"
             },
             "time": "2020-12-21T16:41:18+00:00"
         },
@@ -12231,6 +12244,7 @@
         "ext-gd": "*",
         "ext-intl": "*",
         "ext-json": "*",
+        "ext-libxml": "*",
         "ext-mbstring": "*",
         "ext-mysqli": "*",
         "ext-pcntl": "*",

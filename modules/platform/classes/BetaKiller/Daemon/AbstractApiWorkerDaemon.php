@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Daemon;
 
+use Beberlei\Metrics\Collector\Collector;
 use BetaKiller\Api\ApiFacade;
 use BetaKiller\Error\ExceptionService;
 use BetaKiller\Helper\LoggerHelper;
@@ -72,11 +73,17 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
     private MaintenanceModeService $maintenance;
 
     /**
+     * @var \Beberlei\Metrics\Collector\Collector
+     */
+    private Collector $metrics;
+
+    /**
      * @param \BetaKiller\Wamp\WampClientBuilder         $clientFactory
      * @param \BetaKiller\Api\ApiFacade                  $apiFacade
      * @param \BetaKiller\Error\ExceptionService         $exceptionService
      * @param \BetaKiller\Wamp\WampClientHelper          $clientHelper
      * @param \BetaKiller\Service\MaintenanceModeService $maintenance
+     * @param \Beberlei\Metrics\Collector\Collector      $metrics
      * @param \Psr\Log\LoggerInterface                   $logger
      */
     public function __construct(
@@ -85,6 +92,7 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
         ExceptionService $exceptionService,
         WampClientHelper $clientHelper,
         MaintenanceModeService $maintenance,
+        Collector $metrics,
         LoggerInterface $logger
     ) {
         $this->clientBuilder    = $clientFactory;
@@ -93,6 +101,7 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
         $this->clientHelper     = $clientHelper;
         $this->maintenance      = $maintenance;
         $this->logger           = $logger;
+        $this->metrics = $metrics;
     }
 
     public function startDaemon(LoopInterface $loop): PromiseInterface
@@ -154,20 +163,20 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
         $user = null;
 
         try {
-            $t = (new Stopwatch(true))->start('api');
+            // Prevent calling API methods during maintenance
+            if ($this->maintenance->isEnabled()) {
+                return [
+                    'error' => 'maintenance',
+                ];
+            }
+
+            $start = \microtime(true);
 
             $wampSession = $this->clientHelper->getProcedureSession(func_get_args());
             $user        = $this->clientHelper->getSessionUser($wampSession);
 
 //            $this->logger->debug('Indexed args are :value', [':value' => json_encode($indexedArgs)]);
 //            $this->logger->debug('Named args are :value', [':value' => json_encode($namedArgs)]);
-
-            // Prevent calling API methods during maintenance for non-developers
-            if (!$user->hasRoleName(RoleInterface::DEVELOPER) && $this->maintenance->isEnabled()) {
-                return [
-                    'error' => 'maintenance',
-                ];
-            }
 
             $arrayArgs = (array)$namedArgs;
 
@@ -195,11 +204,16 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
 
             $result = $this->callApiMethod($resource, $method, $arguments, $user)->jsonSerialize();
 
+            $duration = (microtime(true) - $start) * 1000;
+
             $this->logger->debug(':resource.:method executed in :time ms', [
                 ':resource' => $resource,
                 ':method'   => $method,
-                ':time'     => $t->stop()->getDuration(),
+                ':time'     => (int)$duration,
             ]);
+
+            // Send wall-time metrics
+            $this->metrics->timing(sprintf('api.call.%s.%s', $resource, $method), $duration);
         } catch (Throwable $e) {
             return $this->makeApiError($e, $user);
         }

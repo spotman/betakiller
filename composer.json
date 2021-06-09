@@ -22,6 +22,7 @@
     "ext-zlib": "*",
     "aidantwoods/secureheaders": "^2.0",
     "asm89/twig-cache-extension": "^1.2",
+    "beberlei/metrics": "^2.8",
     "bramus/monolog-colored-line-formatter": "~3.0",
     "caxy/php-htmldiff": "^0.1.6",
     "clue/block-react": "^1.4",

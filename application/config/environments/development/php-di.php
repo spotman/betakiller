@@ -1,5 +1,10 @@
 <?php
 
+use Beberlei\Metrics\Collector\Collector;
+use Beberlei\Metrics\Collector\Logger;
+use Psr\Log\LoggerInterface;
+use function DI\factory;
+
 return [
 
     /**
@@ -8,6 +13,11 @@ return [
     'compile' => false,
 
     'definitions' => [
+
+        Collector::class => factory(function (LoggerInterface $logger) {
+            // Send metrics to Monolog
+            return new Logger($logger);
+        }),
 
     ],
 
