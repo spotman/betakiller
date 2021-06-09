@@ -113,7 +113,7 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
             $loop->stop();
         });
 
-        $loop->addTimer(5, function () {
+        $loop->addPeriodicTimer(5, function () {
             $this->metrics->flush();
         });
 
