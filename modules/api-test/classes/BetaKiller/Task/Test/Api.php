@@ -82,6 +82,8 @@ class Api extends AbstractTask
 
         $start = \microtime(true);
 
+        \Database_Query::resetQueryCount();
+
         $response = $this->api
             ->getResource($resourceName)
             ->call($methodName, $arguments, $this->user);
@@ -90,6 +92,10 @@ class Api extends AbstractTask
 
         $this->logger->info('Last modified at :date', [
             ':date' => $response->getLastModified()->format(DateTimeImmutable::COOKIE),
+        ]);
+
+        $this->logger->info('Total SQL queries: :count', [
+            ':count' => \Database_Query::getQueryCount(),
         ]);
 
         $this->logger->info('Executed in :time ms', [
