@@ -230,6 +230,7 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
             $this->metrics->timing('api.prepare.user', $userTime);
             $this->metrics->timing('api.prepare.maintenance', $maintenanceTime);
             $this->metrics->timing(sprintf('api.call.%s.%s', $resource, $method), $wallTime);
+            $this->metrics->measure('api.sql', $queryCount);
             $this->metrics->measure(sprintf('api.sql.%s.%s', $resource, $method), $queryCount);
         } catch (Throwable $e) {
             return $this->makeApiError($e, $user);
