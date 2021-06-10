@@ -165,6 +165,8 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
         $user = null;
 
         try {
+            $maintenanceBegin = \microtime(true);
+
             // Prevent calling API methods during maintenance
             if ($this->maintenance->isEnabled()) {
                 return [
@@ -172,10 +174,13 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
                 ];
             }
 
-            $start = \microtime(true);
+            $userBegin = \microtime(true);
 
             $wampSession = $this->clientHelper->getProcedureSession(func_get_args());
             $user        = $this->clientHelper->getSessionUser($wampSession);
+
+            $userTime        = (microtime(true) - $userBegin) * 1000;
+            $maintenanceTime = ($userBegin - $maintenanceBegin) * 1000;
 
 //            $this->logger->debug('Indexed args are :value', [':value' => json_encode($indexedArgs)]);
 //            $this->logger->debug('Named args are :value', [':value' => json_encode($namedArgs)]);
@@ -204,18 +209,22 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
                 ':value' => json_encode($arguments),
             ]);
 
+            $callStart = \microtime(true);
+
             $result = $this->callApiMethod($resource, $method, $arguments, $user)->jsonSerialize();
 
-            $duration = (microtime(true) - $start) * 1000;
+            $wallTime = (microtime(true) - $callStart) * 1000;
 
             $this->logger->debug(':resource.:method executed in :time ms', [
                 ':resource' => $resource,
                 ':method'   => $method,
-                ':time'     => (int)$duration,
+                ':time'     => (int)$wallTime,
             ]);
 
-            // Send wall-time metrics
-            $this->metrics->timing(sprintf('api.call.%s.%s', $resource, $method), $duration);
+            // Send metrics
+            $this->metrics->timing(sprintf('api.call.%s.%s', $resource, $method), $wallTime);
+            $this->metrics->timing('api.prepare.user', $userTime);
+            $this->metrics->timing('api.prepare.maintenance', $maintenanceTime);
         } catch (Throwable $e) {
             return $this->makeApiError($e, $user);
         }
