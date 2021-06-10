@@ -9,6 +9,7 @@ use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Service\MaintenanceModeService;
 use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Wamp\WampClient;
@@ -57,12 +58,18 @@ class IsAlive extends AbstractTask
     private $appEnv;
 
     /**
+     * @var \BetaKiller\Service\MaintenanceModeService
+     */
+    private MaintenanceModeService $maintenance;
+
+    /**
      * IsAlive constructor.
      *
      * @param \BetaKiller\Session\SessionStorageInterface $sessionStorage
      * @param \BetaKiller\Wamp\WampClientBuilder          $clientFactory
      * @param \BetaKiller\Model\UserInterface             $user
      * @param \BetaKiller\Helper\AppEnvInterface          $appEnv
+     * @param \BetaKiller\Service\MaintenanceModeService  $maintenance
      * @param \Psr\Log\LoggerInterface                    $logger
      */
     public function __construct(
@@ -70,6 +77,7 @@ class IsAlive extends AbstractTask
         WampClientBuilder $clientFactory,
         UserInterface $user,
         AppEnvInterface $appEnv,
+        MaintenanceModeService $maintenance,
         LoggerInterface $logger
     ) {
         parent::__construct();
@@ -79,6 +87,7 @@ class IsAlive extends AbstractTask
         $this->clientBuilder  = $clientFactory;
         $this->appEnv         = $appEnv;
         $this->logger         = $logger;
+        $this->maintenance = $maintenance;
     }
 
     /**
@@ -94,6 +103,11 @@ class IsAlive extends AbstractTask
 
     public function run(): void
     {
+        // Skip checks during maintenance (API is down during maintenance)
+        if ($this->maintenance->isEnabled()) {
+            return;
+        }
+
         $this->createSession();
 
         Logger::set($this->logger);
