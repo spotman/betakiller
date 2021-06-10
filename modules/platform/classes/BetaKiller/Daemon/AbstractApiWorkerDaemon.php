@@ -174,6 +174,8 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
                 ];
             }
 
+            $queriesAtStart = \Database_Query::getQueryCount();
+
             $userBegin = \microtime(true);
 
             $wampSession = $this->clientHelper->getProcedureSession(func_get_args());
@@ -221,10 +223,14 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
                 ':time'     => (int)$wallTime,
             ]);
 
+            $queryCount = \Database_Query::getQueryCount() - $queriesAtStart;
+
             // Send metrics
-            $this->metrics->timing(sprintf('api.call.%s.%s', $resource, $method), $wallTime);
+            $this->metrics->increment('api.call');
             $this->metrics->timing('api.prepare.user', $userTime);
             $this->metrics->timing('api.prepare.maintenance', $maintenanceTime);
+            $this->metrics->timing(sprintf('api.call.%s.%s', $resource, $method), $wallTime);
+            $this->metrics->measure(sprintf('api.sql.%s.%s', $resource, $method), $queryCount);
         } catch (Throwable $e) {
             return $this->makeApiError($e, $user);
         }
