@@ -5,7 +5,7 @@ namespace BetaKiller\Model;
 
 class Role extends AbstractOrmBasedMultipleParentsTreeModel implements RoleInterface
 {
-    public const TABLE_NAME              = 'roles';
+    public const TABLE_NAME      = 'roles';
     public const COL_NAME        = 'name';
     public const COL_DESCRIPTION = 'description';
 
@@ -32,7 +32,7 @@ class Role extends AbstractOrmBasedMultipleParentsTreeModel implements RoleInter
     public function rules(): array
     {
         return [
-            self::COL_NAME => [
+            self::COL_NAME        => [
                 ['not_empty'],
                 ['min_length', [':value', 3]],
                 ['max_length', [':value', 32]],
