@@ -83,6 +83,7 @@ class Api extends AbstractTask
         $start = \microtime(true);
 
         \Database_Query::resetQueryCount();
+        \Database_Query::enableQueryLog();
 
         $response = $this->api
             ->getResource($resourceName)
@@ -101,6 +102,10 @@ class Api extends AbstractTask
         $this->logger->info('Executed in :time ms', [
             ':time' => \round(($end - $start) * 1000),
         ]);
+
+        if (\function_exists('d')) {
+            d(\Database_Query::getQueries());
+        }
 
         echo json_encode($response->getData(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT).PHP_EOL;
     }
