@@ -33,6 +33,13 @@ class Kohana_Database_Query {
 
     private static int $queryCounter = 0;
 
+    private static bool $logQueries = false;
+
+    /**
+     * @var string[]
+     */
+    private static array $queries = [];
+
     /**
 	 * Creates a new SQL query of the specified type.
 	 *
@@ -53,6 +60,21 @@ class Kohana_Database_Query {
     public static function resetQueryCount(): void
     {
         self::$queryCounter = 0;
+    }
+
+    public static function enableQueryLog(): void
+    {
+        self::$logQueries = true;
+    }
+
+    public static function disableQueryLog(): void
+    {
+        self::$logQueries = false;
+    }
+
+    public static function getQueries(): array
+    {
+        return self::$queries;
     }
 
     /**
@@ -266,6 +288,10 @@ class Kohana_Database_Query {
 			// Cache the result array
 			Kohana::cache($cache_key, $result->as_array(), $this->_lifetime);
 		}
+
+		if (self::$logQueries) {
+		    self::$queries[] = $sql;
+        }
 
 		return $result;
 	}
