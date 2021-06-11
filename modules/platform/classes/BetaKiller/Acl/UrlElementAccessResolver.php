@@ -62,7 +62,7 @@ final class UrlElementAccessResolver implements UrlElementAccessResolverInterfac
         $zoneRoles    = $zoneSpec->getRolesNames();
 
         // Check zone roles if defined
-        if ($zoneRoles && !$user->hasAnyOfRolesNames($zoneRoles)) {
+        if ($zoneRoles && !$this->acl->hasAnyAssignedRoleName($user, $zoneRoles)) {
             return false;
         }
 

@@ -12,6 +12,7 @@ use BetaKiller\View\ViewFactoryInterface;
 use BetaKiller\View\ViewInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Spotman\Acl\AclInterface;
 
 class WidgetFacade
 {
@@ -31,19 +32,27 @@ class WidgetFacade
     private $logger;
 
     /**
+     * @var \Spotman\Acl\AclInterface
+     */
+    private AclInterface $acl;
+
+    /**
      * WidgetFacade constructor.
      *
      * @param \BetaKiller\Widget\WidgetFactory      $widgetFactory
      * @param \BetaKiller\View\ViewFactoryInterface $viewFactory
+     * @param \Spotman\Acl\AclInterface             $acl
      * @param \Psr\Log\LoggerInterface              $logger
      */
     public function __construct(
         WidgetFactory $widgetFactory,
         ViewFactoryInterface $viewFactory,
+        AclInterface $acl,
         LoggerInterface $logger
     ) {
         $this->widgetFactory = $widgetFactory;
         $this->viewFactory   = $viewFactory;
+        $this->acl           = $acl;
         $this->logger        = $logger;
     }
 
@@ -124,13 +133,7 @@ class WidgetFacade
 
     private function isAllowed(WidgetInterface $widget, UserInterface $user): bool
     {
-        foreach ($widget->getAclRoles() as $roleName) {
-            if ($user->hasRoleName($roleName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->acl->hasAnyAssignedRoleName($user, $widget->getAclRoles());
     }
 
     /**

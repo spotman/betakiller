@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Dev;
 
+use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\UserInterface;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
@@ -62,7 +63,9 @@ class DebugBarUserDataCollector extends DataCollector implements Renderable
 
     private function getAssignedRoles(): array
     {
-        return $this->user->getAllRolesNames();
+        return array_map(function (RoleInterface $role) {
+            return $role->getName();
+        }, $this->user->getRoles());
     }
 
     /**

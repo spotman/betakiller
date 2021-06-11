@@ -151,12 +151,6 @@ class AuthService
         // Store user in session
         SessionHelper::setUserID($session, $user);
 
-        // Prefetch all roles
-        $roles = $user->getAllRolesNames();
-
-        // Store roles names in session for further usage
-        SessionHelper::setRolesNames($session, $roles);
-
         // Always create new session on successful login to prevent stale sessions
         $session->regenerate();
         // Session will be saved in SessionMiddleware

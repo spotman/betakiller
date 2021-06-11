@@ -21,7 +21,6 @@ class SessionHelper
     public const ORIGIN_URL   = 'origin_url';
     public const ORIGIN_UUID  = 'origin_uuid';
     public const TOKEN_HASH   = 'token';
-    public const ROLES_NAMES  = 'roles';
     public const DEBUG        = 'debug';
 
     public static function transferData(SessionInterface $from, SessionInterface $to): void
@@ -109,36 +108,6 @@ class SessionHelper
     public static function setOriginUrl(SessionInterface $session, string $url): void
     {
         $session->set(self::ORIGIN_URL, $url);
-    }
-
-    /**
-     * @param \Zend\Expressive\Session\SessionInterface $session
-     *
-     * @return string[]
-     */
-    public static function getRolesNames(SessionInterface $session): array
-    {
-        return $session->get(self::ROLES_NAMES) ?? [];
-    }
-
-    /**
-     * @param \Zend\Expressive\Session\SessionInterface $session
-     * @param string                                    $role
-     *
-     * @return bool
-     */
-    public static function hasRoleName(SessionInterface $session, string $role): bool
-    {
-        return in_array($role, self::getRolesNames($session), true);
-    }
-
-    /**
-     * @param \Zend\Expressive\Session\SessionInterface $session
-     * @param string[]                                  $roles
-     */
-    public static function setRolesNames(SessionInterface $session, array $roles): void
-    {
-        $session->set(self::ROLES_NAMES, $roles);
     }
 
     public static function getOriginUuid(SessionInterface $session): ?UuidInterface

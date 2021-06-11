@@ -9,7 +9,6 @@ use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Helper\SessionHelper;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\RoleInterface;
@@ -21,6 +20,7 @@ use HTML;
 use Meta;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Spotman\Acl\AclInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -30,27 +30,27 @@ final class TwigExtension extends AbstractExtension
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
-    private $appEnv;
+    private AppEnvInterface $appEnv;
 
     /**
      * @var \BetaKiller\Widget\WidgetFacade
      */
-    private $widgetFacade;
+    private WidgetFacade $widgetFacade;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var string[][]
      */
-    private $manifestCache = [];
+    private array $manifestCache = [];
 
     /**
      * @var \BetaKiller\IdentityConverterInterface
      */
-    private $identityConverter;
+    private IdentityConverterInterface $identityConverter;
 
     /**
      * @var \BetaKiller\Config\AppConfigInterface
@@ -67,6 +67,11 @@ final class TwigExtension extends AbstractExtension
      */
     private I18nFacade $i18n;
 
+    /**
+     * @var \Spotman\Acl\AclInterface
+     */
+    private AclInterface $acl;
+
     private array $entryPointsJson = [];
 
     /**
@@ -77,6 +82,7 @@ final class TwigExtension extends AbstractExtension
      * @param \BetaKiller\Security\SecurityConfigInterface $securityConfig
      * @param \BetaKiller\Widget\WidgetFacade              $widgetFacade
      * @param \BetaKiller\I18n\I18nFacade                  $i18n
+     * @param \Spotman\Acl\AclInterface                    $acl
      * @param \BetaKiller\IdentityConverterInterface       $identityConverter
      * @param \Psr\Log\LoggerInterface                     $logger
      */
@@ -86,6 +92,7 @@ final class TwigExtension extends AbstractExtension
         SecurityConfigInterface $securityConfig,
         WidgetFacade $widgetFacade,
         I18nFacade $i18n,
+        AclInterface $acl,
         IdentityConverterInterface $identityConverter,
         LoggerInterface $logger
     ) {
@@ -96,6 +103,7 @@ final class TwigExtension extends AbstractExtension
         $this->i18n              = $i18n;
         $this->logger            = $logger;
         $this->identityConverter = $identityConverter;
+        $this->acl               = $acl;
     }
 
     public function getFunctions(): array
@@ -251,7 +259,7 @@ final class TwigExtension extends AbstractExtension
                         throw new Exception('Pass dist dir as a second argument or set "dist_dir" variable in layout before using entry() function');
                     }
 
-                    $assets = $this->getStaticAssets($context);
+                    $assets   = $this->getStaticAssets($context);
                     $fileName = $distDir.\DIRECTORY_SEPARATOR.'entrypoints.json';
 
                     if (!isset($this->entryPointsJson[$fileName])) {
@@ -462,9 +470,9 @@ final class TwigExtension extends AbstractExtension
                         return false;
                     }
 
-                    $session = ServerRequestHelper::getSession($request);
+                    $user = ServerRequestHelper::getUser($request);
 
-                    return SessionHelper::hasRoleName($session, RoleInterface::ADMIN_PANEL);
+                    return $this->acl->hasAssignedRoleName($user, RoleInterface::ADMIN_PANEL);
                 },
                 ['needs_context' => true]
             ),
@@ -757,7 +765,7 @@ final class TwigExtension extends AbstractExtension
     private function findTagsContents(string $tagName, string $text): \Generator
     {
         /** @see http://www.regular-expressions.info/examples.html */
-        $regex = '#<'.$tagName.'[^>]*>(.*?)<\/'.$tagName.'>#ims';
+        $regex = '#<'.$tagName.'[^>]*>(.*?)</'.$tagName.'>#ims';
 
         if (!\preg_match_all($regex, $text, $matches, PREG_SET_ORDER)) {
             return;

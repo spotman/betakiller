@@ -3,13 +3,26 @@ declare(strict_types=1);
 
 namespace BetaKiller\Acl\Spec;
 
-use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\UserInterface;
+use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclUserInterface;
 
 final class UserAclSpec implements EntityAclSpecInterface
 {
+    /**
+     * @var \Spotman\Acl\AclInterface
+     */
+    private AclInterface $acl;
+
+    /**
+     * UserAclSpec constructor.
+     */
+    public function __construct(AclInterface $acl)
+    {
+        $this->acl = $acl;
+    }
+
     /**
      * @inheritDoc
      */
@@ -23,7 +36,7 @@ final class UserAclSpec implements EntityAclSpecInterface
             throw new \LogicException();
         }
 
-        if ($user->hasRoleName(RoleInterface::USER_MANAGEMENT)) {
+        if ($this->acl->hasAssignedRoleName($user, RoleInterface::USER_MANAGEMENT)) {
             return true;
         }
 

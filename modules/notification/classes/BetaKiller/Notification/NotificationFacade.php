@@ -23,6 +23,7 @@ use BetaKiller\Repository\UserRepositoryInterface;
 use DateTimeImmutable;
 use Interop\Queue\Context;
 use Psr\Log\LoggerInterface;
+use Spotman\Acl\AclInterface;
 use Throwable;
 
 final class NotificationFacade
@@ -111,6 +112,11 @@ final class NotificationFacade
     private $userRepo;
 
     /**
+     * @var \Spotman\Acl\AclInterface
+     */
+    private AclInterface $acl;
+
+    /**
      * NotificationFacade constructor.
      *
      * @param \BetaKiller\Notification\TransportFactory                             $transportFactory
@@ -140,6 +146,7 @@ final class NotificationFacade
         Context $queueContext,
         MessageSerializer $serializer,
         MessageActionUrlGeneratorInterface $actionUrlGenerator,
+        AclInterface $acl,
         LoggerInterface $logger
     ) {
         $this->transportFactory   = $transportFactory;
@@ -154,6 +161,7 @@ final class NotificationFacade
         $this->renderer           = $renderer;
         $this->freqRepo           = $freqRepo;
         $this->logRepo            = $logRepo;
+        $this->acl                = $acl;
         $this->logger             = $logger;
 
         $this->queueProducer = $this->queueContext->createProducer()->setTimeToLive(0); // Never expire
@@ -323,7 +331,7 @@ final class NotificationFacade
             ]);
         }
 
-        $body   = $logRecord->getBody();
+        $body = $logRecord->getBody();
 
         if (!$body) {
             throw new NotificationException('Can not retry message without a body; hash ":hash"', [
@@ -517,7 +525,7 @@ final class NotificationFacade
     public function isGroupAllowedToUser(NotificationGroupInterface $group, UserInterface $user): bool
     {
         // User has any of group roles => allowed
-        return $user->hasAnyOfRoles($group->getRoles());
+        return $this->acl->hasAnyAssignedRole($user, $group->getRoles());
     }
 
     public function getGroupUserConfig(

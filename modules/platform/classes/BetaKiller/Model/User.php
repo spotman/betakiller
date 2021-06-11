@@ -41,8 +41,6 @@ class User extends \ORM implements UserInterface
     public const  REL_ROLES    = 'roles';
     public const  REL_SESSIONS = 'sessions';
 
-    protected array $allUserRolesNames = [];
-
     protected function configure(): void
     {
         $this->_table_name       = self::TABLE_NAME;
@@ -219,7 +217,7 @@ class User extends \ORM implements UserInterface
      */
     public function setCreatedAt(\DateTimeInterface $value = null): UserInterface
     {
-        $value = $value ?: new \DateTimeImmutable;
+        $value = $value ?: new DateTimeImmutable;
         $this->set_datetime_column_value(self::COL_CREATED_AT, $value);
 
         return $this;
@@ -298,50 +296,6 @@ class User extends \ORM implements UserInterface
     }
 
     /**
-     * @param string $role
-     *
-     * @return bool
-     */
-    public function hasRoleName(string $role): bool
-    {
-        foreach ($this->getAllRolesNames() as $name) {
-            if ($role === $name) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns true if user has any of provided role assigned
-     *
-     * @param string[] $roles
-     *
-     * @return bool
-     */
-    public function hasAnyOfRolesNames(array $roles): bool
-    {
-        return (bool)\array_intersect($this->getAllRolesNames(), $roles);
-    }
-
-    /**
-     * Returns true if user has any of provided role assigned
-     *
-     * @param \BetaKiller\Model\RoleInterface[] $roles
-     *
-     * @return bool
-     */
-    public function hasAnyOfRoles(array $roles): bool
-    {
-        $rolesNames = array_map(static function (RoleInterface $role) {
-            return $role->getName();
-        }, $roles);
-
-        return $this->hasAnyOfRolesNames($rolesNames);
-    }
-
-    /**
      * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return \BetaKiller\Model\UserInterface
@@ -349,21 +303,6 @@ class User extends \ORM implements UserInterface
     public function addRole(RoleInterface $role): UserInterface
     {
         return $this->add(self::REL_ROLES, $role);
-    }
-
-    /**
-     * Get all user`s roles names (include parent roles)
-     *
-     * @return string[]
-     */
-    public function getAllRolesNames(): array
-    {
-        // Caching coz it is very heavy operation without MPTT
-        if (!$this->allUserRolesNames) {
-            $this->allUserRolesNames = $this->fetchAllUserRolesNames();
-        }
-
-        return $this->allUserRolesNames;
     }
 
     /**
@@ -376,7 +315,6 @@ class User extends \ORM implements UserInterface
 
     /**
      * @inheritDoc
-     * @todo Rewrite to ORM MPTT call
      */
     public function getAllRoles(): array
     {
@@ -392,27 +330,6 @@ class User extends \ORM implements UserInterface
         }
 
         return \array_values($roles);
-    }
-
-    /**
-     * @return array
-     * @throws \Kohana_Exception
-     * @todo Rewrite to ORM MPTT call
-     */
-    protected function fetchAllUserRolesNames(): array
-    {
-        $rolesNames = [];
-
-        foreach ($this->getRoles() as $role) {
-            $rolesNames[] = $role->getName();
-
-            /** @var \BetaKiller\Model\RoleInterface $parent */
-            foreach ($role->getAllParents() as $parent) {
-                $rolesNames[] = $parent->getName();
-            }
-        }
-
-        return \array_unique($rolesNames);
     }
 
     /**
@@ -659,7 +576,7 @@ class User extends \ORM implements UserInterface
      */
     public function getAccessControlRoles(): array
     {
-        return $this->getAllRelated(self::REL_ROLES);
+        return $this->getRoles();
     }
 
     /**
@@ -673,16 +590,6 @@ class User extends \ORM implements UserInterface
         if ($this->isGuest()) {
             throw new AuthorizationRequiredException();
         }
-    }
-
-    /**
-     * @return array
-     */
-    protected function getSerializableProperties(): array
-    {
-        return array_merge(parent::getSerializableProperties(), [
-            'allUserRolesNames',
-        ]);
     }
 
     /**

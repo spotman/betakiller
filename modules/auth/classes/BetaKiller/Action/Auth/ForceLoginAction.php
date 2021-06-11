@@ -11,7 +11,6 @@ use BetaKiller\Event\WebLoginEvent;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Helper\SessionHelper;
 use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
@@ -19,6 +18,7 @@ use BetaKiller\Service\AuthService;
 use BetaKiller\Url\Parameter\UserNameUrlParameter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Spotman\Acl\AclInterface;
 
 /**
  * Class ForceLoginAction
@@ -54,12 +54,18 @@ final class ForceLoginAction extends AbstractAction
     private AppEnvInterface $appEnv;
 
     /**
+     * @var \Spotman\Acl\AclInterface
+     */
+    private AclInterface $acl;
+
+    /**
      * ForceLoginAction constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface             $appEnv
      * @param \BetaKiller\Service\AuthService                $auth
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
      * @param \BetaKiller\Auth\UserUrlDetectorInterface      $urlDetector
+     * @param \Spotman\Acl\AclInterface                      $acl
      * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
     public function __construct(
@@ -67,6 +73,7 @@ final class ForceLoginAction extends AbstractAction
         AuthService $auth,
         UserRepositoryInterface $userRepo,
         UserUrlDetectorInterface $urlDetector,
+        AclInterface $acl,
         EventBusInterface $eventBus
     ) {
         $this->appEnv      = $appEnv;
@@ -74,6 +81,7 @@ final class ForceLoginAction extends AbstractAction
         $this->userRepo    = $userRepo;
         $this->eventBus    = $eventBus;
         $this->urlDetector = $urlDetector;
+        $this->acl         = $acl;
     }
 
     /**
@@ -88,10 +96,11 @@ final class ForceLoginAction extends AbstractAction
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $user    = ServerRequestHelper::getUser($request);
         $session = ServerRequestHelper::getSession($request);
 
         $isRestrictedEnv     = $this->appEnv->inProductionMode() || $this->appEnv->inStagingMode();
-        $isForceLoginAllowed = SessionHelper::hasRoleName($session, RoleInterface::FORCE_LOGIN);
+        $isForceLoginAllowed = $this->acl->hasAssignedRoleName($user, RoleInterface::FORCE_LOGIN);
 
         if ($isRestrictedEnv && !$isForceLoginAllowed) {
             throw new AccessDeniedException();
