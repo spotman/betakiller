@@ -41,7 +41,7 @@ class User extends \ORM implements UserInterface
     public const  REL_ROLES    = 'roles';
     public const  REL_SESSIONS = 'sessions';
 
-    protected $allUserRolesNames = [];
+    protected array $allUserRolesNames = [];
 
     protected function configure(): void
     {
