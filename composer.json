@@ -15,6 +15,7 @@
     "ext-mysqli": "*",
     "ext-pcntl": "*",
     "ext-pdo": "*",
+    "ext-posix": "*",
     "ext-simplexml": "*",
     "ext-sodium": "*",
     "ext-sqlite3": "*",
