@@ -14,8 +14,10 @@ class WampConfig extends AbstractConfig implements WampConfigInterface
         PATH_REALMS_LIST = [self::CONFIG_REALMS],
         PATH_REALM_EXT = [self::CONFIG_REALMS, self::CONFIG_REALM_KEY_EXT],
         PATH_REALM_INT = [self::CONFIG_REALMS, self::CONFIG_REALM_KEY_INT],
-        PATH_CONNECTION_HOST = ['connection', 'host'],
-        PATH_CONNECTION_PORT = ['connection', 'port'];
+        PATH_CLIENT_HOST = ['client', 'host'],
+        PATH_CLIENT_PORT = ['client', 'port'],
+        PATH_SERVER_HOST = ['server', 'host'],
+        PATH_SERVER_PORT = ['server', 'port'];
 
     /**
      * @return string
@@ -52,16 +54,40 @@ class WampConfig extends AbstractConfig implements WampConfigInterface
     /**
      * @return string
      */
-    public function getConnectionHost(): string
+    public function getClientHost(): string
     {
-        return (string)$this->get(self::PATH_CONNECTION_HOST);
+        return (string)$this->get(self::PATH_CLIENT_HOST);
     }
 
     /**
      * @return string
      */
-    public function getConnectionPort(): string
+    public function getClientPort(): string
     {
-        return (string)$this->get(self::PATH_CONNECTION_PORT);
+        return (string)$this->get(self::PATH_CLIENT_PORT);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasServerHost(): bool
+    {
+        return (bool)$this->get(self::PATH_SERVER_HOST);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getServerHost(): string
+    {
+        return (string)$this->get(self::PATH_SERVER_HOST);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getServerPort(): string
+    {
+        return (string)$this->get(self::PATH_SERVER_PORT);
     }
 }

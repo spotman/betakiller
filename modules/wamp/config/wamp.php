@@ -8,8 +8,13 @@ return [
         WampConfig::CONFIG_REALM_KEY_INT => 'internal',
     ],
 
-    'connection' => [
-        'host' => \getenv('WAMP_HOST'),
-        'port' => \getenv('WAMP_PORT'),
+    'client' => [
+        'host' => \getenv('WAMP_CLIENT_HOST'),
+        'port' => \getenv('WAMP_CLIENT_PORT'),
+    ],
+
+    'server' => [
+        'host' => \getenv('WAMP_SERVER_HOST'),
+        'port' => \getenv('WAMP_SERVER_PORT'),
     ],
 ];

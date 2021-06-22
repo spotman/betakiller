@@ -15,6 +15,7 @@ use Thruway\Authentication\WampCraUserDbInterface;
 use Thruway\Logging\Logger;
 use Thruway\Transport\RatchetTransportProvider;
 use function React\Promise\resolve;
+use function React\Promise\reject;
 
 final class WampRouterDaemon extends AbstractDaemon
 {
@@ -61,10 +62,14 @@ final class WampRouterDaemon extends AbstractDaemon
 
         $this->router = new WampRouter($loop);
 
+        if (!$this->wampConfig->hasServerHost()) {
+            return reject();
+        }
+
         // Transport
         $transport = new RatchetTransportProvider(
-            $this->wampConfig->getConnectionHost(),
-            $this->wampConfig->getConnectionPort()
+            $this->wampConfig->getServerHost(),
+            $this->wampConfig->getServerPort()
         );
         $transport->enableKeepAlive($loop);
         $this->router->addTransportProvider($transport);

@@ -23,10 +23,25 @@ interface WampConfigInterface
     /**
      * @return string
      */
-    public function getConnectionHost(): string;
+    public function getClientHost(): string;
 
     /**
      * @return string
      */
-    public function getConnectionPort(): string;
+    public function getClientPort(): string;
+
+    /**
+     * @return bool
+     */
+    public function hasServerHost(): bool;
+
+    /**
+     * @return string
+     */
+    public function getServerHost(): string;
+
+    /**
+     * @return string
+     */
+    public function getServerPort(): string;
 }

@@ -178,8 +178,8 @@ class WampClientBuilder
             case self::CONNECTION_INTERNAL:
                 return sprintf(
                     'ws://%s:%s',
-                    $this->wampConfig->getConnectionHost(),
-                    $this->wampConfig->getConnectionPort()
+                    $this->wampConfig->getClientHost(),
+                    $this->wampConfig->getClientPort()
                 );
 
             case self::CONNECTION_EXTERNAL:
