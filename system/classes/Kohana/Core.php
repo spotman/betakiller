@@ -229,9 +229,10 @@ class Kohana_Core
         }
 
         if (!is_writable(Kohana::$cache_dir)) {
-            throw new Kohana_Exception('Directory :dir must be writable by user ":who"', [
+            throw new Kohana_Exception('Directory :dir must be writable by user ":who" but having ":real" instead', [
                 ':dir' => Debug::path(Kohana::$cache_dir),
-                ':who' => posix_getpwuid(posix_geteuid())['name']
+                ':who' => print_r(posix_getpwuid(posix_geteuid()), true),
+                ':real' => fileowner(Kohana::$cache_dir),
             ]);
         }
 
