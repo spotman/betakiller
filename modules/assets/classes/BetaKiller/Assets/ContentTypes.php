@@ -6,25 +6,26 @@ namespace BetaKiller\Assets;
 use BetaKiller\Assets\Exception\AssetsException;
 use Mimey\MimeMappingBuilder;
 use Mimey\MimeTypes;
+use Mimey\MimeTypesInterface;
 use function finfo_file;
 use function finfo_open;
 
 class ContentTypes
 {
     /**
-     * @var MimeTypes
+     * @var \Mimey\MimeTypesInterface
      */
-    private $mimey;
+    private MimeTypesInterface $mimeTypes;
 
     /**
      * ContentTypes constructor.
      */
     public function __construct()
     {
-        $this->mimey = $this->buildMimey();
+        $this->mimeTypes = $this->buildMimeTypes();
     }
 
-    private function buildMimey(): MimeTypes
+    private function buildMimeTypes(): MimeTypesInterface
     {
         // Create a builder using the built-in conversions as the basis.
         $builder = MimeMappingBuilder::create();
@@ -59,7 +60,7 @@ class ContentTypes
      */
     public function getExtensionMimeType(string $ext): string
     {
-        return $this->mimey->getMimeType($ext);
+        return $this->mimeTypes->getMimeType($ext);
     }
 
     /**
@@ -70,7 +71,7 @@ class ContentTypes
      */
     public function getExtensions(string $mimeType): array
     {
-        $extensions = $this->mimey->getAllExtensions($mimeType);
+        $extensions = $this->mimeTypes->getAllExtensions($mimeType);
 
         if (!$extensions) {
             throw new AssetsException('MIME :mime has no defined extension', [':mime' => $mimeType]);

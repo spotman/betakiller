@@ -14,12 +14,12 @@ class StaticFilesDeployHandler implements RequestHandlerInterface
     /**
      * @var \BetaKiller\Assets\ContentTypes
      */
-    private $types;
+    private ContentTypes $types;
 
     /**
      * @var \BetaKiller\Assets\StaticAssetsFactory
      */
-    private $assetsFactory;
+    private StaticAssetsFactory $assetsFactory;
 
     /**
      * StaticFilesDeployHandler constructor.
@@ -53,6 +53,7 @@ class StaticFilesDeployHandler implements RequestHandlerInterface
             throw new NotFoundHttpException('File [:file] not found', [':file' => $file]);
         }
 
+/*
         // Производим deploy статического файла,
         // В следующий раз его будет отдавать сразу nginx без запуска PHP
         $deployPath = $assets->getDeployPath($file);
@@ -64,11 +65,13 @@ class StaticFilesDeployHandler implements RequestHandlerInterface
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $deployDir));
         }
 
-        symlink($orig, $deployPath);
-
+        if (!file_exists($deployPath)) {
+            symlink($orig, $deployPath);
+        }
+*/
         $ext  = pathinfo($file, \PATHINFO_EXTENSION);
         $mime = $this->types->getExtensionMimeType($ext);
 
-        return ResponseHelper::file($orig, $mime);
+        return ResponseHelper::file($orig, $mime, new \DateInterval('P1D'));
     }
 }

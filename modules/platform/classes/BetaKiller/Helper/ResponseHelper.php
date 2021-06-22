@@ -44,7 +44,7 @@ class ResponseHelper
         return new HtmlResponse($text, $status ?? 200);
     }
 
-    public static function file(string $fullPath, string $mimeType): ResponseInterface
+    public static function file(string $fullPath, string $mimeType, DateInterval $ttl = null): ResponseInterface
     {
         $stream   = new Stream($fullPath, 'rb');
         $response = new Response($stream);
@@ -52,7 +52,9 @@ class ResponseHelper
         $timestamp    = filemtime($fullPath);
         $lastModified = (new DateTimeImmutable())->setTimestamp($timestamp);
 
-        $response = self::setLastModified($response, $lastModified);
+        $response = $ttl
+            ? self::enableCaching($response, $lastModified, $ttl)
+            : self::setLastModified($response, $lastModified);
 
         return $response
             ->withHeader('Content-Length', $stream->getSize())
