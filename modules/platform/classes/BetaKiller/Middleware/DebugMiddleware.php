@@ -176,8 +176,8 @@ final class DebugMiddleware implements MiddlewareInterface
         $csp = ServerRequestHelper::getCsp($request);
         $this->addCspRules($renderer, $csp);
 
-        // Prevent caching
-        $response = ResponseHelper::disableCaching($response);
+//        // Prevent caching
+//        $response = ResponseHelper::disableCaching($response);
 
         // Add headers injected by DebugBar
         return $httpDriver->applyHeaders($response);
