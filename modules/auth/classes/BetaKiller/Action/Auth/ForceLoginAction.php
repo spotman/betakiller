@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Action\Auth;
 
 use BetaKiller\Action\AbstractAction;
-use BetaKiller\Auth\AccessDeniedException;
+use BetaKiller\Auth\AuthorizationRequiredException;
 use BetaKiller\Auth\IncorrectCredentialsException;
 use BetaKiller\Auth\UserUrlDetectorInterface;
 use BetaKiller\Event\WebLoginEvent;
@@ -103,7 +103,7 @@ final class ForceLoginAction extends AbstractAction
         $isForceLoginAllowed = $this->acl->hasAssignedRoleName($user, RoleInterface::FORCE_LOGIN);
 
         if ($isRestrictedEnv && !$isForceLoginAllowed) {
-            throw new AccessDeniedException();
+            throw new AuthorizationRequiredException();
         }
 
         if (!ServerRequestHelper::isGuest($request)) {
