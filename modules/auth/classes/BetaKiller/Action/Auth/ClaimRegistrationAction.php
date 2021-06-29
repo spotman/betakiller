@@ -98,9 +98,7 @@ class ClaimRegistrationAction extends AbstractAction
             ]);
 
             // User went from an email link, so confirm email too
-            if (!$user->isEmailConfirmed()) {
-                $this->userWorkflow->confirmEmail($user);
-            }
+            $this->userWorkflow->confirmEmail($user);
         }
 
         $lang = $this->langRepo->getByIsoCode($log->getLanguageIsoCode());

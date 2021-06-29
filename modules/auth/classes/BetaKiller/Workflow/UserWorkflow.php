@@ -145,6 +145,10 @@ final class UserWorkflow
 
     public function confirmEmail(UserInterface $user): void
     {
+        if ($user->isEmailConfirmed()) {
+            return;
+        }
+
         $this->state->doTransition($user, self::TRANSITION_EMAIL_CONFIRMED, $user);
 
         $this->userRepo->save($user);

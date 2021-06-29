@@ -41,9 +41,7 @@ class ConfirmEmailAction extends AbstractTokenVerificationAction
     protected function processValid(UserInterface $user): void
     {
         // Prevent errors on subsequent calls
-        if (!$user->isEmailConfirmed()) {
-            $this->userWorkflow->confirmEmail($user);
-        }
+        $this->userWorkflow->confirmEmail($user);
     }
 
     /**

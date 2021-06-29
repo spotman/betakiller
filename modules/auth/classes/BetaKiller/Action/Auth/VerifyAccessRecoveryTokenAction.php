@@ -43,9 +43,7 @@ class VerifyAccessRecoveryTokenAction extends AbstractTokenVerificationAction
     protected function processValid(UserInterface $user): void
     {
         // Confirm user email if not verified (no errors on duplicate token requests)
-        if (!$user->isEmailConfirmed()) {
-            $this->userWorkflow->confirmEmail($user);
-        }
+        $this->userWorkflow->confirmEmail($user);
     }
 
     /**
