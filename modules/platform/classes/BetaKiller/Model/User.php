@@ -41,7 +41,13 @@ class User extends \ORM implements UserInterface
     public const  REL_ROLES    = 'roles';
     public const  REL_SESSIONS = 'sessions';
 
+    /**
+     * @var array
+     * @deprecated Remove after several deployments since 4 July 2021
+     */
     protected array $allUserRolesNames = [];
+
+    private array $cachedRoles = [];
 
     protected function configure(): void
     {
@@ -304,6 +310,9 @@ class User extends \ORM implements UserInterface
      */
     public function addRole(RoleInterface $role): UserInterface
     {
+        // Reset cached roles
+        $this->cachedRoles = [];
+
         return $this->add(self::REL_ROLES, $role);
     }
 
@@ -312,7 +321,7 @@ class User extends \ORM implements UserInterface
      */
     public function getRoles(): array
     {
-        return $this->getAllRelated(self::REL_ROLES);
+        return $this->cachedRoles ?: $this->cachedRoles = $this->getAllRelated(self::REL_ROLES);
     }
 
     /**
