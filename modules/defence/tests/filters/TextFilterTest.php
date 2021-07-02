@@ -31,8 +31,7 @@ class TextFilterTest extends AbstractFilterTest
             ' asd ' => 'asd', // Trim data
 
             'qwerty'."\0" => 'qwerty', // No NULL-byte
-
-            '<script>alert("Hello")</script> world' => 'alert("Hello") world', // Remove tags
+            'qwerty'."\t" => 'qwerty', // No TAB-byte
         ];
     }
 
@@ -43,6 +42,9 @@ class TextFilterTest extends AbstractFilterTest
             148,
             [],
             new \stdClass(),
+
+            // No HTML tags allowed
+            '<script>alert("Hello")</script> world',
         ];
     }
 

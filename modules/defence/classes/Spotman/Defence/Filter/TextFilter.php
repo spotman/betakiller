@@ -39,10 +39,10 @@ class TextFilter extends AbstractFilterVarFilter
             throw new \InvalidArgumentException;
         }
 
-        $value = strip_tags(str_replace(["\0", "\t"], '', $value));
+        $value = str_replace(["\0", "\t"], '', $value);
 
-        if ($value === null) {
-            throw new \InvalidArgumentException;
+        if (strip_tags($value) !== $value) {
+            throw new \InvalidArgumentException('HTML tags are not allowed');
         }
 
         return trim((string)$value);
