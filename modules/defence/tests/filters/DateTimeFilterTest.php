@@ -22,6 +22,12 @@ class DateTimeFilterTest extends AbstractFilterTest
         ];
     }
 
+    public function testPassUnchanged($input = []): void
+    {
+        // Fake assert to prevent "passUnchanged" checks on DateTimeFilter
+        self::assertTrue(true);
+    }
+
     public function passDataUnchanged(): array
     {
         // Filter converts string to DateTimeImmutable
@@ -30,8 +36,13 @@ class DateTimeFilterTest extends AbstractFilterTest
 
     public function sanitizeData(): array
     {
+        $text = '2021-07-05T12:13:39.000000+0000';
+        $date = new \DateTimeImmutable($text);
+
         // Filter converts string to DateTimeImmutable, they can not be compared
-        return [];
+        return [
+            $text => $date,
+        ];
     }
 
     public function invalidData(): array
