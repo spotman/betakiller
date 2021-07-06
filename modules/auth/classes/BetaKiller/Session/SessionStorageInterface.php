@@ -10,7 +10,7 @@ use Zend\Expressive\Session\SessionPersistenceInterface;
 interface SessionStorageInterface extends SessionPersistenceInterface
 {
     /**
-     * @param string $originUrl
+     * @param string|null $originUrl
      *
      * @return \Zend\Expressive\Session\SessionInterface
      */
