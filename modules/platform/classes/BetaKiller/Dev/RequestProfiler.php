@@ -71,6 +71,10 @@ final class RequestProfiler
 
     public static function begin(ServerRequestInterface $request, string $label): array
     {
+        if (!DebugServerRequestHelper::hasProfiler($request)) {
+            return [$request, null];
+        }
+
         $event = DebugServerRequestHelper::getProfiler($request)->start($label);
 
         return [$request, $event];
@@ -82,6 +86,8 @@ final class RequestProfiler
         /** @var StopwatchEvent $event */
         [$request, $event] = $pack;
 
-        DebugServerRequestHelper::getProfiler($request)->stop($event);
+        if ($request && $event && DebugServerRequestHelper::hasProfiler($request)) {
+            DebugServerRequestHelper::getProfiler($request)->stop($event);
+        }
     }
 }

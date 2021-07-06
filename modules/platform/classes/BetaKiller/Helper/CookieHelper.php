@@ -8,6 +8,7 @@ use BetaKiller\Exception\SecurityException;
 use HansOtt\PSR7Cookies\Cookie;
 use HansOtt\PSR7Cookies\RequestCookies;
 use HansOtt\PSR7Cookies\SetCookie;
+use HansOtt\PSR7Cookies\Signer;
 use HansOtt\PSR7Cookies\Signer\Hmac\Sha512;
 use HansOtt\PSR7Cookies\Signer\Key;
 use HansOtt\PSR7Cookies\Signer\Mismatch;
@@ -19,34 +20,34 @@ class CookieHelper
     /**
      * @var \HansOtt\PSR7Cookies\Signer
      */
-    private $signer;
+    private Signer $signer;
 
     /**
      * @var Key
      */
-    private $key;
+    private Key $key;
 
     /**
      * @var string
      */
-    private $path = '/';
+    private string $path = '/';
 
     /**
      * @var bool
      */
-    private $secureOnly = false;
+    private bool $secureOnly = false;
 
     /**
      * @var string
      */
-    private $sameSite = 'lax';
+    private string $sameSite = 'lax';
 
     /**
      * Session ID cookie is used for WAMP auth
      *
      * @var bool
      */
-    private $httpOnly = false;
+    private bool $httpOnly = false;
 
     /**
      * CookieHelper constructor.
@@ -64,11 +65,7 @@ class CookieHelper
 
         $this->signer = new Sha512();
 
-        $key = getenv('COOKIE_ENCRYPT_KEY');
-
-        if (!$key) {
-            throw new \UnexpectedValueException('Cookie encryption key must be set via COOKIE_ENCRYPT_KEY env var');
-        }
+        $key = $appEnv->getEnvVariable('COOKIE_ENCRYPT_KEY', true);
 
         $this->key = new Key($key);
     }
@@ -81,7 +78,7 @@ class CookieHelper
 
         foreach ($cookies as $cookie) {
             try {
-                $data[$cookie->getName()] = $this->decode($cookie)->getValue();
+                $data[$cookie->getName()] = $this->decode($cookie);
             } /** @noinspection BadExceptionsProcessingInspection */
             catch (Mismatch $e) {
                 // Skip tempered/client-side cookies
@@ -102,7 +99,7 @@ class CookieHelper
         $cookie = $cookies->get($name);
 
         try {
-            return $this->decode($cookie)->getValue();
+            return $this->decode($cookie);
         } catch (Mismatch $e) {
             // Cookie is tampered!
             throw new SecurityException('Cookie ":name" is tampered from IP :ip', [
@@ -116,7 +113,7 @@ class CookieHelper
     {
         $cookie = new Cookie($name, $value);
 
-        return $this->decode($cookie)->getValue();
+        return $this->decode($cookie);
     }
 
     public function encodeValue(string $name, string $value): string
@@ -131,9 +128,9 @@ class CookieHelper
         return RequestCookies::createFromRequest($request);
     }
 
-    private function decode(Cookie $cookie): Cookie
+    private function decode(Cookie $cookie): string
     {
-        return $this->signer->verify($cookie, $this->key);
+        return $this->signer->verify($cookie, $this->key)->getValue();
     }
 
     public function set(

@@ -32,6 +32,8 @@ use BetaKiller\Repository\TokenRepository;
 use BetaKiller\Repository\TokenRepositoryInterface;
 use BetaKiller\Repository\UserRepository;
 use BetaKiller\Repository\UserRepositoryInterface;
+use BetaKiller\Repository\UserSessionRepository;
+use BetaKiller\Repository\UserSessionRepositoryInterface;
 use BetaKiller\Session\DatabaseSessionStorage;
 use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -225,9 +227,10 @@ return [
 
         RepositoryFactoryInterface::class => autowire(RepositoryFactory::class),
 
-        UserRepositoryInterface::class  => autowire(UserRepository::class),
-        RoleRepositoryInterface::class  => autowire(RoleRepository::class),
-        TokenRepositoryInterface::class => autowire(TokenRepository::class),
+        UserRepositoryInterface::class        => autowire(UserRepository::class),
+        UserSessionRepositoryInterface::class => autowire(UserSessionRepository::class),
+        RoleRepositoryInterface::class        => autowire(RoleRepository::class),
+        TokenRepositoryInterface::class       => autowire(TokenRepository::class),
 
         IdentityConverterInterface::class => autowire(DummyIdentityConverter::class),
 

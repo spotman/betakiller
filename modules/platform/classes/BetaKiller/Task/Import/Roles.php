@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Import;
 
-use BetaKiller\Auth\RoleConfig;
+use BetaKiller\Config\RoleConfig;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Factory\EntityFactoryInterface;

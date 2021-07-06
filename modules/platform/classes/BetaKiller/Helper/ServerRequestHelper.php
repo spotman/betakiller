@@ -307,10 +307,10 @@ class ServerRequestHelper
         return $request->withUri($targetUri);
     }
 
-    public static function getRequestUuid(ServerRequestInterface $request): UuidInterface
+    public static function getRequestUuid(ServerRequestInterface $request): ?UuidInterface
     {
         $value = $request->getAttribute(RequestIdMiddleware::ATTRIBUTE_NAME);
 
-        return Uuid::fromString($value);
+        return $value ? Uuid::fromString($value) : null;
     }
 }

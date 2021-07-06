@@ -19,16 +19,16 @@ class CsrfService implements ArgumentsDefinitionProviderInterface
     public const REQUEST_TOKEN_KEY  = 'csrf';
 
     /**
-     * @var \BetaKiller\Security\Encryption
+     * @var \BetaKiller\Security\EncryptionInterface
      */
-    private $encryption;
+    private EncryptionInterface $encryption;
 
     /**
      * CsrfService constructor.
      *
-     * @param \BetaKiller\Security\Encryption $encryption
+     * @param \BetaKiller\Security\EncryptionInterface $encryption
      */
-    public function __construct(Encryption $encryption)
+    public function __construct(EncryptionInterface $encryption)
     {
         $this->encryption = $encryption;
     }

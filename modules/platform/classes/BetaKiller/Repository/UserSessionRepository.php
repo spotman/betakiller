@@ -18,7 +18,7 @@ use DateInterval;
  * @method UserSessionInterface[] findAll(OrmInterface $orm)
  * @method void delete(UserSessionInterface $entity)
  */
-class UserSessionRepository extends AbstractOrmBasedRepository
+class UserSessionRepository extends AbstractOrmBasedRepository implements UserSessionRepositoryInterface
 {
     /**
      * Returns null if session is not exists (cleared by gc)

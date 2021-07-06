@@ -3,22 +3,22 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Security;
 
-use BetaKiller\Security\Encryption;
+use BetaKiller\Security\EncryptionInterface;
 use BetaKiller\Task\AbstractTask;
 
 class EncryptionKey extends AbstractTask
 {
     /**
-     * @var \BetaKiller\Security\Encryption
+     * @var \BetaKiller\Security\EncryptionInterface
      */
-    private $encrypt;
+    private EncryptionInterface $encrypt;
 
     /**
      * EncryptionKey constructor.
      *
-     * @param \BetaKiller\Security\Encryption $encrypt
+     * @param \BetaKiller\Security\EncryptionInterface $encrypt
      */
-    public function __construct(Encryption $encrypt)
+    public function __construct(EncryptionInterface $encrypt)
     {
         $this->encrypt = $encrypt;
 

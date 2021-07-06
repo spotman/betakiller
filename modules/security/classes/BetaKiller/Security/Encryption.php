@@ -11,7 +11,7 @@ use function random_bytes;
 use function sodium_crypto_secretbox;
 use function sodium_crypto_secretbox_open;
 
-class Encryption
+class Encryption implements EncryptionInterface
 {
     private const NONCE_DELIMITER = '^';
 

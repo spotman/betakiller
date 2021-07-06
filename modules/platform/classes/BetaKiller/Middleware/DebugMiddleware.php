@@ -256,11 +256,13 @@ final class DebugMiddleware implements MiddlewareInterface
             {
                 $response = $this->handler->handle($request);
 
-                $profiler = DebugServerRequestHelper::getProfiler($request);
-                $debugBar = DebugServerRequestHelper::getDebugBar($request);
+                if (DebugServerRequestHelper::hasProfiler($request)) {
+                    $profiler = DebugServerRequestHelper::getProfiler($request);
+                    $debugBar = DebugServerRequestHelper::getDebugBar($request);
 
-                // Push measures to DebugBar
-                $profiler->transferMeasuresToDebugBar($debugBar);
+                    // Push measures to DebugBar
+                    $profiler->transferMeasuresToDebugBar($debugBar);
+                }
 
                 return $response;
             }

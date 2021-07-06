@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\Auth;
+namespace BetaKiller\Config;
 
 class RoleConfig
 {

@@ -5,8 +5,8 @@ namespace BetaKiller\Service;
 
 use BetaKiller\Acl\Resource\UserResource;
 use BetaKiller\Auth\AccessDeniedException;
-use BetaKiller\Auth\SessionConfig;
 use BetaKiller\Auth\UserBlockedException;
+use BetaKiller\Config\SessionConfigInterface;
 use BetaKiller\Event\UserPasswordChangedEvent;
 use BetaKiller\Event\UserPasswordChangeRequestedEvent;
 use BetaKiller\Factory\GuestUserFactory;
@@ -25,19 +25,19 @@ class AuthService
     public const PASSWORD_MAX_LENGTH = 50;
 
     /**
-     * @var \BetaKiller\Auth\SessionConfig
+     * @var \BetaKiller\Config\SessionConfigInterface
      */
-    private $config;
+    private SessionConfigInterface $config;
 
     /**
      * @var \BetaKiller\Repository\UserRepositoryInterface
      */
-    private $userRepo;
+    private UserRepositoryInterface $userRepo;
 
     /**
      * @var \BetaKiller\Session\SessionStorageInterface
      */
-    private $sessionStorage;
+    private SessionStorageInterface $sessionStorage;
 
     /**
      * @var \BetaKiller\Factory\GuestUserFactory
@@ -47,7 +47,7 @@ class AuthService
     /**
      * @var \BetaKiller\MessageBus\EventBusInterface
      */
-    private $eventBus;
+    private EventBusInterface $eventBus;
 
     /**
      * @var \Spotman\Acl\AclInterface
@@ -57,7 +57,7 @@ class AuthService
     /**
      * AuthService constructor.
      *
-     * @param \BetaKiller\Auth\SessionConfig                 $config
+     * @param \BetaKiller\Config\SessionConfigInterface      $config
      * @param \BetaKiller\Session\SessionStorageInterface    $sessionStorage
      * @param \BetaKiller\Factory\GuestUserFactory           $guestUserFactory
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
@@ -65,7 +65,7 @@ class AuthService
      * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
     public function __construct(
-        SessionConfig $config,
+        SessionConfigInterface $config,
         SessionStorageInterface $sessionStorage,
         GuestUserFactory $guestUserFactory,
         UserRepositoryInterface $userRepo,

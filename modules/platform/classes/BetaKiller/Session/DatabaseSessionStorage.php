@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Session;
 
-use BetaKiller\Auth\SessionConfig;
+use BetaKiller\Config\SessionConfigInterface;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception;
 use BetaKiller\Exception\DomainException;
@@ -13,8 +13,8 @@ use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\UserSession;
 use BetaKiller\Model\UserSessionInterface;
-use BetaKiller\Repository\UserSessionRepository;
-use BetaKiller\Security\Encryption;
+use BetaKiller\Repository\UserSessionRepositoryInterface;
+use BetaKiller\Security\EncryptionInterface;
 use DateTimeImmutable;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -29,37 +29,37 @@ class DatabaseSessionStorage implements SessionStorageInterface
     public const COOKIE_NAME = 'sid';
 
     /**
-     * @var \BetaKiller\Auth\SessionConfig
+     * @var \BetaKiller\Config\SessionConfigInterface
      */
-    private $config;
+    private SessionConfigInterface $config;
 
     /**
-     * @var \BetaKiller\Repository\UserSessionRepository
+     * @var \BetaKiller\Repository\UserSessionRepositoryInterface
      */
-    private $sessionRepo;
+    private UserSessionRepositoryInterface $sessionRepo;
 
     /**
-     * @var \BetaKiller\Security\Encryption
+     * @var \BetaKiller\Security\EncryptionInterface
      */
-    private $encryption;
+    private EncryptionInterface $encryption;
 
     /**
      * @var \BetaKiller\Helper\CookieHelper
      */
-    private $cookies;
+    private CookieHelper $cookies;
 
     /**
      * DatabaseSessionStorage constructor.
      *
-     * @param \BetaKiller\Repository\UserSessionRepository $sessionRepo
-     * @param \BetaKiller\Auth\SessionConfig               $config
-     * @param \BetaKiller\Security\Encryption              $encryption
-     * @param \BetaKiller\Helper\CookieHelper              $cookies
+     * @param \BetaKiller\Repository\UserSessionRepositoryInterface $sessionRepo
+     * @param \BetaKiller\Config\SessionConfigInterface             $config
+     * @param \BetaKiller\Security\EncryptionInterface              $encryption
+     * @param \BetaKiller\Helper\CookieHelper                       $cookies
      */
     public function __construct(
-        UserSessionRepository $sessionRepo,
-        SessionConfig $config,
-        Encryption $encryption,
+        UserSessionRepositoryInterface $sessionRepo,
+        SessionConfigInterface $config,
+        EncryptionInterface $encryption,
         CookieHelper $cookies
     ) {
         $this->sessionRepo = $sessionRepo;
@@ -186,7 +186,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * @param string                          $originUrl
+     * @param string|null                     $originUrl
      * @param \Ramsey\Uuid\UuidInterface|null $originUuid
      *
      * @return \Zend\Expressive\Session\SessionInterface
@@ -228,15 +228,16 @@ class DatabaseSessionStorage implements SessionStorageInterface
             ]);
         }
 
-        if ($session->isRegenerated()) {
-            // Keep old session
-            $this->storeSession($session);
+        // Keep session
+        $this->storeSession($session);
 
+        if ($session->isRegenerated()) {
             // Generate new token and create fresh session with original user agent and IP address
             $session = $this->regenerateSession($session);
-        }
 
-        $this->storeSession($session);
+            // Keep new session
+            $this->storeSession($session);
+        }
 
         // Set cookie
         return $this->cookies->set(
@@ -368,16 +369,24 @@ class DatabaseSessionStorage implements SessionStorageInterface
     {
         $content = serialize($data);
 
-        // Encrypt
-        $content = $this->encryption->encrypt($content, $this->getEncryptionKey());
+        $key = $this->getEncryptionKey();
+
+        if ($key) {
+            // Encrypt
+            $content = $this->encryption->encrypt($content, $key);
+        }
 
         return $content;
     }
 
     private function decodeData(string $content): array
     {
-        // Decrypt
-        $content = $this->encryption->decrypt($content, $this->getEncryptionKey());
+        $key = $this->getEncryptionKey();
+
+        if ($key) {
+            // Decrypt
+            $content = $this->encryption->decrypt($content, $key);
+        }
 
         $data = unserialize($content, $this->config->getAllowedClassNames());
 
@@ -388,7 +397,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         return $data;
     }
 
-    private function getEncryptionKey(): string
+    private function getEncryptionKey(): ?string
     {
         return $this->config->getEncryptionKey();
     }

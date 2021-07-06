@@ -180,13 +180,19 @@ class HitStatMiddleware implements MiddlewareInterface
         $requestId = ServerRequestHelper::getRequestUuid($request);
         $params    = ServerRequestHelper::getUrlContainer($request);
 
+        if (!$requestId) {
+            throw new \LogicException('Request UUID is missing');
+        }
+
         // Detect marker
         $marker = $this->service->getMarkerFromUrlContainer($params);
 
         $p3 = RequestProfiler::begin($request, 'Hit stat: store');
 
         if (!$session instanceof SessionIdentifierAwareInterface) {
-            throw new \LogicException();
+            throw new \LogicException(
+                sprintf('Session object must implement %s', SessionIdentifierAwareInterface::class)
+            );
         }
 
         // Create new Hit object with source/target pages, marker, ip and other info

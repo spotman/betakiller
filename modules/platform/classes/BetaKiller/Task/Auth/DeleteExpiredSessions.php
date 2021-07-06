@@ -3,31 +3,31 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Auth;
 
-use BetaKiller\Auth\SessionConfig;
-use BetaKiller\Repository\UserSessionRepository;
+use BetaKiller\Config\SessionConfigInterface;
+use BetaKiller\Repository\UserSessionRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 
 class DeleteExpiredSessions extends AbstractTask
 {
     /**
-     * @var \BetaKiller\Auth\SessionConfig
+     * @var \BetaKiller\Config\SessionConfigInterface
      */
-    private $config;
+    private SessionConfigInterface $config;
 
     /**
-     * @var \BetaKiller\Repository\UserSessionRepository
+     * @var \BetaKiller\Repository\UserSessionRepositoryInterface
      */
-    private $sessionRepo;
+    private UserSessionRepositoryInterface $sessionRepo;
 
     /**
      * DeleteExpiredSessions constructor.
      *
-     * @param \BetaKiller\Auth\SessionConfig               $config
-     * @param \BetaKiller\Repository\UserSessionRepository $sessionRepo
+     * @param \BetaKiller\Repository\UserSessionRepositoryInterface $sessionRepo
+     * @param \BetaKiller\Config\SessionConfig                      $config
      */
     public function __construct(
-        UserSessionRepository $sessionRepo,
-        SessionConfig $config
+        UserSessionRepositoryInterface $sessionRepo,
+        SessionConfigInterface $config
     ) {
         $this->sessionRepo = $sessionRepo;
         $this->config      = $config;

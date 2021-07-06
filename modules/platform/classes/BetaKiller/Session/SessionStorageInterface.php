@@ -17,11 +17,11 @@ interface SessionStorageInterface extends SessionPersistenceInterface
     public function createSession(string $originUrl = null): SessionInterface;
 
     /**
-     * @param string $id
+     * @param string $token
      *
      * @return \Zend\Expressive\Session\SessionInterface
      */
-    public function getByToken(string $id): SessionInterface;
+    public function getByToken(string $token): SessionInterface;
 
     /**
      * @param \BetaKiller\Model\UserInterface $user
