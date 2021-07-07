@@ -1,4 +1,6 @@
-<?php defined('SYSPATH') or die('No direct access allowed.');
+<?php
+
+use Webmozart\Assert\Assert;
 
 /**
  * Email module
@@ -46,12 +48,15 @@ class Kohana_Email
 
         switch ($driver) {
             case 'smtp':
+                Assert::keyExists($options, 'hostname', 'SMTP hostname is missing');
+                Assert::keyExists($options, 'port', 'SMTP port is missing');
+
                 // Create SMTP Transport
-                $transport = new Swift_SmtpTransport($options['hostname'], $options['port'] ?? 25);
+                $transport = new Swift_SmtpTransport($options['hostname'], $options['port']);
 
                 $encryption = $options['encryption'] ?? null;
-                $username = $options['username'] ?? null;
-                $password = $options['password'] ?? null;
+                $username   = $options['username'] ?? null;
+                $password   = $options['password'] ?? null;
 
                 // Set encryption
                 if ($encryption) {
@@ -101,7 +106,7 @@ class Kohana_Email
      * @param string       $subject message subject
      * @param string       $body    message body
      * @param bool         $html    send email as HTML
-     * @param array|null $attach  attach filenames
+     * @param array|null   $attach  attach filenames
      *
      * @return int                      number of emails sent
      */
@@ -160,7 +165,7 @@ class Kohana_Email
             // Set Reply-To header email only
             $msg->setFrom($from)->setReplyTo($from);
         } elseif (is_array($from)) {
-            list($fromAddress, $fromName) = $from;
+            [$fromAddress, $fromName] = $from;
 
             // From with a name
             // Set Reply-To header email with name
@@ -172,7 +177,7 @@ class Kohana_Email
             // From without a name
             $msg->setSender($sender);
         } elseif (is_array($sender)) {
-            list($senderAddress, $senderName) = $sender;
+            [$senderAddress, $senderName] = $sender;
 
             // Set Reply-To header email with name
             $msg->setSender($senderAddress, $senderName);
