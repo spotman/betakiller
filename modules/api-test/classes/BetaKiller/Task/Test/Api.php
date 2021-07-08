@@ -13,6 +13,7 @@ use const JSON_PRETTY_PRINT;
 class Api extends AbstractTask
 {
     private const ARG_TARGET = 'target';
+    private const ARG_REQ    = 'req';
     private const ARG_P1     = 'p1';
     private const ARG_P2     = 'p2';
     private const ARG_P3     = 'p3';
@@ -59,6 +60,7 @@ class Api extends AbstractTask
     {
         return [
             self::ARG_TARGET => null,
+            self::ARG_REQ    => null,
             self::ARG_P1     => null,
             self::ARG_P2     => null,
             self::ARG_P3     => null,
@@ -119,6 +121,12 @@ class Api extends AbstractTask
 
         if ($stdin) {
             return (array)json_decode($stdin, true, 5, \JSON_THROW_ON_ERROR);
+        }
+
+        $req = $this->getOption(self::ARG_REQ, false);
+
+        if ($req) {
+            return (array)json_decode($req, true, 5, \JSON_THROW_ON_ERROR);
         }
 
         $names = [
