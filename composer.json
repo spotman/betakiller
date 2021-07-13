@@ -27,6 +27,7 @@
     "bramus/monolog-colored-line-formatter": "~3.0",
     "caxy/php-htmldiff": "^0.1.6",
     "clue/block-react": "^1.4",
+    "clue/redis-react": "^2.4",
     "dflydev/fig-cookies": "^3.0",
     "doctrine/annotations": "^1.2",
     "doctrine/cache": "^1.6",

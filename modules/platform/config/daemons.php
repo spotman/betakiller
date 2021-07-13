@@ -12,6 +12,7 @@ use BetaKiller\Daemon\ApiWorkerTenDaemon;
 use BetaKiller\Daemon\ApiWorkerThreeDaemon;
 use BetaKiller\Daemon\ApiWorkerTwoDaemon;
 use BetaKiller\Daemon\CommandBusWorkerDaemon;
+use BetaKiller\Daemon\EsbPingDaemon;
 use BetaKiller\Daemon\WampEsbBridgeDaemon;
 
 return [
@@ -29,4 +30,6 @@ return [
 
     WampEsbBridgeDaemon::CODENAME,
     CommandBusWorkerDaemon::CODENAME,
+
+    EsbPingDaemon::CODENAME,
 ];

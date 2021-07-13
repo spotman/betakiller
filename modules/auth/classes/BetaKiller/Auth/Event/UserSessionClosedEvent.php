@@ -12,4 +12,12 @@ final class UserSessionClosedEvent extends AbstractUserSessionEvent
     {
         return 'user.session.closed';
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getExternalName(): string
+    {
+        return 'user.session.closed';
+    }
 }

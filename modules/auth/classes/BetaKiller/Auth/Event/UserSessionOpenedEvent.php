@@ -10,6 +10,14 @@ final class UserSessionOpenedEvent extends AbstractUserSessionEvent
      */
     public function getOutboundName(): string
     {
-        return 'session.opened';
+        return 'user.session.opened';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getExternalName(): string
+    {
+        return 'user.session.opened';
     }
 }

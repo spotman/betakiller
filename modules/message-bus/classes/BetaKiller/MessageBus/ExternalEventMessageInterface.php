@@ -9,4 +9,10 @@ namespace BetaKiller\MessageBus;
  */
 interface ExternalEventMessageInterface extends EventMessageInterface
 {
+    /**
+     * Must return string representation of the event name (without binding to FQN)
+     *
+     * @return string
+     */
+    public static function getExternalName(): string;
 }

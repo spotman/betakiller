@@ -10,7 +10,7 @@ use React\EventLoop\LoopInterface;
  *
  * @package BetaKiller\MessageBus
  */
-interface BoundedEventTransportInterface
+interface BoundedEventTransportInterface extends EventTransportInterface
 {
     /**
      * @param \BetaKiller\MessageBus\BoundedEventMessageInterface $event
@@ -22,18 +22,4 @@ interface BoundedEventTransportInterface
      * @param callable $handler
      */
     public function subscribeBounded(string $eventName, callable $handler): void;
-
-    /**
-     * Start consuming loop
-     *
-     * @param \React\EventLoop\LoopInterface $loop
-     */
-    public function startConsuming(LoopInterface $loop): void;
-
-    /**
-     * Stop consuming loop
-     *
-     * @param \React\EventLoop\LoopInterface $loop
-     */
-    public function stopConsuming(LoopInterface $loop): void;
 }

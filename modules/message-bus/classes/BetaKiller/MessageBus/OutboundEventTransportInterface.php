@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\MessageBus;
 
-interface OutboundEventTransportInterface
+interface OutboundEventTransportInterface extends EventTransportInterface
 {
     /**
      * @param \BetaKiller\MessageBus\OutboundEventMessageInterface $event
@@ -16,17 +16,8 @@ interface OutboundEventTransportInterface
     public function subscribeAnyOutbound(callable $handler): void;
 
     /**
-     * Start consuming loop
-     *
-     * @param \React\EventLoop\LoopInterface $loop
+     * @param string   $eventName Outbound name (heartbeat.outbound)
+     * @param callable $handler   Function to call on incoming event
      */
-    public function startConsuming(\React\EventLoop\LoopInterface $loop): void;
-
-    /**
-     * Stop consuming loop
-     *
-     * @param \React\EventLoop\LoopInterface $loop
-     */
-    public function stopConsuming(\React\EventLoop\LoopInterface $loop): void;
-
+    public function subscribeOutbound(string $eventName, callable $handler): void;
 }

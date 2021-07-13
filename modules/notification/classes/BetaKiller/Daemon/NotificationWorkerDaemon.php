@@ -145,13 +145,25 @@ final class NotificationWorkerDaemon extends AbstractDaemon
             $isBroadcast = $this->notification->isBroadcastMessage($messageCodename);
 
             // Iterate over events
-            foreach ($eventsNames as $eventName) {
-                $this->checkEvent($eventName, $isBroadcast);
+            foreach ($eventsNames as $eventClassName) {
+                $this->checkEvent($eventClassName, $isBroadcast);
 
                 $this->logger->debug('Listening :event event to dismiss ":message" message', [
-                    ':event'   => $eventName,
+                    ':event'   => $eventClassName,
                     ':message' => $messageCodename,
                 ]);
+
+                /**
+                 * @uses \BetaKiller\MessageBus\ExternalEventMessageInterface::getExternalName()
+                 * @var string
+                 */
+                $eventName = forward_static_call([$eventClassName, 'getExternalName']);
+
+                if (!$eventName) {
+                    throw new NotificationException('Can not detect external name for event :fqn', [
+                        ':fqn' => $eventClassName,
+                    ]);
+                }
 
                 // Subscribe for provided event
                 $this->eventTransport->subscribeBounded(
@@ -162,6 +174,8 @@ final class NotificationWorkerDaemon extends AbstractDaemon
                         } else {
                             $this->onDismissDirectEvent($event, $messageCodename);
                         }
+
+                        return resolve();
                     }
                 );
             }

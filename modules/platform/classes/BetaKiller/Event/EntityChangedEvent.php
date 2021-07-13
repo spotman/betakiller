@@ -56,4 +56,12 @@ final class EntityChangedEvent implements OutboundEventMessageInterface
             'ts' => $this->ts,
         ];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getExternalName(): string
+    {
+        return 'entity.changed';
+    }
 }
