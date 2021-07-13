@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Daemon;
 
+use Beberlei\Metrics\Collector\Collector;
 use BetaKiller\Event\HeartbeatBoundedEvent;
 use BetaKiller\Event\HeartbeatOutboundEvent;
 use BetaKiller\Helper\LoggerHelper;
@@ -60,17 +61,25 @@ final class EsbPingDaemon extends AbstractDaemon
     private TimerInterface $checkTimer;
 
     /**
+     * @var \Beberlei\Metrics\Collector\Collector
+     */
+    private Collector $metrics;
+
+    /**
      * @param \BetaKiller\MessageBus\BoundedEventTransportInterface  $boundedTransport
      * @param \BetaKiller\MessageBus\OutboundEventTransportInterface $outboundTransport
+     * @param \Beberlei\Metrics\Collector\Collector                  $metrics
      * @param \Psr\Log\LoggerInterface                               $logger
      */
     public function __construct(
         BoundedEventTransportInterface $boundedTransport,
         OutboundEventTransportInterface $outboundTransport,
+        Collector $metrics,
         LoggerInterface $logger
     ) {
         $this->outboundTransport = $outboundTransport;
         $this->boundedTransport  = $boundedTransport;
+        $this->metrics           = $metrics;
         $this->logger            = $logger;
     }
 
@@ -95,6 +104,9 @@ final class EsbPingDaemon extends AbstractDaemon
         // Check missing heartbeat events
         $this->checkTimer = $loop->addPeriodicTimer(self::CHECK_INTERVAL, function () {
             $this->checkStaleEvents();
+
+            // Push stat metrics
+            $this->metrics->flush();
         });
 
         $this->boundedTransport->subscribeBounded(
@@ -136,13 +148,16 @@ final class EsbPingDaemon extends AbstractDaemon
     {
         try {
             $ts = $event->getTimestamp();
+            $ms = (microtime(true) - $ts) * 1000;
 
             $this->logger->info('Bounded heartbeat received in :ms ms', [
-                ':ms' => (int)((microtime(true) - $ts) * 1000),
+                ':ms' => (int)$ms,
             ]);
 
             // Remove event from "pending" list
             unset($this->boundedEvents[$ts]);
+
+            $this->metrics->timing('heartbeat.esb.bounded', $ms);
         } catch (Throwable $e) {
             LoggerHelper::logRawException($this->logger, $e);
         }
@@ -153,14 +168,17 @@ final class EsbPingDaemon extends AbstractDaemon
     private function proceedOutboundEvent(HeartbeatOutboundEvent $event): PromiseInterface
     {
         try {
-            $ts = $event->getTimestamp();
+            $ts    = $event->getTimestamp();
+            $ms = (microtime(true) - $ts) * 1000;
 
             $this->logger->info('Outbound heartbeat received in :ms ms', [
-                ':ms' => (int)((microtime(true) - $ts) * 1000),
+                ':ms' => (int)$ms,
             ]);
 
             // Remove event from "pending" list
             unset($this->outboundEvents[$ts]);
+
+            $this->metrics->timing('heartbeat.esb.outbound', $ms);
         } catch (Throwable $e) {
             LoggerHelper::logRawException($this->logger, $e);
         }
