@@ -153,10 +153,7 @@ final class NotificationWorkerDaemon extends AbstractDaemon
                     ':message' => $messageCodename,
                 ]);
 
-                /**
-                 * @uses \BetaKiller\MessageBus\ExternalEventMessageInterface::getExternalName()
-                 * @var string
-                 */
+                /** @uses \BetaKiller\MessageBus\ExternalEventMessageInterface::getExternalName() */
                 $eventName = forward_static_call([$eventClassName, 'getExternalName']);
 
                 if (!$eventName) {
