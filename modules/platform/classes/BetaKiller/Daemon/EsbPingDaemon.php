@@ -97,8 +97,7 @@ final class EsbPingDaemon extends AbstractDaemon
 
             $this->boundedTransport->publishBounded($boundedEvent);
             $this->outboundTransport->publishOutbound($outboundEvent);
-
-            $this->logger->info('Heartbeat sent');
+//            $this->logger->info('Heartbeat sent');
         });
 
         // Check missing heartbeat events
@@ -150,9 +149,9 @@ final class EsbPingDaemon extends AbstractDaemon
             $ts = $event->getTimestamp();
             $ms = (microtime(true) - $ts) * 1000;
 
-            $this->logger->info('Bounded heartbeat received in :ms ms', [
-                ':ms' => (int)$ms,
-            ]);
+//            $this->logger->info('Bounded heartbeat received in :ms ms', [
+//                ':ms' => (int)$ms,
+//            ]);
 
             // Remove event from "pending" list
             unset($this->boundedEvents[$ts]);
@@ -168,12 +167,12 @@ final class EsbPingDaemon extends AbstractDaemon
     private function proceedOutboundEvent(HeartbeatOutboundEvent $event): PromiseInterface
     {
         try {
-            $ts    = $event->getTimestamp();
+            $ts = $event->getTimestamp();
             $ms = (microtime(true) - $ts) * 1000;
 
-            $this->logger->info('Outbound heartbeat received in :ms ms', [
-                ':ms' => (int)$ms,
-            ]);
+//            $this->logger->info('Outbound heartbeat received in :ms ms', [
+//                ':ms' => (int)$ms,
+//            ]);
 
             // Remove event from "pending" list
             unset($this->outboundEvents[$ts]);
