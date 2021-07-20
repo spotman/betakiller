@@ -24,7 +24,7 @@ final class UpdateApiMethod extends AbstractEntityUpdateApiMethod
         $builder
             ->compositeStart(self::ARG_DATA)
             ->string(self::ARG_AUTHOR_NAME)->optional()
-            ->string(self::ARG_MESSAGE)->optional();
+            ->text(self::ARG_MESSAGE)->optional();
     }
 
     /**

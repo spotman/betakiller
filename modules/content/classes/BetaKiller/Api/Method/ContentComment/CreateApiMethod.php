@@ -23,7 +23,7 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
         $builder
             ->compositeStart(self::ARG_DATA)
             ->string(self::ARG_AUTHOR_NAME)
-            ->string(self::ARG_MESSAGE);
+            ->text(self::ARG_MESSAGE);
     }
 
     /**
