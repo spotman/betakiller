@@ -87,9 +87,13 @@ class Api extends AbstractTask
         \Database_Query::resetQueryCount();
         \Database_Query::enableQueryLog();
 
-        $response = $this->api
-            ->getResource($resourceName)
-            ->call($methodName, $arguments, $this->user);
+        try {
+            $response = $this->api->getResource($resourceName)->call($methodName, $arguments, $this->user);
+        } catch (\Throwable $e) {
+            $this->printQueries();
+
+            throw $e;
+        }
 
         $end = \microtime(true);
 
@@ -105,11 +109,16 @@ class Api extends AbstractTask
             ':time' => \round(($end - $start) * 1000),
         ]);
 
+        $this->printQueries();
+
+        echo json_encode($response->getData(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT).PHP_EOL;
+    }
+
+    private function printQueries(): void
+    {
         if (\function_exists('d')) {
             d(\Database_Query::getQueries());
         }
-
-        echo json_encode($response->getData(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT).PHP_EOL;
     }
 
     private function getCallArguments(): array
