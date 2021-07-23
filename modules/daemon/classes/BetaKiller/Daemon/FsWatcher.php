@@ -5,6 +5,7 @@ namespace BetaKiller\Daemon;
 
 use BetaKiller\Exception;
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\TextHelper;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -175,6 +176,10 @@ final class FsWatcher
                     $onChange($path);
                 });
             });
+
+        $this->fsWatcher->on('error', function(\Throwable $e) {
+            LoggerHelper::logRawException($this->logger, $e);
+        });
 
         $this->fsWatcher->start($loop);
     }
