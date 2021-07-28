@@ -10,9 +10,11 @@ use BetaKiller\Helper\TextHelper;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
+use React\Promise\Promise;
 use ReactFilesystemMonitor\FilesystemMonitorFactory;
 use ReactFilesystemMonitor\FilesystemMonitorInterface;
 use Symfony\Component\Process\Process;
+use function Clue\React\Block\await;
 
 final class FsWatcher
 {
@@ -54,6 +56,8 @@ final class FsWatcher
      */
     private array $brokenPhpFiles = [];
 
+    private bool $isStarted = false;
+
     /**
      * FsWatcher constructor.
      *
@@ -79,11 +83,27 @@ final class FsWatcher
         $this->watchDir($appPath, $loop, $onChange);
     }
 
-    public function stop(): void
+    public function stop(LoopInterface $loop): void
     {
-        if ($this->fsWatcher) {
-            $this->fsWatcher->stop();
+        if (!$this->fsWatcher) {
+            return;
         }
+
+        $promise = new Promise(function ($resolve) use ($loop) {
+            $loop->addPeriodicTimer(0.2, function (TimerInterface $timer) use ($loop, $resolve) {
+                if ($this->isStarted) {
+                    return;
+                }
+
+                $loop->cancelTimer($timer);
+                $resolve();
+            });
+        });
+
+        $this->fsWatcher->stop();
+
+        // Block until done
+        await($promise, $loop, 3);
     }
 
     private function watchDir(string $path, LoopInterface $loop, callable $onChange): void
@@ -177,11 +197,19 @@ final class FsWatcher
                 });
             });
 
-        $this->fsWatcher->on('error', function(\Throwable $e) {
+        $this->fsWatcher->on('error', function (\Throwable $e) {
             LoggerHelper::logRawException($this->logger, $e);
+
+            $this->isStarted = false;
+        });
+
+        $this->fsWatcher->on('stop', function () {
+            $this->isStarted = false;
         });
 
         $this->fsWatcher->start($loop);
+
+        $this->isStarted = true;
     }
 
     private function hasFatalErrors(string $path): bool

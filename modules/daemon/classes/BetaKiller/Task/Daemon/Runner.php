@@ -374,7 +374,7 @@ final class Runner extends AbstractTask
         }
 
         // Stop FS watcher if enabled
-        $this->fsWatcher->stop();
+        $this->fsWatcher->stop($this->loop);
 
         $this->logger->debug('Daemon ":name" has exited with exit code :code', [
             ':name' => $this->codename,
