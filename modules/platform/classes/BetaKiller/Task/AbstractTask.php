@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Task;
 
+use Beberlei\Metrics\Collector\Collector;
 use BetaKiller\Helper\AppEnvInterface;
 use Minion_CLI;
 use Minion_Task;
@@ -8,6 +9,12 @@ use Minion_Task;
 abstract class AbstractTask extends Minion_Task
 {
     public const CLI_USER_NAME = 'minion';
+
+    /**
+     * @Inject
+     * @var \Beberlei\Metrics\Collector\Collector
+     */
+    private Collector $metrics;
 
     public function __construct()
     {
@@ -104,7 +111,16 @@ abstract class AbstractTask extends Minion_Task
     /** @noinspection PhpMethodNamingConventionInspection */
     protected function _execute(array $params): void
     {
+        $start = microtime(true);
+
         $this->run();
+
+        $duration = (microtime(true) - $start) * 1000;
+
+        $name = str_replace(self::$task_separator, '.', self::convert_class_to_task($this));
+
+        $this->metrics->measure(sprintf('task.%s', $name), $duration);
+        $this->metrics->flush();
     }
 
     /**
