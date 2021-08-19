@@ -45,7 +45,15 @@ abstract class Kohana_Minion_Task {
 			$class = get_class($class);
 		}
 
-		return strtolower(str_replace('_', Minion_Task::$task_separator, substr($class, 5)));
+		if (strpos($class, '\\') !== false) {
+            $codename = explode('\\', $class);
+            array_splice($codename, 0, -1 * \count($codename) + 2);
+            $codename = implode(Minion_Task::$task_separator, $codename);
+        } else {
+		    $codename = str_replace('_', Minion_Task::$task_separator, substr($class, 5));
+        }
+
+		return strtolower($codename);
 	}
 
 	/**
