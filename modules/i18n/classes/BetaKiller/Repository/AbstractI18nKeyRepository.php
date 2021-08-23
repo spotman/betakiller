@@ -160,6 +160,8 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
                 '#',
                 '&',
                 '/',
+                '(',
+                ')',
                 '\\',
             ],
             [
@@ -167,6 +169,8 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
                 '\\#',
                 '\\&',
                 '\\/',
+                '\\(',
+                '\\)',
                 '\\\\',
             ],
             $term
