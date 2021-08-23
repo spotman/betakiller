@@ -11,6 +11,7 @@ use BetaKiller\Notification\DismissDirectOnEventMessageInterface;
 use BetaKiller\Notification\MessageSerializer;
 use BetaKiller\Notification\NotificationException;
 use BetaKiller\Notification\NotificationFacade;
+use BetaKiller\Service\MaintenanceModeService;
 use Interop\Queue\Consumer;
 use Interop\Queue\Context;
 use Interop\Queue\Message;
@@ -49,12 +50,18 @@ final class NotificationWorkerDaemon extends AbstractDaemon
     private BoundedEventTransportInterface $eventTransport;
 
     /**
+     * @var \BetaKiller\Service\MaintenanceModeService
+     */
+    private MaintenanceModeService $maintenance;
+
+    /**
      * NotificationWorkerDaemon constructor.
      *
      * @param \Interop\Queue\Context                                $context
      * @param \BetaKiller\MessageBus\BoundedEventTransportInterface $eventTransport
      * @param \BetaKiller\Notification\MessageSerializer            $serializer
      * @param \BetaKiller\Notification\NotificationFacade           $notification
+     * @param \BetaKiller\Service\MaintenanceModeService            $maintenance
      * @param \Psr\Log\LoggerInterface                              $logger
      */
     public function __construct(
@@ -62,6 +69,7 @@ final class NotificationWorkerDaemon extends AbstractDaemon
         BoundedEventTransportInterface $eventTransport,
         MessageSerializer $serializer,
         NotificationFacade $notification,
+        MaintenanceModeService $maintenance,
         LoggerInterface $logger
     ) {
         $this->context        = $context;
@@ -69,6 +77,7 @@ final class NotificationWorkerDaemon extends AbstractDaemon
         $this->serializer     = $serializer;
         $this->notification   = $notification;
         $this->logger         = $logger;
+        $this->maintenance = $maintenance;
     }
 
     public function startDaemon(LoopInterface $loop): PromiseInterface
@@ -82,6 +91,11 @@ final class NotificationWorkerDaemon extends AbstractDaemon
         $loop->addPeriodicTimer(1, function () use ($regularConsumer, $priorityConsumer) {
             // Prevent subsequent calls upon processing
             if (!$this->isIdle()) {
+                return;
+            }
+
+            // Prevent sending notifications during maintenance
+            if ($this->maintenance->isEnabled()) {
                 return;
             }
 
