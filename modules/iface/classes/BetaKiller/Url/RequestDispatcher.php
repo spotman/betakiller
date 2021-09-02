@@ -48,10 +48,10 @@ class RequestDispatcher
      * @param \BetaKiller\Url\Zone\ZoneAccessSpecFactory        $specFactory
      */
     public function __construct(
-        UrlDispatcherInterface $urlDispatcher,
+        UrlDispatcherInterface            $urlDispatcher,
         UrlElementAccessResolverInterface $elementAccessResolver,
         EntityPermissionResolverInterface $entityPermissionResolver,
-        ZoneAccessSpecFactory $specFactory
+        ZoneAccessSpecFactory             $specFactory
     ) {
         $this->urlDispatcher            = $urlDispatcher;
         $this->elementAccessResolver    = $elementAccessResolver;
@@ -103,9 +103,9 @@ class RequestDispatcher
      * @throws \Spotman\Acl\AclException
      */
     private function checkUrlElementAccess(
-        UrlElementInterface $urlElement,
+        UrlElementInterface   $urlElement,
         UrlContainerInterface $urlParameters,
-        UserInterface $user
+        UserInterface         $user
     ): void {
         // Force authorization for non-public zones before security check
         $this->forceAuthorizationIfNeeded($urlElement, $user);
@@ -133,7 +133,7 @@ class RequestDispatcher
 
     private function checkUrlParameterAccess(
         UrlParameterInterface $param,
-        UserInterface $user
+        UserInterface         $user
     ): void {
         if (!$param instanceof DispatchableEntityInterface) {
             return;
@@ -143,9 +143,10 @@ class RequestDispatcher
 
         // Perform Entity check
         if (!$this->entityPermissionResolver->isAllowed($user, $param, $action)) {
-            throw new AccessDeniedException('Entity ":name" is not allowed to User ":who"', [
-                ':name' => $param::getModelName(),
-                ':who'  => $user->isGuest() ? 'Guest' : $user->getID(),
+            throw new AccessDeniedException('Entity ":name" is not allowed to User ":who" with action ":action"', [
+                ':name'   => $param::getModelName(),
+                ':action' => $action,
+                ':who'    => $user->isGuest() ? 'Guest' : $user->getID(),
             ]);
         }
     }
