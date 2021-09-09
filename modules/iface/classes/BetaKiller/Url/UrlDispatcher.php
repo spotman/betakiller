@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url;
 
+use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Factory\UrlElementInstanceFactory;
 use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourException;
@@ -77,6 +78,12 @@ class UrlDispatcher implements UrlDispatcherInterface
         $uri = htmlspecialchars($uri, ENT_QUOTES);
 
         $path = parse_url($uri, PHP_URL_PATH);
+
+        if (!$path) {
+            throw new BadRequestHttpException('Invalid URL path: :uri', [
+                ':uri' => $uri
+            ]);
+        }
 
         try {
             // Parse path first and detect target UrlElement
