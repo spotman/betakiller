@@ -25,9 +25,6 @@ set('app_path', 'app');
 // Option for GIT management
 option('repo', null, InputOption::VALUE_OPTIONAL, 'Tag to deploy.', 'app');
 
-// Option --branch
-\define('DEFAULT_BRANCH', 'master');
-
 // Option --to for migrations:down
 option('to', null, InputOption::VALUE_OPTIONAL, 'Target migration');
 
@@ -75,6 +72,22 @@ task('check', static function () {
         throw new RuntimeException('Please, set up site path via set("app_path")');
     }
 
+    $host = Context::get()->getHost();
+
+    $appBranch  = $host->has('app_branch') ? $host->get('app_branch') : null;
+    $coreBranch = $host->has('core_branch') ? $host->get('core_branch') : null;
+
+    if (!$appBranch) {
+        $appBranch = askForLocalBranch();
+    }
+
+    if (!$coreBranch) {
+        throw new RuntimeException('Core target branch must be set in hosts.yml');
+    }
+
+    set('app_branch', $appBranch);
+    set('core_branch', $coreBranch);
+
     // Check is assets:build task defined
     task('assets:build');
 });
@@ -83,15 +96,46 @@ task('check', static function () {
 task('deploy:repository:prepare:app', static function () {
     set('repository', get('app_repository'));
     set('repository_path', get('app_path'));
+    set('repository_branch', get('app_branch'));
 })->desc('Prepare app repository');
 
 // Prepare BetaKiller env
 task('deploy:repository:prepare:betakiller', static function () {
     set('repository', get('core_repository'));
     set('repository_path', get('core_path'));
+    set('repository_branch', get('core_branch'));
 })->desc('Prepare BetaKiller repository');
 
-function cd_repository_path_cmd()
+function askForLocalBranch(): string
+{
+    // Fetch branches from remote
+    runGitCommand('fetch --all', null, true);
+
+    // List all branches
+    $listResult = runGitCommand('branch -r', null, true);
+
+    $branches = explode(PHP_EOL, $listResult);
+
+    // Filter real branches only, reset indexes
+    $branches = array_values(array_filter($branches, static function (string $name) {
+        return $name && strpos($name, 'HEAD') === false;
+    }));
+
+    // Map names (cut "origin/")
+    $branches = array_map(static function (string $name) {
+        return mb_substr($name, mb_strpos($name, '/') + 1);
+    }, $branches);
+
+    $selected = ask('Select target branch', $branches[0], $branches);
+
+    if (!$selected) {
+        throw new Exception('Target branch is required');
+    }
+
+    return $selected;
+}
+
+function cd_repository_path_cmd(): string
 {
     return 'cd {{release_path}}/{{repository_path}}';
 }
@@ -101,6 +145,11 @@ task('deploy:repository:clone', static function () {
     cd('{{release_path}}');
     run('git clone {{repository}} {{repository_path}}');
 })->desc('Fetch repository'); //.env()->parse('{{repository_path}}')
+
+// Fetch repo branch task
+task('deploy:repository:checkout', static function () {
+    run(cd_repository_path_cmd().' && git checkout {{repository_branch}}');
+})->desc('Checkout repository branch');    // .env()->parse('{{repository_path}}')
 
 // Update repo task
 task('deploy:repository:update', static function () {
@@ -140,6 +189,7 @@ function process_vendors(string $repo)
 task('deploy:app', [
     'deploy:repository:prepare:app',
     'deploy:repository:clone',
+    'deploy:repository:checkout',
     'deploy:repository:update',
     'deploy:vendors:app',
 ])->desc('Deploy app repository');
@@ -148,6 +198,7 @@ task('deploy:app', [
 task('deploy:betakiller', [
     'deploy:repository:prepare:betakiller',
     'deploy:repository:clone',
+    'deploy:repository:checkout',
     'deploy:repository:update',
     'deploy:vendors:betakiller',
 ])->desc('Deploy BetaKiller repository');
@@ -216,7 +267,6 @@ task('httpd:restart', static function () {
  * GIT tasks
  */
 task('git:config:user', static function () {
-
     $name = ask('Enter git name:', stage());
     gitConfig('user.name', $name);
 
@@ -227,6 +277,12 @@ task('git:config:user', static function () {
 task('git:status', static function () {
     gitStatus();
 })->desc('git status');
+
+task('git:check-no-changes', static function () {
+    if (gitHasLocalChanges()) {
+        throw new \RuntimeException('Git repo is not clean; commit changes or stash them');
+    }
+})->desc('git status --porcelain');
 
 task('git:add', static function () {
     gitAdd();
@@ -321,7 +377,7 @@ task('migrations:create', static function () {
 
     $outArr = explode('Done! Check ', $output);
 
-    if (\count($outArr) === 2) {
+    if ($outArr && \count($outArr) === 2) {
         $filePath = trim($outArr[1]);
 
         if (file_exists($filePath)) {
@@ -484,6 +540,8 @@ task('migrate', [
 ])->setPrivate();
 
 task('deploy', [
+    'git:check-no-changes',
+
     // Check app configuration
     'check',
 
@@ -609,7 +667,7 @@ function runMinionTask(string $name, bool $asHttpUser = null, bool $tty = null)
  * @return string
  * @throws \Deployer\Exception\Exception
  */
-function runGitCommand(string $gitCmd, string $path = null, ?bool $silent = null)
+function runGitCommand(string $gitCmd, string $path = null, ?bool $silent = null): string
 {
     $path   = $path ?: getRepoPath();
     $silent = $silent ?? false;
@@ -632,6 +690,13 @@ function runGitCommand(string $gitCmd, string $path = null, ?bool $silent = null
 function gitStatus(?string $path = null)
 {
     return runGitCommand('status', $path);
+}
+
+function gitHasLocalChanges(): bool
+{
+    $result = runLocally('git status --porcelain --untracked-files=no');
+
+    return (bool)$result;
 }
 
 /**
@@ -679,7 +744,7 @@ function gitCommitAll(?string $path = null)
  */
 function gitCheckout(?string $path = null)
 {
-    $branch = input()->getOption('branch') ?: DEFAULT_BRANCH;
+    $branch = input()->getOption('branch') ?: 'master';
 
     return runGitCommand('checkout '.$branch, $path);
 }
