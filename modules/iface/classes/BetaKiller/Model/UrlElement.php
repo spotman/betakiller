@@ -327,4 +327,12 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements Entity
     {
         throw new NotImplementedHttpException();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function isAclBypassed(): bool
+    {
+        throw new NotImplementedHttpException();
+    }
 }

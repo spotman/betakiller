@@ -79,14 +79,28 @@ class RequestDispatcher
 
         $this->urlDispatcher->process($url, $stack, $params, $user, $i18n);
 
+        $skippedEntities = [];
+
         // Check current user access for all URL elements
         foreach ($stack as $urlElement) {
+            if ($urlElement->isAclBypassed()) {
+
+                if ($urlElement instanceof EntityLinkedUrlElementInterface) {
+                    $skippedEntities[] = $urlElement->getEntityModelName();
+                }
+                continue;
+            }
+
             // Check current user access (may depend on Entities injected in afterDispatching() hook)
             $this->checkUrlElementAccess($urlElement, $params, $user);
         }
 
         // Check access to UrlParameters
         foreach ($params->getAllParameters() as $urlParameter) {
+            if (in_array($urlParameter::getUrlContainerKey(), $skippedEntities, true)) {
+                continue;
+            }
+
             $this->checkUrlParameterAccess($urlParameter, $user);
         }
     }

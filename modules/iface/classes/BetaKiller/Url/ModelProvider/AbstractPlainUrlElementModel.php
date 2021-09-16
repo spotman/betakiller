@@ -18,6 +18,7 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     public const OPTION_IS_DEFAULT         = 'isDefault';
     public const OPTION_ZONE               = 'zone';
     public const OPTION_ACL_RULES          = 'aclRules';
+    public const OPTION_BYPASS_ACL          = 'bypassAcl';
     public const OPTION_ENV                = 'env';
 
     public const OPTION_EXTENDS = 'extends';
@@ -68,6 +69,11 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     private array $aclRules = [];
 
     /**
+     * @var bool
+     */
+    private bool $bypassAcl = false;
+
+    /**
      * @var string[]
      */
     private array $environments = [];
@@ -92,7 +98,6 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
      */
     public static function factory(array $data): UrlElementInterface
     {
-        /** @var static $instance */
         $instance = new static;
         $instance->fromArray($data);
 
@@ -202,6 +207,14 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     /**
      * @inheritDoc
      */
+    public function isAclBypassed(): bool
+    {
+        return $this->bypassAcl;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function hasEnvironmentRestrictions(): bool
     {
         return count($this->environments) > 0;
@@ -239,6 +252,7 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
             self::OPTION_PARENT             => $this->getParentCodename(),
             self::OPTION_HIDE_IN_SITEMAP    => $this->isHiddenInSiteMap(),
             self::OPTION_ACL_RULES          => $this->exportAclRules(),
+            self::OPTION_BYPASS_ACL         => $this->isAclBypassed(),
             self::OPTION_IS_DEFAULT         => $this->isDefault(),
             self::OPTION_ZONE               => $this->getZoneName(),
             self::OPTION_ENV                => $this->exportEnvironments(),
@@ -279,6 +293,8 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
         if (isset($data[self::OPTION_ACL_RULES])) {
             $this->importAclRules((string)$data[self::OPTION_ACL_RULES]);
         }
+
+        $this->bypassAcl = $this->validateBooleanOption($data, self::OPTION_BYPASS_ACL, false);
 
         if (isset($data[self::OPTION_ENV])) {
             $this->importEnvironments((string)$data[self::OPTION_ENV]);

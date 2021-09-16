@@ -116,6 +116,14 @@ abstract class AbstractOrmModelContainsUrlElement extends \ORM implements Entity
     }
 
     /**
+     * @inheritDoc
+     */
+    public function isAclBypassed(): bool
+    {
+        return $this->getUrlElement()->isAclBypassed();
+    }
+
+    /**
      * Returns zone codename where this URL element is placed
      *
      * @return string
@@ -135,6 +143,7 @@ abstract class AbstractOrmModelContainsUrlElement extends \ORM implements Entity
         return $this->getUrlElement()->getEntityModelName();
     }
 
+
     /**
      * Returns entity [primary] action, applied by this URL element
      *
@@ -144,7 +153,6 @@ abstract class AbstractOrmModelContainsUrlElement extends \ORM implements Entity
     {
         return $this->getUrlElement()->getEntityActionName();
     }
-
 
     /**
      * @inheritDoc

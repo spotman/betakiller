@@ -84,6 +84,11 @@ interface UrlElementInterface extends \JsonSerializable
     /**
      * @return bool
      */
+    public function isAclBypassed(): bool;
+
+    /**
+     * @return bool
+     */
     public function hasEnvironmentRestrictions(): bool;
 
     /**

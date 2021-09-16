@@ -8,7 +8,7 @@ class IdUrlParameter extends AbstractRawUrlParameter
     /**
      * @var string
      */
-    private $id;
+    private string $id;
 
     /**
      * Process uri and set internal state
