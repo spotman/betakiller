@@ -129,8 +129,9 @@ class ResponseHelper
 
         $response = self::setExpires($response, $expiresAt);
         $response = self::setPragmaNoCache($response);
+        $response = self::setAge($response, 0);
 
-        return self::setCacheControl($response, 'no-cache, no-store, must-revalidate');
+        return self::setCacheControl($response, 'no-cache, no-store, must-revalidate, max-age=0');
     }
 
     public static function enableCaching(
@@ -142,9 +143,11 @@ class ResponseHelper
         $expiresAt = $reference->add($ttl);
 
         $expiresInSeconds = $expiresAt->getTimestamp() - $reference->getTimestamp();
+        $ageSeconds = $reference->getTimestamp() - $lastModified->getTimestamp();
 
         $response = self::setExpires($response, $expiresAt);
         $response = self::setLastModified($response, $lastModified);
+        $response = self::setAge($response, $ageSeconds);
 
         return self::setCacheControl($response, 'private, must-revalidate, max-age='.$expiresInSeconds);
     }
@@ -169,6 +172,11 @@ class ResponseHelper
     public static function setPragmaNoCache(ResponseInterface $response): ResponseInterface
     {
         return $response->withHeader('Pragma', 'no-cache');
+    }
+
+    public static function setAge(ResponseInterface $response, int $seconds): ResponseInterface
+    {
+        return $response->withHeader('Age', (string)$seconds);
     }
 
     public static function successJson($message = null): ResponseInterface
