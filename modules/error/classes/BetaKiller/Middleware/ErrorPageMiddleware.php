@@ -5,6 +5,7 @@ namespace BetaKiller\Middleware;
 
 use BetaKiller\Error\ErrorPageRendererInterface;
 use BetaKiller\Helper\LoggerHelper;
+use BetaKiller\Helper\ResponseHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -52,7 +53,9 @@ class ErrorPageMiddleware implements MiddlewareInterface
             // Logging exception
             LoggerHelper::logRequestException($this->logger, $e, $request);
 
-            return $this->renderer->render($request, $e);
+            $response = $this->renderer->render($request, $e);
+
+            return ResponseHelper::disableCaching($response);
         }
     }
 }
