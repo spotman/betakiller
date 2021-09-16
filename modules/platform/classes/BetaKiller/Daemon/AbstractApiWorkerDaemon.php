@@ -227,6 +227,7 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
 
             // Send metrics
             $this->metrics->increment('api.call');
+            $this->metrics->increment(sprintf('api.call.user.%s', $user->getID()));
             $this->metrics->timing('api.prepare.user', $userTime);
             $this->metrics->timing('api.prepare.maintenance', $maintenanceTime);
             $this->metrics->timing(sprintf('api.call.%s.%s', $resource, $method), $wallTime);
