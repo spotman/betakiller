@@ -98,6 +98,7 @@ final class NotificationWorkerDaemon extends AbstractDaemon
             if ($this->isFailed) {
                 $loop->cancelTimer($timer);
                 $this->stopDaemon($loop);
+
                 return;
             }
 
