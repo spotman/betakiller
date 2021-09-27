@@ -87,6 +87,7 @@ return [
                 WorkflowConfig::TRANSITIONS => [
                     // Set "resumed" state to prevent workflow hacks (created => suspended => confirmed)
                     UserWorkflow::TRANSITION_RESUME_SUSPENDED => UserState::RESUMED,
+                    UserWorkflow::TRANSITION_BLOCK            => UserState::BLOCKED,
                 ],
             ],
 
