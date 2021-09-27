@@ -235,7 +235,7 @@ abstract class AbstractEsbTransport implements EventTransportInterface
         $channel = $this->makeChannelName($eventName);
 
         if (isset($this->singleHandlers[$channel])) {
-            throw new \LogicException(sprintf('Already subscribed to "%s"', $channel));
+            throw new \LogicException(sprintf('Already subscribed to single event "%s"', $channel));
         }
 
         $this->singleHandlers[$channel] = $handler;
@@ -246,7 +246,7 @@ abstract class AbstractEsbTransport implements EventTransportInterface
         $channel = $this->makeChannelName($eventPattern);
 
         if (isset($this->patternHandlers[$channel])) {
-            throw new \LogicException(sprintf('Already subscribed to "%s"', $channel));
+            throw new \LogicException(sprintf('Already subscribed to event pattern "%s"', $channel));
         }
 
         $this->patternHandlers[$channel] = $handler;
