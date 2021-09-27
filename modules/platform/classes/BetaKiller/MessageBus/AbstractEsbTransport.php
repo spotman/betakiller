@@ -10,6 +10,7 @@ use Clue\React\Redis\Factory;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Promise\PromiseInterface;
+use function React\Promise\all;
 use function React\Promise\reject;
 
 abstract class AbstractEsbTransport implements EventTransportInterface
@@ -45,7 +46,7 @@ abstract class AbstractEsbTransport implements EventTransportInterface
     private bool $isConsuming = false;
 
     /**
-     * @var callable[]
+     * @var callable[][]
      */
     private array $singleHandlers = [];
 
@@ -80,7 +81,7 @@ abstract class AbstractEsbTransport implements EventTransportInterface
         $client = $this->getSubClient($loop);
 
         // Start consuming
-        foreach ($this->singleHandlers as $channel => $handler) {
+        foreach ($this->singleHandlers as $channel => $handlers) {
             $client->subscribe($channel);
         }
 
@@ -98,7 +99,7 @@ abstract class AbstractEsbTransport implements EventTransportInterface
     {
         if ($this->subClient) {
             // Unsubscribe from everything
-            foreach ($this->singleHandlers as $channel => $handler) {
+            foreach ($this->singleHandlers as $channel => $handlers) {
                 $this->subClient->unsubscribe($channel);
             }
 
@@ -115,15 +116,21 @@ abstract class AbstractEsbTransport implements EventTransportInterface
 
     protected function processSingleMessage(string $channel, string $payload): PromiseInterface
     {
-        $handler = $this->singleHandlers[$channel] ?? null;
+        $handlers = $this->singleHandlers[$channel] ?? [];
 
-        if (!$handler) {
-            throw new \LogicException(sprintf('Missing handler for channel "%s"', $channel));
+        if (!$handlers) {
+            throw new \LogicException(sprintf('Missing handlers for channel "%s"', $channel));
         }
 
         $event = $this->serializer->decode($payload);
 
-        return $this->processEvent($event, $handler);
+        $results = [];
+
+        foreach ($handlers as $handler) {
+            $results[] = $this->processEvent($event, $handler);
+        }
+
+        return all($results);
     }
 
     protected function processPatternMessage(string $pattern, string $payload): PromiseInterface
@@ -234,11 +241,9 @@ abstract class AbstractEsbTransport implements EventTransportInterface
     {
         $channel = $this->makeChannelName($eventName);
 
-        if (isset($this->singleHandlers[$channel])) {
-            throw new \LogicException(sprintf('Already subscribed to single event "%s"', $channel));
-        }
+        $this->singleHandlers[$channel] = $this->singleHandlers[$channel] ?? [];
 
-        $this->singleHandlers[$channel] = $handler;
+        $this->singleHandlers[$channel][] = $handler;
     }
 
     protected function subscribePattern(string $eventPattern, callable $handler): void
