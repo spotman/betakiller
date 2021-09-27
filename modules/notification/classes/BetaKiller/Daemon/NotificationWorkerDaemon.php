@@ -17,6 +17,7 @@ use Interop\Queue\Context;
 use Interop\Queue\Message;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use React\EventLoop\TimerInterface;
 use React\Promise\PromiseInterface;
 use function React\Promise\resolve;
 
@@ -55,6 +56,11 @@ final class NotificationWorkerDaemon extends AbstractDaemon
     private MaintenanceModeService $maintenance;
 
     /**
+     * @var bool
+     */
+    private bool $isFailed = false;
+
+    /**
      * NotificationWorkerDaemon constructor.
      *
      * @param \Interop\Queue\Context                                $context
@@ -88,7 +94,13 @@ final class NotificationWorkerDaemon extends AbstractDaemon
         $regularConsumer  = $this->context->createConsumer($regularQueue);
         $priorityConsumer = $this->context->createConsumer($priorityQueue);
 
-        $loop->addPeriodicTimer(1, function () use ($regularConsumer, $priorityConsumer) {
+        $loop->addPeriodicTimer(1, function (TimerInterface $timer) use ($loop, $regularConsumer, $priorityConsumer) {
+            if ($this->isFailed) {
+                $loop->cancelTimer($timer);
+                $this->stopDaemon($loop);
+                return;
+            }
+
             // Prevent subsequent calls upon processing
             if (!$this->isIdle()) {
                 return;
@@ -146,6 +158,8 @@ final class NotificationWorkerDaemon extends AbstractDaemon
             return $this->notification->send($message);
         } catch (\Throwable $e) {
             LoggerHelper::logRawException($this->logger, $e);
+
+            $this->isFailed = true;
 
             // Temp fix for failing tasks
             return false;
