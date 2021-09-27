@@ -65,19 +65,19 @@ final class NotificationWorkerDaemon extends AbstractDaemon
      * @param \Psr\Log\LoggerInterface                              $logger
      */
     public function __construct(
-        Context $context,
+        Context                        $context,
         BoundedEventTransportInterface $eventTransport,
-        MessageSerializer $serializer,
-        NotificationFacade $notification,
-        MaintenanceModeService $maintenance,
-        LoggerInterface $logger
+        MessageSerializer              $serializer,
+        NotificationFacade             $notification,
+        MaintenanceModeService         $maintenance,
+        LoggerInterface                $logger
     ) {
         $this->context        = $context;
         $this->eventTransport = $eventTransport;
         $this->serializer     = $serializer;
         $this->notification   = $notification;
         $this->logger         = $logger;
-        $this->maintenance = $maintenance;
+        $this->maintenance    = $maintenance;
     }
 
     public function startDaemon(LoopInterface $loop): PromiseInterface
@@ -249,7 +249,9 @@ final class NotificationWorkerDaemon extends AbstractDaemon
             ':message' => $messageCodename,
         ]);
 
-        $this->notification->dismissDirect($messageCodename, $event->getDismissibleTarget());
+        foreach ($event->getDismissibleTargets() as $target) {
+            $this->notification->dismissDirect($messageCodename, $target);
+        }
 
         $this->markAsIdle();
     }

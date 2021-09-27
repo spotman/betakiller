@@ -13,5 +13,8 @@ use BetaKiller\MessageBus\BoundedEventMessageInterface;
  */
 interface DismissDirectOnEventMessageInterface extends BoundedEventMessageInterface
 {
-    public function getDismissibleTarget(): MessageTargetInterface;
+    /**
+     * @return MessageTargetInterface[]
+     */
+    public function getDismissibleTargets(): array;
 }
