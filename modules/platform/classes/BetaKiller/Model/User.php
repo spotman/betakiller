@@ -304,6 +304,20 @@ class User extends \ORM implements UserInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function isDeveloper(): bool
+    {
+        foreach ($this->getRoles() as $role) {
+            if ($role->getName() === RoleInterface::DEVELOPER) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return \BetaKiller\Model\UserInterface

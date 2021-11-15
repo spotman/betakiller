@@ -101,6 +101,13 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     public function isGuest(): bool;
 
     /**
+     * Returns true if current user is developer
+     *
+     * @return bool
+     */
+    public function isDeveloper(): bool;
+
+    /**
      * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return \BetaKiller\Model\UserInterface
