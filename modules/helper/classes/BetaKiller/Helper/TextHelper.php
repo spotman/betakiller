@@ -92,9 +92,26 @@ class TextHelper
         return substr($haystack, -strlen($needle)) === $needle;
     }
 
-    public static function contains(string $haystack, string $needle): bool
+    public static function contains(string $haystack, string $needle, bool $caseInsensitive = null): bool
     {
+        if ($caseInsensitive) {
+            $haystack = mb_strtolower($haystack);
+            $needle   = mb_strtolower($needle);
+        }
+
         return \strpos($haystack, $needle) !== false;
+    }
+
+    public static function similar(string $left, string $right, bool $caseInsensitive = null): bool
+    {
+        if ($caseInsensitive) {
+            $left  = mb_strtolower($left);
+            $right = mb_strtolower($right);
+        }
+
+        \similar_text($left, $right, $similarity);
+
+        return $similarity >= 85;
     }
 
     /**
