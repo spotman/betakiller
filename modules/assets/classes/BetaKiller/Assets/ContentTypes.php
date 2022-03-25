@@ -33,6 +33,7 @@ class ContentTypes
         // Add a conversion. This conversion will take precedence over existing ones.
         $builder->add('image/jpeg', 'jpg');
         $builder->add('text/rtf', 'rtf');
+        $builder->add('text/plain', 'map');
 
         return new MimeTypes($builder->getMapping());
     }
@@ -60,7 +61,15 @@ class ContentTypes
      */
     public function getExtensionMimeType(string $ext): string
     {
-        return $this->mimeTypes->getMimeType($ext);
+        $mimeType = $this->mimeTypes->getMimeType($ext);
+
+        if (!$mimeType) {
+            throw new AssetsException('MIME can not be detected for ":ext" extension', [
+                ':ext' => $ext
+            ]);
+        }
+
+        return $mimeType;
     }
 
     /**
