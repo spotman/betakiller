@@ -19,6 +19,11 @@ class HitRepository extends AbstractOrmBasedRepository implements HitRepositoryI
 {
     use CreatedAtByRepositoryTrait;
 
+    protected function getTableName(): string
+    {
+        return Hit::TABLE_NAME;
+    }
+
     /**
      * @param \Ramsey\Uuid\UuidInterface $uuid
      *

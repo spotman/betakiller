@@ -83,6 +83,14 @@ class UserService
         return $this->workflow->create($email, $primaryRoleName, $createdFromIp, $username);
     }
 
+    public function getCliUser(): UserInterface
+    {
+        $userName = AbstractTask::CLI_USER_NAME;
+        $user     = $this->userRepository->searchBy($userName);
+
+        return $user ?? $this->createCliUser();
+    }
+
     /**
      * @return \BetaKiller\Model\UserInterface
      * @throws \BetaKiller\Repository\RepositoryException
@@ -90,16 +98,13 @@ class UserService
     public function createCliUser(): UserInterface
     {
         $userName = AbstractTask::CLI_USER_NAME;
-        $user     = $this->userRepository->searchBy($userName);
 
-        if (!$user) {
-            $host  = $this->appConfig->getBaseUri()->getHost();
-            $email = $userName.'@'.$host;
+        $host  = $this->appConfig->getBaseUri()->getHost();
+        $email = $userName.'@'.$host;
 
-            $user = $this->createUser(RoleInterface::CLI, $email, self::DEFAULT_IP, $userName)
-                ->setFirstName('Minion')
-                ->setLastName('Server');
-        }
+        $user = $this->createUser(RoleInterface::CLI, $email, self::DEFAULT_IP, $userName)
+            ->setFirstName('Minion')
+            ->setLastName('Server');
 
         // No notification for cron user
         $user->disableEmailNotification();
