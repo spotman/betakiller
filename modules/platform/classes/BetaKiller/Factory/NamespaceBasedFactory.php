@@ -2,6 +2,8 @@
 namespace BetaKiller\Factory;
 
 use BetaKiller\DI\ContainerInterface;
+use BetaKiller\Helper\LoggerHelper;
+use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 
@@ -10,7 +12,7 @@ final class NamespaceBasedFactory implements NamespaceBasedFactoryInterface
     public const CACHE_TTL = 86400; // 1 day
 
     /**
-     * @var mixed[]
+     * @var array
      */
     private static array $instances = [];
 
@@ -20,7 +22,7 @@ final class NamespaceBasedFactory implements NamespaceBasedFactoryInterface
     private ContainerInterface $container;
 
     /**
-     * @var array
+     * @var string[]
      */
     private array $rootNamespaces = [];
 
@@ -70,14 +72,21 @@ final class NamespaceBasedFactory implements NamespaceBasedFactoryInterface
     private bool $rawInstance = false;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
      *
      * @param \BetaKiller\DI\ContainerInterface $container
      * @param \Psr\SimpleCache\CacheInterface   $cache
+     * @param \Psr\Log\LoggerInterface          $logger
      */
-    public function __construct(ContainerInterface $container, CacheInterface $cache)
+    public function __construct(ContainerInterface $container, CacheInterface $cache, LoggerInterface $logger)
     {
         $this->container       = $container;
         $this->classNamesCache = $cache;
+        $this->logger          = $logger;
     }
 
     public function setExpectedInterface($interfaceName): NamespaceBasedFactoryInterface
@@ -195,7 +204,7 @@ final class NamespaceBasedFactory implements NamespaceBasedFactoryInterface
                 if ($prepArgs === false) {
                     throw new FactoryException('Can not prepare arguments for ":class" with :data', [
                         ':class' => $className,
-                        ':data' => \json_encode($arguments, JSON_THROW_ON_ERROR),
+                        ':data'  => \json_encode($arguments, JSON_THROW_ON_ERROR),
                     ]);
                 }
 
@@ -299,6 +308,10 @@ final class NamespaceBasedFactory implements NamespaceBasedFactoryInterface
             return $this->classNamesCache->get($key);
         } catch (InvalidArgumentException $e) {
             throw FactoryException::wrap($e);
+        } catch (\Throwable $e) {
+            LoggerHelper::logRawException($this->logger, $e);
+
+            return null;
         }
     }
 
@@ -306,16 +319,19 @@ final class NamespaceBasedFactory implements NamespaceBasedFactoryInterface
      * @param string $codename
      * @param string $className
      *
-     * @return bool
+     * @return void
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    private function storeClassNameInCache(string $codename, string $className): bool
+    private function storeClassNameInCache(string $codename, string $className): void
     {
         try {
             $key = $this->getClassNameCacheKey($codename);
 
-            return $this->classNamesCache->set($key, $className, self::CACHE_TTL);
+            $this->classNamesCache->set($key, $className, self::CACHE_TTL);
         } catch (InvalidArgumentException $e) {
             throw FactoryException::wrap($e);
+        } catch (\Throwable $e) {
+            LoggerHelper::logRawException($this->logger, $e);
         }
     }
 
@@ -365,8 +381,6 @@ final class NamespaceBasedFactory implements NamespaceBasedFactoryInterface
     /**
      * @param string $codename
      * @param mixed  $instance
-     *
-     * @throws \BetaKiller\Factory\FactoryException
      */
     private function storeInstanceInCache(string $codename, $instance): void
     {
@@ -375,7 +389,10 @@ final class NamespaceBasedFactory implements NamespaceBasedFactoryInterface
         }
 
         if ($this->hasInstanceInCache($codename)) {
-            throw new FactoryException('Instance :codename is already cached', [':codename' => $codename]);
+            LoggerHelper::logRawException(
+                $this->logger,
+                new FactoryException('Instance :codename is already cached', [':codename' => $codename])
+            );
         }
 
         $key = $this->getInstanceCacheKey($codename);
