@@ -18,7 +18,7 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     public const OPTION_IS_DEFAULT         = 'isDefault';
     public const OPTION_ZONE               = 'zone';
     public const OPTION_ACL_RULES          = 'aclRules';
-    public const OPTION_BYPASS_ACL          = 'bypassAcl';
+    public const OPTION_BYPASS_ACL         = 'bypassAcl';
     public const OPTION_ENV                = 'env';
 
     public const OPTION_EXTENDS = 'extends';
