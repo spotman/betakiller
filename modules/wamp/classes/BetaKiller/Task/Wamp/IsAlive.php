@@ -189,7 +189,7 @@ class IsAlive extends AbstractTask
                     $this->logger->warning('API call result is empty');
                     $this->isAlive = false;
                 } elseif (isset($args['error'])) {
-                    $this->logger->warning('API call result is :error', [
+                    $this->logger->warning('API call result is ":error"', [
                         ':error' => $args['error'],
                     ]);
                     $this->isAlive = false;
