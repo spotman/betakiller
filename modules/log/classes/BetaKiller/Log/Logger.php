@@ -173,4 +173,9 @@ class Logger implements LoggerInterface
     {
         $this->monolog->close();
     }
+
+    public function getMonologInstance(): \Monolog\Logger
+    {
+        return $this->monolog;
+    }
 }

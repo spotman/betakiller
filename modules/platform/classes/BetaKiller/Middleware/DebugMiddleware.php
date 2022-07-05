@@ -16,6 +16,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Log\SkipExpectedExceptionsHandler;
 use BetaKiller\Log\LoggerInterface;
+use DebugBar\Bridge\MonologCollector;
 use DebugBar\DataCollector\MemoryCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DebugBar;
@@ -73,12 +74,12 @@ final class DebugMiddleware implements MiddlewareInterface
      * @param \BetaKiller\Log\LoggerInterface            $logger
      */
     public function __construct(
-        AppEnvInterface $appEnv,
-        CookieHelper $cookieHelper,
+        AppEnvInterface          $appEnv,
+        CookieHelper             $cookieHelper,
 //        Environment $twigEnv,
         ResponseFactoryInterface $responseFactory,
-        StreamFactoryInterface $streamFactory,
-        LoggerInterface $logger
+        StreamFactoryInterface   $streamFactory,
+        LoggerInterface          $logger
     ) {
         $this->responseFactory = $responseFactory;
         $this->cookieHelper    = $cookieHelper;
@@ -137,7 +138,8 @@ final class DebugMiddleware implements MiddlewareInterface
             ->addCollector(new TimeDataCollector($startTime))
             ->addCollector(new DebugBarCookiesDataCollector($this->cookieHelper, $request))
             ->addCollector(new DebugBarSessionDataCollector($session))
-            ->addCollector(new MemoryCollector());
+            ->addCollector(new MemoryCollector())
+            ->addCollector(new MonologCollector($this->logger->getMonologInstance()));
 
 // Temp disable coz of error
 //        if (ServerRequestHelper::isHtmlPreferred($request)) {

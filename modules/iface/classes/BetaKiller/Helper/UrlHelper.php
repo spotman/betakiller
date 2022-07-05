@@ -97,6 +97,15 @@ class UrlHelper implements UrlHelperInterface
         return $this->tree->getDefault();
     }
 
+    /**
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
+     */
+    public function getUrlContainer(): UrlContainerInterface
+    {
+        // Return a copy (immutable container)
+        return $this->createUrlContainer(true);
+    }
+
     public function createUrlContainer(bool $importCurrent = null): UrlContainerInterface
     {
         $container = ResolvingUrlContainer::create();

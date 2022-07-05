@@ -40,6 +40,11 @@ interface UrlHelperInterface
     public function importUrlContainer(UrlContainerInterface $params): UrlHelperInterface;
 
     /**
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
+     */
+    public function getUrlContainer(): UrlContainerInterface;
+
+    /**
      * @param string                                               $codename
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
@@ -49,9 +54,9 @@ interface UrlHelperInterface
      * @throws \BetaKiller\Url\UrlElementException
      */
     public function makeCodenameUrl(
-        string $codename,
+        string                 $codename,
         ?UrlContainerInterface $params = null,
-        ?bool $removeCyclingLinks = null
+        ?bool                  $removeCyclingLinks = null
     ): string;
 
     /**
@@ -63,9 +68,9 @@ interface UrlHelperInterface
      * @throws \BetaKiller\Url\UrlElementException
      */
     public function makeUrl(
-        UrlElementInterface $urlElement,
+        UrlElementInterface    $urlElement,
         ?UrlContainerInterface $params = null,
-        ?bool $removeCyclingLinks = null
+        ?bool                  $removeCyclingLinks = null
     ): string;
 
     /**
@@ -80,17 +85,17 @@ interface UrlHelperInterface
      */
     public function getEntityUrl(
         DispatchableEntityInterface $entity,
-        string $action,
-        string $zone,
-        ?bool $removeCycling = null
+        string                      $action,
+        string                      $zone,
+        ?bool                       $removeCycling = null
     ): string;
 
     public function getEntityNameUrl(
-        string $entityName,
-        string $action,
-        string $zone,
+        string                 $entityName,
+        string                 $action,
+        string                 $zone,
         ?UrlContainerInterface $params = null,
-        ?bool $removeCycling = null
+        ?bool                  $removeCycling = null
     ): string;
 
     /**
@@ -113,8 +118,8 @@ interface UrlHelperInterface
      */
     public function getReadEntityUrl(
         DispatchableEntityInterface $entity,
-        string $zone,
-        ?bool $removeCycling = null
+        string                      $zone,
+        ?bool                       $removeCycling = null
     ): string;
 
     /**

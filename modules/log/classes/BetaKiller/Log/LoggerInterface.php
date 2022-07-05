@@ -11,4 +11,9 @@ interface LoggerInterface extends \Psr\Log\LoggerInterface
     public function pushHandler(HandlerInterface $handler): void;
 
     public function flushBuffers(): void;
+
+    /**
+     * @return \Monolog\Logger
+     */
+    public function getMonologInstance(): \Monolog\Logger;
 }

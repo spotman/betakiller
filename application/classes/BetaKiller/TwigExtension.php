@@ -9,10 +9,13 @@ use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\StringPatternHelper;
+use BetaKiller\Helper\UrlHelper;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Security\SecurityConfigInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;
 use BetaKiller\Widget\WidgetFacade;
@@ -75,30 +78,38 @@ final class TwigExtension extends AbstractExtension
     private array $entryPointsJson = [];
 
     /**
+     * @var \BetaKiller\Helper\StringPatternHelper
+     */
+    private StringPatternHelper $patternHelper;
+
+    /**
      * TwigExtension constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface           $appEnv
      * @param \BetaKiller\Config\AppConfigInterface        $appConfig
      * @param \BetaKiller\Security\SecurityConfigInterface $securityConfig
      * @param \BetaKiller\Widget\WidgetFacade              $widgetFacade
+     * @param \BetaKiller\Helper\StringPatternHelper       $patternHelper
      * @param \BetaKiller\I18n\I18nFacade                  $i18n
      * @param \Spotman\Acl\AclInterface                    $acl
      * @param \BetaKiller\IdentityConverterInterface       $identityConverter
      * @param \Psr\Log\LoggerInterface                     $logger
      */
     public function __construct(
-        AppEnvInterface $appEnv,
-        AppConfigInterface $appConfig,
-        SecurityConfigInterface $securityConfig,
-        WidgetFacade $widgetFacade,
-        I18nFacade $i18n,
-        AclInterface $acl,
+        AppEnvInterface            $appEnv,
+        AppConfigInterface         $appConfig,
+        SecurityConfigInterface    $securityConfig,
+        WidgetFacade               $widgetFacade,
+        StringPatternHelper        $patternHelper,
+        I18nFacade                 $i18n,
+        AclInterface               $acl,
         IdentityConverterInterface $identityConverter,
-        LoggerInterface $logger
+        LoggerInterface            $logger
     ) {
         $this->appEnv            = $appEnv;
         $this->appConfig         = $appConfig;
         $this->securityConfig    = $securityConfig;
+        $this->patternHelper     = $patternHelper;
         $this->widgetFacade      = $widgetFacade;
         $this->i18n              = $i18n;
         $this->logger            = $logger;
@@ -578,6 +589,8 @@ final class TwigExtension extends AbstractExtension
             new TwigFunction(
                 'meta_title',
                 function (array $context, string $value): void {
+                    $value = $this->processStringPattern($context, $value);
+
                     $this->getMeta($context)->setTitle($value, Meta::TITLE_APPEND);
                 },
                 ['needs_context' => true,]
@@ -586,7 +599,22 @@ final class TwigExtension extends AbstractExtension
             new TwigFunction(
                 'meta_description',
                 function (array $context, string $value): void {
+                    $value = $this->processStringPattern($context, $value);
+
                     $this->getMeta($context)->setDescription($value);
+                },
+                ['needs_context' => true,]
+            ),
+
+            new TwigFunction(
+                'meta_share_title',
+                function (array $context, string $title): void {
+                    $meta = $this->getMeta($context);
+
+                    if (!$meta->hasSocialTitle()) {
+                        $title = $this->processStringPattern($context, $title);
+                        $meta->setSocialTitle($title);
+                    }
                 },
                 ['needs_context' => true,]
             ),
@@ -594,30 +622,23 @@ final class TwigExtension extends AbstractExtension
             new TwigFunction(
                 'meta_share_description',
                 function (array $context, string $value): void {
-                    $this->getMeta($context)->setSocialDescription($value);
-                },
-                ['needs_context' => true,]
-            ),
-
-            new TwigFunction(
-                'meta_share_image',
-                function (array $context, string $url, bool $overwrite = null): void {
                     $meta = $this->getMeta($context);
 
-                    if ($overwrite || !$meta->hasSocialImage()) {
-                        $meta->setSocialImage($url);
+                    if (!$meta->hasSocialDescription()) {
+                        $value = $this->processStringPattern($context, $value);
+                        $meta->setSocialDescription($value);
                     }
                 },
                 ['needs_context' => true,]
             ),
 
             new TwigFunction(
-                'meta_share_title',
-                function (array $context, string $title, bool $overwrite = null): void {
+                'meta_share_image',
+                function (array $context, string $url): void {
                     $meta = $this->getMeta($context);
 
-                    if ($overwrite || !$meta->hasSocialTitle()) {
-                        $meta->setSocialTitle($title);
+                    if (!$meta->hasSocialImage()) {
+                        $meta->setSocialImage($url);
                     }
                 },
                 ['needs_context' => true,]
@@ -718,6 +739,28 @@ final class TwigExtension extends AbstractExtension
     private function getRequest(array $context): ServerRequestInterface
     {
         return $context[IFaceView::REQUEST_KEY];
+    }
+
+    private function getRequestUrlHelper(array $context): UrlHelper
+    {
+        $request = $this->getRequest($context);
+
+        return ServerRequestHelper::getUrlHelper($request);
+    }
+
+    private function getRequestUrlContainer(array $context): UrlContainerInterface
+    {
+        $helper = $this->getRequestUrlHelper($context);
+
+        return $helper->getUrlContainer();
+    }
+
+    private function processStringPattern(array $context, string $value): string
+    {
+        $params = $this->getRequestUrlContainer($context);
+        $lang   = $this->getRequestLang($context);
+
+        return $this->patternHelper->process($value, $params, $lang);
     }
 
     private function getI18nHelper(array $context): RequestLanguageHelperInterface
