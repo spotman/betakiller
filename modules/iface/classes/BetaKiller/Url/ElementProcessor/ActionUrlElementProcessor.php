@@ -52,36 +52,8 @@ class ActionUrlElementProcessor implements UrlElementProcessorInterface
         }
 
         try {
-            if ($action instanceof GetRequestActionInterface) {
-                // Fetch GET definition
-                $getDefinition = $this->definitionBuilderFactory();
-                $action->defineGetArguments($getDefinition);
-
-                // Prepare arguments` data
-                $getData      = $request->getQueryParams();
-                $getArguments = $this->argumentsFacade->prepareArguments($getData, $getDefinition);
-
-                // Fetch query keys to prevent "unused query keys" exception (all keys are already checked)
-                $params = ServerRequestHelper::getUrlContainer($request);
-
-                foreach ($getData as $key => $value) {
-                    $params->getQueryPart($key);
-                }
-
-                $request = ActionRequestHelper::withGetArguments($request, $getArguments);
-            }
-
-            if ($action instanceof PostRequestActionInterface) {
-                // Fetch POST definition
-                $postDefinition = $this->definitionBuilderFactory();
-                $action->definePostArguments($postDefinition);
-
-                // Prepare arguments` data
-                $postData      = ServerRequestHelper::getPost($request);
-                $postArguments = $this->argumentsFacade->prepareArguments($postData, $postDefinition);
-
-                $request = ActionRequestHelper::withPostArguments($request, $postArguments);
-            }
+            $request = $this->prepareGetArguments($action, $request);
+            $request = $this->preparePostArguments($action, $request);
         } catch (InvalidArgumentException $e) {
             throw new BadRequestHttpException('Arguments validation error for action ":action": :error', [
                 ':error'  => $e->getMessage(),
@@ -95,5 +67,50 @@ class ActionUrlElementProcessor implements UrlElementProcessorInterface
     private function definitionBuilderFactory(): DefinitionBuilderInterface
     {
         return new DefinitionBuilder;
+    }
+
+    private function prepareGetArguments(
+        UrlElementInstanceInterface $action,
+        ServerRequestInterface      $request
+    ): ServerRequestInterface {
+        if (!$action instanceof GetRequestActionInterface) {
+            return $request;
+        }
+
+        // Fetch GET definition
+        $getDefinition = $this->definitionBuilderFactory();
+        $action->defineGetArguments($getDefinition);
+
+        // Prepare arguments` data
+        $getData      = $request->getQueryParams();
+        $getArguments = $this->argumentsFacade->prepareArguments($getData, $getDefinition);
+
+        // Fetch query keys to prevent "unused query keys" exception (all keys are already checked)
+        $params = ServerRequestHelper::getUrlContainer($request);
+
+        foreach ($getData as $key => $value) {
+            $params->getQueryPart($key);
+        }
+
+        return ActionRequestHelper::withGetArguments($request, $getArguments);
+    }
+
+    private function preparePostArguments(
+        UrlElementInstanceInterface $action,
+        ServerRequestInterface      $request
+    ): ServerRequestInterface {
+        if (!$action instanceof PostRequestActionInterface) {
+            return $request;
+        }
+
+        // Fetch POST definition
+        $postDefinition = $this->definitionBuilderFactory();
+        $action->definePostArguments($postDefinition);
+
+        // Prepare arguments` data
+        $postData      = ServerRequestHelper::getPost($request);
+        $postArguments = $this->argumentsFacade->prepareArguments($postData, $postDefinition);
+
+        return ActionRequestHelper::withPostArguments($request, $postArguments);
     }
 }

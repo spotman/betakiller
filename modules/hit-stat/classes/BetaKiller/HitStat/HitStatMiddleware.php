@@ -60,11 +60,11 @@ class HitStatMiddleware implements MiddlewareInterface
      * @param \Psr\Log\LoggerInterface                      $logger
      */
     public function __construct(
-        AppEnvInterface $appEnv,
-        HitService $service,
-        UriFactoryInterface $uriFactory,
+        AppEnvInterface        $appEnv,
+        HitService             $service,
+        UriFactoryInterface    $uriFactory,
         HitRepositoryInterface $hitRepo,
-        LoggerInterface $logger
+        LoggerInterface        $logger
     ) {
         $this->appEnv     = $appEnv;
         $this->service    = $service;
@@ -171,8 +171,21 @@ class HitStatMiddleware implements MiddlewareInterface
         if ($targetPage->isMissing()) {
             $redirect = $targetPage->getRedirect();
 
-            if ($redirect) {
-                throw new SeeOtherHttpException($redirect->getUrl());
+            $redirectException = $redirect ? new SeeOtherHttpException($redirect->getUrl()) : null;
+
+            // Log redirect instead of processing and skip this stat hit
+            if ($redirectException && $this->appEnv->inDevelopmentMode()) {
+                LoggerHelper::logRequestException(
+                    $this->logger,
+                    $redirectException,
+                    $request
+                );
+
+                return null;
+            }
+
+            if ($redirectException) {
+                throw $redirectException;
             }
         }
 
