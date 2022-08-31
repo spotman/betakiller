@@ -3,7 +3,6 @@ namespace BetaKiller\Model;
 
 use Psr\Http\Message\UriInterface;
 use Ramsey\Uuid\UuidInterface;
-use Worknector\Model\CreatedByAtInterface;
 
 interface HitInterface extends AbstractEntityInterface, CreatedByAtInterface
 {

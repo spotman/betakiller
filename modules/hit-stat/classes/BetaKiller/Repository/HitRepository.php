@@ -5,7 +5,6 @@ use BetaKiller\Model\Hit;
 use BetaKiller\Model\HitInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use Ramsey\Uuid\UuidInterface;
-use Worknector\Repository\CreatedAtByRepositoryTrait;
 
 /**
  * Class HitRepository
@@ -17,7 +16,7 @@ use Worknector\Repository\CreatedAtByRepositoryTrait;
  */
 class HitRepository extends AbstractOrmBasedRepository implements HitRepositoryInterface
 {
-    use CreatedAtByRepositoryTrait;
+    use CreatedByAtRepositoryTrait;
 
     protected function getTableName(): string
     {

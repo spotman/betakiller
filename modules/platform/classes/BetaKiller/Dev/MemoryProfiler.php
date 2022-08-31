@@ -43,6 +43,7 @@ class MemoryProfiler
             return;
         }
 
+        /** @phpstan-ignore-next-line */
         if (!\memprof_enabled()) {
             $this->logger->error('Memory profiling is not enabled');
 
@@ -53,6 +54,7 @@ class MemoryProfiler
 
         $resource = fopen($path, 'wb+');
 
+        /** @phpstan-ignore-next-line */
         \memprof_dump_callgrind($resource);
 
         fclose($resource);

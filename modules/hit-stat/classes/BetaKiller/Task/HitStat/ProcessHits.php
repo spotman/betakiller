@@ -14,8 +14,6 @@ use BetaKiller\Repository\UserSessionRepository;
 use BetaKiller\Service\HitService;
 use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
-use Worknector\Exception\UserInheritanceException;
-use Worknector\Model\UserInterface;
 
 class ProcessHits extends AbstractTask
 {
@@ -172,13 +170,7 @@ class ProcessHits extends AbstractTask
                 $session = $this->sessionRepo->findByToken($hit->getSessionToken());
 
                 if ($session && $session->hasUser()) {
-                    $user = $session->getUser();
-
-                    if (!$user instanceof UserInterface) {
-                        throw new UserInheritanceException;
-                    }
-
-                    $hit->setCreatedBy($user);
+                    $hit->setCreatedBy($session->getUser());
                 }
             }
 

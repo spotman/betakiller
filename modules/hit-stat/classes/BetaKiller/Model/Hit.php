@@ -4,7 +4,6 @@ namespace BetaKiller\Model;
 use Psr\Http\Message\UriInterface;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use Worknector\Model\AbstractCreatedByAt;
 
 class Hit extends AbstractCreatedByAt implements HitInterface
 {

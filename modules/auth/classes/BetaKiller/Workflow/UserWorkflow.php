@@ -108,8 +108,9 @@ final class UserWorkflow
         /** @var UserInterface $user */
         $user = $this->entityFactory->create(User::getModelName());
 
+        $user->setCreatedAt();
+
         $user
-            ->setCreatedAt()
             ->setEmail($email)
             ->setCreatedFromIP($createdFromIp);
 
