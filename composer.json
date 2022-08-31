@@ -107,15 +107,15 @@
     "qa": [
       "@testEnv",
       "@phpstan",
-      "@testEnvCleanup"
+      "@envCleanup"
     ],
     "test": [
       "@testEnv",
       "@phpunit",
-      "@testEnvCleanup"
+      "@envCleanup"
     ],
-    "testEnv": "ln -sf ./../.env.testing ./application/.env",
-    "testEnvCleanup": "rm ./application/.env",
+    "testEnv": "ln -sf ./application/.env.testing ./application/.env",
+    "envCleanup": "rm ./application/.env",
     "phpunit": "APP_ENV=testing ./vendor/bin/phpunit --colors=always",
     "phpstan": "APP_ENV=testing ./vendor/bin/phpstan analyze"
   },
