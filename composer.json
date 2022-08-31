@@ -114,7 +114,7 @@
       "@phpunit",
       "@envCleanup"
     ],
-    "testEnv": "ln -sf ./application/.env.testing ./application/.env",
+    "testEnv": "cp -P ./.env.testing ./application/.env",
     "envCleanup": "rm ./application/.env",
     "phpunit": "APP_ENV=testing ./vendor/bin/phpunit --colors=always",
     "phpstan": "APP_ENV=testing ./vendor/bin/phpstan analyze"
