@@ -25,11 +25,6 @@ try {
         : AppEnv::MODE_DEVELOPMENT;
 
     bootstrapKohana($envMode);
-
-//    var_dump($_ENV);
-//    var_dump(Kohana::include_paths());
-//    var_dump(Kohana::$config->load('database'));
-//    die;
     bootstrapApp($appEnv);
 } catch (Throwable $e) {
     fallbackExceptionHandler($e);
