@@ -1,4 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php use BetaKiller\Task\TaskFactory;
+
+defined('SYSPATH') or die('No direct script access.');
 /**
  * Interface that all minion tasks must implement
  *
@@ -63,7 +65,7 @@ abstract class Kohana_Minion_Task {
 	 * @throws Minion_Exception_InvalidTask
 	 * @return Minion_Task The Minion task
 	 */
-	public static function factory($options)
+	public static function factory($options, TaskFactory $taskFactory)
 	{
 		if (($task = Arr::get($options, 'task')) !== NULL)
 		{
@@ -82,7 +84,7 @@ abstract class Kohana_Minion_Task {
 
 		$class = Minion_Task::convert_task_to_class_name($task);
 
-		$instance = static::makeTaskInstance($class);
+		$instance = static::makeTaskInstance($taskFactory, $class);
 
 		if ( ! $instance instanceof Minion_Task)
 		{
@@ -103,17 +105,14 @@ abstract class Kohana_Minion_Task {
 		return $instance;
 	}
 
-    protected static function makeTaskInstance($className)
+    protected static function makeTaskInstance(TaskFactory $factory, string $className)
     {
-        if ( ! class_exists($className))
+        if (class_exists($className))
         {
-            throw new Minion_Exception_InvalidTask(
-                "Task ':task' is not a valid minion task",
-                array(':task' => $className)
-            );
+            return new $className;
         }
 
-        return new $className;
+        return $factory->create($className);
 	}
 
 	/**
@@ -276,7 +275,7 @@ abstract class Kohana_Minion_Task {
 
 		$inspector = new ReflectionClass($this);
 
-		list($description, $tags) = $this->_parse_doccomment($inspector->getDocComment());
+		[$description, $tags] = $this->_parse_doccomment($inspector->getDocComment());
 
 		$view = View::factory('minion/help/task')
 			->set('description', $description)

@@ -3,7 +3,7 @@ namespace BetaKiller\Cache;
 
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Exception;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use Doctrine\Common\Cache\ChainCache;
 use Pcelta\Doctrine\Cache\Factory;
 
@@ -22,16 +22,16 @@ class DoctrineCacheProvider extends ChainCache
     /**
      * DoctrineCacheProvider constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface            $appEnv
      * @param \BetaKiller\Config\ConfigProviderInterface $config
      *
      * @throws \BetaKiller\Exception
      */
     public function __construct(AppEnvInterface $appEnv, ConfigProviderInterface $config)
     {
-        $workingName = $appEnv->isCoreRunning() ? 'core' : $appEnv->getAppCodename();
-
-        $this->nsPrefix = implode('.', [$workingName, $appEnv->getModeName(), $appEnv->getRevisionKey()]);
+        $this->nsPrefix = $appEnv->isAppRunning()
+            ? implode('.', [$appEnv->getAppCodename(), $appEnv->getModeName(), $appEnv->getRevisionKey()])
+            : 'core';
 
         $settings = (array)$config->load(['cache', 'default']);
 

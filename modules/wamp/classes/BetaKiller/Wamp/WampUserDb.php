@@ -7,8 +7,6 @@ use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Service\AuthService;
-use BetaKiller\Session\DatabaseSessionStorage;
-use LogicException;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Thruway\Authentication\WampCraUserDbInterface;
@@ -31,20 +29,13 @@ class WampUserDb implements WampCraUserDbInterface
     private $logger;
 
     /**
-     * @var \BetaKiller\Helper\CookieHelper
-     */
-    private $cookieHelper;
-
-    /**
      * @param \BetaKiller\Service\AuthService $auth
-     * @param \BetaKiller\Helper\CookieHelper $cookieHelper
      * @param \Psr\Log\LoggerInterface        $logger
      */
-    public function __construct(AuthService $auth, CookieHelper $cookieHelper, LoggerInterface $logger)
+    public function __construct(AuthService $auth, LoggerInterface $logger)
     {
-        $this->auth         = $auth;
-        $this->logger       = $logger;
-        $this->cookieHelper = $cookieHelper;
+        $this->auth   = $auth;
+        $this->logger = $logger;
     }
 
     /**
@@ -60,13 +51,7 @@ class WampUserDb implements WampCraUserDbInterface
     public function get($authid)
     {
         try {
-            // Session cookie is encoded
-            $this->logger->debug('Decoding sid ":value"', [':value' => $authid]);
-            $sessionId = $this->cookieHelper->decodeValue(DatabaseSessionStorage::COOKIE_NAME, $authid);
-
-            $this->logger->debug('Sid decoded to ":value"', [':value' => $sessionId]);
-
-            $session = $this->auth->getSession($sessionId);
+            $session = $this->auth->getSession($authid);
 
             if (!SessionHelper::isPersistent($session)) {
                 // Make random key string so auth will never be succeeded

@@ -12,9 +12,14 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
 {
     /**
-     * @var OrmFactory
+     * @var \OrmFactoryInterface
      */
-    private static $factoryInstance;
+    private static OrmFactoryInterface $factoryInstance;
+
+    public static function setModelFactory(OrmFactoryInterface $factory): void
+    {
+        self::$factoryInstance = $factory;
+    }
 
     /**
      * @param string         $model
@@ -28,8 +33,6 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         $model = str_replace(' ', '_', ucwords(str_replace('_', ' ', $model)));
 
         // No direct search by ID coz ORM crashes with circular dependencies when extended from TreeModel and initialized with id
-
-        /** @var OrmInterface $object */
         $object = self::getFactory()->create($model);
 
         // Old Kohana sugar for searching in model
@@ -51,13 +54,10 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         return $object;
     }
 
-    protected static function getFactory(): OrmFactory
+    protected static function getFactory(): OrmFactoryInterface
     {
         if (!self::$factoryInstance) {
-            /** @var OrmFactory $factory */
-            $factory = Container::getInstance()->get(OrmFactory::class);
-
-            self::$factoryInstance = $factory;
+            throw new LogicException('Set OrmFactoryInterface instance before using ORM');
         }
 
         return self::$factoryInstance;

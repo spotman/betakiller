@@ -5,6 +5,7 @@ use BetaKiller\Factory\RepositoryFactoryInterface;
 use BetaKiller\IdentityConverterInterface;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Repository\RepositoryInterface;
+use DI\Attribute\Inject;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\Method\AbstractApiMethod;
 use Spotman\Defence\ArgumentsInterface;
@@ -12,15 +13,15 @@ use Spotman\Defence\ArgumentsInterface;
 abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements EntityBasedApiMethodInterface
 {
     /**
-     * @Inject
      * @var \BetaKiller\Factory\RepositoryFactoryInterface
      */
+    #[Inject]
     private RepositoryFactoryInterface $repositoryFactory;
 
     /**
-     * @Inject
      * @var \BetaKiller\IdentityConverterInterface
      */
+    #[Inject]
     private IdentityConverterInterface $converter;
 
     /**

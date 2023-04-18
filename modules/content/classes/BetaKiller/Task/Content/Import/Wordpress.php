@@ -31,6 +31,7 @@ use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use DateTime;
 use DateTimeImmutable;
+use DI\Attribute\Inject;
 use DiDom\Document;
 use Throwable;
 use Thunder\Shortcode\Parser\RegexParser;
@@ -74,111 +75,111 @@ class Wordpress extends AbstractTask
     private $contentPostEntity;
 
     /**
-     * @Inject
      * @var \BetaKiller\Model\UserInterface
      */
+    #[Inject]
     private $user;
 
     /**
      * @var \BetaKiller\Helper\ContentHelper
-     * @Inject
      */
+    #[Inject]
     private $contentHelper;
 
     /**
      * @var \BetaKiller\Factory\EntityFactoryInterface
-     * @Inject
      */
+    #[Inject]
     private $entityFactory;
 
     /**
      * @var \BetaKiller\Repository\ContentPostRepository
-     * @Inject
      */
+    #[Inject]
     private $postRepository;
 
     /**
      * @var \BetaKiller\Repository\ContentCommentRepository
-     * @Inject
      */
+    #[Inject]
     private $commentRepository;
 
     /**
      * @var \BetaKiller\Workflow\ContentCommentWorkflow
-     * @Inject
      */
+    #[Inject]
     private $commentWorkflow;
 
     /**
      * @var \BetaKiller\Repository\ContentCategoryRepository
-     * @Inject
      */
+    #[Inject]
     private $categoryRepository;
 
     /**
-     * @Inject
      * @var \BetaKiller\Repository\ContentGalleryRepository
      */
+    #[Inject]
     private $galleryRepository;
 
     /**
      * @var \BetaKiller\Repository\ContentYoutubeRecordRepository
-     * @Inject
      */
+    #[Inject]
     private $youtubeRepository;
 
     /**
-     * @Inject
      * @var \BetaKiller\Repository\EntityRepository
      */
+    #[Inject]
     private $entityRepository;
 
     /**
-     * @Inject
      * @var \BetaKiller\Repository\QuoteRepository
      */
+    #[Inject]
     private $quoteRepository;
 
     /**
-     * @Inject
      * @var \BetaKiller\Repository\UserRepositoryInterface
      */
+    #[Inject]
     private $userRepository;
 
     /**
-     * @Inject
      * @var \BetaKiller\Service\UserService
      */
+    #[Inject]
     private $userService;
 
     /**
-     * @Inject
      * @var \BetaKiller\Content\Shortcode\ShortcodeFacade
      */
+    #[Inject]
     private $shortcodeFacade;
 
     /**
-     * @Inject
      * @var \BetaKiller\Workflow\StatusWorkflowFactory
      */
+    #[Inject]
     private $statusWorkflowFactory;
 
     /**
-     * @Inject
      * @var \BetaKiller\Assets\ContentTypes
      */
+    #[Inject]
     private $contentTypes;
 
     /**
-     * @Inject
      * @var \WP
      */
+    #[Inject]
     private $wp;
 
     /**
-     * @Inject
      * @var \Psr\Log\LoggerInterface
      */
+    #[Inject]
     private $logger;
 
     private $loadedTmpFiles = [];

@@ -8,7 +8,7 @@ use BetaKiller\Cron\CronException;
 use BetaKiller\Cron\CronLockFactory;
 use BetaKiller\Cron\CronTask;
 use BetaKiller\Cron\TaskQueue;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\DateTimeHelper;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Model\CronCommand;
@@ -34,7 +34,7 @@ class Cron extends AbstractTask
     private const TAG_LOG_ID      = 'log-id';
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $env;
 
@@ -86,7 +86,7 @@ class Cron extends AbstractTask
     /**
      * Cron constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface                    $env
+     * @param \BetaKiller\Env\AppEnvInterface                       $env
      * @param \BetaKiller\Cron\TaskQueue                            $queue
      * @param \BetaKiller\Repository\CronLogRepositoryInterface     $logRepo
      * @param \BetaKiller\Repository\CronCommandRepositoryInterface $cmdRepo

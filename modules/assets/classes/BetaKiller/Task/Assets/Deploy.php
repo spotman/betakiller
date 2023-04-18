@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Assets;
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Kohana;
@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 class Deploy extends AbstractTask
 {
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
@@ -24,8 +24,8 @@ class Deploy extends AbstractTask
     /**
      * Deploy constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
-     * @param \Psr\Log\LoggerInterface           $logger
+     * @param \BetaKiller\Env\AppEnvInterface $appEnv
+     * @param \Psr\Log\LoggerInterface        $logger
      */
     public function __construct(AppEnvInterface $appEnv, LoggerInterface $logger)
     {

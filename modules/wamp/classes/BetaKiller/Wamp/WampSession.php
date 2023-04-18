@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Wamp;
 
-use Zend\Expressive\Session\SessionIdentifierAwareInterface;
-use Zend\Expressive\Session\SessionInterface;
+use Mezzio\Session\SessionIdentifierAwareInterface;
+use Mezzio\Session\SessionInterface;
 
 class WampSession
 {

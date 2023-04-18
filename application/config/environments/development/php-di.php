@@ -6,11 +6,6 @@ use function DI\factory;
 
 return [
 
-    /**
-     * @url http://php-di.org/doc/performances.html
-     */
-    'compile' => false,
-
     'definitions' => [
 
         Collector::class => factory(function () {

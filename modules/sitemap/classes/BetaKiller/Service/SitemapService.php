@@ -5,7 +5,7 @@ namespace BetaKiller\Service;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Exception\NotFoundHttpException;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Url\AvailableUrlsCollector;
 use Psr\Http\Message\ResponseInterface;
@@ -41,7 +41,7 @@ class SitemapService
     private AvailableUrlsCollector $urlCollector;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
@@ -51,7 +51,7 @@ class SitemapService
      * @param \BetaKiller\Url\AvailableUrlsCollector $urlCollector
      * @param \Psr\Log\LoggerInterface               $logger
      * @param \BetaKiller\Config\AppConfigInterface  $appConfig
-     * @param \BetaKiller\Helper\AppEnvInterface     $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface        $appEnv
      */
     public function __construct(
         AvailableUrlsCollector $urlCollector,

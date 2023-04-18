@@ -3,7 +3,7 @@ namespace BetaKiller\IFace\Cache;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Exception\NotImplementedHttpException;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\IFace\IFaceInterface;
 use PageCache\PageCache;
 use Psr\Http\Message\ServerRequestInterface;
@@ -27,7 +27,7 @@ final class IFaceCache
     private $enabled;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
@@ -35,7 +35,7 @@ final class IFaceCache
      * IFaceCache constructor.
      *
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
-     * @param \BetaKiller\Helper\AppEnvInterface    $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface       $appEnv
      * @param \Psr\Log\LoggerInterface              $logger
      */
     public function __construct(
@@ -94,7 +94,7 @@ final class IFaceCache
 
         $this->pageCache->setStrategy($strategy);
 
-        $cachePath = $this->appEnv->getAppRootPath().\DIRECTORY_SEPARATOR.$this->appConfig->getPageCachePath();
+        $cachePath = $this->appEnv->getCachePath($this->appConfig->getPageCachePath());
 
         $this->pageCache->config()
             ->setCacheExpirationInSeconds($iface->getExpiresSeconds())

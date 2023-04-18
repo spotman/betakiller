@@ -7,7 +7,6 @@ use BetaKiller\Config\SessionConfigInterface;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception;
 use BetaKiller\Exception\DomainException;
-use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
@@ -16,13 +15,13 @@ use BetaKiller\Model\UserSessionInterface;
 use BetaKiller\Repository\UserSessionRepositoryInterface;
 use BetaKiller\Security\EncryptionInterface;
 use DateTimeImmutable;
+use Mezzio\Session\Session;
+use Mezzio\Session\SessionIdentifierAwareInterface;
+use Mezzio\Session\SessionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Ramsey\Uuid\UuidInterface;
 use Text;
-use Zend\Expressive\Session\Session;
-use Zend\Expressive\Session\SessionIdentifierAwareInterface;
-use Zend\Expressive\Session\SessionInterface;
 
 class DatabaseSessionStorage implements SessionStorageInterface
 {
@@ -44,28 +43,20 @@ class DatabaseSessionStorage implements SessionStorageInterface
     private EncryptionInterface $encryption;
 
     /**
-     * @var \BetaKiller\Helper\CookieHelper
-     */
-    private CookieHelper $cookies;
-
-    /**
      * DatabaseSessionStorage constructor.
      *
      * @param \BetaKiller\Repository\UserSessionRepositoryInterface $sessionRepo
      * @param \BetaKiller\Config\SessionConfigInterface             $config
      * @param \BetaKiller\Security\EncryptionInterface              $encryption
-     * @param \BetaKiller\Helper\CookieHelper                       $cookies
      */
     public function __construct(
         UserSessionRepositoryInterface $sessionRepo,
-        SessionConfigInterface $config,
-        EncryptionInterface $encryption,
-        CookieHelper $cookies
+        SessionConfigInterface         $config,
+        EncryptionInterface            $encryption
     ) {
         $this->sessionRepo = $sessionRepo;
         $this->config      = $config;
         $this->encryption  = $encryption;
-        $this->cookies     = $cookies;
     }
 
     /**
@@ -73,7 +64,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @return \Zend\Expressive\Session\SessionInterface
+     * @return \Mezzio\Session\SessionInterface
      */
     public function initializeSessionFromRequest(ServerRequestInterface $request): SessionInterface
     {
@@ -97,7 +88,8 @@ class DatabaseSessionStorage implements SessionStorageInterface
             return $this->createSession($originUrl, $originUuid);
         }
 
-        $token = $this->cookies->get($request, self::COOKIE_NAME);
+        $cookies = $request->getCookieParams();
+        $token   = $cookies[self::COOKIE_NAME] ?? null;
 
         if (!$token) {
             // No session (cleared by browser or new visitor) => regenerate empty session
@@ -146,7 +138,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
     /**
      * @param string $token
      *
-     * @return \Zend\Expressive\Session\Session
+     * @return \Mezzio\Session\Session
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getByToken(string $token): SessionInterface
@@ -176,7 +168,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
     /**
      * @param \BetaKiller\Model\UserInterface $user
      *
-     * @return \Zend\Expressive\Session\SessionInterface[]
+     * @return \Mezzio\Session\SessionInterface[]
      * @throws \BetaKiller\Exception\DomainException
      * @throws \BetaKiller\Repository\RepositoryException
      */
@@ -189,7 +181,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
      * @param string|null                     $originUrl
      * @param \Ramsey\Uuid\UuidInterface|null $originUuid
      *
-     * @return \Zend\Expressive\Session\SessionInterface
+     * @return \Mezzio\Session\SessionInterface
      */
     public function createSession(string $originUrl = null, UuidInterface $originUuid = null): SessionInterface
     {
@@ -215,8 +207,8 @@ class DatabaseSessionStorage implements SessionStorageInterface
      * Persists the session data, returning a response instance with any
      * artifacts required to return to the client.
      *
-     * @param \Zend\Expressive\Session\SessionInterface $session
-     * @param \Psr\Http\Message\ResponseInterface       $response
+     * @param \Mezzio\Session\SessionInterface    $session
+     * @param \Psr\Http\Message\ResponseInterface $response
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
@@ -249,7 +241,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * @param \Zend\Expressive\Session\SessionInterface $session
+     * @param \Mezzio\Session\SessionInterface $session
      */
     public function destroySession(SessionInterface $session): void
     {

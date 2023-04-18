@@ -9,7 +9,7 @@ use BetaKiller\Dev\DebugBarHttpDriver;
 use BetaKiller\Dev\DebugBarSessionDataCollector;
 use BetaKiller\Dev\DebugServerRequestHelper;
 use BetaKiller\Dev\RequestProfiler;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -45,7 +45,7 @@ final class DebugMiddleware implements MiddlewareInterface
     private $streamFactory;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
@@ -67,7 +67,7 @@ final class DebugMiddleware implements MiddlewareInterface
     /**
      * DebugMiddleware constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface            $appEnv
      * @param \BetaKiller\Helper\CookieHelper            $cookieHelper
      * @param \Psr\Http\Message\ResponseFactoryInterface $responseFactory
      * @param \Psr\Http\Message\StreamFactoryInterface   $streamFactory

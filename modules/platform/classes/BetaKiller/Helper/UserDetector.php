@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Helper;
 
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Exception;
 use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\Model\UserInterface;
@@ -10,7 +11,7 @@ use BetaKiller\Task\AbstractTask;
 class UserDetector
 {
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
@@ -27,7 +28,7 @@ class UserDetector
     /**
      * UserDetector constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface             $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface                $appEnv
      * @param \BetaKiller\Repository\UserRepositoryInterface $repo
      * @param \BetaKiller\Factory\GuestUserFactory           $guestFactory
      */

@@ -1,5 +1,13 @@
 <?php
 
+use BetaKiller\Env\AppEnv;
+
+$appEnv = AppEnv::instance();
+
+$cachePath = $appEnv->isAppRunning()
+    ? $appEnv->getCachePath('twig')
+    : false;
+
 return [
 
     /**
@@ -43,8 +51,7 @@ return [
         'auto_reload'      => false,
         'debug'            => false,
         'autoescape'       => 'html',
-        'cache'            => MultiSite::instance()
-                ->getWorkingPath().DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'twig',
+        'cache'            => $cachePath,
         'optimizations'    => -1,
         'strict_variables' => true,
     ],

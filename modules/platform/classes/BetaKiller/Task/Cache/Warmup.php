@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Cache;
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Middleware\PhpBuiltInServerMiddleware;
 use BetaKiller\Service\HttpClientService;
 use BetaKiller\Task\AbstractTask;
@@ -50,7 +50,7 @@ class Warmup extends AbstractTask
     private $serverProcess;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
@@ -69,7 +69,7 @@ class Warmup extends AbstractTask
      *
      * @param \BetaKiller\Url\AvailableUrlsCollector $urlCollector
      * @param \BetaKiller\Service\HttpClientService  $httpClient
-     * @param \BetaKiller\Helper\AppEnvInterface     $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface        $appEnv
      * @param \BetaKiller\Config\AppConfigInterface  $appConfig
      * @param \Psr\Log\LoggerInterface               $logger
      */

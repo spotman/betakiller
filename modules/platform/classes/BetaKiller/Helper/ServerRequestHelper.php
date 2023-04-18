@@ -14,11 +14,11 @@ use PhpMiddleware\RequestId\RequestIdMiddleware;
 use Psr\Http\Message\ServerRequestInterface;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use Zend\Expressive\Flash\FlashMessageMiddleware;
-use Zend\Expressive\Flash\FlashMessagesInterface;
-use Zend\Expressive\Router\RouteResult;
-use Zend\Expressive\Session\SessionInterface;
-use Zend\Expressive\Session\SessionMiddleware;
+use Mezzio\Flash\FlashMessageMiddleware;
+use Mezzio\Flash\FlashMessagesInterface;
+use Mezzio\Router\RouteResult;
+use Mezzio\Session\SessionInterface;
+use Mezzio\Session\SessionMiddleware;
 
 class ServerRequestHelper
 {

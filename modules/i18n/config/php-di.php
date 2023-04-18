@@ -1,6 +1,6 @@
 <?php
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\I18n\CachingI18nLoader;
 use BetaKiller\I18n\I18nConfig;
 use BetaKiller\I18n\I18nConfigInterface;

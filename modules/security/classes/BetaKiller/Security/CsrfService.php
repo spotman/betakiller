@@ -10,8 +10,8 @@ use LogicException;
 use Psr\Http\Message\ServerRequestInterface;
 use Spotman\Defence\ArgumentsDefinitionProviderInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
-use Zend\Expressive\Session\SessionIdentifierAwareInterface;
-use Zend\Expressive\Session\SessionInterface;
+use Mezzio\Session\SessionIdentifierAwareInterface;
+use Mezzio\Session\SessionInterface;
 
 class CsrfService implements ArgumentsDefinitionProviderInterface
 {

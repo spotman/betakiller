@@ -5,7 +5,7 @@ namespace BetaKiller\Factory;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\DI\ContainerInterface;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 
 class NamespaceBasedFactoryBuilder implements NamespaceBasedFactoryBuilderInterface
 {
@@ -20,7 +20,7 @@ class NamespaceBasedFactoryBuilder implements NamespaceBasedFactoryBuilderInterf
     private AppConfigInterface $appConfig;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
@@ -29,7 +29,7 @@ class NamespaceBasedFactoryBuilder implements NamespaceBasedFactoryBuilderInterf
      *
      * @param \BetaKiller\DI\ContainerInterface     $container
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
-     * @param \BetaKiller\Helper\AppEnvInterface    $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface       $appEnv
      */
     public function __construct(ContainerInterface $container, AppConfigInterface $appConfig, AppEnvInterface $appEnv)
     {
@@ -50,7 +50,7 @@ class NamespaceBasedFactoryBuilder implements NamespaceBasedFactoryBuilderInterf
             $factory = $this->container->make(NamespaceBasedFactory::class);
 
             // Add project namespace as primary one
-            if (!$this->appEnv->isCoreRunning()) {
+            if ($this->appEnv->isAppRunning()) {
                 $factory->addRootNamespace($this->appConfig->getNamespace());
             }
 

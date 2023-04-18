@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\I18n;
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use Psr\Container\ContainerInterface;
 
 class LazyAggregateI18nLoader implements I18nKeysLoaderInterface
@@ -14,7 +14,7 @@ class LazyAggregateI18nLoader implements I18nKeysLoaderInterface
     private ContainerInterface $container;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
@@ -33,7 +33,7 @@ class LazyAggregateI18nLoader implements I18nKeysLoaderInterface
      *
      * @param \Psr\Container\ContainerInterface    $container
      * @param \BetaKiller\I18n\I18nConfigInterface $config
-     * @param \BetaKiller\Helper\AppEnvInterface   $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface      $appEnv
      */
     public function __construct(ContainerInterface $container, I18nConfigInterface $config, AppEnvInterface $appEnv)
     {

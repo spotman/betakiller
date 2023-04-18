@@ -5,7 +5,7 @@ use Aidantwoods\SecureHeaders\SecureHeaders;
 use BetaKiller\Assets\StaticAssets;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Dev\RequestProfiler;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -31,7 +31,7 @@ use Twig\TwigFunction;
 final class TwigExtension extends AbstractExtension
 {
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
@@ -85,7 +85,7 @@ final class TwigExtension extends AbstractExtension
     /**
      * TwigExtension constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface           $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface              $appEnv
      * @param \BetaKiller\Config\AppConfigInterface        $appConfig
      * @param \BetaKiller\Security\SecurityConfigInterface $securityConfig
      * @param \BetaKiller\Widget\WidgetFacade              $widgetFacade

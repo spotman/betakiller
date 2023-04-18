@@ -6,7 +6,7 @@ use Asm89\Twig\CacheExtension\CacheStrategy\BlackholeCacheStrategy;
 use Asm89\Twig\CacheExtension\CacheStrategy\IndexedChainingCacheStrategy;
 use Asm89\Twig\CacheExtension\CacheStrategy\LifetimeCacheStrategy;
 use Asm89\Twig\CacheExtension\Extension as CacheExtension;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use Doctrine\Common\Cache\ArrayCache;
 
 class TwigCacheExtension extends CacheExtension
@@ -14,7 +14,7 @@ class TwigCacheExtension extends CacheExtension
     /**
      * TwigCacheExtension constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface $appEnv
      */
     public function __construct(AppEnvInterface $appEnv)
     {

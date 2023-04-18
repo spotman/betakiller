@@ -15,7 +15,7 @@ return [
 
     'definitions' => [
         UrlDispatcherInterface::class => DI\factory(static function (
-            UrlDispatcher $proxy,
+            UrlDispatcher      $proxy,
             ContainerInterface $container
         ) {
             return $container->make(UrlDispatcherCacheWrapper::class, [
@@ -27,10 +27,9 @@ return [
             return $loader->load();
         }),
 
-        UrlElementRendererInterface::class => autowire(UrlElementRenderer::class)->lazy(),
+        UrlElementRendererInterface::class => autowire(UrlElementRenderer::class), /* ->lazy() */
 
-        // Lazy injection coz circular dependency TwigExtension => WidgetFacade => TwigExtension
-        WidgetFacade::class                => autowire(WidgetFacade::class)->lazy(),
+        WidgetFacade::class => autowire(WidgetFacade::class),
     ],
 
 ];

@@ -83,7 +83,8 @@ class I18nMiddleware implements MiddlewareInterface
 
     private function detectHttpLang(ServerRequestInterface $request): string
     {
-        $lang = $this->cookies->get($request, self::COOKIE_NAME);
+        $cookies = $request->getCookieParams();
+        $lang    = $cookies[self::COOKIE_NAME] ?? null;
 
         // Cookie lang has priority
         if ($lang) {

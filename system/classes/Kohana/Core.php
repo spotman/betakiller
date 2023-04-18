@@ -445,15 +445,6 @@ class Kohana_Core
         // Set the current module list
         Kohana::$_modules = $modules;
 
-        foreach (Kohana::$_modules as $path) {
-            $init = $path.'init'.EXT;
-
-            if (is_file($init)) {
-                // Include the module initialization file once
-                require_once $init;
-            }
-        }
-
         return Kohana::$_modules;
     }
 

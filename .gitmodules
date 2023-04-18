@@ -1,6 +1,3 @@
-[submodule "modules/multi-site"]
-	path = modules/multi-site
-	url = git@github.com:spotman/kohana-multi-site.git
 [submodule "modules/meta-tags"]
 	path = modules/meta-tags
 	url = git@github.com:spotman/kohana-meta-tags.git

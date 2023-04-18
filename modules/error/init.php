@@ -1,6 +1,4 @@
 <?php
-use BetaKiller\Error\Initializer;
+use BetaKiller\Error\ErrorModuleInitializer;
 
-/** @var \BetaKiller\Error\Initializer $errorInit */
-$errorInit = \BetaKiller\DI\Container::getInstance()->get(Initializer::class);
-$errorInit->init();
+return ErrorModuleInitializer::class;

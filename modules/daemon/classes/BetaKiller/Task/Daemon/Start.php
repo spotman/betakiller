@@ -5,7 +5,7 @@ namespace BetaKiller\Task\Daemon;
 
 use BetaKiller\Daemon\AbstractDaemon;
 use BetaKiller\Daemon\DaemonLockFactory;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\ProcessLock\LockInterface;
 use BetaKiller\Task\TaskException;
 use Psr\Log\LoggerInterface;
@@ -14,7 +14,7 @@ use Symfony\Component\Process\Process;
 final class Start extends AbstractDaemonCommandTask
 {
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
@@ -27,7 +27,7 @@ final class Start extends AbstractDaemonCommandTask
      * Start constructor.
      *
      * @param \BetaKiller\Daemon\DaemonLockFactory $lockFactory
-     * @param \BetaKiller\Helper\AppEnvInterface   $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface      $appEnv
      * @param \Psr\Log\LoggerInterface             $logger
      */
     public function __construct(DaemonLockFactory $lockFactory, AppEnvInterface $appEnv, LoggerInterface $logger)

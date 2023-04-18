@@ -5,24 +5,24 @@ namespace BetaKiller\Dev;
 
 use DebugBar\HttpDriverInterface;
 use Psr\Http\Message\ResponseInterface;
-use Zend\Expressive\Session\SessionInterface;
+use Mezzio\Session\SessionInterface;
 
 class DebugBarHttpDriver implements HttpDriverInterface
 {
     /**
      * @var string[]
      */
-    private $headers = [];
+    private array $headers = [];
 
     /**
-     * @var \Zend\Expressive\Session\SessionInterface
+     * @var \Mezzio\Session\SessionInterface
      */
-    private $session;
+    private SessionInterface $session;
 
     /**
      * DebugBarHttpDriver constructor.
      *
-     * @param \Zend\Expressive\Session\SessionInterface $session
+     * @param \Mezzio\Session\SessionInterface $session
      */
     public function __construct(SessionInterface $session)
     {
@@ -96,7 +96,7 @@ class DebugBarHttpDriver implements HttpDriverInterface
      *
      * @return mixed
      */
-    public function getSessionValue($name)
+    public function getSessionValue($name): mixed
     {
         return $this->session->get($name);
     }

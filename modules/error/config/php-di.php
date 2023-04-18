@@ -9,7 +9,7 @@ use function DI\autowire;
 
 return [
     'definitions' => [
-        ErrorPageRendererInterface::class      => autowire(ErrorPageRenderer::class)->lazy(),
+        ErrorPageRendererInterface::class      => autowire(ErrorPageRenderer::class), /* ->lazy() */
         PhpExceptionRepositoryInterface::class => autowire(PhpExceptionRepository::class),
     ],
 ];

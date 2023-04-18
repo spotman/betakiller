@@ -3,18 +3,12 @@ declare(strict_types=1);
 
 namespace BetaKiller\Dev;
 
-use BetaKiller\Helper\CookieHelper;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
 use Psr\Http\Message\ServerRequestInterface;
 
 class DebugBarCookiesDataCollector extends DataCollector implements Renderable
 {
-    /**
-     * @var \BetaKiller\Helper\CookieHelper
-     */
-    private $helper;
-
     /**
      * @var \Psr\Http\Message\ServerRequestInterface
      */
@@ -23,12 +17,10 @@ class DebugBarCookiesDataCollector extends DataCollector implements Renderable
     /**
      * DebugBarSessionDataCollector constructor.
      *
-     * @param \BetaKiller\Helper\CookieHelper          $helper
      * @param \Psr\Http\Message\ServerRequestInterface $request
      */
-    public function __construct(CookieHelper $helper, ServerRequestInterface $request)
+    public function __construct(ServerRequestInterface $request)
     {
-        $this->helper  = $helper;
         $this->request = $request;
     }
 
@@ -51,7 +43,7 @@ class DebugBarCookiesDataCollector extends DataCollector implements Renderable
     {
         $data = [];
 
-        foreach ($this->helper->getAll($this->request) as $key => $value) {
+        foreach ($this->request->getCookieParams() as $key => $value) {
             $data[$key] = $this->getDataFormatter()->formatVar($value);
         }
 

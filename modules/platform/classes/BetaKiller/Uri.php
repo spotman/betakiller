@@ -5,6 +5,6 @@ namespace BetaKiller;
 
 use Psr\Http\Message\UriInterface;
 
-class Uri extends \Zend\Diactoros\Uri implements UriInterface
+class Uri extends \Laminas\Diactoros\Uri implements UriInterface
 {
 }

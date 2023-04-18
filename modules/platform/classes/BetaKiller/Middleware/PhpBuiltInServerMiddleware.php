@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Auth\AccessDeniedException;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\TextHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,14 +17,14 @@ final class PhpBuiltInServerMiddleware implements MiddlewareInterface
     public const HTTP_HEADER_VALUE = 'yes';
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
     /**
      * PhpBuiltInServerMiddleware constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface $appEnv
      */
     public function __construct(AppEnvInterface $appEnv)
     {

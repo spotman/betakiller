@@ -632,6 +632,30 @@ class Kohana_ORM extends Model implements Serializable
         }
     }
 
+    public function __serialize(): array
+    {
+        $data = [];
+
+        // Store only information about the object
+        foreach ($this->getSerializableProperties() as $var) {
+            $data[$var] = $this->{$var};
+        }
+
+        return $data;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        foreach ($data as $name => $var) {
+            $this->{$name} = $var;
+        }
+
+        if ($this->_reload_on_wakeup === true) {
+            // Reload the object
+            $this->reload();
+        }
+    }
+
     /**
      * Handles retrieval of all model values, relationships, and metadata.
      * [!!] This should not be overridden.

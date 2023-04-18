@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use Zend\Expressive\Helper\BodyParams\JsonStrategy;
+use Mezzio\Helper\BodyParams\JsonStrategy;
 
 class CspReportBodyParamsStrategy extends JsonStrategy
 {

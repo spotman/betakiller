@@ -5,20 +5,20 @@ namespace BetaKiller\Dev;
 
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
-use Zend\Expressive\Session\SessionIdentifierAwareInterface;
-use Zend\Expressive\Session\SessionInterface;
+use Mezzio\Session\SessionIdentifierAwareInterface;
+use Mezzio\Session\SessionInterface;
 
 class DebugBarSessionDataCollector extends DataCollector implements Renderable
 {
     /**
-     * @var \Zend\Expressive\Session\SessionInterface
+     * @var \Mezzio\Session\SessionInterface
      */
-    private $session;
+    private SessionInterface $session;
 
     /**
      * DebugBarSessionDataCollector constructor.
      *
-     * @param \Zend\Expressive\Session\SessionInterface $session
+     * @param \Mezzio\Session\SessionInterface $session
      */
     public function __construct(SessionInterface $session)
     {

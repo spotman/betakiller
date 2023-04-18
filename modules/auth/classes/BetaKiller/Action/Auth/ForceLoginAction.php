@@ -8,7 +8,7 @@ use BetaKiller\Auth\AuthorizationRequiredException;
 use BetaKiller\Auth\IncorrectCredentialsException;
 use BetaKiller\Auth\UserUrlDetectorInterface;
 use BetaKiller\Event\WebLoginEvent;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\MessageBus\EventBusInterface;
@@ -49,7 +49,7 @@ final class ForceLoginAction extends AbstractAction
     private UserRepositoryInterface $userRepo;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
@@ -61,7 +61,7 @@ final class ForceLoginAction extends AbstractAction
     /**
      * ForceLoginAction constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface             $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface                $appEnv
      * @param \BetaKiller\Service\AuthService                $auth
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
      * @param \BetaKiller\Auth\UserUrlDetectorInterface      $urlDetector

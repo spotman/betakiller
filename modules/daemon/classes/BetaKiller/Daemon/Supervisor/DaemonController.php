@@ -7,7 +7,7 @@ use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Daemon\AbstractDaemon;
 use BetaKiller\Daemon\DaemonException;
 use BetaKiller\Daemon\DaemonInterface;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\Daemon\Runner;
 use Psr\Log\LoggerInterface;
@@ -47,7 +47,7 @@ final class DaemonController
     private DaemonUnitCollectionInterface $registry;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
@@ -78,7 +78,7 @@ final class DaemonController
     /**
      * DaemonController constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface            $appEnv
      * @param \BetaKiller\Config\ConfigProviderInterface $config
      * @param \React\EventLoop\LoopInterface             $loop
      * @param \Psr\Log\LoggerInterface                   $logger

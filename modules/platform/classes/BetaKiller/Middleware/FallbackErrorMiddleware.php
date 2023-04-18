@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ResponseHelper;
 use Psr\Http\Message\ResponseInterface;
@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 final class FallbackErrorMiddleware implements MiddlewareInterface
 {
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
@@ -27,8 +27,8 @@ final class FallbackErrorMiddleware implements MiddlewareInterface
     /**
      * FallbackErrorMiddleware constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
-     * @param \Psr\Log\LoggerInterface           $logger
+     * @param \BetaKiller\Env\AppEnvInterface $appEnv
+     * @param \Psr\Log\LoggerInterface        $logger
      */
     public function __construct(AppEnvInterface $appEnv, LoggerInterface $logger)
     {

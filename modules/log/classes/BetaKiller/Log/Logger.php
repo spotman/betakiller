@@ -1,13 +1,15 @@
 <?php
 namespace BetaKiller\Log;
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use Monolog\ErrorHandler;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\SlackWebhookHandler;
 use Monolog\Handler\StreamHandler;
+use Monolog\Handler\TelegramBotHandler;
 use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\WebProcessor;
@@ -23,14 +25,14 @@ class Logger implements LoggerInterface
     private \Monolog\Logger $monolog;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
     /**
      * Logger constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $env
+     * @param \BetaKiller\Env\AppEnvInterface $env
      *
      * @throws \Exception
      */
@@ -92,13 +94,11 @@ class Logger implements LoggerInterface
         }
 
         // File logging
-        $logFilePath = implode(DIRECTORY_SEPARATOR, [
-            $this->appEnv->getAppRootPath(),
-            'logs',
+        $logFilePath = $this->appEnv->getLogsPath(implode(DIRECTORY_SEPARATOR, [
             date('Y'),
             date('m'),
             date('d').'.log',
-        ]);
+        ]));
 
         $logsLevel = $isDebug ? $monolog::DEBUG : $monolog::NOTICE;
 //        $triggerLevel = $isDebug ? $monolog::DEBUG : $monolog::WARNING;
@@ -110,37 +110,73 @@ class Logger implements LoggerInterface
 //        $monolog->pushHandler(new SkipExpectedExceptionsHandler(new FingersCrossedHandler($fileHandler, $triggerLevel)));
 
         $slackWebHookUrl = $this->appEnv->getEnvVariable('SLACK_ERROR_WEBHOOK');
+        $tgApiKey        = $this->appEnv->getEnvVariable('TELEGRAM_ERROR_API_KEY');
+        $tgChannel       = $this->appEnv->getEnvVariable('TELEGRAM_ERROR_CHANNEL');
 
-        if ($slackWebHookUrl) {
-            $slackHandler = new SlackWebhookHandler(
-                $slackWebHookUrl,
-                null,
-                'Errors Bot',
-                true,
-                ':interrobang:',
-                true,
-                true,
-                \Monolog\Logger::NOTICE
-            );
-            $slackHandler->pushProcessor(new ContextCleanupProcessor);
-
-            // Remove duplicate errors in debugging mode
-            if ($isDebug) {
-                $slackStorage = $this->appEnv->getTempPath('monolog-slack.storage');
-
-                if (!\is_file($slackStorage)) {
-                    touch($slackStorage) && \chmod($slackStorage, 0660);
-                }
-
-                $slackHandler = new DeduplicationHandler(
-                    $slackHandler,
-                    $slackStorage,
-                    \Monolog\Logger::NOTICE,
-                    300 // Repeat notification in 5 minutes
+        switch (true) {
+            case $slackWebHookUrl:
+                $errorHandler = new SlackWebhookHandler(
+                    $slackWebHookUrl,
+                    null,
+                    'Errors Bot',
+                    true,
+                    ':interrobang:',
+                    true,
+                    true,
+                    \Monolog\Logger::NOTICE
                 );
+                break;
+
+            case $tgApiKey && $tgChannel:
+                $errorHandler = new TelegramBotHandler(
+                    $tgApiKey,
+                    $tgChannel,
+                    \Monolog\Logger::NOTICE,
+                    true,
+                    'HTML',
+                    true,
+                    false,
+                    false
+                );
+
+                $tgFormatter = new LineFormatter(
+                    "%channel%.%level_name%:\n%message%\n%context%\n%extra%\n\n",
+                    null,
+                    true,
+                    true,
+                    true
+                );
+                $errorHandler->setFormatter($tgFormatter);
+                break;
+
+            default:
+                throw new \LogicException('Error notification handler must be specified');
+        }
+
+        $errorHandler->pushProcessor(new ContextCleanupProcessor);
+
+        // Remove duplicate errors in debugging mode
+        if ($isDebug) {
+            $slackStorage = $this->appEnv->getTempPath('monolog-deduplication.storage');
+
+            if (!\is_file($slackStorage)) {
+                touch($slackStorage) && \chmod($slackStorage, 0660);
             }
 
-            $monolog->pushHandler(new SkipExpectedExceptionsHandler($slackHandler));
+            $errorHandler = new DeduplicationHandler(
+                $errorHandler,
+                $slackStorage,
+                \Monolog\Logger::NOTICE,
+                300 // Repeat notification in 5 minutes
+            );
+        }
+
+        $monolog->pushHandler(new SkipExpectedExceptionsHandler($errorHandler));
+
+        if ($this->appEnv->isDebugEnabled() && !$this->appEnv->inDevelopmentMode()) {
+            $monolog->debug('Running :name env', [
+                ':name' => $this->appEnv->getModeName(),
+            ]);
         }
 
         return $monolog;

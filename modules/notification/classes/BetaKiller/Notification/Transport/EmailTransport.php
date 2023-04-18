@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Notification\Transport;
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Notification\MessageInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 
@@ -10,14 +10,14 @@ final class EmailTransport extends AbstractTransport
     public const CODENAME = 'email';
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
     /**
      * EmailTransport constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface $appEnv
      */
     public function __construct(AppEnvInterface $appEnv)
     {

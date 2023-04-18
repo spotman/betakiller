@@ -11,7 +11,7 @@ use DateTimeImmutable;
 use LogicException;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use Zend\Expressive\Session\SessionInterface;
+use Mezzio\Session\SessionInterface;
 
 class SessionHelper
 {
@@ -48,7 +48,7 @@ class SessionHelper
     /**
      * Mark session as saved in persistent storage
      *
-     * @param \Zend\Expressive\Session\SessionInterface $session
+     * @param \Mezzio\Session\SessionInterface $session
      */
     public static function markAsPersistent(SessionInterface $session): void
     {
@@ -58,7 +58,7 @@ class SessionHelper
     /**
      * Check session was saved in persistent storage
      *
-     * @param \Zend\Expressive\Session\SessionInterface $session
+     * @param \Mezzio\Session\SessionInterface $session
      *
      * @return bool
      */
@@ -84,7 +84,7 @@ class SessionHelper
     /**
      * Null means guest user
      *
-     * @param \Zend\Expressive\Session\SessionInterface $session
+     * @param \Mezzio\Session\SessionInterface $session
      *
      * @return string|null
      */

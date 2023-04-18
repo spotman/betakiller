@@ -2,28 +2,26 @@
 namespace BetaKiller\View;
 
 use BetaKiller\Twig\TwigView;
+use Psr\Container\ContainerInterface;
 use Twig\Environment;
 
 class TwigViewFactory implements ViewFactoryInterface
 {
-    /**
-     * @var \Twig\Environment
-     */
-    private $env;
+    private ContainerInterface $container;
 
     /**
      * TwigViewFactory constructor.
      *
-     * @param \Twig\Environment $env
+     * @param \Psr\Container\ContainerInterface $container
      */
-    public function __construct(Environment $env)
+    public function __construct(ContainerInterface $container)
     {
-        $this->env = $env;
+        $this->container = $container;
     }
 
     public function create(string $file): ViewInterface
     {
-        return new TwigView($this->env, $file);
+        return new TwigView($this->getTwigEnv(), $file);
     }
 
     /**
@@ -35,6 +33,20 @@ class TwigViewFactory implements ViewFactoryInterface
      */
     public function exists(string $file): bool
     {
-        return $this->env->getLoader()->exists($file);
+        return $this->getTwigEnv()->getLoader()->exists($file);
+    }
+
+    /**
+     * No direct Environment injection coz of circular dependency TwigExtension => WidgetFacade => TwigExtension
+     *
+     * @return \Twig\Environment
+     */
+    private function getTwigEnv(): Environment
+    {
+        try {
+            return $this->container->get(Environment::class);
+        } catch (\Throwable $e) {
+            throw new \LogicException($e->getMessage());
+        }
     }
 }

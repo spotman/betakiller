@@ -1,20 +1,24 @@
 <?php
 
-$ms = MultiSite::instance();
+use BetaKiller\Env\AppEnv;
 
-if (!$ms->isSiteDetected()) {
-    throw new Exception('Migrations task must be called from per-site directory');
+$scopes = [
+    'core'        => APPPATH,
+    'core:module' => MODPATH,
+];
+
+$appEnv = AppEnv::instance();
+
+if ($appEnv->isAppRunning()) {
+    $scopes = array_merge($scopes, [
+        'app'        => $appEnv->getAppRootPath(),
+        'app:module' => $appEnv->getAppRootPath().DIRECTORY_SEPARATOR.'modules',
+    ]);
 }
 
 return [
     /**
      * Scopes with paths for creating migration files
      */
-    'scopes'    =>  [
-        'core'          =>  APPPATH,
-        'core:module'   =>  MODPATH,
-
-        'app'           =>  $ms->getSitePath(),
-        'app:module'    =>  $ms->getSitePath().DIRECTORY_SEPARATOR.'modules',
-    ],
+    'scopes' => $scopes,
 ];

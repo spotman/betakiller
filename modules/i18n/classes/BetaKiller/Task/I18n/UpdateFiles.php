@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\I18n;
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Repository\TranslationKeyRepositoryInterface;
@@ -13,7 +13,7 @@ use Symfony\Component\Yaml\Yaml;
 final class UpdateFiles extends AbstractTask
 {
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
@@ -30,7 +30,7 @@ final class UpdateFiles extends AbstractTask
     /**
      * UpdateFiles constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface                       $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface                          $appEnv
      * @param \BetaKiller\I18n\I18nFacade                              $facade
      * @param \BetaKiller\Repository\TranslationKeyRepositoryInterface $keyRepo
      */

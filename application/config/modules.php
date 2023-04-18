@@ -32,10 +32,10 @@ return [
     'unittest'     => MODPATH.'unittest',              // Module for unit testing via phpunit
 
     // Place it before other modules for correct initialization of per-site classes and configs
-    'multi-site'   => MODPATH.'multi-site',            // Multiple apps on top of single engine
+//    'multi-site'   => MODPATH.'multi-site',            // Multiple apps on top of single engine
 
     // Initialize platform (AppEnv, DIC, etc)
-    'platform'     => MODPATH.'platform',              // Platform implementation and initialization
+//    'platform'     => MODPATH.'platform',              // Platform implementation and initialization
 
     // These modules DEPENDS on PLATFORM and have NO legacy ROUTES
     'acl'          => MODPATH.'acl',                   // Role based access control
@@ -66,5 +66,9 @@ return [
     'admin'        => MODPATH.'admin',                 // Basic admin
 
     // Various helper modules
-    'outdated-browser'     => MODPATH.'outdated-browser',
+//    'outdated-browser'     => MODPATH.'outdated-browser',
+
+    // Initialize platform (AppEnv, DIC, etc)
+    'platform'     => MODPATH.'platform',              // Platform implementation and initialization
+
 ];

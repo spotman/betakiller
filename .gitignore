@@ -1,5 +1,5 @@
 .idea
+vendor
 /application/.env
 .env.testing
-~syncthing~*.tmp
 .phpunit.result.cache

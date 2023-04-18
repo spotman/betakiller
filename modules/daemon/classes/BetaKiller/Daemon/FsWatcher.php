@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Daemon;
 
 use BetaKiller\Exception;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\TextHelper;
 use Psr\Log\LoggerInterface;
@@ -14,7 +14,7 @@ use React\Promise\Promise;
 use ReactFilesystemMonitor\FilesystemMonitorFactory;
 use ReactFilesystemMonitor\FilesystemMonitorInterface;
 use Symfony\Component\Process\Process;
-use function Clue\React\Block\await;
+use function React\Async\await;
 
 final class FsWatcher
 {
@@ -32,7 +32,7 @@ final class FsWatcher
     ];
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
@@ -61,8 +61,8 @@ final class FsWatcher
     /**
      * FsWatcher constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
-     * @param \Psr\Log\LoggerInterface           $logger
+     * @param \BetaKiller\Env\AppEnvInterface $appEnv
+     * @param \Psr\Log\LoggerInterface        $logger
      */
     public function __construct(AppEnvInterface $appEnv, LoggerInterface $logger)
     {
@@ -103,7 +103,7 @@ final class FsWatcher
         $this->fsWatcher->stop();
 
         // Block until done
-        await($promise, $loop, 3);
+        await($promise);
     }
 
     private function watchDir(string $path, LoopInterface $loop, callable $onChange): void

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
@@ -21,7 +21,7 @@ class SchemeMiddleware implements MiddlewareInterface
     private $appConfig;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
@@ -29,7 +29,7 @@ class SchemeMiddleware implements MiddlewareInterface
      * SchemeMiddleware constructor.
      *
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
-     * @param \BetaKiller\Helper\AppEnvInterface    $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface       $appEnv
      */
     public function __construct(AppConfigInterface $appConfig, AppEnvInterface $appEnv)
     {

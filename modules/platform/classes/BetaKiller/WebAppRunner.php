@@ -11,7 +11,7 @@ use BetaKiller\Assets\Middleware\UploadInfoMiddleware;
 use BetaKiller\Assets\Middleware\UploadMiddleware;
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
-use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
+use BetaKiller\Assets\Provider\HasPreviewProviderInterface;
 use BetaKiller\Assets\StaticFilesDeployHandler;
 use BetaKiller\Dev\UserDebugMiddleware;
 use BetaKiller\HitStat\HitStatMiddleware;
@@ -41,28 +41,28 @@ use BetaKiller\RequestHandler\App\I18next\FetchTranslationRequestHandler;
 use BetaKiller\RobotsTxt\RobotsTxtHandler;
 use BetaKiller\Security\CspReportHandler;
 use BetaKiller\Security\SecureHeadersMiddleware;
+use Mezzio\Application;
+use Mezzio\Flash\FlashMessageMiddleware;
+use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
+use Mezzio\Router\Middleware\DispatchMiddleware;
+use Mezzio\Router\Middleware\ImplicitHeadMiddleware;
+use Mezzio\Router\Middleware\ImplicitOptionsMiddleware;
+use Mezzio\Router\Middleware\MethodNotAllowedMiddleware;
+use Mezzio\Router\Middleware\RouteMiddleware;
 use Middlewares\ContentType;
 use Spotman\Api\ApiRequestHandler;
-use Zend\Expressive\Application;
-use Zend\Expressive\Flash\FlashMessageMiddleware;
-use Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware;
-use Zend\Expressive\Router\Middleware\DispatchMiddleware;
-use Zend\Expressive\Router\Middleware\ImplicitHeadMiddleware;
-use Zend\Expressive\Router\Middleware\ImplicitOptionsMiddleware;
-use Zend\Expressive\Router\Middleware\MethodNotAllowedMiddleware;
-use Zend\Expressive\Router\Middleware\RouteMiddleware;
 
-class WebApp
+final class WebAppRunner implements AppRunnerInterface
 {
     /**
-     * @var \Zend\Expressive\Application
+     * @var \Mezzio\Application
      */
-    private $app;
+    private Application $app;
 
     /**
      * WebApp constructor.
      *
-     * @param \Zend\Expressive\Application $app
+     * @param \Mezzio\Application $app
      */
     public function __construct(Application $app)
     {
@@ -176,7 +176,7 @@ class WebApp
         $downloadAction = AssetsProviderInterface::ACTION_DOWNLOAD;
         $originalAction = AssetsProviderInterface::ACTION_ORIGINAL;
         $deleteAction   = AssetsProviderInterface::ACTION_DELETE;
-        $previewAction  = ImageAssetsProviderInterface::ACTION_PREVIEW;
+        $previewAction  = HasPreviewProviderInterface::ACTION_PREVIEW;
 
         $uploadUrl = '/assets/{provider}/'.$uploadAction;
 

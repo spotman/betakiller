@@ -206,7 +206,7 @@ abstract class Kohana_Database_Result implements Countable, Iterator, SeekableIt
 	 *
 	 * @return  integer
 	 */
-	public function count()
+	public function count(): int
 	{
 		return $this->_total_rows;
 	}
@@ -222,7 +222,7 @@ abstract class Kohana_Database_Result implements Countable, Iterator, SeekableIt
 	 * @param   int     $offset
 	 * @return  boolean
 	 */
-	public function offsetExists($offset)
+	public function offsetExists($offset): bool
 	{
 		return ($offset >= 0 AND $offset < $this->_total_rows);
 	}
@@ -235,10 +235,9 @@ abstract class Kohana_Database_Result implements Countable, Iterator, SeekableIt
 	 * @param   int     $offset
 	 * @return  mixed
 	 */
-	public function offsetGet($offset)
+	public function offsetGet($offset): mixed
 	{
-		if ( ! $this->seek($offset))
-			return NULL;
+        $this->seek($offset);
 
 		return $this->current();
 	}
@@ -253,7 +252,7 @@ abstract class Kohana_Database_Result implements Countable, Iterator, SeekableIt
 	 * @return  void
 	 * @throws  Kohana_Exception
 	 */
-	final public function offsetSet($offset, $value)
+	final public function offsetSet($offset, $value): void
 	{
 		throw new Kohana_Exception('Database results are read-only');
 	}
@@ -267,7 +266,7 @@ abstract class Kohana_Database_Result implements Countable, Iterator, SeekableIt
 	 * @return  void
 	 * @throws  Kohana_Exception
 	 */
-	final public function offsetUnset($offset)
+	final public function offsetUnset($offset): void
 	{
 		throw new Kohana_Exception('Database results are read-only');
 	}
@@ -277,24 +276,23 @@ abstract class Kohana_Database_Result implements Countable, Iterator, SeekableIt
 	 *
 	 *     echo key($result);
 	 *
-	 * @return  integer
+	 * @return  mixed
 	 */
-	public function key()
+	public function key(): mixed
 	{
 		return $this->_current_row;
 	}
 
-	/**
-	 * Implements [Iterator::next], moves to the next row.
-	 *
-	 *     next($result);
-	 *
-	 * @return  $this
-	 */
-	public function next()
+    /**
+     * Implements [Iterator::next], moves to the next row.
+     *
+     *     next($result);
+     *
+     * @return void
+     */
+	public function next(): void
 	{
 		++$this->_current_row;
-		return $this;
 	}
 
 	/**
@@ -310,17 +308,16 @@ abstract class Kohana_Database_Result implements Countable, Iterator, SeekableIt
 		return $this;
 	}
 
-	/**
-	 * Implements [Iterator::rewind], sets the current row to zero.
-	 *
-	 *     rewind($result);
-	 *
-	 * @return  $this
-	 */
-	public function rewind()
+    /**
+     * Implements [Iterator::rewind], sets the current row to zero.
+     *
+     *     rewind($result);
+     *
+     * @return void
+     */
+	public function rewind(): void
 	{
 		$this->_current_row = 0;
-		return $this;
 	}
 
 	/**
@@ -330,8 +327,8 @@ abstract class Kohana_Database_Result implements Countable, Iterator, SeekableIt
 	 *
 	 * @return  boolean
 	 */
-	public function valid()
-	{
+	public function valid(): bool
+    {
 		return $this->offsetExists($this->_current_row);
 	}
 

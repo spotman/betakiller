@@ -3,7 +3,7 @@ namespace BetaKiller\Factory;
 
 use BetaKiller\Model\ExtendedOrmInterface;
 
-class OrmFactory
+class OrmFactory implements \OrmFactoryInterface
 {
     /**
      * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface

@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task;
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use Psr\Log\LoggerInterface;
 use Spotman\DotEnv\DotEnv;
 
 class StoreAppRevision extends AbstractTask
 {
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
@@ -27,9 +27,9 @@ class StoreAppRevision extends AbstractTask
     /**
      * StoreAppRevision constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
-     * @param \Spotman\DotEnv\DotEnv             $dotEnv
-     * @param \Psr\Log\LoggerInterface           $logger
+     * @param \BetaKiller\Env\AppEnvInterface $appEnv
+     * @param \Spotman\DotEnv\DotEnv          $dotEnv
+     * @param \Psr\Log\LoggerInterface        $logger
      */
     public function __construct(AppEnvInterface $appEnv, DotEnv $dotEnv, LoggerInterface $logger)
     {

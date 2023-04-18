@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\RobotsTxt;
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -12,14 +12,14 @@ use Psr\Http\Server\RequestHandlerInterface;
 class RobotsTxtHandler implements RequestHandlerInterface
 {
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
     /**
      * RobotsTxtHandler constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface $appEnv
      */
     public function __construct(AppEnvInterface $appEnv)
     {

@@ -6,7 +6,7 @@ namespace BetaKiller\HitStat;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception\HttpExceptionExpectedInterface;
 use BetaKiller\Exception\SeeOtherHttpException;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\Hit;
@@ -14,6 +14,7 @@ use BetaKiller\Model\HitInterface;
 use BetaKiller\Repository\HitRepositoryInterface;
 use BetaKiller\Service\HitService;
 use InvalidArgumentException;
+use Mezzio\Session\SessionIdentifierAwareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriFactoryInterface;
@@ -21,7 +22,6 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
-use Zend\Expressive\Session\SessionIdentifierAwareInterface;
 
 class HitStatMiddleware implements MiddlewareInterface
 {
@@ -31,7 +31,7 @@ class HitStatMiddleware implements MiddlewareInterface
     private HitService $service;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
@@ -53,7 +53,7 @@ class HitStatMiddleware implements MiddlewareInterface
     /**
      * HitStatMiddleware constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface            $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface               $appEnv
      * @param \BetaKiller\Service\HitService                $service
      * @param \Psr\Http\Message\UriFactoryInterface         $uriFactory
      * @param \BetaKiller\Repository\HitRepositoryInterface $hitRepo

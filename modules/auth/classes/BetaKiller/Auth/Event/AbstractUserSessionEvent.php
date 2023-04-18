@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace BetaKiller\Auth\Event;
 
 use BetaKiller\MessageBus\OutboundEventMessageInterface;
-use Zend\Expressive\Session\SessionIdentifierAwareInterface;
-use Zend\Expressive\Session\SessionInterface;
+use Mezzio\Session\SessionIdentifierAwareInterface;
+use Mezzio\Session\SessionInterface;
 
 // WAMP/Websocket daemon needs this events
 abstract class AbstractUserSessionEvent implements OutboundEventMessageInterface
@@ -18,7 +18,7 @@ abstract class AbstractUserSessionEvent implements OutboundEventMessageInterface
     /**
      * AbstractUserSessionEvent constructor.
      *
-     * @param \Zend\Expressive\Session\SessionInterface $session
+     * @param \Mezzio\Session\SessionInterface $session
      */
     public function __construct(SessionInterface $session)
     {

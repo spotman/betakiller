@@ -5,7 +5,7 @@ namespace BetaKiller\Task\Wamp;
 
 use BetaKiller\Api\Method\WampTest\DataApiMethod;
 use BetaKiller\Daemon\AbstractApiWorkerDaemon;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
@@ -23,7 +23,7 @@ use Thruway\Logging\Logger;
 class IsAlive extends AbstractTask
 {
     /**
-     * @var \Zend\Expressive\Session\SessionInterface|\Zend\Expressive\Session\SessionIdentifierAwareInterface
+     * @var \Mezzio\Session\SessionInterface|\Mezzio\Session\SessionIdentifierAwareInterface
      */
     private $session;
 
@@ -53,7 +53,7 @@ class IsAlive extends AbstractTask
     private $logger;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
@@ -68,17 +68,17 @@ class IsAlive extends AbstractTask
      * @param \BetaKiller\Session\SessionStorageInterface $sessionStorage
      * @param \BetaKiller\Wamp\WampClientBuilder          $clientFactory
      * @param \BetaKiller\Model\UserInterface             $user
-     * @param \BetaKiller\Helper\AppEnvInterface          $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface             $appEnv
      * @param \BetaKiller\Service\MaintenanceModeService  $maintenance
      * @param \Psr\Log\LoggerInterface                    $logger
      */
     public function __construct(
         SessionStorageInterface $sessionStorage,
-        WampClientBuilder $clientFactory,
-        UserInterface $user,
-        AppEnvInterface $appEnv,
-        MaintenanceModeService $maintenance,
-        LoggerInterface $logger
+        WampClientBuilder       $clientFactory,
+        UserInterface           $user,
+        AppEnvInterface         $appEnv,
+        MaintenanceModeService  $maintenance,
+        LoggerInterface         $logger
     ) {
         parent::__construct();
 
@@ -87,7 +87,7 @@ class IsAlive extends AbstractTask
         $this->clientBuilder  = $clientFactory;
         $this->appEnv         = $appEnv;
         $this->logger         = $logger;
-        $this->maintenance = $maintenance;
+        $this->maintenance    = $maintenance;
     }
 
     /**

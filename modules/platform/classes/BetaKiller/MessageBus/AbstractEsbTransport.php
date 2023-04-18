@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\MessageBus;
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use Clue\React\Redis\Client;
 use Clue\React\Redis\Factory;
@@ -16,7 +16,7 @@ use function React\Promise\reject;
 abstract class AbstractEsbTransport implements EventTransportInterface
 {
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
@@ -58,7 +58,7 @@ abstract class AbstractEsbTransport implements EventTransportInterface
     /**
      * AbstractEsbTransport constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface              $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface                 $appEnv
      * @param \BetaKiller\MessageBus\EventSerializerInterface $serializer
      * @param \Psr\Log\LoggerInterface                        $logger
      */

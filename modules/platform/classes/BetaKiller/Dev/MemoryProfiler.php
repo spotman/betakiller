@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Dev;
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use Psr\Log\LoggerInterface;
 
 class MemoryProfiler
@@ -14,15 +14,15 @@ class MemoryProfiler
     private LoggerInterface $logger;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
     /**
      * MemoryProfiler constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
-     * @param \Psr\Log\LoggerInterface           $logger
+     * @param \BetaKiller\Env\AppEnvInterface $appEnv
+     * @param \Psr\Log\LoggerInterface        $logger
      */
     public function __construct(AppEnvInterface $appEnv, LoggerInterface $logger)
     {

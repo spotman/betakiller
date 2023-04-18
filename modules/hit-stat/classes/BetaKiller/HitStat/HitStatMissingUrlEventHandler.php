@@ -2,14 +2,14 @@
 namespace BetaKiller\HitStat;
 
 use BetaKiller\Event\MissingUrlEvent;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Repository\HitPageRepositoryInterface;
 use BetaKiller\Service\HitService;
 
 final class HitStatMissingUrlEventHandler
 {
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
@@ -26,7 +26,7 @@ final class HitStatMissingUrlEventHandler
     /**
      * HitStatMissingUrlEventHandler constructor.
      *
-     * @param AppEnvInterface                                   $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface                   $appEnv
      * @param \BetaKiller\Repository\HitPageRepositoryInterface $pageRepo
      * @param \BetaKiller\Service\HitService                    $service
      */

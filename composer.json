@@ -22,16 +22,15 @@
     "ext-xml": "*",
     "ext-zlib": "*",
     "aidantwoods/secureheaders": "^2.0",
-    "asm89/twig-cache-extension": "^1.2",
     "beberlei/metrics": "^2.8",
     "bramus/monolog-colored-line-formatter": "~3.0",
     "caxy/php-htmldiff": "^0.1.6",
-    "clue/block-react": "^1.4",
     "clue/redis-react": "^2.4",
     "dflydev/fig-cookies": "^3.0",
     "doctrine/annotations": "^1.2",
     "doctrine/cache": "^1.6",
     "dragonmantank/cron-expression": "^2.0",
+    "elephox/mimey": "^4.0.5",
     "enqueue/dbal": "^0.10.18",
     "enqueue/enqueue": "^0.10.18",
     "enqueue/redis": "^0.10.18",
@@ -41,12 +40,21 @@
     "hansott/psr7-cookies": "^3.0",
     "imangazaliev/didom": "^1.14",
     "jakeasmith/http_build_url": "^1",
+    "laminas/laminas-dependency-plugin": "^2.1",
+    "laminas/laminas-diactoros": "^2.0",
+    "laminas/laminas-httphandlerrunner": "^1.0",
+    "laminas/laminas-permissions-acl": "^2.7",
+    "mezzio/mezzio": "^3.2",
+    "mezzio/mezzio-fastroute": "^3.0",
+    "mezzio/mezzio-flash": "^1.0",
+    "mezzio/mezzio-helpers": "^5.1",
+    "mezzio/mezzio-session": "^1.1",
     "middlewares/negotiation": "^2.1",
     "mmamedov/page-cache": "^2.0",
     "monolog/monolog": "^2.2",
     "pcelta/doctrine-cache-factory": "^0.1.0",
     "php-console/php-console": "^3.1",
-    "php-di/php-di": "^6.0",
+    "php-di/php-di": "^7.0",
     "php-http/guzzle6-adapter": "^2.0",
     "php-http/message": "^1.7",
     "php-middleware/php-debug-bar": "^4.2.0",
@@ -54,7 +62,7 @@
     "psr/log": "^1.0",
     "psr/simple-cache": "^1.0",
     "punic/punic": "^3.1",
-    "elephox/mimey": "^4.0.5",
+    "react/async": "^4.0",
     "react/child-process": "^0.6.1",
     "roave/doctrine-simplecache": "^2.2",
     "samdark/sitemap": "^2.0",
@@ -66,18 +74,11 @@
     "symfony/yaml": "^4.0",
     "thruway/pawl-transport": "^0.5.0",
     "thunderer/shortcode": "^0.7",
+    "twig/cache-extra": "^v3.5.0",
     "twig/extensions": "^1.5",
     "twig/twig": "^2.6.0",
     "vlucas/phpdotenv": "^3.3",
-    "voryx/thruway": "^0.5.3",
-    "zendframework/zend-diactoros": "^2.0",
-    "zendframework/zend-expressive": "^3.2",
-    "zendframework/zend-expressive-fastroute": "^3.0",
-    "zendframework/zend-expressive-flash": "^1.0",
-    "zendframework/zend-expressive-helpers": "^5.1",
-    "zendframework/zend-expressive-session": "^1.1",
-    "zendframework/zend-httphandlerrunner": "^1.0",
-    "zendframework/zend-permissions-acl": "^2.7"
+    "voryx/thruway": "^0.5.3"
   },
   "require-dev": {
     "codedungeon/phpunit-result-printer": "^0.32.0",
@@ -118,8 +119,20 @@
   },
   "config": {
     "platform": {
-      "php": "8.1"
+      "php": "8.1.11"
     },
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "php-http/discovery": true,
+      "laminas/laminas-dependency-plugin": true
+    }
+  },
+  "autoload": {
+    "files": [
+      "./functions.php"
+    ],
+    "psr-4": {
+      "BetaKiller\\Env\\": "modules/env/classes/BetaKiller/Env"
+    }
   }
 }

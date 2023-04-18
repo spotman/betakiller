@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\I18n;
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Task\AbstractTask;
@@ -17,7 +17,7 @@ final class ExportToExcel extends AbstractTask
     private const CELL_DE  = 'de';
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
@@ -29,8 +29,8 @@ final class ExportToExcel extends AbstractTask
     /**
      * ExportToExcel constructor.
      *
-     * @param \BetaKiller\I18n\I18nFacade        $i18n
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \BetaKiller\I18n\I18nFacade     $i18n
+     * @param \BetaKiller\Env\AppEnvInterface $appEnv
      */
     public function __construct(I18nFacade $i18n, AppEnvInterface $appEnv)
     {

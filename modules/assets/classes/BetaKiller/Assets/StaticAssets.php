@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Assets;
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use HTML;
 use Kohana;
 use Psr\Http\Message\UriInterface;
@@ -11,7 +11,7 @@ use Psr\Http\Message\UriInterface;
 class StaticAssets
 {
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
@@ -37,8 +37,8 @@ class StaticAssets
     /**
      * JS constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
-     * @param \BetaKiller\Assets\AssetsConfig    $config
+     * @param \BetaKiller\Env\AppEnvInterface $appEnv
+     * @param \BetaKiller\Assets\AssetsConfig $config
      */
     public function __construct(AppEnvInterface $appEnv, AssetsConfig $config)
     {

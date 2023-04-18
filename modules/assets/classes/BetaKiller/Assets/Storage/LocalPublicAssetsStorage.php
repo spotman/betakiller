@@ -2,21 +2,21 @@
 namespace BetaKiller\Assets\Storage;
 
 use BetaKiller\Assets\Exception\AssetsStorageException;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 
 final class LocalPublicAssetsStorage extends AbstractLocalAssetsStorage
 {
     public const CODENAME = 'LocalPublic';
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
     /**
      * AbstractLocalAssetsStorage constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface $appEnv
      */
     public function __construct(AppEnvInterface $appEnv)
     {

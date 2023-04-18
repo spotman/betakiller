@@ -6,19 +6,19 @@ namespace BetaKiller\Assets;
 use BetaKiller\Assets\Exception\AssetsProviderException;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 
 class AssetsDeploymentService
 {
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
     /**
      * AssetsDeploymentService constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface $appEnv
      */
     public function __construct(AppEnvInterface $appEnv)
     {

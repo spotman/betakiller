@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url;
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Url\ModelProvider\UrlElementProviderDatabase;
 use BetaKiller\Url\ModelProvider\UrlElementProviderXmlConfig;
@@ -38,7 +38,7 @@ class UrlElementTreeLoader
     private LoggerInterface $logger;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
@@ -47,7 +47,7 @@ class UrlElementTreeLoader
      *
      * @param \BetaKiller\Url\ModelProvider\UrlElementProviderDatabase  $databaseProvider
      * @param \BetaKiller\Url\ModelProvider\UrlElementProviderXmlConfig $xmlProvider
-     * @param \BetaKiller\Helper\AppEnvInterface                        $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface                           $appEnv
      * @param \Psr\SimpleCache\CacheInterface                           $cache
      * @param \Psr\Log\LoggerInterface                                  $logger
      */

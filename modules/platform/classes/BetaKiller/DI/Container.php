@@ -3,8 +3,7 @@ namespace BetaKiller\DI;
 
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Exception;
-use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Log\LoggerInterface;
+use BetaKiller\Env\AppEnvInterface;
 use DI\ContainerBuilder;
 use DI\DependencyException;
 use Invoker\Exception\InvocationException;
@@ -17,84 +16,79 @@ final class Container implements ContainerInterface
     /**
      * @var Container|null
      */
-    private static ?Container $instance = null;
+    private static ?ContainerInterface $instance = null;
 
     /**
-     * @var \DI\Container|null
+     * @var \DI\Container
      */
-    private ?\DI\Container $container = null;
+    private \DI\Container $container;
+
+    public static function factory(
+        AppEnvInterface         $appEnv,
+        ConfigProviderInterface $configProvider
+    ): ContainerInterface {
+        if (self::$instance) {
+            throw new \LogicException('DI container is already initialized');
+        }
+
+        return self::$instance = new self($appEnv, $configProvider);
+    }
 
     /**
      * @deprecated Bad practice, use DI in constructor instead
      */
     public static function getInstance(): self
     {
-        if (!static::$instance) {
-            static::$instance = new static;
+        if (!self::$instance) {
+            throw new Exception('Initialize DI container before using it');
         }
 
-        return static::$instance;
+        return self::$instance;
     }
 
     /**
      * You can`t create objects directly, use CLASS::instance() instead
      * Also you can define your own protected constructor in child class
      */
-    private function __construct()
-    {
-    }
-
-    public function init(
-        ConfigProviderInterface $configProvider,
-        AppEnvInterface $appEnv,
-        LoggerInterface $logger
-    ): void {
-        if ($this->container) {
-            throw new Exception('Container is already initialized');
-        }
-
+    private function __construct(
+        AppEnvInterface         $appEnv,
+        ConfigProviderInterface $configProvider
+    ) {
         $builder = new ContainerBuilder();
+
+        /** @see http://php-di.org/doc/performances.html */
+        $enableOptimization = $appEnv->isAppRunning() && ($appEnv->inProductionMode() || $appEnv->inStagingMode());
+
+        if ($enableOptimization) {
+            $compileTo = $appEnv->getCachePath('php-di');
+            $builder->enableCompilation($compileTo);
+
+            if (function_exists('apcu_enabled') && apcu_enabled()) {
+                $builder->enableDefinitionCache();
+            }
+        }
 
         $config = (array)$configProvider->load(['php-di']);
 
-        $definitions    = $config['definitions'];
-        $useAutowiring  = $config['autowiring'] ?? true;
-        $useAnnotations = $config['annotations'] ?? true;
-
-        /** @url http://php-di.org/doc/performances.html */
-        $compile          = $config['compile'];
-        $cacheDefinitions = $config['cache_definitions'];
-
-        if ($compile) {
-            $compileTo = $appEnv->getCachePath('php-di');
-            $builder->enableCompilation($compileTo);
-        }
-
-        if ($cacheDefinitions) {
-            $builder->enableDefinitionCache();
-        }
+        $definitions = $config['definitions'] ?? [];
 
         $builder->addDefinitions($definitions);
 
         // Add core classes explicitly
         $builder->addDefinitions([
-            AppEnvInterface::class          => $appEnv,
-            ConfigProviderInterface::class  => $configProvider,
-
-            // Inject PSR logger and BetaKiller logger
-            LoggerInterface::class          => $logger,
-            \Psr\Log\LoggerInterface::class => $logger,
+            AppEnvInterface::class         => $appEnv,
+            ConfigProviderInterface::class => $configProvider,
 
             // Inject container into factories
-            ContainerInterface::class       => $this,
+            ContainerInterface::class      => $this,
 
             // Use Invoker for calling methods and lambda functions with dependencies
-            InvokerInterface::class         => $this,
+            InvokerInterface::class        => $this,
         ]);
 
         $this->container = $builder
-            ->useAutowiring($useAutowiring)
-            ->useAnnotations($useAnnotations)
+            ->useAutowiring(true)
+            ->useAttributes(true)
             ->build();
     }
 
@@ -110,7 +104,7 @@ final class Container implements ContainerInterface
      */
     public function get($id)
     {
-        return $this->getContainer()->get($id);
+        return $this->container->get($id);
     }
 
     /**
@@ -123,7 +117,7 @@ final class Container implements ContainerInterface
      */
     public function has($id): bool
     {
-        return $this->getContainer()->has($id);
+        return $this->container->has($id);
     }
 
     /**
@@ -139,9 +133,9 @@ final class Container implements ContainerInterface
      * @throws \DI\NotFoundException         No entry or class found for the given name.
      * @throws \InvalidArgumentException The name parameter must be of type string.
      */
-    public function make($name, array $parameters = null)
+    public function make(string $name, array $parameters = null): mixed
     {
-        return $this->getContainer()->make($name, $parameters ?? []);
+        return $this->container->make($name, $parameters ?? []);
     }
 
     /**
@@ -158,19 +152,7 @@ final class Container implements ContainerInterface
      */
     public function call($callable, array $parameters = null)
     {
-        return $this->getContainer()->call($callable, $parameters ?: []);
-    }
-
-    /**
-     * @return \DI\Container
-     */
-    private function getContainer(): \DI\Container
-    {
-        if (!$this->container) {
-            throw new Exception('Initialize DI container before using it');
-        }
-
-        return $this->container;
+        return $this->container->call($callable, $parameters ?: []);
     }
 
     /**

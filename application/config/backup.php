@@ -1,8 +1,10 @@
 <?php
 
-return array(
+use BetaKiller\Env\AppEnv;
 
-    'database'  =>  'default',
-    'folder'    =>  MultiSite::instance()->getSitePath(),
+return [
 
-);
+    'database' => 'default',
+    'folder'   => AppEnv::instance()->getAppRootPath(),
+
+];

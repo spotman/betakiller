@@ -16,8 +16,8 @@ use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Session\SessionStorageInterface;
+use Mezzio\Session\SessionInterface;
 use Spotman\Acl\AclInterface;
-use Zend\Expressive\Session\SessionInterface;
 
 class AuthService
 {
@@ -42,7 +42,7 @@ class AuthService
     /**
      * @var \BetaKiller\Factory\GuestUserFactory
      */
-    private $guestUserFactory;
+    private GuestUserFactory $guestUserFactory;
 
     /**
      * @var \BetaKiller\MessageBus\EventBusInterface
@@ -65,12 +65,12 @@ class AuthService
      * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
     public function __construct(
-        SessionConfigInterface $config,
+        SessionConfigInterface  $config,
         SessionStorageInterface $sessionStorage,
-        GuestUserFactory $guestUserFactory,
+        GuestUserFactory        $guestUserFactory,
         UserRepositoryInterface $userRepo,
-        AclInterface $acl,
-        EventBusInterface $eventBus
+        AclInterface            $acl,
+        EventBusInterface       $eventBus
     ) {
         $this->config           = $config;
         $this->sessionStorage   = $sessionStorage;
@@ -119,8 +119,8 @@ class AuthService
     /**
      * Attempt to log in a user by using an ORM object and plain-text password.
      *
-     * @param \Zend\Expressive\Session\SessionInterface $session
-     * @param \BetaKiller\Model\UserInterface           $user
+     * @param \Mezzio\Session\SessionInterface $session
+     * @param \BetaKiller\Model\UserInterface  $user
      *
      * @return void
      * @throws \BetaKiller\Auth\AccessDeniedException
@@ -130,7 +130,7 @@ class AuthService
      */
     public function login(
         SessionInterface $session,
-        UserInterface $user
+        UserInterface    $user
     ): void {
         // Check account is active
         if (!$user->isActive()) {

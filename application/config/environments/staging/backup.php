@@ -1,8 +1,10 @@
 <?php
 
+use BetaKiller\Env\AppEnv;
+
 return [
 
     // Include core
-    'folder' => MultiSite::instance()->getSitePath().'/../',
+    'folder' => AppEnv::instance()->getAppRootPath().'/../',
 
 ];

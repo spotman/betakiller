@@ -2,7 +2,8 @@
 namespace BetaKiller\Task;
 
 use Beberlei\Metrics\Collector\Collector;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
+use DI\Attribute\Inject;
 use Minion_CLI;
 use Minion_Task;
 
@@ -11,9 +12,9 @@ abstract class AbstractTask extends Minion_Task
     public const CLI_USER_NAME = 'minion';
 
     /**
-     * @Inject
      * @var \Beberlei\Metrics\Collector\Collector
      */
+    #[Inject]
     private Collector $metrics;
 
     public function __construct()

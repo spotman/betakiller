@@ -6,16 +6,14 @@ namespace BetaKiller\Wamp;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\WampConfigInterface;
 use BetaKiller\DI\ContainerInterface;
-use BetaKiller\Helper\CookieHelper;
-use BetaKiller\Session\DatabaseSessionStorage;
 use InvalidArgumentException;
 use LogicException;
+use Mezzio\Session\SessionIdentifierAwareInterface;
+use Mezzio\Session\SessionInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Thruway\Authentication\ClientWampCraAuthenticator;
 use Thruway\Transport\PawlTransportProvider;
-use Zend\Expressive\Session\SessionIdentifierAwareInterface;
-use Zend\Expressive\Session\SessionInterface;
 
 class WampClientBuilder
 {
@@ -39,11 +37,6 @@ class WampClientBuilder
      * @var \BetaKiller\DI\ContainerInterface
      */
     private $container;
-
-    /**
-     * @var \BetaKiller\Helper\CookieHelper
-     */
-    private $cookieHelper;
 
     /**
      * @var string
@@ -76,21 +69,18 @@ class WampClientBuilder
      * @param \BetaKiller\Config\WampConfigInterface $wampConfig
      * @param \BetaKiller\Config\AppConfigInterface  $appConfig
      * @param \BetaKiller\DI\ContainerInterface      $container
-     * @param \BetaKiller\Helper\CookieHelper        $cookieHelper
      * @param \Psr\Log\LoggerInterface               $logger
      */
     public function __construct(
         WampConfigInterface $wampConfig,
-        AppConfigInterface $appConfig,
-        ContainerInterface $container,
-        CookieHelper $cookieHelper,
-        LoggerInterface $logger
+        AppConfigInterface  $appConfig,
+        ContainerInterface  $container,
+        LoggerInterface     $logger
     ) {
-        $this->wampConfig   = $wampConfig;
-        $this->appConfig    = $appConfig;
-        $this->container    = $container;
-        $this->cookieHelper = $cookieHelper;
-        $this->logger       = $logger;
+        $this->wampConfig = $wampConfig;
+        $this->appConfig  = $appConfig;
+        $this->container  = $container;
+        $this->logger     = $logger;
     }
 
     public function internalConnection(): self
@@ -226,11 +216,7 @@ class WampClientBuilder
             throw new LogicException('Session must implement '.SessionIdentifierAwareInterface::class);
         }
 
-        // Encode SessionID like Cookies do
-        $authId = $this->cookieHelper->encodeValue(
-            DatabaseSessionStorage::COOKIE_NAME,
-            $this->session->getId()
-        );
+        $authId = $this->session->getId();
 
         $auth = new ClientWampCraAuthenticator($authId, $authId); // No more user-agent here
 

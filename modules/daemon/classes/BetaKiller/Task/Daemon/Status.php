@@ -5,7 +5,7 @@ namespace BetaKiller\Task\Daemon;
 
 use BetaKiller\Daemon\DaemonLockFactory;
 use BetaKiller\Daemon\ShutdownDaemonException;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Symfony\Component\Process\Process;
@@ -13,7 +13,7 @@ use Symfony\Component\Process\Process;
 class Status extends AbstractTask
 {
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
@@ -26,7 +26,7 @@ class Status extends AbstractTask
      * Start constructor.
      *
      * @param \BetaKiller\Daemon\DaemonLockFactory $lockFactory
-     * @param \BetaKiller\Helper\AppEnvInterface   $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface      $appEnv
      */
     public function __construct(DaemonLockFactory $lockFactory, AppEnvInterface $appEnv)
     {

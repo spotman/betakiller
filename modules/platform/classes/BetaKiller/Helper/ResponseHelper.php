@@ -6,13 +6,13 @@ namespace BetaKiller\Helper;
 use DateInterval;
 use DateTimeImmutable;
 use Psr\Http\Message\ResponseInterface;
-use Zend\Diactoros\Response;
-use Zend\Diactoros\Response\HtmlResponse;
-use Zend\Diactoros\Response\JsonResponse;
-use Zend\Diactoros\Response\RedirectResponse;
-use Zend\Diactoros\Response\TextResponse;
-use Zend\Diactoros\Response\XmlResponse;
-use Zend\Diactoros\Stream;
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\Response\RedirectResponse;
+use Laminas\Diactoros\Response\TextResponse;
+use Laminas\Diactoros\Response\XmlResponse;
+use Laminas\Diactoros\Stream;
 
 class ResponseHelper
 {

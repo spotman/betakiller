@@ -5,7 +5,7 @@ namespace BetaKiller\Error;
 
 use BetaKiller\ExceptionInterface;
 use BetaKiller\Factory\IFaceFactory;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -15,15 +15,15 @@ use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\View\IFaceView;
+use Laminas\Diactoros\Response\HtmlResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Zend\Diactoros\Response\HtmlResponse;
 
 class ErrorPageRenderer implements ErrorPageRendererInterface
 {
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
@@ -57,18 +57,18 @@ class ErrorPageRenderer implements ErrorPageRendererInterface
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface $tree
      * @param \BetaKiller\Factory\IFaceFactory        $ifaceFactory
-     * @param \BetaKiller\Helper\AppEnvInterface      $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface         $appEnv
      * @param \BetaKiller\View\IFaceView              $ifaceView
      * @param \BetaKiller\Error\ExceptionService      $exceptionService
      * @param \Psr\Log\LoggerInterface                $logger
      */
     public function __construct(
         UrlElementTreeInterface $tree,
-        IFaceFactory $ifaceFactory,
-        AppEnvInterface $appEnv,
-        IFaceView $ifaceView,
-        ExceptionService $exceptionService,
-        LoggerInterface $logger
+        IFaceFactory            $ifaceFactory,
+        AppEnvInterface         $appEnv,
+        IFaceView               $ifaceView,
+        ExceptionService        $exceptionService,
+        LoggerInterface         $logger
     ) {
         $this->appEnv           = $appEnv;
         $this->ifaceView        = $ifaceView;

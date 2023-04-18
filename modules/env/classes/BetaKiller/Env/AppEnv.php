@@ -1,80 +1,74 @@
 <?php
-namespace BetaKiller\Helper;
+namespace BetaKiller\Env;
 
-use BetaKiller\Exception;
 use Dotenv\Dotenv;
+use function stream_isatty;
 
 /**
  * Class AppEnv
  *
  * @package BetaKiller\Helper
  */
-class AppEnv implements AppEnvInterface
+final class AppEnv implements AppEnvInterface
 {
-    /**
-     * @var bool
-     */
-    private $debugEnabled = false;
-
-    /**
-     * @var string
-     */
-    private $mode;
-
-    /**
-     * @var string
-     */
-    private $appRootPath;
-
-    /**
-     * @var string
-     */
-    private $docRootPath;
+    private static ?AppEnvInterface $instance = null;
 
     /**
      * @var bool
      */
-    private $isCoreRunning;
+    private bool $debugEnabled = false;
 
     /**
-     * AppEnv constructor.
-     *
-     * @param string $appRoot
-     * @param string $docRoot
-     * @param bool   $isCoreRunning
+     * @var string
      */
-    public function __construct(string $appRoot, string $docRoot, bool $isCoreRunning)
+    private string $mode = AppEnvInterface::MODE_PRODUCTION;
+
+    /**
+     * @var string
+     */
+    private string $url;
+
+    /**
+     * @var string
+     */
+    private string $revision;
+
+    /**
+     * @var string
+     */
+    private string $appRootPath;
+
+    private bool $isAppRunning = false;
+
+    public static function instance(): AppEnvInterface
     {
-        $this->appRootPath   = $appRoot;
-        $this->docRootPath   = $docRoot;
-        $this->isCoreRunning = $isCoreRunning;
+        if (!self::$instance) {
+            self::$instance = new self;
+        }
 
-        $this->initDotEnv();
-        $this->detectAppMode();
-        $this->detectDebugMode();
-        $this->detectCliEnv(); // Cli options can override app configuration
+        return self::$instance;
     }
 
-    private function initDotEnv(): void
+    private function __construct()
     {
-        $dotEnv = Dotenv::create($this->appRootPath);
+        if ($this->isCli()) {
+            $this->detectCliEnv(); // Cli options can override app configuration
+        }
 
-        // Load local .env file if exists even in production, ignore missing file
-        $dotEnv->safeLoad();
+        $this->detectAppRunning();
 
-        // App absolute URL with scheme
-        $dotEnv->required(self::APP_URL)->notEmpty();
-
-        // App mode (via SetEnv in .htaccess or VirtualHost)
-        $dotEnv->required(self::APP_MODE)->notEmpty()->allowedValues(self::ALLOWED_MODES);
-
-        // Current git revision (set upon deployment process)
-        $dotEnv->required(self::APP_REVISION)->notEmpty();
+        if ($this->isAppRunning) {
+            $this->detectAppMode();
+            $this->detectAppRoot();
+            $this->detectAppUrl();
+            $this->detectAppRevision();
+            $this->detectDebugMode();
+        }
     }
 
     private function detectDebugMode(): void
     {
-        if (!$this->inProductionMode() && (bool)\getenv('APP_DEBUG')) {
+        if (!$this->inProductionMode() && $this->hasEnvVariable(self::APP_DEBUG)) {
             $this->enableDebug();
         }
     }
@@ -84,18 +78,38 @@ class AppEnv implements AppEnvInterface
         $this->mode = $this->getEnvVariable(self::APP_MODE);
     }
 
+    private function detectAppRoot(): void
+    {
+        $this->appRootPath = $this->getEnvVariable(self::APP_ROOT_PATH);
+    }
+
+    private function detectAppUrl(): void
+    {
+        $this->url = $this->getEnvVariable(self::APP_URL);
+    }
+
+    private function detectAppRevision(): void
+    {
+        $this->revision = $this->getEnvVariable(self::APP_REVISION);
+    }
+
+    private function detectAppRunning(): void
+    {
+        $this->isAppRunning = $this->hasEnvVariable(self::APP_ROOT_PATH);
+    }
+
     private function detectCliEnv(): void
     {
-        if (!$this->isCli()) {
-            return;
-        }
-
         $debugOption = $this->getCliOption('debug', false);
 
         if ($debugOption === 'true') {
-            $this->enableDebug();
-        } elseif ($debugOption === 'false') {
-            $this->disableDebug();
+            // Set variable
+            putenv(self::APP_DEBUG.'=true');
+        }
+
+        if ($debugOption === 'false') {
+            // Remove variable
+            putenv(self::APP_DEBUG);
         }
 
         $stage = $this->getCliOption('stage');
@@ -103,6 +117,16 @@ class AppEnv implements AppEnvInterface
         if ($stage) {
             \putenv(self::APP_MODE.'='.$stage);
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasEnvVariable(string $name): bool
+    {
+        $name = \mb_strtoupper($name);
+
+        return !empty(getenv($name));
     }
 
     /**
@@ -117,7 +141,7 @@ class AppEnv implements AppEnvInterface
         $value = getenv($name);
 
         if (!$value && $required) {
-            throw new Exception('Missing :name env variable', [':name' => $name]);
+            throw new \LogicException('Missing :name env variable', [':name' => $name]);
         }
 
         return (string)$value;
@@ -146,24 +170,6 @@ class AppEnv implements AppEnvInterface
         return $this->mode === self::MODE_STAGING;
     }
 
-    public function isDebugEnabled(): bool
-    {
-        return $this->debugEnabled;
-    }
-
-    public function enableDebug(): void
-    {
-        $this->debugEnabled = true;
-    }
-
-    /**
-     * Call this method to disable debug mode
-     */
-    public function disableDebug(): void
-    {
-        $this->debugEnabled = false;
-    }
-
     public function getModeName(): string
     {
         return $this->mode;
@@ -171,7 +177,38 @@ class AppEnv implements AppEnvInterface
 
     public function getRevisionKey(): string
     {
-        return $this->getEnvVariable(self::APP_REVISION);
+        return $this->revision;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAppCodename(): string
+    {
+        return basename($this->appRootPath);
+    }
+
+    public function getAppUrl(): string
+    {
+        return $this->url;
+    }
+
+    public function getAppRootPath(): string
+    {
+        return $this->appRootPath;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDocRootPath(): string
+    {
+        return $this->appRootPath.DIRECTORY_SEPARATOR.'public';
+    }
+
+    public function isAppRunning(): bool
+    {
+        return $this->isAppRunning;
     }
 
     /**
@@ -197,9 +234,14 @@ class AppEnv implements AppEnvInterface
         }
     }
 
-    public function getAppRootPath(): string
+    /**
+     * Returns true when app was server by an internal PHP web-server (php -S)
+     *
+     * @return bool
+     */
+    public function isInternalWebServer(): bool
     {
-        return $this->appRootPath;
+        return PHP_SAPI === 'cli-server';
     }
 
     /**
@@ -215,32 +257,6 @@ class AppEnv implements AppEnvInterface
 
         // Human otherwise
         return true;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDocRootPath(): string
-    {
-        return $this->docRootPath;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAppCodename(): string
-    {
-        return basename($this->appRootPath);
-    }
-
-    /**
-     * Returns true if this is a core run (core console commands, CI tests, etc)
-     *
-     * @return bool
-     */
-    public function isCoreRunning(): bool
-    {
-        return $this->isCoreRunning;
     }
 
     /**
@@ -275,9 +291,13 @@ class AppEnv implements AppEnvInterface
      */
     public function getTempPath(string $target): string
     {
+        $envKey = $this->isAppRunning
+            ? $this->getAppCodename().'.'.$this->getModeName()
+            : 'core';
+
         $path = implode(\DIRECTORY_SEPARATOR, [
             \sys_get_temp_dir(),
-            $this->getAppCodename().'.'.$this->getModeName(),
+            $envKey,
             $target,
         ]);
 
@@ -296,8 +316,24 @@ class AppEnv implements AppEnvInterface
     public function getStoragePath(string $target): string
     {
         $path = implode(\DIRECTORY_SEPARATOR, [
-            $this->getAppRootPath(),
+            $this->getWorkingPath(),
             'storage',
+            $target,
+        ]);
+
+        $this->checkFileDirectoryExists($path);
+
+        return $path;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLogsPath(string $target): string
+    {
+        $path = implode(\DIRECTORY_SEPARATOR, [
+            $this->getWorkingPath(),
+            'logs',
             $target,
         ]);
 
@@ -312,7 +348,7 @@ class AppEnv implements AppEnvInterface
     public function getCachePath(string $target): string
     {
         $path = implode(\DIRECTORY_SEPARATOR, [
-            $this->getAppRootPath(),
+            $this->getWorkingPath(),
             'cache',
             $target,
         ]);
@@ -329,17 +365,45 @@ class AppEnv implements AppEnvInterface
      */
     public function getDebugEmail(): string
     {
-        return $this->getEnvVariable('DEBUG_EMAIL_ADDRESS');
+        return $this->getEnvVariable(self::DEBUG_EMAIL_ADDRESS);
+    }
+
+    public function isDebugEnabled(): bool
+    {
+        return $this->debugEnabled;
+    }
+
+    public function enableDebug(): void
+    {
+        $this->debugEnabled = true;
     }
 
     /**
-     * Returns true when app was server by an internal PHP web-server (php -S)
-     *
-     * @return bool
+     * Call this method to disable debug mode
      */
-    public function isInternalWebServer(): bool
+    public function disableDebug(): void
     {
-        return PHP_SAPI === 'cli-server';
+        $this->debugEnabled = false;
+    }
+
+    public function validateEnvVariables(): void
+    {
+        $dotEnv = Dotenv::create($this->getAppRootPath());
+
+//        // Load local .env file if exists even in production, ignore missing file
+//        $dotEnv->safeLoad();
+
+        // App mode (via SetEnv in .htaccess or VirtualHost)
+        $dotEnv->required(self::APP_MODE)->notEmpty()->allowedValues(self::ALLOWED_MODES);
+
+        // Absolute path to app root
+        $dotEnv->required(self::APP_ROOT_PATH)->notEmpty();
+
+        // Absolute URL with scheme
+        $dotEnv->required(self::APP_URL)->notEmpty();
+
+        // Current git revision (set upon deployment process)
+        $dotEnv->required(self::APP_REVISION)->notEmpty();
     }
 
     private function checkFileDirectoryExists(string $filePath): void
@@ -350,5 +414,10 @@ class AppEnv implements AppEnvInterface
         if (!is_dir($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $dir));
         }
+    }
+
+    private function getWorkingPath(): string
+    {
+        return $this->isAppRunning ? $this->appRootPath : DOCROOT;
     }
 }

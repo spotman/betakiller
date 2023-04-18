@@ -10,19 +10,18 @@ use BetaKiller\Daemon\DaemonLockFactory;
 use BetaKiller\Daemon\FsWatcher;
 use BetaKiller\Daemon\ShutdownDaemonException;
 use BetaKiller\Dev\MemoryProfiler;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Log\LoggerInterface;
 use BetaKiller\ProcessLock\LockInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Database;
-use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
-use function Clue\React\Block\await;
+use function React\Async\await;
 use function React\Promise\reject;
 use function React\Promise\Timer\timeout;
 
@@ -47,7 +46,7 @@ final class Runner extends AbstractTask
     private DaemonLockFactory $lockFactory;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
 
@@ -121,20 +120,20 @@ final class Runner extends AbstractTask
      *
      * @param \BetaKiller\Daemon\DaemonFactory     $daemonFactory
      * @param \BetaKiller\Daemon\DaemonLockFactory $lockFactory
-     * @param \BetaKiller\Helper\AppEnvInterface   $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface      $appEnv
      * @param \BetaKiller\Daemon\FsWatcher         $fsWatcher
      * @param \BetaKiller\Dev\MemoryProfiler       $memProf
      * @param \React\EventLoop\LoopInterface       $loop
      * @param \BetaKiller\Log\LoggerInterface      $logger
      */
     public function __construct(
-        DaemonFactory $daemonFactory,
+        DaemonFactory     $daemonFactory,
         DaemonLockFactory $lockFactory,
-        AppEnvInterface $appEnv,
-        FsWatcher $fsWatcher,
-        MemoryProfiler $memProf,
-        LoopInterface $loop,
-        LoggerInterface $logger
+        AppEnvInterface   $appEnv,
+        FsWatcher         $fsWatcher,
+        MemoryProfiler    $memProf,
+        LoopInterface     $loop,
+        LoggerInterface   $logger
     ) {
         $this->daemonFactory = $daemonFactory;
         $this->lockFactory   = $lockFactory;
@@ -222,7 +221,7 @@ final class Runner extends AbstractTask
 
         $this->startMemoryConsumptionGuard();
 
-        await($this->start(), Factory::create(), AbstractDaemon::STARTUP_TIMEOUT + 2);
+        await($this->start());
 
         // Based on the included files
         if ($this->appEnv->inDevelopmentMode() && $this->daemon->isRestartOnFsChangesAllowed()) {

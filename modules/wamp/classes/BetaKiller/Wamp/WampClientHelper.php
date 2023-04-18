@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Wamp;
 
-use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\AuthService;
-use BetaKiller\Session\DatabaseSessionStorage;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 
@@ -16,11 +14,6 @@ class WampClientHelper
      * @var \BetaKiller\Service\AuthService
      */
     private $auth;
-
-    /**
-     * @var \BetaKiller\Helper\CookieHelper
-     */
-    private $cookieHelper;
 
     /**
      * @var \BetaKiller\Wamp\WampSessionStorage
@@ -44,18 +37,15 @@ class WampClientHelper
 
     /**
      * @param \BetaKiller\Service\AuthService     $auth
-     * @param \BetaKiller\Helper\CookieHelper     $cookieHelper
      * @param \BetaKiller\Wamp\WampSessionStorage $sessionStorage
      * @param \Psr\Log\LoggerInterface            $logger
      */
     public function __construct(
-        AuthService $auth,
-        CookieHelper $cookieHelper,
+        AuthService        $auth,
         WampSessionStorage $sessionStorage,
-        LoggerInterface $logger
+        LoggerInterface    $logger
     ) {
         $this->auth           = $auth;
-        $this->cookieHelper   = $cookieHelper;
         $this->sessionStorage = $sessionStorage;
         $this->logger         = $logger;
     }
@@ -114,8 +104,7 @@ class WampClientHelper
 
         // Initialize WAMP session if not exists
         if (!$wampSession) {
-            $sessionID   = $this->cookieHelper->decodeValue(DatabaseSessionStorage::COOKIE_NAME, $authID);
-            $userSession = $this->auth->getSession($sessionID);
+            $userSession = $this->auth->getSession($authID);
             $wampSession = new WampSession($authID, $userSession);
 
             if ($this->isCacheEnabled) {

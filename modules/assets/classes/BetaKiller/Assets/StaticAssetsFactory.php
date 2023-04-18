@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Assets;
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use Psr\Container\ContainerInterface;
 
 class StaticAssetsFactory

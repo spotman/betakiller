@@ -5,7 +5,7 @@ namespace BetaKiller\Test;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\SessionConfigInterface;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -19,7 +19,7 @@ use BetaKiller\Session\SessionStorageInterface;
 use Dflydev\FigCookies\SetCookies;
 use Middlewares\Utils\RequestHandler;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\ServerRequest;
+use Laminas\Diactoros\ServerRequest;
 
 final class DatabaseSessionStorageTest extends AbstractTestCase
 {
@@ -249,10 +249,6 @@ final class DatabaseSessionStorageTest extends AbstractTestCase
         $sessionRepo   = $this->createMock(UserSessionRepositoryInterface::class);
         $sessionConfig = $this->createMock(SessionConfigInterface::class);
         $encryption    = $this->createMock(EncryptionInterface::class);
-
-        $appEnv->method('getEnvVariable')
-            ->with(self::equalTo('COOKIE_ENCRYPT_KEY'))
-            ->willReturn('Z68ptd+HdNU2wpzqA/Z/8y1XDmF2/CJ8LHXdAjKFKG0=');
 
         // Retrieve data
         $sessionRepo->method('findByToken')->willReturnCallback(function (string $token) {

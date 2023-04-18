@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace BetaKiller\Daemon;
 
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Env\AppEnvInterface;
 use Psr\Log\LoggerInterface;
 
 class UnixSocketFactory
 {
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Env\AppEnvInterface
      */
     private $appEnv;
 
@@ -21,7 +21,7 @@ class UnixSocketFactory
     /**
      * LockFactory constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface $appEnv
      */
     public function __construct(AppEnvInterface $appEnv, LoggerInterface $logger)
     {

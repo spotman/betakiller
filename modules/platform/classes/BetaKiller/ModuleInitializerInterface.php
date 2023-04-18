@@ -1,8 +1,7 @@
 <?php
 namespace BetaKiller;
 
-
 interface ModuleInitializerInterface
 {
-    public function init(): void;
+    public function initModule(): void;
 }
