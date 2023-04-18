@@ -157,15 +157,15 @@ class Logger implements LoggerInterface
 
         // Remove duplicate errors in debugging mode
         if ($isDebug) {
-            $slackStorage = $this->appEnv->getTempPath('monolog-deduplication.storage');
+            $errorStorage = $this->appEnv->getTempPath('monolog-deduplication.storage');
 
-            if (!\is_file($slackStorage)) {
-                touch($slackStorage) && \chmod($slackStorage, 0660);
+            if (!\is_file($errorStorage)) {
+                touch($errorStorage) && \chmod($errorStorage, 0660);
             }
 
             $errorHandler = new DeduplicationHandler(
                 $errorHandler,
-                $slackStorage,
+                $errorStorage,
                 \Monolog\Logger::NOTICE,
                 300 // Repeat notification in 5 minutes
             );
