@@ -411,7 +411,19 @@ final class AppEnv implements AppEnvInterface
 
     private function detectDocRoot(): string
     {
-        return dirname(realpath($_SERVER['SCRIPT_FILENAME']));
+        $path = dirname(realpath($_SERVER['SCRIPT_FILENAME']));
+
+        $vSplit = explode(DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR, $path);
+
+        if (count($vSplit) > 1) {
+            $path = array_shift($vSplit).DIRECTORY_SEPARATOR.'public';
+
+            if (!file_exists($path)) {
+                throw new \LogicException('Missing "public" directory '.$path);
+            }
+        }
+
+        return $path;
     }
 
     private function detectAppRoot(): string
