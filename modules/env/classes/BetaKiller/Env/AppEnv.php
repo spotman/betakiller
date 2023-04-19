@@ -413,10 +413,9 @@ final class AppEnv implements AppEnvInterface
     {
         $path = dirname(realpath($_SERVER['SCRIPT_FILENAME']));
 
-        $vSplit = explode(DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR, $path);
-
-        if (count($vSplit) > 1) {
-            $path = array_shift($vSplit).DIRECTORY_SEPARATOR.'public';
+        // Use current dir if vendor/bin script is used
+        if (str_contains($path, DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR)) {
+            $path = getcwd().DIRECTORY_SEPARATOR.'public';
 
             if (!file_exists($path)) {
                 throw new \LogicException('Missing "public" directory '.$path);

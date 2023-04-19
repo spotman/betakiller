@@ -336,7 +336,7 @@ if (!function_exists('includeComposerAutoloader')) {
         ]);
 
         if (!file_exists($vendorAutoload)) {
-            throw new LogicException('Init Composer first');
+            throw new LogicException('Init Composer in '.$rootPath);
         }
 
         require_once $vendorAutoload;
