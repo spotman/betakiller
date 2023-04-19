@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "854daabd853e070703f0234db17291a4",
+    "content-hash": "15584689b7b7ff06259af5edbbb4aff1",
     "packages": [
         {
             "name": "aidantwoods/secureheaders",
@@ -185,25 +185,25 @@
         },
         {
             "name": "bramus/monolog-colored-line-formatter",
-            "version": "3.1.0",
+            "version": "3.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bramus/monolog-colored-line-formatter.git",
-                "reference": "cd1ada798fec11a5862cb67944c651b6a8e04911"
+                "reference": "708891d34cb431d9ed56da91a53ecc2d8afdc24e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bramus/monolog-colored-line-formatter/zipball/cd1ada798fec11a5862cb67944c651b6a8e04911",
-                "reference": "cd1ada798fec11a5862cb67944c651b6a8e04911",
+                "url": "https://api.github.com/repos/bramus/monolog-colored-line-formatter/zipball/708891d34cb431d9ed56da91a53ecc2d8afdc24e",
+                "reference": "708891d34cb431d9ed56da91a53ecc2d8afdc24e",
                 "shasum": ""
             },
             "require": {
                 "bramus/ansi-php": "^3.0.3",
-                "php": "^8.1"
+                "php": "^7.2|^8.0"
             },
             "require-dev": {
-                "monolog/monolog": "~3.0",
-                "phpunit/phpunit": "~9.6"
+                "monolog/monolog": "~2.0",
+                "phpunit/phpunit": "~7.0|^9.4"
             },
             "type": "library",
             "autoload": {
@@ -225,15 +225,9 @@
             "description": "Colored Line Formatter for Monolog",
             "support": {
                 "issues": "https://github.com/bramus/monolog-colored-line-formatter/issues",
-                "source": "https://github.com/bramus/monolog-colored-line-formatter/tree/3.1.0"
+                "source": "https://github.com/bramus/monolog-colored-line-formatter/tree/3.0.6"
             },
-            "funding": [
-                {
-                    "url": "https://github.com/bramus",
-                    "type": "github"
-                }
-            ],
-            "time": "2023-03-29T13:28:41+00:00"
+            "time": "2021-12-05T09:10:49+00:00"
         },
         {
             "name": "brick/math",

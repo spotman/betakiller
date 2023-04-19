@@ -23,7 +23,7 @@
     "ext-zlib": "*",
     "aidantwoods/secureheaders": "^2.0",
     "beberlei/metrics": "^2.8",
-    "bramus/monolog-colored-line-formatter": "~3.0",
+    "bramus/monolog-colored-line-formatter": "~3.0.0",
     "caxy/php-htmldiff": "^0.1.6",
     "clue/redis-react": "^2.4",
     "dflydev/fig-cookies": "^3.0",
