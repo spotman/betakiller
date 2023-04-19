@@ -21,7 +21,7 @@ final class AppEnv implements AppEnvInterface
     /**
      * @var string
      */
-    private string $mode = AppEnvInterface::MODE_PRODUCTION;
+    private string $mode;
 
     /**
      * @var string
@@ -38,7 +38,9 @@ final class AppEnv implements AppEnvInterface
      */
     private string $appRootPath;
 
-    private bool $isAppRunning = false;
+    private string $docRootPath;
+
+    private bool $isAppRunning;
 
     public static function instance(): AppEnvInterface
     {
@@ -51,19 +53,18 @@ final class AppEnv implements AppEnvInterface
 
     private function __construct()
     {
+        $this->docRootPath  = $this->detectDocRoot();
+        $this->isAppRunning = $this->docRootPath !== $this->getCoreRootPath();
+        $this->appRootPath  = $this->detectAppRoot();
+
         if ($this->isCli()) {
             $this->detectCliEnv(); // Cli options can override app configuration
         }
 
-        $this->detectAppRunning();
-
-        if ($this->isAppRunning) {
-            $this->detectAppMode();
-            $this->detectAppRoot();
-            $this->detectAppUrl();
-            $this->detectAppRevision();
-            $this->detectDebugMode();
-        }
+        $this->detectAppMode();
+        $this->detectAppUrl();
+        $this->detectAppRevision();
+        $this->detectDebugMode();
     }
 
     private function detectDebugMode(): void
@@ -78,11 +79,6 @@ final class AppEnv implements AppEnvInterface
         $this->mode = $this->getEnvVariable(self::APP_MODE);
     }
 
-    private function detectAppRoot(): void
-    {
-        $this->appRootPath = $this->getEnvVariable(self::APP_ROOT_PATH);
-    }
-
     private function detectAppUrl(): void
     {
         $this->url = $this->getEnvVariable(self::APP_URL);
@@ -91,11 +87,6 @@ final class AppEnv implements AppEnvInterface
     private function detectAppRevision(): void
     {
         $this->revision = $this->getEnvVariable(self::APP_REVISION);
-    }
-
-    private function detectAppRunning(): void
-    {
-        $this->isAppRunning = $this->hasEnvVariable(self::APP_ROOT_PATH);
     }
 
     private function detectCliEnv(): void
@@ -203,7 +194,7 @@ final class AppEnv implements AppEnvInterface
      */
     public function getDocRootPath(): string
     {
-        return $this->appRootPath.DIRECTORY_SEPARATOR.'public';
+        return $this->docRootPath;
     }
 
     public function isAppRunning(): bool
@@ -251,6 +242,11 @@ final class AppEnv implements AppEnvInterface
      */
     public function isHuman(): bool
     {
+        // Internal server is used for cache warmup only
+        if ($this->isInternalWebServer()) {
+            return false;
+        }
+
         if ($this->isCli()) {
             return stream_isatty(STDOUT);
         }
@@ -316,7 +312,7 @@ final class AppEnv implements AppEnvInterface
     public function getStoragePath(string $target): string
     {
         $path = implode(\DIRECTORY_SEPARATOR, [
-            $this->getWorkingPath(),
+            $this->getAppRootPath(),
             'storage',
             $target,
         ]);
@@ -332,7 +328,7 @@ final class AppEnv implements AppEnvInterface
     public function getLogsPath(string $target): string
     {
         $path = implode(\DIRECTORY_SEPARATOR, [
-            $this->getWorkingPath(),
+            $this->getAppRootPath(),
             'logs',
             $target,
         ]);
@@ -348,7 +344,7 @@ final class AppEnv implements AppEnvInterface
     public function getCachePath(string $target): string
     {
         $path = implode(\DIRECTORY_SEPARATOR, [
-            $this->getWorkingPath(),
+            $this->getAppRootPath(),
             'cache',
             $target,
         ]);
@@ -396,9 +392,6 @@ final class AppEnv implements AppEnvInterface
         // App mode (via SetEnv in .htaccess or VirtualHost)
         $dotEnv->required(self::APP_MODE)->notEmpty()->allowedValues(self::ALLOWED_MODES);
 
-        // Absolute path to app root
-        $dotEnv->required(self::APP_ROOT_PATH)->notEmpty();
-
         // Absolute URL with scheme
         $dotEnv->required(self::APP_URL)->notEmpty();
 
@@ -416,8 +409,20 @@ final class AppEnv implements AppEnvInterface
         }
     }
 
-    private function getWorkingPath(): string
+    private function detectDocRoot(): string
     {
-        return $this->isAppRunning ? $this->appRootPath : DOCROOT;
+        return dirname(realpath($_SERVER['SCRIPT_FILENAME']));
+    }
+
+    private function detectAppRoot(): string
+    {
+        return $this->isAppRunning
+            ? realpath($this->docRootPath.DIRECTORY_SEPARATOR.'..') // parent o public dir
+            : $this->getCoreRootPath();
+    }
+
+    private function getCoreRootPath(): string
+    {
+        return realpath(DOCROOT);
     }
 }

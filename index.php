@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-use BetaKiller\Env\AppEnv;
-
 if (PHP_SAPI === 'cli-server') {
     $docRoot  = $_SERVER['DOCUMENT_ROOT'];
     $fileName = $_SERVER['PHP_SELF'];
@@ -13,20 +11,11 @@ if (PHP_SAPI === 'cli-server') {
     }
 }
 
-include_once __DIR__.'/functions.php';
-
 try {
-    configureKohana();
-
-    $appEnv = AppEnv::instance();
-
-    $envMode = $appEnv->isAppRunning()
-        ? $appEnv->getModeName()
-        : AppEnv::MODE_DEVELOPMENT;
-
-    bootstrapKohana($envMode);
-    bootstrapApp($appEnv);
+    $container = include __DIR__.'/bootstrap.php';
 } catch (Throwable $e) {
     fallbackExceptionHandler($e);
     exit;
 }
+
+runApp($container);

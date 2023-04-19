@@ -170,7 +170,7 @@ if (!function_exists('bootstrapKohana')) {
 }
 
 if (!function_exists('bootstrapApp')) {
-    function bootstrapApp(AppEnvInterface $appEnv): void
+    function bootstrapApp(AppEnvInterface $appEnv): ContainerInterface
     {
         /*
         - AppEnv
@@ -214,7 +214,7 @@ if (!function_exists('bootstrapApp')) {
         initKohanaModules(Kohana::modules(), $container);
 
         if ($appRootPath) {
-            // Init site-related modules if they exist
+            // Init app-related modules if they exist
             if ($appModules) {
                 initKohanaModules($appModules, $container);
             }
@@ -223,16 +223,17 @@ if (!function_exists('bootstrapApp')) {
             proceedAppInitFile($appRootPath);
         }
 
-        /** @var AppRunnerFactoryInterface $runnerFactory */
-        $runnerFactory = $container->get(AppRunnerFactoryInterface::class);
-
-        $runnerFactory->create()->run();
+        return $container;
     }
 }
 
 if (!function_exists('runApp')) {
     function runApp(ContainerInterface $container): void
     {
+        /** @var AppRunnerFactoryInterface $runnerFactory */
+        $runnerFactory = $container->get(AppRunnerFactoryInterface::class);
+
+        $runnerFactory->create()->run();
     }
 }
 
