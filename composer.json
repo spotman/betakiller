@@ -82,7 +82,7 @@
   },
   "require-dev": {
     "codedungeon/phpunit-result-printer": "^0.32.0",
-    "deployer/deployer": "^6.4",
+    "deployer/deployer": "^v7.3.1",
     "jolicode/jolinotif": "^2.0",
     "kint-php/kint": "^4.2.3",
     "kint-php/kint-twig": "^3.0",
