@@ -15,4 +15,5 @@ $envMode = $appEnv->isAppRunning()
     : AppEnvInterface::MODE_DEVELOPMENT;
 
 bootstrapKohana($envMode);
+
 return bootstrapApp($appEnv);
