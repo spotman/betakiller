@@ -1,5 +1,6 @@
 .idea
 vendor
 /application/.env
+/logs
 .env.testing
 .phpunit.result.cache
