@@ -11,12 +11,10 @@ require 'recipe/common.php';
 set('git_tty', true); // [Optional] Allocate tty for git on first deployment
 set('ssh_multiplexing', true);
 
-\define('BETAKILLER_CORE_PATH', 'core');
-
 $tzName = date_default_timezone_get();
 $tz     = new \DateTimeZone($tzName);
 
-set('core_path', BETAKILLER_CORE_PATH);
+set('core_path', 'core');
 set('core_repository', 'git@github.com:spotman/betakiller.git');
 
 // Default application path
@@ -234,7 +232,6 @@ set('betakiller_writable_dirs', [
     '{{app_path}}/cache',
     '{{app_path}}/public/assets/static',
     '{{app_path}}/assets',
-    '{{app_path}}/storage',
 ]);
 
 task('deploy:betakiller:writable', static function () {
@@ -426,7 +423,7 @@ task('assets:deploy', static function () {
     runMinionTask('assets:deploy', true);
 })->desc('Collect assets from all static-files directories');
 
-task('deploy:dotenv:migrate', static function () {
+task('bk:deploy:dotenv:migrate', static function () {
     $globalDotEnv  = '{{deploy_path}}/.env';
     $targetDotEnv  = '{{release_path}}/{{app_path}}/.env';
     $exampleDotEnv = '{{release_path}}/{{app_path}}/.env.example';
@@ -442,7 +439,7 @@ task('deploy:dotenv:migrate', static function () {
     run("cp $globalDotEnv $targetDotEnv");
 })->desc('Copy .env file from deploy path');
 
-task('deploy:dotenv:revision', static function () {
+task('bk:deploy:dotenv:revision', static function () {
     $revision = gitRevision('app').gitRevision('core');
     runMinionTask('storeAppRevision --revision='.$revision);
 })->desc('Set APP_REVISION env variable from current git revision');
@@ -539,9 +536,7 @@ task('migrate', [
     'import:i18n', // Depends on roles and notification
 ])->setPrivate();
 
-task('deploy', [
-    'git:check-no-changes',
-
+task('bk:deploy:prepare', [
     // Check app configuration
     'check',
 
@@ -555,11 +550,14 @@ task('deploy', [
     //'git:check',
 
     'deploy:release',
+]);
 
-    // Deploy code
+task('bk:deploy:code', [
     'deploy:app',
     'deploy:betakiller',
+]);
 
+task('bk:deploy:shared', [
     // app shared and writable dirs
     'deploy:shared',
     'deploy:writable',
@@ -567,17 +565,23 @@ task('deploy', [
     // BetaKiller shared and writable dirs
     'deploy:betakiller:shared',
     'deploy:betakiller:writable',
+]);
 
+task('bk:deploy:dotenv', [
     // Copy .env file from previous revision to the new one
-    'deploy:dotenv:migrate',
+    'bk:deploy:dotenv:migrate',
 
     // Store APP_REVISION hash (leads to cache reset)
-    'deploy:dotenv:revision',
+    'bk:deploy:dotenv:revision',
+]);
 
+task('bk:deploy:assets', [
     // Deploy assets (locally or on remote host)
     'assets:build',
     'assets:deploy',
+]);
 
+task('bk:deploy:migrate', [
     // Enable maintenance mode before any DB processing
     'maintenance:on',
 
@@ -596,11 +600,27 @@ task('deploy', [
 
     // Disable maintenance mode
     'maintenance:off',
+]);
 
-    // Finalize
+task('bk:deploy:finalize', [
     'cleanup',
     'deploy:unlock',
     'deploy:done',
+]);
+
+/**
+ * Composite deployment scenario
+ */
+task('bk:deploy', [
+    'git:check-no-changes',
+
+    'bk:deploy:prepare',
+    'bk:deploy:code',
+    'bk:deploy:shared',
+    'bk:deploy:dotenv',
+    'bk:deploy:assets',
+    'bk:deploy:migrate',
+    'bk:deploy:finalize',
 ])->desc('Deploy app bundle')->onStage(
     DEPLOYER_STAGE_STAGING,
     DEPLOYER_STAGE_PRODUCTION,
@@ -630,8 +650,9 @@ function runMinionTask(string $name, bool $asHttpUser = null, bool $tty = null)
 {
     $currentPath = getcwd();
     $path        = getRepoPath();
+    $corePath = get('core_path');
 
-    if (strpos($currentPath, BETAKILLER_CORE_PATH) === false) {
+    if (!str_contains($currentPath, $corePath)) {
         $path .= '/public';
     }
 

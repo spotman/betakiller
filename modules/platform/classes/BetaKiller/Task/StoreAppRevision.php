@@ -57,6 +57,11 @@ class StoreAppRevision extends AbstractTask
 
         $dotEnvFile = $this->appEnv->getAppRootPath().DIRECTORY_SEPARATOR.'.env';
 
+        // Create empty .env file if not exists
+        if (!file_exists($dotEnvFile)) {
+            touch($dotEnvFile);
+        }
+
         $this->dotEnv->update($dotEnvFile, [
             AppEnvInterface::APP_REVISION => $revision,
         ]);
