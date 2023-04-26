@@ -19,6 +19,13 @@ set('core_repository', 'git@github.com:spotman/betakiller.git');
 
 // Default application path
 set('app_path', 'app');
+set('app_git_root', 'app');
+
+set('git_exec', '%s'); // Nothing by default, just change dir on the server and call git comand directly
+
+set('repo_base_path', function () {
+    return getLatestReleasePath();
+});
 
 // Option for GIT management
 option('repo', null, InputOption::VALUE_OPTIONAL, 'Tag to deploy.', 'app');
@@ -87,7 +94,7 @@ task('check', static function () {
     set('core_branch', $coreBranch);
 
     // Check is assets:build task defined
-    task('assets:build');
+//    task('assets:build');
 });
 
 // Prepare app env
@@ -107,10 +114,10 @@ task('deploy:repository:prepare:betakiller', static function () {
 function askForLocalBranch(): string
 {
     // Fetch branches from remote
-    runGitCommand('fetch --all', null, true);
+    runLocally('git fetch --all');
 
     // List all branches
-    $listResult = runGitCommand('branch -r', null, true);
+    $listResult = runLocally('git branch -r');
 
     $branches = explode(PHP_EOL, $listResult);
 
@@ -301,26 +308,19 @@ task('git:pull', static function () {
     gitPull();
 })->desc('git pull');
 
-task('git:pull:all', static function () {
-    gitPullAll();
-})->desc('git pull for all repositories');
-
 /**
- * Makes git:check inside of {current} directory
+ * Makes git:check inside {current} directory
  */
 task('git:check', static function () {
-    $currentRevisionPath = get('current');
-    $path                = getRepoPath(null, $currentRevisionPath);
-
-    $out = gitStatus($path);
+    $out = gitStatus();
 
     if (stripos($out, 'nothing to commit (working directory clean)') !== false) {
         return;
     }
 
     if (askConfirmation('Commit changes?')) {
-        gitCommitAll($path);
-        gitPush($path);
+        gitCommitAll();
+        gitPush();
     } else {
         writeln('Exiting...');
     }
@@ -440,7 +440,7 @@ task('bk:deploy:dotenv:migrate', static function () {
 })->desc('Copy .env file from deploy path');
 
 task('bk:deploy:dotenv:revision', static function () {
-    $revision = gitRevision('app').gitRevision('core');
+    $revision = gitRevision();
     runMinionTask('storeAppRevision --revision='.$revision);
 })->desc('Set APP_REVISION env variable from current git revision');
 
@@ -650,7 +650,7 @@ function runMinionTask(string $name, bool $asHttpUser = null, bool $tty = null)
 {
     $currentPath = getcwd();
     $path        = getRepoPath();
-    $corePath = get('core_path');
+    $corePath    = get('core_path');
 
     if (!str_contains($currentPath, $corePath)) {
         $path .= '/public';
@@ -658,7 +658,7 @@ function runMinionTask(string $name, bool $asHttpUser = null, bool $tty = null)
 
     $stage = stage();
 
-    $cmd = "{{bin/php}} index.php --task=$name --stage=$stage";
+    $cmd = "{{bin/php}} $path/index.php --task=$name --stage=$stage";
 
     if (isVeryVerbose()) {
         $cmd .= ' --debug';
@@ -668,8 +668,9 @@ function runMinionTask(string $name, bool $asHttpUser = null, bool $tty = null)
         $cmd = 'sudo -u {{http_user}} '.$cmd;
     }
 
-    cd($path);
-    $text = run($cmd, ['tty' => (bool)$tty]);
+    $text = run($cmd, [
+        'tty' => (bool)$tty,
+    ]);
 
     if ($text) {
         write($text);
@@ -693,7 +694,8 @@ function runGitCommand(string $gitCmd, string $path = null, ?bool $silent = null
     $path   = $path ?: getRepoPath();
     $silent = $silent ?? false;
 
-    $result = run("cd $path && git $gitCmd");
+    $exec = sprintf(get('git_exec'), "cd $path && git $gitCmd");
+    $result = run($exec);
 
     if (!$silent) {
         write($result);
@@ -793,15 +795,6 @@ function gitPull(?string $path = null)
 }
 
 /**
- * @return string
- * @throws \Deployer\Exception\Exception
- */
-function gitPullAll()
-{
-    return gitPull(getRepoPath('core')).gitPull(getRepoPath('app'));
-}
-
-/**
  * @param string $key
  * @param string $value
  *
@@ -819,9 +812,9 @@ function gitConfig(string $key, string $value)
  * @return string
  * @throws \Deployer\Exception\Exception
  */
-function gitRevision(string $repo)
+function gitRevision(): string
 {
-    return trim(runGitCommand('rev-parse --short HEAD', getRepoPath($repo), true));
+    return trim(runGitCommand('rev-parse --short HEAD', getRepoPath('app'), true));
 }
 
 /**
@@ -844,7 +837,11 @@ function getLatestReleasePath()
 {
     /** @var string[] $list */
     $list    = get('releases_list');
-    $release = $list[0];
+    $release = $list[0] ?? null;
+
+    if (!$release) {
+        return get('release_path') ?: get('current');
+    }
 
     if (isVerbose()) {
         writeln(PHP_EOL.'Releases are:'.PHP_EOL);
@@ -866,25 +863,26 @@ function getLatestReleasePath()
  * @return string
  * @throws \Deployer\Exception\Exception
  */
-function getRepoPath(?string $repo = null, ?string $basePath = null)
+function getRepoPath(?string $repo = null): string
 {
     if (stage() === DEPLOYER_STAGE_DEV) {
         return getcwd();
     }
 
-    $allowed = ['core', 'app'];
+    $repoPaths = [
+        'core' => 'core_path',
+        'app'  => 'app_path',
+    ];
 
     if (!$repo) {
-        $repo = (string)input()->getOption('repo') ?: 'core';
+        $repo = (string)input()->getOption('repo') ?: 'app'; // TODO Maybe revert to 'core'
     }
 
-    if (!\in_array($repo, $allowed, true)) {
+    if (!\in_array($repo, array_keys($repoPaths), true)) {
         throw new Exception('Unknown repo '.$repo);
     }
 
-    if (!$basePath) {
-        $basePath = getLatestReleasePath();
-    }
+    $basePath = get('repo_base_path');
 
-    return $basePath.'/'.get($repo.'_path');
+    return $basePath.'/'.get($repoPaths[$repo]);
 }
