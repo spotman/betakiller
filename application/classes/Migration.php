@@ -60,9 +60,8 @@ abstract class Migration extends Kohana_Migration
 
             // Query completed => table and column exists
             return true;
-        }
-            /** @noinspection BadExceptionsProcessingInspection */
-        catch (Database_Exception $ignore) {
+        } /** @noinspection BadExceptionsProcessingInspection */
+        catch (Throwable $ignore) {
             // Query failed => table or column is absent
             return false;
         }
@@ -84,7 +83,7 @@ abstract class Migration extends Kohana_Migration
 
         $query = DB::select($columnName)
             ->from($tableName)
-            ->where($columnName,'=', $value)
+            ->where($columnName, '=', $value)
             ->limit(1);
 
         return (bool)$query->execute($db)->get($columnName);
@@ -142,9 +141,9 @@ abstract class Migration extends Kohana_Migration
      * @return bool
      */
     protected function addTableColumn(
-        string $tableName,
-        string $columnName,
-        string $columnProperty,
+        string  $tableName,
+        string  $columnName,
+        string  $columnProperty,
         ?string $comment = null,
         ?string $db = null
     ): bool {
@@ -177,9 +176,9 @@ abstract class Migration extends Kohana_Migration
      * @return bool
      */
     protected function changeTableColumn(
-        string $tableName,
-        string $columnName,
-        string $columnProperty,
+        string  $tableName,
+        string  $columnName,
+        string  $columnProperty,
         ?string $comment = null,
         ?string $db = null
     ): bool {
@@ -299,10 +298,10 @@ abstract class Migration extends Kohana_Migration
      * @return bool
      */
     private function addTableIndexAny(
-        string $tableName,
-        string $indexName,
-        array $indexFields,
-        bool $isUnique = null,
+        string  $tableName,
+        string  $indexName,
+        array   $indexFields,
+        bool    $isUnique = null,
         ?string $db = null
     ): bool {
         $tableNameEsc   = $this->escapeSqlName($tableName);
@@ -334,9 +333,9 @@ abstract class Migration extends Kohana_Migration
      * @return bool
      */
     protected function addTableIndex(
-        string $tableName,
-        string $indexName,
-        array $indexFields,
+        string  $tableName,
+        string  $indexName,
+        array   $indexFields,
         ?string $db = null
     ): bool {
         return $this->addTableIndexAny($tableName, $indexName, $indexFields, false, $db);
@@ -351,9 +350,9 @@ abstract class Migration extends Kohana_Migration
      * @return bool
      */
     protected function addTableIndexUnique(
-        string $tableName,
-        string $indexName,
-        array $indexFields,
+        string  $tableName,
+        string  $indexName,
+        array   $indexFields,
         ?string $db = null
     ): bool {
         return $this->addTableIndexAny($tableName, $indexName, $indexFields, true, $db);
@@ -372,13 +371,13 @@ abstract class Migration extends Kohana_Migration
      * @return bool
      */
     protected function addTableIndexForeign(
-        string $tableName,
-        string $indexName,
-        array $indexFields,
-        string $refTableName,
-        array $refFields,
-        string $actionUpdate,
-        string $actionDelete,
+        string  $tableName,
+        string  $indexName,
+        array   $indexFields,
+        string  $refTableName,
+        array   $refFields,
+        string  $actionUpdate,
+        string  $actionDelete,
         ?string $db = null
     ): bool {
         $tableNameEsc    = $this->escapeSqlName($tableName);
@@ -428,7 +427,7 @@ abstract class Migration extends Kohana_Migration
         return $names;
     }
 
-    protected function importDump(string $filename) : void
+    protected function importDump(string $filename): void
     {
         $sql = file_get_contents($filename);
 

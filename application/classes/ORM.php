@@ -12,9 +12,9 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
 {
     /**
-     * @var \OrmFactoryInterface
+     * @var \OrmFactoryInterface|null
      */
-    private static OrmFactoryInterface $factoryInstance;
+    private static ?OrmFactoryInterface $factoryInstance = null;
 
     public static function setModelFactory(OrmFactoryInterface $factory): void
     {

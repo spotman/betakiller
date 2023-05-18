@@ -290,7 +290,7 @@ if (!function_exists('initKohanaModules')) {
     {
         // Execute init.php in each module (if exists)
         foreach ($modules as $modulePath) {
-            $initFile = $modulePath.DIRECTORY_SEPARATOR.'init.php';
+            $initFile = rtrim($modulePath, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'init.php';
 
             if (file_exists($initFile)) {
                 proceedModuleInit($initFile, $container);
@@ -305,7 +305,7 @@ if (!function_exists('proceedModuleInit')) {
         // Include the module initialization file once
         $className = include_once $initFilePath;
 
-        if ($className && is_a($className, ModuleInitializerInterface::class)) {
+        if ($className && is_a($className, ModuleInitializerInterface::class, true)) {
             /** @var ModuleInitializerInterface $initializer */
             $initializer = $container->get($className);
 

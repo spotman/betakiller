@@ -3,7 +3,6 @@
 use Geocoder\Provider\Chain\Chain;
 use Geocoder\Provider\GoogleMaps\GoogleMaps;
 use Geocoder\Provider\Provider;
-use Geocoder\Provider\Yandex\Yandex;
 use Http\Client\HttpClient;
 use function DI\{factory};
 
@@ -19,7 +18,6 @@ return [
 
             return new Chain([
                 new GoogleMaps($httpClient, null, $googleApiKey),
-//                new Yandex($httpClient),
             ]);
         }),
     ],

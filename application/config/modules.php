@@ -27,26 +27,26 @@ return [
     'paginate'     => MODPATH.'paginate',              // Paginate abstraction for ORM, ORM-REST and others
 
     // Kohana dependencies WITH DB ACCESS
-    'backup'       => MODPATH.'backup',                // Complex backup (files + database)
+//    'backup'       => MODPATH.'backup',                // Complex backup (files + database)
     'migrations'   => MODPATH.'migrations',            // Migrations toolkit
     'unittest'     => MODPATH.'unittest',              // Module for unit testing via phpunit
 
     // Place it before other modules for correct initialization of per-site classes and configs
 //    'multi-site'   => MODPATH.'multi-site',            // Multiple apps on top of single engine
 
-    // Initialize platform (AppEnv, DIC, etc)
-//    'platform'     => MODPATH.'platform',              // Platform implementation and initialization
+    // Platform defaults (DI config, presets, etc)
+    'platform'     => MODPATH.'platform',              // Platform implementation
 
     // These modules DEPENDS on PLATFORM and have NO legacy ROUTES
     'acl'          => MODPATH.'acl',                   // Role based access control
     'api'          => MODPATH.'api',                   // API subsystem
-    'api-test'     => MODPATH.'api-test',              // CLI and UI helpers for testing API subsystem
+//    'api-test'     => MODPATH.'api-test',              // CLI and UI helpers for testing API subsystem
     'auth'         => MODPATH.'auth',                  // Auth IFaces and Widgets
     'assets'       => MODPATH.'assets',                // Asset management subsystem
     'cron'         => MODPATH.'cron',                  // Helper for running scheduled tasks
     'error'        => MODPATH.'error',                 // Error handling and logging
     'daemon'       => MODPATH.'daemon',                // Daemon run
-    'geo'          => MODPATH.'geo',                   // Various geo utilities (geocoder, etc)
+//    'geo'          => MODPATH.'geo',                   // Various geo utilities (geocoder, etc)
     'i18n'         => MODPATH.'i18n',                  // Localization and pluralization
     'iface'        => MODPATH.'iface',                 // Dynamic user interfaces
     'maintenance'  => MODPATH.'maintenance',           // Maintenance mode
@@ -67,8 +67,4 @@ return [
 
     // Various helper modules
 //    'outdated-browser'     => MODPATH.'outdated-browser',
-
-    // Initialize platform (AppEnv, DIC, etc)
-    'platform'     => MODPATH.'platform',              // Platform implementation and initialization
-
 ];

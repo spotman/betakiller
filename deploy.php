@@ -662,7 +662,7 @@ function runMinionTask(string $name, bool $asHttpUser = null, bool $tty = null):
 
     $cmd = "{{bin/php}} $path/index.php --task=$name --stage=$stage";
 
-    if (isVeryVerbose()) {
+    if (isVeryVerbose() || isDebug()) {
         $cmd .= ' --debug';
     }
 
