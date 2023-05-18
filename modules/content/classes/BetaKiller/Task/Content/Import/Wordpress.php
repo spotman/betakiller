@@ -77,7 +77,6 @@ class Wordpress extends AbstractTask
     /**
      * @var \BetaKiller\Model\UserInterface
      */
-    #[Inject]
     private $user;
 
     /**
@@ -205,6 +204,8 @@ class Wordpress extends AbstractTask
      */
     public function run(): void
     {
+        $this->user = $this->getUser();
+
         $skipBefore = $this->getOption('skip-before');
         if ($skipBefore) {
             $this->skipBeforeDate = new DateTimeImmutable($skipBefore);

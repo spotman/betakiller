@@ -11,20 +11,14 @@ use BetaKiller\Task\AbstractTask;
 abstract class AbstractUserEventTask extends AbstractTask
 {
     /**
-     * @var \BetaKiller\Model\UserInterface
-     */
-    private UserInterface $user;
-
-    /**
      * @var \BetaKiller\MessageBus\EventBusInterface
      */
     private EventBusInterface $eventBus;
 
-    public function __construct(UserInterface $user, EventBusInterface $eventBus)
+    public function __construct(EventBusInterface $eventBus)
     {
         parent::__construct();
 
-        $this->user = $user;
         $this->eventBus = $eventBus;
     }
 
@@ -40,7 +34,7 @@ abstract class AbstractUserEventTask extends AbstractTask
 
     public function run(): void
     {
-        $event = $this->makeEvent($this->user);
+        $event = $this->makeEvent($this->getUser());
 
         $this->eventBus->emit($event);
     }

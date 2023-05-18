@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Test;
 
 use BetaKiller\Auth\UserUrlDetectorInterface;
-use BetaKiller\Model\UserInterface;
 use BetaKiller\Task\AbstractTask;
 
 class UrlDetector extends AbstractTask
@@ -15,22 +14,15 @@ class UrlDetector extends AbstractTask
     private $urlDetector;
 
     /**
-     * @var \BetaKiller\Model\UserInterface
-     */
-    private $user;
-
-    /**
      * UrlDetector constructor.
      *
-     * @param \BetaKiller\Model\UserInterface           $user
      * @param \BetaKiller\Auth\UserUrlDetectorInterface $urlDetector
      */
-    public function __construct(UserInterface $user, UserUrlDetectorInterface $urlDetector)
+    public function __construct(UserUrlDetectorInterface $urlDetector)
     {
         parent::__construct();
 
         $this->urlDetector = $urlDetector;
-        $this->user = $user;
     }
 
     /**
@@ -46,6 +38,6 @@ class UrlDetector extends AbstractTask
 
     public function run(): void
     {
-        echo $this->urlDetector->detect($this->user).PHP_EOL;
+        echo $this->urlDetector->detect($this->getUser()).PHP_EOL;
     }
 }

@@ -31,18 +31,15 @@ class AclCheck extends AbstractTask
      * AclCheck constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface           $tree
-     * @param \BetaKiller\Model\UserInterface                   $user
      * @param \BetaKiller\Acl\UrlElementAccessResolverInterface $elementAccessResolver
      */
     public function __construct(
         UrlElementTreeInterface $tree,
-        UserInterface $user,
         UrlElementAccessResolverInterface $elementAccessResolver
     ) {
         parent::__construct();
 
         $this->tree                  = $tree;
-        $this->user                  = $user;
         $this->elementAccessResolver = $elementAccessResolver;
     }
 
@@ -59,6 +56,8 @@ class AclCheck extends AbstractTask
 
     public function run(): void
     {
+        $this->user = $this->getUser();
+
         $filter = new AggregateUrlElementFilter([
             new IFaceUrlElementFilter,
         ]);

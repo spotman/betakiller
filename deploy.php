@@ -42,14 +42,17 @@ option('to', null, InputOption::VALUE_OPTIONAL, 'Target migration');
 \define('DEPLOYER_STAGE_STAGING', 'staging');
 \define('DEPLOYER_STAGE_PRODUCTION', 'production');
 
+\define('DEPLOYER_HOST_DEV', 'dev');
+\define('DEPLOYER_HOST_TESTING', 'test');
+
 set('default_stage', DEPLOYER_STAGE_DEV);
 
 // Local server for creating migrations, git actions, etc
-localhost('dev')
+localhost(DEPLOYER_HOST_DEV)
     ->stage(DEPLOYER_STAGE_DEV);
 
 // Local server for testing deployment tasks in dev environment
-localhost('testing')
+localhost(DEPLOYER_HOST_TESTING)
     ->set('deploy_path', sys_get_temp_dir().DIRECTORY_SEPARATOR.'deployer-testing')
     ->stage(DEPLOYER_STAGE_TESTING);
 
@@ -367,7 +370,6 @@ task('migrations:create', static function () {
         throw new Exception('Migration name is required');
     }
 
-//    $desc = ask('Enter migration description', '');
     $desc = ''; // Prevent CLI interaction from Minion task
 
     $output = runMinionTask("migrations:create --name=$name --description=$desc --scope=$scope", false, true);
@@ -646,7 +648,7 @@ task('load:errors', static function () {
  * @throws \Deployer\Exception\Exception
  * @throws \Deployer\Exception\RuntimeException
  */
-function runMinionTask(string $name, bool $asHttpUser = null, bool $tty = null)
+function runMinionTask(string $name, bool $asHttpUser = null, bool $tty = null): string
 {
     $currentPath = getcwd();
     $path        = getRepoPath();
@@ -664,7 +666,7 @@ function runMinionTask(string $name, bool $asHttpUser = null, bool $tty = null)
         $cmd .= ' --debug';
     }
 
-    if ($asHttpUser) {
+    if ($stage !== DEPLOYER_STAGE_DEV && $asHttpUser) {
         $cmd = 'sudo -u {{http_user}} '.$cmd;
     }
 
@@ -694,7 +696,7 @@ function runGitCommand(string $gitCmd, string $path = null, ?bool $silent = null
     $path   = $path ?: getRepoPath();
     $silent = $silent ?? false;
 
-    $exec = sprintf(get('git_exec'), "cd $path && git $gitCmd");
+    $exec   = sprintf(get('git_exec'), "cd $path && git $gitCmd");
     $result = run($exec);
 
     if (!$silent) {
@@ -865,10 +867,6 @@ function getLatestReleasePath()
  */
 function getRepoPath(?string $repo = null): string
 {
-    if (stage() === DEPLOYER_STAGE_DEV) {
-        return getcwd();
-    }
-
     $repoPaths = [
         'core' => 'core_path',
         'app'  => 'app_path',
@@ -882,7 +880,9 @@ function getRepoPath(?string $repo = null): string
         throw new Exception('Unknown repo '.$repo);
     }
 
-    $basePath = get('repo_base_path');
+    $basePath = stage() === DEPLOYER_STAGE_DEV
+        ? getcwd()
+        : get('repo_base_path');
 
     return $basePath.'/'.get($repoPaths[$repo]);
 }

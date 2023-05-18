@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Test;
 
 use BetaKiller\Api\ApiFacade;
-use BetaKiller\Model\UserInterface;
 use BetaKiller\Task\AbstractTask;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
@@ -25,11 +24,6 @@ class Api extends AbstractTask
     private $api;
 
     /**
-     * @var \BetaKiller\Model\UserInterface
-     */
-    private $user;
-
-    /**
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
@@ -37,14 +31,12 @@ class Api extends AbstractTask
     /**
      * Api constructor.
      *
-     * @param \BetaKiller\Api\ApiFacade       $api
-     * @param \BetaKiller\Model\UserInterface $user
-     * @param \Psr\Log\LoggerInterface        $logger
+     * @param \BetaKiller\Api\ApiFacade $api
+     * @param \Psr\Log\LoggerInterface  $logger
      */
-    public function __construct(ApiFacade $api, UserInterface $user, LoggerInterface $logger)
+    public function __construct(ApiFacade $api, LoggerInterface $logger)
     {
         $this->api    = $api;
-        $this->user   = $user;
         $this->logger = $logger;
 
         parent::__construct();
@@ -88,7 +80,7 @@ class Api extends AbstractTask
         \Database_Query::enableQueryLog();
 
         try {
-            $response = $this->api->getResource($resourceName)->call($methodName, $arguments, $this->user);
+            $response = $this->api->getResource($resourceName)->call($methodName, $arguments, $this->getUser());
         } catch (\Throwable $e) {
             $this->printQueries();
 

@@ -67,7 +67,6 @@ class IsAlive extends AbstractTask
      *
      * @param \BetaKiller\Session\SessionStorageInterface $sessionStorage
      * @param \BetaKiller\Wamp\WampClientBuilder          $clientFactory
-     * @param \BetaKiller\Model\UserInterface             $user
      * @param \BetaKiller\Env\AppEnvInterface             $appEnv
      * @param \BetaKiller\Service\MaintenanceModeService  $maintenance
      * @param \Psr\Log\LoggerInterface                    $logger
@@ -75,14 +74,12 @@ class IsAlive extends AbstractTask
     public function __construct(
         SessionStorageInterface $sessionStorage,
         WampClientBuilder       $clientFactory,
-        UserInterface           $user,
         AppEnvInterface         $appEnv,
         MaintenanceModeService  $maintenance,
         LoggerInterface         $logger
     ) {
         parent::__construct();
 
-        $this->user           = $user;
         $this->sessionStorage = $sessionStorage;
         $this->clientBuilder  = $clientFactory;
         $this->appEnv         = $appEnv;
@@ -107,6 +104,8 @@ class IsAlive extends AbstractTask
         if ($this->maintenance->isEnabled()) {
             return;
         }
+
+        $this->user = $this->getUser();
 
         $this->createSession();
 
