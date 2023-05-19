@@ -236,9 +236,7 @@ return [
             ]);
         }),
 
-        HttpClient::class => autowire(\Http\Adapter\Guzzle6\Client::class),
-
-        ClientInterface::class => get(HttpClient::class),
+        ClientInterface::class => autowire(\Http\Adapter\Guzzle7\Client::class),
 
         Context::class => DI\factory(static function (AppEnvInterface $appEnv) {
             $prefix = implode('.', [
