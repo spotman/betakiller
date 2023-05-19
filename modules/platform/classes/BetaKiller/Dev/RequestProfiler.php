@@ -3,79 +3,14 @@ declare(strict_types=1);
 
 namespace BetaKiller\Dev;
 
-use DebugBar\DebugBar;
 use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
-final class RequestProfiler
+final class RequestProfiler extends AbstractProfiler
 {
-    private const DEBUGBAR_TIME_COLLECTOR = 'time';
-
-    /**
-     * @var \Symfony\Component\Stopwatch\Stopwatch
-     */
-    private $stopwatch;
-
-    /**
-     * @var float
-     */
-    private $createdAt;
-
-    /**
-     * RequestProfiler constructor.
-     */
-    public function __construct()
-    {
-        $this->createdAt = \microtime(true);
-        $this->stopwatch = new Stopwatch(true);
-    }
-
-    public function transferMeasuresToDebugBar(DebugBar $debugBar): void
-    {
-        if (!$debugBar->hasCollector(self::DEBUGBAR_TIME_COLLECTOR)) {
-            throw new \LogicException('RequestProfiler requires DebugBar TimeDataCollector');
-        }
-
-        /** @var \DebugBar\DataCollector\TimeDataCollector $collector */
-        $collector = $debugBar->getCollector(self::DEBUGBAR_TIME_COLLECTOR);
-
-        $collector->addMeasure('Startup', $collector->getRequestStartTime(), $this->createdAt);
-
-        // Iterate sections
-        foreach ($this->stopwatch->getSections() as $section) {
-            // iterate section events
-            foreach ($section->getEvents() as $name => $event) {
-                $start = $event->getOrigin();
-                $end   = $event->getOrigin() + $event->getDuration();
-
-                // Push measure to DebugBar
-                $collector->addMeasure(
-                    $name,
-                    $start / 1000,
-                    $end / 1000
-                );
-            }
-        }
-    }
-
-    public function start(string $label): StopwatchEvent
-    {
-        return $this->stopwatch->start($label);
-    }
-
-    public function stop(StopwatchEvent $event): void
-    {
-        $event->stop();
-    }
-
     public static function begin(ServerRequestInterface $request, string $label): array
     {
-        if (!DebugServerRequestHelper::hasProfiler($request)) {
-            return [$request, null];
-        }
-
-        $event = DebugServerRequestHelper::getProfiler($request)->start($label);
+        $event = self::fetch($request)?->start($label);
 
         return [$request, $event];
     }
@@ -86,8 +21,28 @@ final class RequestProfiler
         /** @var StopwatchEvent $event */
         [$request, $event] = $pack;
 
-        if ($request && $event && DebugServerRequestHelper::hasProfiler($request)) {
-            DebugServerRequestHelper::getProfiler($request)->stop($event);
+        if ($request && $event) {
+            self::fetch($request)?->stop($event);
         }
+    }
+
+    public static function mark(ServerRequestInterface $request, string $label): void
+    {
+        self::fetch($request)?->start($label)->stop();
+    }
+
+    public static function inject(ServerRequestInterface $request, RequestProfiler $profiler): ServerRequestInterface
+    {
+        return $request->withAttribute(RequestProfiler::class, $profiler);
+    }
+
+    public static function fetch(ServerRequestInterface $request): ?RequestProfiler
+    {
+        return $request->getAttribute(RequestProfiler::class);
+    }
+
+    public static function getRequestStartTime(ServerRequestInterface $request): float
+    {
+        return $request->getServerParams()['REQUEST_TIME_FLOAT'] ?? $_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true);
     }
 }

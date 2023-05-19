@@ -47,13 +47,9 @@ final class FallbackErrorMiddleware implements MiddlewareInterface
             // Keep minimal data (no session at this point)
             LoggerHelper::logRawException($this->logger, $e);
 
-            if ($this->appEnv->inProductionMode()) {
-                return ResponseHelper::text('', 500);
-            }
-
-            \Debug::injectStackTraceCsp($request);
-
-            return ResponseHelper::html(\Debug::htmlStacktrace($e), 500);
+            return $this->appEnv->inProductionMode()
+                ? ResponseHelper::text('System error', 500)
+                : \Debug::renderStackTrace($e, $request);
         }
     }
 }

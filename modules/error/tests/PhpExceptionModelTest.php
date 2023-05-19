@@ -9,7 +9,7 @@ class PhpExceptionModelTest extends \BetaKiller\Test\AbstractTestCase
     {
         $model = new PhpException;
 
-        $trace = Debug::htmlStacktrace(new Exception());
+        $trace = Debug::htmlStackTrace(new Exception());
 
         $model->setTrace($trace);
 

@@ -61,11 +61,6 @@ final class TwigExtension extends AbstractExtension
     private AppConfigInterface $appConfig;
 
     /**
-     * @var \BetaKiller\Security\SecurityConfigInterface
-     */
-    private SecurityConfigInterface $securityConfig;
-
-    /**
      * @var \BetaKiller\I18n\I18nFacade
      */
     private I18nFacade $i18n;
@@ -85,20 +80,18 @@ final class TwigExtension extends AbstractExtension
     /**
      * TwigExtension constructor.
      *
-     * @param \BetaKiller\Env\AppEnvInterface              $appEnv
-     * @param \BetaKiller\Config\AppConfigInterface        $appConfig
-     * @param \BetaKiller\Security\SecurityConfigInterface $securityConfig
-     * @param \BetaKiller\Widget\WidgetFacade              $widgetFacade
-     * @param \BetaKiller\Helper\StringPatternHelper       $patternHelper
-     * @param \BetaKiller\I18n\I18nFacade                  $i18n
-     * @param \Spotman\Acl\AclInterface                    $acl
-     * @param \BetaKiller\IdentityConverterInterface       $identityConverter
-     * @param \Psr\Log\LoggerInterface                     $logger
+     * @param \BetaKiller\Env\AppEnvInterface        $appEnv
+     * @param \BetaKiller\Config\AppConfigInterface  $appConfig
+     * @param \BetaKiller\Widget\WidgetFacade        $widgetFacade
+     * @param \BetaKiller\Helper\StringPatternHelper $patternHelper
+     * @param \BetaKiller\I18n\I18nFacade            $i18n
+     * @param \Spotman\Acl\AclInterface              $acl
+     * @param \BetaKiller\IdentityConverterInterface $identityConverter
+     * @param \Psr\Log\LoggerInterface               $logger
      */
     public function __construct(
         AppEnvInterface            $appEnv,
         AppConfigInterface         $appConfig,
-        SecurityConfigInterface    $securityConfig,
         WidgetFacade               $widgetFacade,
         StringPatternHelper        $patternHelper,
         I18nFacade                 $i18n,
@@ -108,7 +101,6 @@ final class TwigExtension extends AbstractExtension
     ) {
         $this->appEnv            = $appEnv;
         $this->appConfig         = $appConfig;
-        $this->securityConfig    = $securityConfig;
         $this->patternHelper     = $patternHelper;
         $this->widgetFacade      = $widgetFacade;
         $this->i18n              = $i18n;
@@ -193,17 +185,13 @@ final class TwigExtension extends AbstractExtension
             new TwigFunction(
                 'csp',
                 function (array $context, string $name, string $value, bool $reportOnly = null): void {
-                    if (!$this->securityConfig->isCspEnabled()) {
-                        return;
-                    }
-
                     $request = $this->getRequest($context);
                     $csp     = ServerRequestHelper::getCsp($request);
 
                     if ($reportOnly) {
-                        $csp->csp($name, $value, true);
+                        $csp?->csp($name, $value, true);
                     } else {
-                        $csp->csp($name, $value);
+                        $csp?->csp($name, $value);
                     }
                 },
                 ['needs_context' => true]
@@ -226,13 +214,9 @@ final class TwigExtension extends AbstractExtension
             new TwigFunction(
                 'js_nonce',
                 function (array $context): ?string {
-                    if (!$this->securityConfig->isCspEnabled()) {
-                        return null;
-                    }
-
                     $request = $this->getRequest($context);
 
-                    return ServerRequestHelper::getCsp($request)->cspNonce('script');
+                    return ServerRequestHelper::getCsp($request)?->cspNonce('script');
                 },
                 ['needs_context' => true]
             ),
@@ -240,13 +224,9 @@ final class TwigExtension extends AbstractExtension
             new TwigFunction(
                 'css_nonce',
                 function (array $context): ?string {
-                    if (!$this->securityConfig->isCspEnabled()) {
-                        return null;
-                    }
-
                     $request = $this->getRequest($context);
 
-                    return ServerRequestHelper::getCsp($request)->cspNonce('style');
+                    return ServerRequestHelper::getCsp($request)?->cspNonce('style');
                 },
                 ['needs_context' => true]
             ),
@@ -727,8 +707,10 @@ final class TwigExtension extends AbstractExtension
 
                 $csp = ServerRequestHelper::getCsp($request);
 
-                $this->processHashesForStyleTags($text, $csp);
-                $this->processHashesForScriptTags($text, $csp);
+                if ($csp) {
+                    $this->processHashesForStyleTags($text, $csp);
+                    $this->processHashesForScriptTags($text, $csp);
+                }
 
                 // Return unprocessed text
                 return $text;
@@ -785,10 +767,6 @@ final class TwigExtension extends AbstractExtension
 
     private function processHashesForScriptTags(string $text, SecureHeaders $csp): void
     {
-        if (!$this->securityConfig->isCspEnabled()) {
-            return;
-        }
-
         foreach ($this->findTagsContents('script', $text) as $content) {
             $csp->cspHash('script', $content);
         }
@@ -796,10 +774,6 @@ final class TwigExtension extends AbstractExtension
 
     private function processHashesForStyleTags(string $text, SecureHeaders $csp): void
     {
-        if (!$this->securityConfig->isCspEnabled()) {
-            return;
-        }
-
         foreach ($this->findTagsContents('style', $text) as $content) {
             $csp->cspHash('style', $content);
         }

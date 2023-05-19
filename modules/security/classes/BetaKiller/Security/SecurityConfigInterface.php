@@ -61,4 +61,9 @@ interface SecurityConfigInterface
      * @return string[]
      */
     public function getHeadersToRemove(): array;
+
+    /**
+     * @return string[]
+     */
+    public function getProtectedCookies(): array;
 }

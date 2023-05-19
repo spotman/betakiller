@@ -21,6 +21,8 @@ class SecurityConfig extends AbstractConfig implements SecurityConfigInterface
     private const PATH_HEADERS_ADD    = ['headers', 'add'];
     private const PATH_HEADERS_REMOVE = ['headers', 'remove'];
 
+    private const PATH_COOKIES_PROTECTED = ['cookies', 'protected'];
+
     protected function getConfigRootGroup(): string
     {
         return 'security';
@@ -113,5 +115,10 @@ class SecurityConfig extends AbstractConfig implements SecurityConfigInterface
     public function isHstsPreload(): bool
     {
         return (bool)$this->get(self::PATH_HSTS_PRELOAD);
+    }
+
+    public function getProtectedCookies(): array
+    {
+        return $this->get(self::PATH_COOKIES_PROTECTED) ?? [];
     }
 }

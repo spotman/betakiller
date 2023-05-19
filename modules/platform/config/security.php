@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use BetaKiller\Session\DatabaseSessionStorage;
+
 return [
     'csp' => [
         'enabled'   => false,
@@ -17,15 +19,10 @@ return [
         'preload'    => false,
     ],
 
-    'headers' => [
-        'add'    => [
-            // Allow nested iframes from the same domain
-            'X-Frame-Options' => 'SAMEORIGIN',
-        ],
-        'remove' => [],
-    ],
-
     'cookies' => [
-        'protected' => [],
+        'protected' => [
+            // This cookie is used by WAMP JS client as auth id
+            DatabaseSessionStorage::COOKIE_NAME,
+        ],
     ],
 ];

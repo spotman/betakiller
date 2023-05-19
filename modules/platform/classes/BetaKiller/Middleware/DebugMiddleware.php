@@ -3,12 +3,13 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use Aidantwoods\SecureHeaders\SecureHeaders;
+use BetaKiller\Dev\AbstractProfiler;
 use BetaKiller\Dev\DebugBarCookiesDataCollector;
 use BetaKiller\Dev\DebugBarHttpDriver;
 use BetaKiller\Dev\DebugBarSessionDataCollector;
 use BetaKiller\Dev\DebugServerRequestHelper;
 use BetaKiller\Dev\RequestProfiler;
+use BetaKiller\Dev\StartupProfiler;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
@@ -106,8 +107,6 @@ final class DebugMiddleware implements MiddlewareInterface
 
         $ps = RequestProfiler::begin($request, 'Debug middleware (start up)');
 
-        $startTime = $request->getServerParams()['REQUEST_TIME_FLOAT'] ?? null;
-
         // Fresh instance for every request
         $debugBar = new DebugBar();
 
@@ -116,7 +115,7 @@ final class DebugMiddleware implements MiddlewareInterface
         $debugBar->setHttpDriver($httpDriver);
 
         $debugBar
-            ->addCollector(new TimeDataCollector($startTime))
+            ->addCollector(new TimeDataCollector(RequestProfiler::getRequestStartTime($request)))
             ->addCollector(new DebugBarCookiesDataCollector($request))
             ->addCollector(new DebugBarSessionDataCollector($session))
             ->addCollector(new MemoryCollector())
@@ -156,8 +155,7 @@ final class DebugMiddleware implements MiddlewareInterface
         $response = $middleware->process($request, $this->getFakeHandler($handler));
 
         // DebugBar generates inline tags and images so configuring CSP
-        $csp = ServerRequestHelper::getCsp($request);
-        $this->addCspRules($renderer, $csp);
+        $this->addCspRules($renderer, $request);
 
 //        // Prevent caching
 //        $response = ResponseHelper::disableCaching($response);
@@ -166,8 +164,14 @@ final class DebugMiddleware implements MiddlewareInterface
         return $httpDriver->applyHeaders($response);
     }
 
-    private function addCspRules(JavascriptRenderer $renderer, SecureHeaders $csp): void
+    private function addCspRules(JavascriptRenderer $renderer, ServerRequestInterface $request): void
     {
+//        $csp = ServerRequestHelper::getCsp($request);
+//
+//        if (!$csp) {
+//            return;
+//        }
+//
 //        $inlineJs  = $renderer->getAssets('inline_js');
 //        $inlineCss = $renderer->getAssets('inline_css');
 //        $initJs    = \str_replace(['<script type="text/javascript">', '</script>'], '', \trim($renderer->render()));
@@ -207,15 +211,49 @@ final class DebugMiddleware implements MiddlewareInterface
             {
                 $response = $this->handler->handle($request);
 
-                if (DebugServerRequestHelper::hasProfiler($request)) {
-                    $profiler = DebugServerRequestHelper::getProfiler($request);
+                $requestProfiler = RequestProfiler::fetch($request);
+
+                if ($requestProfiler) {
                     $debugBar = DebugServerRequestHelper::getDebugBar($request);
 
-                    // Push measures to DebugBar
-                    $profiler->transferMeasuresToDebugBar($debugBar);
+                    if (!$debugBar->hasCollector('time')) {
+                        throw new \LogicException('RequestProfiler requires DebugBar TimeDataCollector');
+                    }
+
+                    $startupProfiler = StartupProfiler::getInstance();
+
+                    /** @var \DebugBar\DataCollector\TimeDataCollector $collector */
+                    $collector = $debugBar->getCollector('time');
+
+                    $collector->addMeasure('Boot', $collector->getRequestStartTime(), $startupProfiler->getCreatedAt());
+
+                    // Push startup measures to DebugBar
+                    $this->transferMeasuresToDebugBar($startupProfiler, $collector);
+
+                    // Push request measures to DebugBar
+                    $this->transferMeasuresToDebugBar($requestProfiler, $collector);
                 }
 
                 return $response;
+            }
+
+            private function transferMeasuresToDebugBar(AbstractProfiler $profiler, TimeDataCollector $collector): void
+            {
+                // Iterate sections
+                foreach ($profiler->getStopwatchSections() as $section) {
+                    // iterate section events
+                    foreach ($section->getEvents() as $name => $event) {
+                        $start = $event->getOrigin();
+                        $end   = $event->getOrigin() + $event->getDuration();
+
+                        // Push measure to DebugBar
+                        $collector->addMeasure(
+                            $name,
+                            $start / 1000,
+                            $end / 1000
+                        );
+                    }
+                }
             }
         };
     }

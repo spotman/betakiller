@@ -160,11 +160,7 @@ class ErrorPageRenderer implements ErrorPageRendererInterface
      */
     private function makeDebugResponse(\Throwable $exception, ServerRequestInterface $request): ResponseInterface
     {
-        \Debug::injectStackTraceCsp($request);
-
-        $stacktrace = \Debug::htmlStacktrace($exception, $request);
-
-        return ResponseHelper::html($stacktrace, 500);
+        return \Debug::renderStackTrace($exception, $request);
     }
 
     /**

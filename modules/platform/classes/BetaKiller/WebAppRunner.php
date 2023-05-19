@@ -99,9 +99,6 @@ final class WebAppRunner implements AppRunnerInterface
         $this->app->pipe(SchemeMiddleware::class);
         $this->app->pipe(SecureHeadersMiddleware::class);
 
-        // WAMP cookie hack
-        $this->app->pipe(WampCookieMiddleware::class);
-
         // Fetch Session
         $this->app->pipe(SessionMiddleware::class);
 

@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use BetaKiller\Config\KohanaConfigProvider;
+use BetaKiller\Dev\StartupProfiler;
 use BetaKiller\DI\Container;
 use BetaKiller\Env\FakeConfigReader;
 use BetaKiller\Factory\AppRunnerFactoryInterface;
@@ -128,6 +129,12 @@ if (!function_exists('configureKohana')) {
 if (!function_exists('bootstrapKohana')) {
     function bootstrapKohana(string $envMode): void
     {
+        // Load the core Kohana class
+        require MODPATH.'platform/classes/BetaKiller/Dev/AbstractProfiler.php';
+        require MODPATH.'platform/classes/BetaKiller/Dev/StartupProfiler.php';
+
+        $p = StartupProfiler::getInstance()->start('Bootstrap Kohana');
+
         Kohana::$environment = constant('Kohana::'.strtoupper($envMode));
 
         /**
@@ -166,12 +173,16 @@ if (!function_exists('bootstrapKohana')) {
         $coreModules = Kohana::$config->load('modules')->as_array();
 
         Kohana::modules($coreModules);
+
+        StartupProfiler::getInstance()->stop($p);
     }
 }
 
 if (!function_exists('bootstrapApp')) {
     function bootstrapApp(AppEnvInterface $appEnv): ContainerInterface
     {
+        $p = StartupProfiler::getInstance()->start('Bootstrap App');
+
         /*
         - AppEnv
         - Configure Kohana (a-la bootstrap)
@@ -223,6 +234,8 @@ if (!function_exists('bootstrapApp')) {
             proceedAppInitFile($appRootPath);
         }
 
+        StartupProfiler::getInstance()->stop($p);
+
         return $container;
     }
 }
@@ -230,10 +243,16 @@ if (!function_exists('bootstrapApp')) {
 if (!function_exists('runApp')) {
     function runApp(ContainerInterface $container): void
     {
+        $p = StartupProfiler::getInstance()->start('Prepare App');
+
         /** @var AppRunnerFactoryInterface $runnerFactory */
         $runnerFactory = $container->get(AppRunnerFactoryInterface::class);
 
-        $runnerFactory->create()->run();
+        $app = $runnerFactory->create();
+
+        StartupProfiler::getInstance()->stop($p);
+
+        $app->run();
     }
 }
 

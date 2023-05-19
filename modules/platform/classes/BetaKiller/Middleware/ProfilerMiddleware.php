@@ -26,6 +26,8 @@ class ProfilerMiddleware implements MiddlewareInterface
         // Fresh instance for every request
         $profiler = new RequestProfiler;
 
-        return $handler->handle(DebugServerRequestHelper::withProfiler($request, $profiler));
+        $profiler->start('RequestProfiler started')->stop();
+
+        return $handler->handle(RequestProfiler::inject($request, $profiler));
     }
 }

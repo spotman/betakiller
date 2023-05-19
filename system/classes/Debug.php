@@ -1,8 +1,11 @@
 <?php
 
 use BetaKiller\Exception\HttpExceptionInterface;
+use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\View\ViewInterface;
+use Laminas\Diactoros\Response\HtmlResponse;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Debug extends Kohana_Debug
@@ -25,7 +28,14 @@ class Debug extends Kohana_Debug
         E_DEPRECATED        => 'Deprecated',
     ];
 
-    public static function htmlStacktrace(\Throwable $e, ?ServerRequestInterface $request = null): string
+    public static function renderStackTrace(Throwable $e, ServerRequestInterface $request): ResponseInterface
+    {
+        \Debug::injectStackTraceCsp($request);
+
+        return new HtmlResponse(\Debug::htmlStackTrace($e, $request), 500);
+    }
+
+    public static function htmlStackTrace(Throwable $e, ServerRequestInterface $request = null): string
     {
         try {
             if (!\interface_exists(ViewInterface::class)) {
@@ -106,14 +116,10 @@ class Debug extends Kohana_Debug
 
     public static function injectStackTraceCsp(ServerRequestInterface $request): void
     {
-        // CSP may be not loaded yet
-        if (!ServerRequestHelper::hasCsp($request)) {
-            return;
-        }
-
+        // CSP may be disabled
         $csp = ServerRequestHelper::getCsp($request);
 
-        $csp->csp('script', self::CSP_SCRIPT);
-        $csp->csp('style', self::CSP_STYLE);
+        $csp?->csp('script', self::CSP_SCRIPT);
+        $csp?->csp('style', self::CSP_STYLE);
     }
 }

@@ -8,23 +8,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class DebugServerRequestHelper
 {
-    public static function withProfiler(
-        ServerRequestInterface $request,
-        RequestProfiler $profiler
-    ): ServerRequestInterface {
-        return $request->withAttribute(RequestProfiler::class, $profiler);
-    }
-
-    public static function hasProfiler(ServerRequestInterface $request): bool
-    {
-        return (bool)$request->getAttribute(RequestProfiler::class);
-    }
-
-    public static function getProfiler(ServerRequestInterface $request): RequestProfiler
-    {
-        return $request->getAttribute(RequestProfiler::class);
-    }
-
     public static function withDebugBar(ServerRequestInterface $request, DebugBar $debugBar): ServerRequestInterface
     {
         return $request->withAttribute(DebugBar::class, $debugBar);

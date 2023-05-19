@@ -6,6 +6,7 @@ namespace BetaKiller\Security;
 use Aidantwoods\SecureHeaders\Http\Psr7Adapter;
 use Aidantwoods\SecureHeaders\SecureHeaders;
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Dev\RequestProfiler;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -37,9 +38,9 @@ class SecureHeadersMiddleware implements MiddlewareInterface
      * @param \Psr\Log\LoggerInterface                     $logger
      */
     public function __construct(
-        AppConfigInterface $appConfig,
+        AppConfigInterface      $appConfig,
         SecurityConfigInterface $securityConfig,
-        LoggerInterface $logger
+        LoggerInterface         $logger
     ) {
         $this->appConfig      = $appConfig;
         $this->securityConfig = $securityConfig;
@@ -57,7 +58,9 @@ class SecureHeadersMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (!$this->appConfig->isSecure()) {
+        RequestProfiler::mark($request, 'SecureHeadersMiddleware started');
+
+        if (!$this->appConfig->isSecure() || !$this->securityConfig->isCspEnabled()) {
             return $handler->handle($request);
         }
 
@@ -79,6 +82,10 @@ class SecureHeadersMiddleware implements MiddlewareInterface
 
         // Enable/disable errors logging
         $headers->errorReporting($this->securityConfig->isErrorLogEnabled());
+
+        foreach ($this->securityConfig->getProtectedCookies() as $protectedCookieName) {
+            $headers->protectedCookie($protectedCookieName, $headers::COOKIE_REMOVE | $headers::COOKIE_NAME);
+        }
 
 //        $headers->csp('default', $baseUrl);
 //        $headers->csp('image', $baseUrl);
@@ -113,10 +120,6 @@ class SecureHeadersMiddleware implements MiddlewareInterface
 
     private function configureCsp(SecureHeaders $headers): void
     {
-        if (!$this->securityConfig->isCspEnabled()) {
-            return;
-        }
-
         $baseUri = $this->appConfig->getBaseUri();
 
         if ($this->securityConfig->isCspSafeModeEnabled()) {
