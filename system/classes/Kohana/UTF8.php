@@ -167,6 +167,11 @@ class Kohana_UTF8 {
 	 */
 	public static function strlen($str)
 	{
+        if ($str === null) {
+            d(debug_print_backtrace());
+            throw new LogicException('Null value provided for UTF8:strlen() method');
+        }
+
 		if (UTF8::$server_utf8)
 			return mb_strlen($str, Kohana::$charset);
 

@@ -7,6 +7,7 @@ use BetaKiller\Config\SessionConfigInterface;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception;
 use BetaKiller\Exception\DomainException;
+use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
@@ -43,20 +44,28 @@ class DatabaseSessionStorage implements SessionStorageInterface
     private EncryptionInterface $encryption;
 
     /**
+     * @var \BetaKiller\Helper\CookieHelper
+     */
+    private CookieHelper $cookieHelper;
+
+    /**
      * DatabaseSessionStorage constructor.
      *
      * @param \BetaKiller\Repository\UserSessionRepositoryInterface $sessionRepo
      * @param \BetaKiller\Config\SessionConfigInterface             $config
      * @param \BetaKiller\Security\EncryptionInterface              $encryption
+     * @param \BetaKiller\Helper\CookieHelper                       $cookieHelper
      */
     public function __construct(
         UserSessionRepositoryInterface $sessionRepo,
         SessionConfigInterface         $config,
-        EncryptionInterface            $encryption
+        EncryptionInterface            $encryption,
+        CookieHelper                   $cookieHelper
     ) {
-        $this->sessionRepo = $sessionRepo;
-        $this->config      = $config;
-        $this->encryption  = $encryption;
+        $this->sessionRepo  = $sessionRepo;
+        $this->config       = $config;
+        $this->encryption   = $encryption;
+        $this->cookieHelper = $cookieHelper;
     }
 
     /**
@@ -232,7 +241,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         }
 
         // Set cookie
-        return $this->cookies->set(
+        return $this->cookieHelper->set(
             $response,
             self::COOKIE_NAME,
             $session->getId(),

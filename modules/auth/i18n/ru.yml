@@ -1,0 +1,46 @@
+error.auth.user-not-exists: "Неверный логин или пароль"
+error.auth.blocked: "Ваш аккаунт отключён, обратитесь к администратору"
+error.auth.incorrect-credentials: "Неверный логин или пароль"
+error.auth.incorrect-password: "Неверный пароль"
+error.auth.common: "Ошибка авторизации, обратитесь к администратору"
+error.auth.denied: "Доступ запрещён"
+
+auth.regular.login: "Логин или е-мейл"
+auth.regular.password: Пароль
+auth.regular.sign-in: Войти
+
+error.auth.required:
+  Войти в систему
+
+error.auth.wrong-ip:
+  Ваш IP-адрес некорректен
+
+auth.regular.access-recovery:
+  Забыли пароль?
+
+notification.email.user.access-recovery.subj:
+  Восстановление доступа
+
+notification.email.user.password-change-request.subj:
+  Запрос на изменение пароля
+
+iface.auth.password-change.label:
+  Сменить пароль
+
+iface.auth.password-change.title:
+  Сменить пароль
+
+frontend.auth.suspended.header:
+  Ваш аккаунт приостановлен
+
+frontend.auth.suspended.message:
+  Для доступа ко всем возможностям приложения, Ваш аккаунт необходимо активировать.
+
+frontend.auth.suspended.activate:
+  Активировать
+
+frontend.auth.blocked.header:
+  Пожалуйста, остановитесь!
+
+frontend.auth.blocked.message:
+  Ваш аккаунт был заблокирован за нарушение правил пользования сервисом. Вы можете <a href=":contact_url">связаться снами</a>, если Вы считаете, что это произошло по недоразумению.

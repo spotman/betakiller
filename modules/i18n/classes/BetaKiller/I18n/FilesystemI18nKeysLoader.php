@@ -86,8 +86,11 @@ class FilesystemI18nKeysLoader implements I18nKeysLoaderInterface
             if ($files) {
                 $t = [];
                 foreach ($files as $file) {
-//                    $values = \Kohana::load($file);
                     $values = Yaml::parseFile($file);
+
+                    if (!$values) {
+                        continue;
+                    }
 
                     foreach ($values as $key => $value) {
                         if (\is_array($value)) {

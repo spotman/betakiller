@@ -10,20 +10,14 @@ use BetaKiller\Dev\DebugBarSessionDataCollector;
 use BetaKiller\Dev\DebugServerRequestHelper;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Env\AppEnvInterface;
-use BetaKiller\Helper\CookieHelper;
-use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
-use BetaKiller\Log\SkipExpectedExceptionsHandler;
 use BetaKiller\Log\LoggerInterface;
 use DebugBar\Bridge\MonologCollector;
 use DebugBar\DataCollector\MemoryCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DebugBar;
 use DebugBar\JavascriptRenderer;
-use Monolog\Handler\PHPConsoleHandler;
-use PhpConsole\Connector;
-use PhpConsole\Storage\File;
 use PhpMiddleware\PhpDebugBar\PhpDebugBarMiddleware;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -55,11 +49,6 @@ final class DebugMiddleware implements MiddlewareInterface
     private $logger;
 
     /**
-     * @var \BetaKiller\Helper\CookieHelper
-     */
-    private $cookieHelper;
-
-    /**
      * @var \Twig\Environment
      */
 //    private $twigEnv;
@@ -68,21 +57,18 @@ final class DebugMiddleware implements MiddlewareInterface
      * DebugMiddleware constructor.
      *
      * @param \BetaKiller\Env\AppEnvInterface            $appEnv
-     * @param \BetaKiller\Helper\CookieHelper            $cookieHelper
      * @param \Psr\Http\Message\ResponseFactoryInterface $responseFactory
      * @param \Psr\Http\Message\StreamFactoryInterface   $streamFactory
      * @param \BetaKiller\Log\LoggerInterface            $logger
      */
     public function __construct(
         AppEnvInterface          $appEnv,
-        CookieHelper             $cookieHelper,
 //        Environment $twigEnv,
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface   $streamFactory,
         LoggerInterface          $logger
     ) {
         $this->responseFactory = $responseFactory;
-        $this->cookieHelper    = $cookieHelper;
         $this->streamFactory   = $streamFactory;
         $this->appEnv          = $appEnv;
 //        $this->twigEnv         = $twigEnv;
@@ -120,11 +106,6 @@ final class DebugMiddleware implements MiddlewareInterface
 
         $ps = RequestProfiler::begin($request, 'Debug middleware (start up)');
 
-        // Enable debugging via PhpConsole
-        if ($this->appEnv->inDevelopmentMode() && $this->isPhpConsoleActive()) {
-            $this->initPhpConsole();
-        }
-
         $startTime = $request->getServerParams()['REQUEST_TIME_FLOAT'] ?? null;
 
         // Fresh instance for every request
@@ -136,7 +117,7 @@ final class DebugMiddleware implements MiddlewareInterface
 
         $debugBar
             ->addCollector(new TimeDataCollector($startTime))
-            ->addCollector(new DebugBarCookiesDataCollector($this->cookieHelper, $request))
+            ->addCollector(new DebugBarCookiesDataCollector($request))
             ->addCollector(new DebugBarSessionDataCollector($session))
             ->addCollector(new MemoryCollector())
             ->addCollector(new MonologCollector($this->logger->getMonologInstance()));
@@ -204,38 +185,6 @@ final class DebugMiddleware implements MiddlewareInterface
 
         // Inline images in PhpDebugBar
 //        $csp->csp('image', 'data:');
-    }
-
-    /**
-     * @return bool
-     * @throws \Exception
-     */
-    private function isPhpConsoleActive(): bool
-    {
-        $storageFileName = $this->appEnv->getModeName().'.'.$this->appEnv->getRevisionKey().'.phpConsole.data';
-        $storagePath     = $this->appEnv->getTempPath($storageFileName);
-
-        // Can be called only before PhpConsole\Connector::getInstance() and PhpConsole\Handler::getInstance()
-        Connector::setPostponeStorage(new File($storagePath));
-
-        return Connector::getInstance()->isActiveClient();
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function initPhpConsole(): void
-    {
-        $phpConsoleHandler = new PHPConsoleHandler([
-            'enableSslOnlyMode'        => true,
-            'detectDumpTraceAndSource' => true,     // Autodetect and append trace data to debug
-            'useOwnErrorsHandler'      => false,    // Enable errors handling
-            'useOwnExceptionsHandler'  => false,    // Enable exceptions handling
-        ]);
-
-//        $phpConsoleHandler->pushProcessor(new ContextCleanupProcessor);
-
-        $this->logger->pushHandler(new SkipExpectedExceptionsHandler($phpConsoleHandler));
     }
 
     private function getFakeHandler(RequestHandlerInterface $handler): RequestHandlerInterface

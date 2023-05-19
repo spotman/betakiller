@@ -1,7 +1,7 @@
 <?php
 
 use Beberlei\Metrics\Collector\Collector;
-use Beberlei\Metrics\Collector\StatsD;
+use Beberlei\Metrics\Collector\NullCollector;
 use function DI\factory;
 
 return [
@@ -9,11 +9,7 @@ return [
     'definitions' => [
 
         Collector::class => factory(function () {
-            // Send metrics to the local StatsD instance
-            $host = getenv('STATSD_HOST');
-            $port = getenv('STATSD_PORT');
-
-            return new StatsD($host, $port);
+            return new NullCollector();
         }),
 
     ],

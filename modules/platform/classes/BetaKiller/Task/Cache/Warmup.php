@@ -291,7 +291,7 @@ class Warmup extends AbstractTask
         $files = [
             '/sitemap.xml',
             '/robots.txt',
-            '/favicon.ico',
+//            '/favicon.ico',
         ];
 
         foreach ($files as $file) {

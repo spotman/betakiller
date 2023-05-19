@@ -79,8 +79,8 @@ return [
     'extensions' => [
         \Twig\Extension\DebugExtension::class,
         \BetaKiller\TwigExtension::class,
-        \BetaKiller\TwigCacheExtension::class,
         \Twig_Extensions_Extension_Text::class,
+        \Twig\Extra\Cache\CacheExtension::class,
     ],
 
 ];

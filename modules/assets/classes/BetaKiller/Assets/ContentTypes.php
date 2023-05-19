@@ -4,16 +4,16 @@ declare(strict_types=1);
 namespace BetaKiller\Assets;
 
 use BetaKiller\Assets\Exception\AssetsException;
-use Mimey\MimeMappingBuilder;
-use Mimey\MimeTypes;
-use Mimey\MimeTypesInterface;
+use Elephox\Mimey\MimeMappingBuilder;
+use Elephox\Mimey\MimeTypes;
+use Elephox\Mimey\MimeTypesInterface;
 use function finfo_file;
 use function finfo_open;
 
 class ContentTypes
 {
     /**
-     * @var \Mimey\MimeTypesInterface
+     * @var \Elephox\Mimey\MimeTypesInterface
      */
     private MimeTypesInterface $mimeTypes;
 
@@ -65,7 +65,7 @@ class ContentTypes
 
         if (!$mimeType) {
             throw new AssetsException('MIME can not be detected for ":ext" extension', [
-                ':ext' => $ext
+                ':ext' => $ext,
             ]);
         }
 

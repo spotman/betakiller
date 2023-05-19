@@ -178,7 +178,7 @@ abstract class AbstractOrmModelContainsUrlElement extends \ORM implements Entity
      * which is a value of any type other than a resource.
      * @since 5.4.0
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->as_array();
     }

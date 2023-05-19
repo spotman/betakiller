@@ -3,10 +3,6 @@ declare(strict_types=1);
 
 return [
     'csp' => [
-        'report'    => true,
-        'safe_mode' => true,
-        'errors'    => true,
-
         'rules' => [
             'connect' => [
 //                'http://localhost:63342',   // IDEA IDE link

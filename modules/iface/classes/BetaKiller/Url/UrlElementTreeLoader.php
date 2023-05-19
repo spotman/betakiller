@@ -162,9 +162,9 @@ class UrlElementTreeLoader
         ];
 
         // TODO Remove this hack after resolving spotman/betakiller#35
-        if (!$this->appEnv->inTestingMode()) {
-            $sources[] = $this->databaseProvider;
-        }
+//        if (!$this->appEnv->inTestingMode()) {
+//            $sources[] = $this->databaseProvider;
+//        }
 
         foreach ($sources as $provider) {
             foreach ($provider->getAll() as $urlElement) {
