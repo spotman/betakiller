@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a8890188ea524c27bfde004f7052ffa7",
+    "content-hash": "231cf83e1c09857aa820ce3d241849cd",
     "packages": [
         {
             "name": "aidantwoods/secureheaders",
@@ -66,6 +66,52 @@
                 "source": "https://github.com/aidantwoods/secureheaders"
             },
             "time": "2017-08-28T15:41:23+00:00"
+        },
+        {
+            "name": "anthonykgross/dependency-resolver",
+            "version": "v2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/anthonykgross/dependency-resolver.git",
+                "reference": "dd52569197bae913346ef43834b1c36815812d10"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/anthonykgross/dependency-resolver/zipball/dd52569197bae913346ef43834b1c36815812d10",
+                "reference": "dd52569197bae913346ef43834b1c36815812d10",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "ext-curl": "*",
+                "phpunit/phpunit": "^6.0 | ^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Algorithm\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anthony K GROSS",
+                    "email": "anthony.k.gross@gmail.com",
+                    "homepage": "https://github.com/anthonykgross"
+                }
+            ],
+            "description": "dependency-resolver",
+            "homepage": "http://anthonykgross.fr/",
+            "support": {
+                "issues": "https://github.com/anthonykgross/dependency-resolver/issues",
+                "source": "https://github.com/anthonykgross/dependency-resolver/tree/v2"
+            },
+            "time": "2020-07-17T07:30:59+00:00"
         },
         {
             "name": "beberlei/metrics",

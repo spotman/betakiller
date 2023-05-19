@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Dev\RequestProfiler;
-use BetaKiller\Exception\NotAvailableHttpException;
 use BetaKiller\Env\AppEnvInterface;
+use BetaKiller\Exception\NotAvailableHttpException;
 use BetaKiller\Service\MaintenanceModeService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,12 +17,12 @@ class MaintenanceModeMiddleware implements MiddlewareInterface
     /**
      * @var \BetaKiller\Service\MaintenanceModeService
      */
-    private $service;
+    private MaintenanceModeService $service;
 
     /**
      * @var \BetaKiller\Env\AppEnvInterface
      */
-    private $appEnv;
+    private AppEnvInterface $appEnv;
 
     /**
      * MaintenanceModeMiddleware constructor.

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -18,12 +19,12 @@ class SchemeMiddleware implements MiddlewareInterface
     /**
      * @var \BetaKiller\Config\AppConfigInterface
      */
-    private $appConfig;
+    private AppConfigInterface $appConfig;
 
     /**
      * @var \BetaKiller\Env\AppEnvInterface
      */
-    private $appEnv;
+    private AppEnvInterface $appEnv;
 
     /**
      * SchemeMiddleware constructor.
@@ -53,6 +54,8 @@ class SchemeMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
+        $p = RequestProfiler::begin($request, 'SchemeMiddleware');
+
         $baseUri    = $this->appConfig->getBaseUri();
         $baseScheme = $baseUri->getScheme();
         $baseHost   = $baseUri->getHost();
@@ -73,8 +76,8 @@ class SchemeMiddleware implements MiddlewareInterface
         $path = $currentUri->getPath();
         $file = \basename($path);
 
-        if ($path !== '/' && \strpos($file, '.') === false) {
-            $hasSlash       = (substr($path, -1) === '/');
+        if ($path !== '/' && !str_contains($file, '.')) {
+            $hasSlash       = (str_ends_with($path, '/'));
             $isSlashEnabled = $this->appConfig->isTrailingSlashEnabled();
 
             if ($hasSlash && !$isSlashEnabled) {
@@ -92,6 +95,8 @@ class SchemeMiddleware implements MiddlewareInterface
         if ($ignoredParams) {
             $request = ServerRequestHelper::removeQueryParams($request, $ignoredParams);
         }
+
+        RequestProfiler::end($p);
 
         // Forward processing
         return $handler->handle($request);

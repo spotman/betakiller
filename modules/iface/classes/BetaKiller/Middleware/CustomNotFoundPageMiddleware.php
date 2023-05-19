@@ -84,7 +84,7 @@ class CustomNotFoundPageMiddleware implements MiddlewareInterface
                     continue;
                 }
 
-                if (strpos($item->getCodename(), 'Error404') !== false) {
+                if (str_contains($item->getCodename(), 'Error404')) {
                     return $item;
                 }
             }

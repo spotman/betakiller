@@ -12,7 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class RequestUserMiddleware implements MiddlewareInterface
+class UserMiddleware implements MiddlewareInterface
 {
     /**
      * @var \BetaKiller\Service\AuthService

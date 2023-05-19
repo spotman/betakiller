@@ -15,6 +15,8 @@ use BetaKiller\Cache\DoctrineCacheProvider;
 use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Config\WebConfig;
+use BetaKiller\Config\WebConfigInterface;
 use BetaKiller\DefenceParameterProviderFactory;
 use BetaKiller\DummyIdentityConverter;
 use BetaKiller\Exception;
@@ -127,6 +129,8 @@ return [
     'definitions' => [
 
         AppRunnerFactoryInterface::class => autowire(AppRunnerFactory::class),
+
+        WebConfigInterface::class => autowire(WebConfig::class),
 
         RouteCollectorInterface::class  => autowire(RouteCollector::class),
         RouterInterface::class          => autowire(FastRouteRouter::class),

@@ -3,26 +3,28 @@ declare(strict_types=1);
 
 namespace BetaKiller\Dev;
 
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\UserInterface;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
+use Psr\Http\Message\ServerRequestInterface;
 
 class DebugBarUserDataCollector extends DataCollector implements Renderable
 {
     /**
-     * @var \BetaKiller\Model\UserInterface
+     * @var \Psr\Http\Message\ServerRequestInterface
      */
-    private $user;
+    private ServerRequestInterface $request;
 
     /**
      * DebugBarSessionDataCollector constructor.
      *
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      */
-    public function __construct(UserInterface $user)
+    public function __construct(ServerRequestInterface $request)
     {
-        $this->user = $user;
+        $this->request = $request;
     }
 
     /**
@@ -44,7 +46,9 @@ class DebugBarUserDataCollector extends DataCollector implements Renderable
     {
         $data = [];
 
-        foreach ($this->getData($this->user) as $key => $value) {
+        $user = ServerRequestHelper::getUser($this->request);
+
+        foreach ($this->getData($user) as $key => $value) {
             $data[$key] = $this->getDataFormatter()->formatVar($value);
         }
 
@@ -57,15 +61,15 @@ class DebugBarUserDataCollector extends DataCollector implements Renderable
             'id'       => $user->getID(),
             'username' => $user->getUsername(),
             'email'    => $user->getEmail(),
-            'roles'    => implode('", "', $this->getAssignedRoles()),
+            'roles'    => implode('", "', $this->getAssignedRoles($user)),
         ];
     }
 
-    private function getAssignedRoles(): array
+    private function getAssignedRoles(UserInterface $user): array
     {
         return array_map(function (RoleInterface $role) {
             return $role->getName();
-        }, $this->user->getRoles());
+        }, $user->getRoles());
     }
 
     /**

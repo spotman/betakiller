@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller;
 
+use Algorithm\DependencyResolver;
+use Algorithm\ResolveBehaviour;
 use BetaKiller\Assets\Middleware\DeleteMiddleware;
 use BetaKiller\Assets\Middleware\DownloadMiddleware;
 use BetaKiller\Assets\Middleware\OriginalMiddleware;
@@ -13,34 +15,26 @@ use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\HasPreviewProviderInterface;
 use BetaKiller\Assets\StaticFilesDeployHandler;
-use BetaKiller\Dev\UserDebugMiddleware;
+use BetaKiller\Config\WebConfigInterface;
+use BetaKiller\Dev\StartupProfiler;
 use BetaKiller\HitStat\HitStatMiddleware;
 use BetaKiller\Middleware\ContentNegotiationMiddleware;
 use BetaKiller\Middleware\CustomNotFoundPageMiddleware;
-use BetaKiller\Middleware\DebugMiddleware;
-use BetaKiller\Middleware\ErrorPageMiddleware;
-use BetaKiller\Middleware\ExpectedExceptionMiddleware;
+use BetaKiller\Middleware\DummyMiddleware;
 use BetaKiller\Middleware\FallbackErrorMiddleware;
-use BetaKiller\Middleware\I18nMiddleware;
-use BetaKiller\Middleware\MaintenanceModeMiddleware;
 use BetaKiller\Middleware\PhpBuiltInServerMiddleware;
 use BetaKiller\Middleware\ProfilerMiddleware;
-use BetaKiller\Middleware\RequestUserMiddleware;
 use BetaKiller\Middleware\RequestUuidMiddleware;
 use BetaKiller\Middleware\SchemeMiddleware;
-use BetaKiller\Middleware\SessionMiddleware;
 use BetaKiller\Middleware\SitemapRequestHandler;
 use BetaKiller\Middleware\UrlElementDispatchMiddleware;
 use BetaKiller\Middleware\UrlElementRenderMiddleware;
 use BetaKiller\Middleware\UrlHelperMiddleware;
-use BetaKiller\Middleware\UserLanguageMiddleware;
 use BetaKiller\Middleware\UserStatusMiddleware;
-use BetaKiller\Middleware\WampCookieMiddleware;
 use BetaKiller\RequestHandler\App\I18next\AddMissingTranslationRequestHandler;
 use BetaKiller\RequestHandler\App\I18next\FetchTranslationRequestHandler;
 use BetaKiller\RobotsTxt\RobotsTxtHandler;
 use BetaKiller\Security\CspReportHandler;
-use BetaKiller\Security\SecureHeadersMiddleware;
 use Mezzio\Application;
 use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
@@ -60,13 +54,20 @@ final class WebAppRunner implements AppRunnerInterface
     private Application $app;
 
     /**
+     * @var \BetaKiller\Config\WebConfigInterface
+     */
+    private WebConfigInterface $config;
+
+    /**
      * WebApp constructor.
      *
-     * @param \Mezzio\Application $app
+     * @param \Mezzio\Application                   $app
+     * @param \BetaKiller\Config\WebConfigInterface $config
      */
-    public function __construct(Application $app)
+    public function __construct(Application $app, WebConfigInterface $config)
     {
-        $this->app = $app;
+        $this->app    = $app;
+        $this->config = $config;
     }
 
     public function run(): void
@@ -82,8 +83,13 @@ final class WebAppRunner implements AppRunnerInterface
 
     private function addPipeline(): void
     {
+        $p = StartupProfiler::getInstance()->start('Configure pipeline');
+
         // The error handler should be the first (most outer) middleware to catch all Exceptions.
         $this->app->pipe(FallbackErrorMiddleware::class);
+
+        // Generate and bind request ID
+        $this->app->pipe(RequestUuidMiddleware::class);
 
         // Profiling
         $this->app->pipe(ProfilerMiddleware::class);
@@ -91,34 +97,28 @@ final class WebAppRunner implements AppRunnerInterface
         // Marker header for built-in PHP web-server
         $this->app->pipe(PhpBuiltInServerMiddleware::class);
 
-        // Generate and bind request ID
-        $this->app->pipe(RequestUuidMiddleware::class);
+        // Check scheme and domain name
+        $this->app->pipe(SchemeMiddleware::class);
 
         // Prepare request data
         $this->app->pipe(BodyParamsMiddleware::class);
-        $this->app->pipe(SchemeMiddleware::class);
-        $this->app->pipe(SecureHeadersMiddleware::class);
 
-        // Fetch Session
-        $this->app->pipe(SessionMiddleware::class);
-
-        // Bind RequestUserProvider
-        $this->app->pipe(RequestUserMiddleware::class);
-
-        // Debugging (depends on session)
-        $this->app->pipe(DebugMiddleware::class);
-
-        // I18n and content negotiation
+        // Content negotiation
         $this->app->pipe(ContentNegotiationMiddleware::class);
         $this->app->pipe(ContentType::class);
-        $this->app->pipe(I18nMiddleware::class);
 
-        // Exceptions handling (depends on i18n)
-        $this->app->pipe(ErrorPageMiddleware::class);
-        $this->app->pipe(ExpectedExceptionMiddleware::class);
 
-        // Throws raw 501 exception, proceeded by ErrorPageMiddleware
-        $this->app->pipe(MaintenanceModeMiddleware::class);
+        $config = $this->config->getMiddlewares();
+
+        $behaviour = ResolveBehaviour::create()
+            ->setThrowOnMissingReference(true)
+            ->setThrowOnCircularReference(true);
+
+        $resolved = DependencyResolver::resolve($config, $behaviour);
+
+        foreach ($resolved as $className) {
+            $this->app->pipe($className);
+        }
 
         // TODO Check If-Modified-Since and send 304 Not modified
 
@@ -141,161 +141,26 @@ final class WebAppRunner implements AppRunnerInterface
         // At this point, if no Response is returned by any middleware, the
         // NotFoundHandler kicks in; alternately, you can provide other fallback
         // middleware to execute.
+
+        StartupProfiler::getInstance()->stop($p);
     }
 
     private function addRoutes(Application $app): void
     {
-        $userPipe = [
-            // Depends on user and i18n
-            UserLanguageMiddleware::class,
+        $p = StartupProfiler::getInstance()->start('Configure routes');
 
-            // Add debug info
-            UserDebugMiddleware::class,
-        ];
+        foreach ($this->config->fetchGetRoutes() as $path => $handler) {
+            $app->get($path, $handler);
+        }
 
-        $app->post(CspReportHandler::URL, [
-            ...$userPipe,
-            CspReportHandler::class,
-        ], 'security-csp-handler');
+        foreach ($this->config->fetchPostRoutes() as $path => $handler) {
+            $app->post($path, $handler);
+        }
 
-        $app->get('/sitemap.xml', SitemapRequestHandler::class, 'sitemap');
-        $app->get('/robots.txt', RobotsTxtHandler::class, 'robots.txt');
+        foreach ($this->config->fetchAnyRoutes() as $path => $handler) {
+            $app->any($path, $handler);
+        }
 
-        // Assets
-        $extRegexp  = '[a-z]{2,}'; // (jpg|jpeg|gif|png)
-        $sizeRegexp = '[0-9]{0,4}'.AssetsModelImageInterface::SIZE_DELIMITER.'[0-9]{0,4}';
-
-        $itemPlace = '{item:.+}';
-        $sizePlace = '-{size:'.$sizeRegexp.'}';
-        $extPlace  = '.{ext:'.$extRegexp.'}';
-
-        $uploadAction   = AssetsProviderInterface::ACTION_UPLOAD;
-        $downloadAction = AssetsProviderInterface::ACTION_DOWNLOAD;
-        $originalAction = AssetsProviderInterface::ACTION_ORIGINAL;
-        $deleteAction   = AssetsProviderInterface::ACTION_DELETE;
-        $previewAction  = HasPreviewProviderInterface::ACTION_PREVIEW;
-
-        $uploadUrl = '/assets/{provider}/'.$uploadAction;
-
-        /**
-         * Get upload info and restrictions
-         */
-        $app->get(
-            $uploadUrl,
-            [
-                ...$userPipe,
-                UploadInfoMiddleware::class,
-            ],
-            'assets-upload-info'
-        );
-
-        /**
-         * Upload file via concrete provider
-         *
-         * "assets/<provider>/upload"
-         */
-        $app->post(
-            $uploadUrl,
-            [
-                ...$userPipe,
-                UploadMiddleware::class,
-            ],
-            'assets-upload'
-        );
-
-        /**
-         * Static files legacy route first
-         */
-        $app->get('/assets/static/{file:.+}', StaticFilesDeployHandler::class, 'assets-static');
-
-        /**
-         * Download original file via concrete provider
-         */
-        $app->get(
-            '/assets/{provider}/'.$itemPlace.'/'.$downloadAction.$extPlace,
-            [
-                ...$userPipe,
-                DownloadMiddleware::class,
-            ],
-            'assets-download'
-        );
-
-        /**
-         * Get original files via concrete provider
-         */
-        $app->get(
-            '/assets/{provider}/'.$itemPlace.'/'.$originalAction.$extPlace,
-            [
-                ...$userPipe,
-                OriginalMiddleware::class,
-            ],
-            'assets-original'
-        );
-
-        /**
-         * Preview files via concrete provider
-         */
-        $app->get(
-            '/assets/{provider}/'.$itemPlace.'/'.$previewAction.$sizePlace.$extPlace,
-            [
-                ...$userPipe,
-                PreviewMiddleware::class,
-            ],
-            'assets-preview'
-        );
-
-        /**
-         * Delete files via concrete provider
-         */
-        $app->get(
-            '/assets/{provider}/'.$itemPlace.'/'.$deleteAction.$extPlace,
-            [
-                ...$userPipe,
-                DeleteMiddleware::class,
-            ],
-            'assets-delete'
-        );
-
-        // API HTTP gate
-        $app->post(
-            '/api/v{version:\d+}/{type:.+}',
-            [
-                ...$userPipe,
-                ApiRequestHandler::class,
-            ],
-            'api-gate'
-        );
-
-        // I18n handlers
-        $app->get('/i18n/{lang}', FetchTranslationRequestHandler::class, 'i18n-fetch');
-        $app->post('/i18n/{lang}/add-missing', AddMissingTranslationRequestHandler::class, 'i18n-add-missing');
-
-        // UrlElement processing
-        $urlElementPipe = [
-            ...$userPipe,
-
-            // Flash messages for Post-Redirect-Get flow (requires Session)
-            FlashMessageMiddleware::class,
-
-            // Heavy operation
-            UrlHelperMiddleware::class,
-
-            // Save stat (referrer, target, utm markers, etc) (depends on UrlContainer)
-            HitStatMiddleware::class,
-
-            // Display custom 404 page for dispatched UrlElement
-            CustomNotFoundPageMiddleware::class,
-
-            // Depends on UrlHelper
-            UrlElementDispatchMiddleware::class,
-
-            // Prevent access for locked users
-            UserStatusMiddleware::class,
-
-            // Render UrlElement
-            UrlElementRenderMiddleware::class,
-        ];
-
-        $app->any('/{path:.*}', $urlElementPipe, 'url-element');
+        StartupProfiler::getInstance()->stop($p);
     }
 }

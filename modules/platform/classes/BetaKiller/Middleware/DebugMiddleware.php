@@ -7,6 +7,7 @@ use BetaKiller\Dev\AbstractProfiler;
 use BetaKiller\Dev\DebugBarCookiesDataCollector;
 use BetaKiller\Dev\DebugBarHttpDriver;
 use BetaKiller\Dev\DebugBarSessionDataCollector;
+use BetaKiller\Dev\DebugBarUserDataCollector;
 use BetaKiller\Dev\DebugServerRequestHelper;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Dev\StartupProfiler;
@@ -118,6 +119,7 @@ final class DebugMiddleware implements MiddlewareInterface
             ->addCollector(new TimeDataCollector(RequestProfiler::getRequestStartTime($request)))
             ->addCollector(new DebugBarCookiesDataCollector($request))
             ->addCollector(new DebugBarSessionDataCollector($session))
+            ->addCollector(new DebugBarUserDataCollector($request))
             ->addCollector(new MemoryCollector())
             ->addCollector(new MonologCollector($this->logger->getMonologInstance()));
 

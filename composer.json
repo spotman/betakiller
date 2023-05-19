@@ -22,6 +22,7 @@
     "ext-xml": "*",
     "ext-zlib": "*",
     "aidantwoods/secureheaders": "^2.0",
+    "anthonykgross/dependency-resolver": "^2.0",
     "beberlei/metrics": "^2.8",
     "bramus/monolog-colored-line-formatter": "~3.0.0",
     "caxy/php-htmldiff": "^0.1.6",
