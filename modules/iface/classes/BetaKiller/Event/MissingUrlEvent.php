@@ -2,42 +2,35 @@
 namespace BetaKiller\Event;
 
 use BetaKiller\MessageBus\EventMessageInterface;
-use BetaKiller\MessageBus\MessageWithHandlersInterface;
 use BetaKiller\Url\UrlElementInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
-final class MissingUrlEvent implements EventMessageInterface, MessageWithHandlersInterface
+final class MissingUrlEvent implements EventMessageInterface
 {
     /**
      * @var UrlElementInterface|null
      */
-    private $parentModel;
+    private ?UrlElementInterface $parentModel;
 
     /**
      * @var null|string
      */
-    private $redirectToUrl;
-
-    /**
-     * @var \Psr\Http\Message\ServerRequestInterface
-     */
-    private $request;
+    private ?string $redirectToUrl;
 
     /**
      * @var UriInterface
      */
-    private $missedUri;
+    private UriInterface $missedUri;
 
     /**
      * @var string
      */
-    private $ip;
+    private string $ip;
 
     /**
      * @var string|null
      */
-    private $referrer;
+    private ?string $referrer;
 
     /**
      * UrlDispatchedEvent constructor.
@@ -49,25 +42,17 @@ final class MissingUrlEvent implements EventMessageInterface, MessageWithHandler
      * @param string|null                              $referrer
      */
     public function __construct(
-        UriInterface $missedUri,
+        UriInterface         $missedUri,
         ?UrlElementInterface $parentModel,
-        ?string $redirectTo,
-        string $ip,
-        ?string $referrer
+        ?string              $redirectTo,
+        string               $ip,
+        ?string              $referrer
     ) {
         $this->parentModel   = $parentModel;
         $this->redirectToUrl = $redirectTo;
         $this->missedUri     = $missedUri;
         $this->ip            = $ip;
         $this->referrer      = $referrer;
-    }
-
-    /**
-     * @return \Psr\Http\Message\ServerRequestInterface
-     */
-    public function getRequest(): ServerRequestInterface
-    {
-        return $this->request;
     }
 
     /**
