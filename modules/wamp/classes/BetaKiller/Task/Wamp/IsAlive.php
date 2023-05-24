@@ -8,7 +8,6 @@ use BetaKiller\Daemon\AbstractApiWorkerDaemon;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\SessionHelper;
-use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\MaintenanceModeService;
 use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Task\AbstractTask;

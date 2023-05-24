@@ -2,8 +2,8 @@
 namespace BetaKiller\DI;
 
 use BetaKiller\Config\ConfigProviderInterface;
-use BetaKiller\Exception;
 use BetaKiller\Env\AppEnvInterface;
+use BetaKiller\Exception;
 use DI\ContainerBuilder;
 use DI\DependencyException;
 use Invoker\Exception\InvocationException;

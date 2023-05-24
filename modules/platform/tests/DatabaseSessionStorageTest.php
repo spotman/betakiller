@@ -17,9 +17,9 @@ use BetaKiller\Security\EncryptionInterface;
 use BetaKiller\Session\DatabaseSessionStorage;
 use BetaKiller\Session\SessionStorageInterface;
 use Dflydev\FigCookies\SetCookies;
+use Laminas\Diactoros\ServerRequest;
 use Middlewares\Utils\RequestHandler;
 use Psr\Http\Message\ServerRequestInterface;
-use Laminas\Diactoros\ServerRequest;
 
 final class DatabaseSessionStorageTest extends AbstractTestCase
 {

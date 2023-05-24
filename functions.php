@@ -4,10 +4,10 @@ declare(strict_types=1);
 use BetaKiller\Config\KohanaConfigProvider;
 use BetaKiller\Dev\StartupProfiler;
 use BetaKiller\DI\Container;
-use BetaKiller\Env\FakeConfigReader;
-use BetaKiller\Factory\AppRunnerFactoryInterface;
 use BetaKiller\Env\AppEnv;
 use BetaKiller\Env\AppEnvInterface;
+use BetaKiller\Env\FakeConfigReader;
+use BetaKiller\Factory\AppRunnerFactoryInterface;
 use BetaKiller\ModuleInitializerInterface;
 use Psr\Container\ContainerInterface;
 

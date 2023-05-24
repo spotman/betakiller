@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace BetaKiller\HitStat;
 
 use BetaKiller\Dev\RequestProfiler;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Exception\HttpExceptionExpectedInterface;
 use BetaKiller\Exception\SeeOtherHttpException;
-use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\Hit;

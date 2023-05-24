@@ -133,7 +133,7 @@
       "./functions.php"
     ],
     "psr-4": {
-      "BetaKiller\\Env\\": "modules/env/classes/BetaKiller/Env"
+      "BetaKiller\\Env\\": "modules/core/classes/BetaKiller/Env"
     }
   }
 }

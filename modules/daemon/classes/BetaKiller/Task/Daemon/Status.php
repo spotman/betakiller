@@ -4,11 +4,8 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Daemon;
 
 use BetaKiller\Daemon\DaemonLockFactory;
-use BetaKiller\Daemon\ShutdownDaemonException;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
-use BetaKiller\Task\TaskException;
-use Symfony\Component\Process\Process;
 
 class Status extends AbstractTask
 {

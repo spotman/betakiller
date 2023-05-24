@@ -24,6 +24,14 @@ final class ErrorModuleInitializer implements ModuleInitializerInterface
     private PhpExceptionStorageHandler $handler;
 
     /**
+     * @inheritDoc
+     */
+    public static function getDependencies(): array
+    {
+        return [];
+    }
+
+    /**
      * ErrorModuleInitializer constructor.
      *
      * @param \BetaKiller\Env\AppEnvInterface              $appEnv

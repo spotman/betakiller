@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Daemon;
 
-use BetaKiller\Exception;
 use BetaKiller\Env\AppEnvInterface;
+use BetaKiller\Exception;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\TextHelper;
 use Psr\Log\LoggerInterface;

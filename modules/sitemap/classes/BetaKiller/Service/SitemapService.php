@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace BetaKiller\Service;
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Env\AppEnvInterface;
+use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Url\AvailableUrlsCollector;
 use Psr\Http\Message\ResponseInterface;

@@ -1,8 +1,8 @@
 <?php
 namespace BetaKiller\HitStat;
 
-use BetaKiller\Event\MissingUrlEvent;
 use BetaKiller\Env\AppEnvInterface;
+use BetaKiller\Event\MissingUrlEvent;
 use BetaKiller\Repository\HitPageRepositoryInterface;
 use BetaKiller\Service\HitService;
 

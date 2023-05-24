@@ -2,8 +2,8 @@
 namespace BetaKiller\Cache;
 
 use BetaKiller\Config\ConfigProviderInterface;
-use BetaKiller\Exception;
 use BetaKiller\Env\AppEnvInterface;
+use BetaKiller\Exception;
 use Doctrine\Common\Cache\ChainCache;
 use Pcelta\Doctrine\Cache\Factory;
 

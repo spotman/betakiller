@@ -19,4 +19,12 @@ final class LogModuleInitializer implements ModuleInitializerInterface
         // Proxy old Kohana logs to new logging subsystem
         \Kohana::$log->attach(new KohanaLogProxy($this->logger));
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getDependencies(): array
+    {
+        return [];
+    }
 }

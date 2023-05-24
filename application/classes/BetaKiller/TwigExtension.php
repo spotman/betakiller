@@ -14,7 +14,6 @@ use BetaKiller\Helper\UrlHelper;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\RoleInterface;
-use BetaKiller\Security\SecurityConfigInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;

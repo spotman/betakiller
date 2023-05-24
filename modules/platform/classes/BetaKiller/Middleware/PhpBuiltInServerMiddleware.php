@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\TextHelper;
 use Psr\Http\Message\ResponseInterface;

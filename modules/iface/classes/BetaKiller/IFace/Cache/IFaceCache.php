@@ -2,8 +2,8 @@
 namespace BetaKiller\IFace\Cache;
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Env\AppEnvInterface;
+use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\IFace\IFaceInterface;
 use PageCache\PageCache;
 use Psr\Http\Message\ServerRequestInterface;

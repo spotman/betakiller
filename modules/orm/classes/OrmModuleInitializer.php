@@ -8,6 +8,14 @@ final class OrmModuleInitializer implements ModuleInitializerInterface
 {
     private OrmFactoryInterface $factory;
 
+    /**
+     * @inheritDoc
+     */
+    public static function getDependencies(): array
+    {
+        return [];
+    }
+
     public function __construct(OrmFactoryInterface $factory)
     {
         $this->factory = $factory;

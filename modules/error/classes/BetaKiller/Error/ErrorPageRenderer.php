@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace BetaKiller\Error;
 
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\ExceptionInterface;
 use BetaKiller\Factory\IFaceFactory;
-use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
