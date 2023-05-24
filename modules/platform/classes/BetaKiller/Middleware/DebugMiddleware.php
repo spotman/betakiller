@@ -7,6 +7,7 @@ use BetaKiller\Dev\AbstractProfiler;
 use BetaKiller\Dev\DebugBarCookiesDataCollector;
 use BetaKiller\Dev\DebugBarHttpDriver;
 use BetaKiller\Dev\DebugBarSessionDataCollector;
+use BetaKiller\Dev\DebugBarTwigDataCollector;
 use BetaKiller\Dev\DebugBarUserDataCollector;
 use BetaKiller\Dev\DebugServerRequestHelper;
 use BetaKiller\Dev\RequestProfiler;
@@ -20,6 +21,7 @@ use DebugBar\DataCollector\MemoryCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DebugBar;
 use DebugBar\JavascriptRenderer;
+use DebugBar\Storage\FileStorage;
 use PhpMiddleware\PhpDebugBar\PhpDebugBarMiddleware;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -27,9 +29,12 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Twig\Environment;
 
 final class DebugMiddleware implements MiddlewareInterface
 {
+    public const DEBUGBAR_TIME_COLLECTOR = 'time';
+
     /**
      * @var \Psr\Http\Message\ResponseFactoryInterface
      */
@@ -53,19 +58,20 @@ final class DebugMiddleware implements MiddlewareInterface
     /**
      * @var \Twig\Environment
      */
-//    private $twigEnv;
+    private $twigEnv;
 
     /**
      * DebugMiddleware constructor.
      *
      * @param \BetaKiller\Env\AppEnvInterface            $appEnv
+     * @param \Twig\Environment                          $twigEnv
      * @param \Psr\Http\Message\ResponseFactoryInterface $responseFactory
      * @param \Psr\Http\Message\StreamFactoryInterface   $streamFactory
      * @param \BetaKiller\Log\LoggerInterface            $logger
      */
     public function __construct(
         AppEnvInterface          $appEnv,
-//        Environment $twigEnv,
+        Environment $twigEnv,
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface   $streamFactory,
         LoggerInterface          $logger
@@ -73,7 +79,7 @@ final class DebugMiddleware implements MiddlewareInterface
         $this->responseFactory = $responseFactory;
         $this->streamFactory   = $streamFactory;
         $this->appEnv          = $appEnv;
-//        $this->twigEnv         = $twigEnv;
+        $this->twigEnv         = $twigEnv;
         $this->logger = $logger;
     }
 
@@ -123,14 +129,12 @@ final class DebugMiddleware implements MiddlewareInterface
             ->addCollector(new MemoryCollector())
             ->addCollector(new MonologCollector($this->logger->getMonologInstance()));
 
-// Temp disable coz of error
-//        if (ServerRequestHelper::isHtmlPreferred($request)) {
-//            $debugBar->addCollector(new DebugBarTwigDataCollector($debugBar, $this->twigEnv));
-//        }
+        if (ServerRequestHelper::isHtmlPreferred($request)) {
+            $debugBar->addCollector(new DebugBarTwigDataCollector($this->twigEnv));
+        }
 
-        // Temporary disable storage for testing purposes
         // Storage for processing data for AJAX calls and redirects
-        // $debugBar->setStorage(new FileStorage($this->appEnv->getTempPath()));
+        $debugBar->setStorage(new FileStorage($this->appEnv->getTempPath('debugbar-storage')));
 
         // Prepare renderer
         $renderer = $debugBar->getJavascriptRenderer('/phpDebugBar');
@@ -159,38 +163,35 @@ final class DebugMiddleware implements MiddlewareInterface
         // DebugBar generates inline tags and images so configuring CSP
         $this->addCspRules($renderer, $request);
 
-//        // Prevent caching
-//        $response = ResponseHelper::disableCaching($response);
-
         // Add headers injected by DebugBar
         return $httpDriver->applyHeaders($response);
     }
 
     private function addCspRules(JavascriptRenderer $renderer, ServerRequestInterface $request): void
     {
-//        $csp = ServerRequestHelper::getCsp($request);
-//
-//        if (!$csp) {
-//            return;
-//        }
-//
-//        $inlineJs  = $renderer->getAssets('inline_js');
-//        $inlineCss = $renderer->getAssets('inline_css');
-//        $initJs    = \str_replace(['<script type="text/javascript">', '</script>'], '', \trim($renderer->render()));
-//
-//        foreach ($inlineJs as $js) {
-//            $csp->cspHash('script', $js);
-//        }
-//
-//        // Temporary disable coz 'unsafe-inline' for styles enabled (pain in the ass with third-party widgets)
-//        foreach ($inlineCss as $css) {
-//            $csp->cspHash('style', $css);
-//        }
-//
-//        $csp->cspHash('script', $initJs);
+        $csp = ServerRequestHelper::getCsp($request);
+
+        if (!$csp) {
+            return;
+        }
+
+        $inlineJs  = $renderer->getAssets('inline_js');
+        $inlineCss = $renderer->getAssets('inline_css');
+        $initJs    = \str_replace(['<script type="text/javascript">', '</script>'], '', \trim($renderer->render()));
+
+        foreach ($inlineJs as $js) {
+            $csp->cspHash('script', $js);
+        }
+
+        // Temporary disable coz 'unsafe-inline' for styles enabled (pain in the ass with third-party widgets)
+        foreach ($inlineCss as $css) {
+            $csp->cspHash('style', $css);
+        }
+
+        $csp->cspHash('script', $initJs);
 
         // Inline images in PhpDebugBar
-//        $csp->csp('image', 'data:');
+        $csp->csp('image', 'data:');
     }
 
     private function getFakeHandler(RequestHandlerInterface $handler): RequestHandlerInterface
@@ -218,14 +219,14 @@ final class DebugMiddleware implements MiddlewareInterface
                 if ($requestProfiler) {
                     $debugBar = DebugServerRequestHelper::getDebugBar($request);
 
-                    if (!$debugBar->hasCollector('time')) {
+                    if (!$debugBar->hasCollector(DebugMiddleware::DEBUGBAR_TIME_COLLECTOR)) {
                         throw new \LogicException('RequestProfiler requires DebugBar TimeDataCollector');
                     }
 
                     $startupProfiler = StartupProfiler::getInstance();
 
                     /** @var \DebugBar\DataCollector\TimeDataCollector $collector */
-                    $collector = $debugBar->getCollector('time');
+                    $collector = $debugBar->getCollector(DebugMiddleware::DEBUGBAR_TIME_COLLECTOR);
 
                     $collector->addMeasure('Boot', $collector->getRequestStartTime(), $startupProfiler->getCreatedAt());
 
