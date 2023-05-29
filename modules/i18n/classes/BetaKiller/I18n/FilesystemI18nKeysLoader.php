@@ -12,17 +12,17 @@ class FilesystemI18nKeysLoader implements I18nKeysLoaderInterface
     /**
      * @var \BetaKiller\I18n\PluralBagFormatterInterface
      */
-    private $bagFormatter;
+    private PluralBagFormatterInterface $bagFormatter;
 
     /**
      * @var \BetaKiller\I18n\PluralBagFactoryInterface
      */
-    private $bagFactory;
+    private PluralBagFactoryInterface $bagFactory;
 
     /**
      * @var \BetaKiller\Repository\LanguageRepositoryInterface
      */
-    private $langRepo;
+    private LanguageRepositoryInterface $langRepo;
 
     /**
      * FilesystemI18nKeysLoader constructor.
@@ -34,7 +34,7 @@ class FilesystemI18nKeysLoader implements I18nKeysLoaderInterface
     public function __construct(
         LanguageRepositoryInterface $langRepo,
         PluralBagFormatterInterface $bagFormatter,
-        PluralBagFactoryInterface $bagFactory
+        PluralBagFactoryInterface   $bagFactory
     ) {
         $this->langRepo     = $langRepo;
         $this->bagFormatter = $bagFormatter;
@@ -53,7 +53,7 @@ class FilesystemI18nKeysLoader implements I18nKeysLoaderInterface
         foreach ($this->langRepo->getAppLanguages(true) as $lang) {
             foreach ($this->getLangData($lang) as $keyName => $i18nValue) {
                 // Create key if not exists
-                $key = $keys[$keyName] = $keys[$keyName] ?? new I18nKey($keyName);
+                $key = $keys[$keyName] ??= new I18nKey($keyName);
 
                 $key->setI18nValue($lang, $i18nValue);
             }
@@ -71,56 +71,41 @@ class FilesystemI18nKeysLoader implements I18nKeysLoaderInterface
      */
     private function getLangData(LanguageInterface $lang): array
     {
-        // New translation table
-        $table = [];
-
         // Split the language: language, region, locale, etc
-        $parts = explode('-', $lang->getLocale());
+        $parts = explode('_', $lang->getLocale());
+        $path  = array_shift($parts);
 
-        do {
-            // Create a path for this set of parts
-            $path = implode(DIRECTORY_SEPARATOR, $parts);
+        $files = \Kohana::find_file('i18n', $path, 'yml', true);
 
-            $files = \Kohana::find_file('i18n', $path, 'yml', true);
+        $t = [];
 
-            if ($files) {
-                $t = [];
-                foreach ($files as $file) {
-                    $values = Yaml::parseFile($file);
+        foreach ($files as $file) {
+            $values = Yaml::parseFile($file);
 
-                    if (!$values) {
-                        continue;
-                    }
-
-                    foreach ($values as $key => $value) {
-                        if (\is_array($value)) {
-                            // Plural forms are in array
-                            $bag = $this->bagFactory->create($value);
-                            // Compile with default formatter
-                            $value = $this->bagFormatter->compile($bag);
-                        }
-
-                        // Use universal new-line separator
-                        if (\strpos($value, "\n") !== false) {
-                            $value = \str_replace("\n", "\r\n", $value);
-                        }
-
-                        $values[$key] = $value;
-                    }
-
-                    // Merge the language strings into the sub table
-                    $t[] = $values;
-                }
-
-                // Append the sub table, preventing less specific language
-                // files from overloading more specific files
-                $table += array_merge(...$t);
+            if (!$values) {
+                continue;
             }
 
-            // Remove the last part
-            array_pop($parts);
-        } while ($parts);
+            foreach ($values as $key => $value) {
+                if (\is_array($value)) {
+                    // Plural forms are in array
+                    $bag = $this->bagFactory->create($value);
+                    // Compile with default formatter
+                    $value = $this->bagFormatter->compile($bag);
+                }
 
-        return $table;
+                // Use universal new-line separator
+                if (str_contains($value, "\n")) {
+                    $value = \str_replace("\n", "\r\n", $value);
+                }
+
+                $values[$key] = $value;
+            }
+
+            // Merge the language strings into the sub table
+            $t[] = $values;
+        }
+
+        return array_merge(...$t);
     }
 }

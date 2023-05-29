@@ -67,11 +67,11 @@ class LazyAggregateI18nLoader implements I18nKeysLoaderInterface
             throw new I18nException('No i18n loaders defined');
         }
 
-//        // If dev mode
-//        if ($this->appEnv->inDevelopmentMode()) {
-//            // Inject file-based loader as a primary source fallback
-//            $loadersClassNames[] = FilesystemI18nKeysLoader::class;
-//        }
+        // If dev mode
+        if ($this->appEnv->inDevelopmentMode()) {
+            // Inject file-based loader as a primary source fallback
+            $loadersClassNames[] = FilesystemI18nKeysLoader::class;
+        }
 
         $loadersInstances = [];
 
