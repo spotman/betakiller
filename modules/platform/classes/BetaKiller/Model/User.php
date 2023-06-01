@@ -51,7 +51,7 @@ class User extends \ORM implements UserInterface
 
     protected function configure(): void
     {
-        $this->_table_name       = self::TABLE_NAME;
+        $this->_table_name       = static::TABLE_NAME;
         $this->_reload_on_wakeup = true;
 
         $this->belongs_to([
@@ -265,6 +265,14 @@ class User extends \ORM implements UserInterface
     public function getUsername(): string
     {
         return (string)$this->get(self::COL_USERNAME);
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasUsername(): bool
+    {
+        return (bool)$this->get(self::COL_USERNAME);
     }
 
     /**

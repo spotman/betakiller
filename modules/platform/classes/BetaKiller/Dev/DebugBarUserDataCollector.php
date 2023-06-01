@@ -59,7 +59,7 @@ class DebugBarUserDataCollector extends DataCollector implements Renderable
     {
         return [
             'id'       => $user->getID(),
-            'username' => $user->getUsername(),
+            'username' => $user->hasUsername() ? $user->getUsername() : null,
             'email'    => $user->getEmail(),
             'roles'    => implode('", "', $this->getAssignedRoles($user)),
         ];

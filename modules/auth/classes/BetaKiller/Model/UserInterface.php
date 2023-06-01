@@ -77,6 +77,11 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     public function getUsername(): string;
 
     /**
+     * @return bool
+     */
+    public function hasUsername(): bool;
+
+    /**
      * @param string $value
      *
      * @return \BetaKiller\Model\UserInterface
