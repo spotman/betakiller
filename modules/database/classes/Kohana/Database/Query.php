@@ -36,7 +36,7 @@ class Kohana_Database_Query {
     private static bool $logQueries = false;
 
     /**
-     * @var string[]
+     * @var string[][]
      */
     private static array $queries = [];
 
@@ -278,7 +278,9 @@ class Kohana_Database_Query {
 			}
 		}
 
-		// Execute the query
+        $startedOn = microtime(true);
+
+        // Execute the query
 		$result = $db->query($this->_type, $sql, $as_object, $object_params);
 
         self::$queryCounter++;
@@ -290,7 +292,12 @@ class Kohana_Database_Query {
 		}
 
 		if (self::$logQueries) {
-		    self::$queries[] = $sql;
+            $endedOn = microtime(true);
+
+            self::$queries[(string)$endedOn] = [
+                'query' => $sql,
+                'duration' => $endedOn - $startedOn,
+            ];
         }
 
 		return $result;
