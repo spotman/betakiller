@@ -287,7 +287,12 @@ class Kohana_Database_Query
                 $file = mb_strtolower(basename($btr['file']));
             } while (str_contains($file, 'orm'));
 
-            $sql .= sprintf(' -- %s:%s %s::%s()', $btr['file'], $btr['line'], $btr['class'], $btr['function']);
+            $sql .= sprintf(
+                ' -- %s:%s %s()',
+                $btr['file'],
+                $btr['line'],
+                isset($btr['class']) ? $btr['class'].'::'.$btr['function'] : $btr['function']
+            );
         }
 
         // Execute the query
