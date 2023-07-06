@@ -249,7 +249,7 @@ return [
             ]);
 
             $factory = new RedisConnectionFactory([
-                'scheme_extensions' => ['phpredis',],
+                'scheme_extensions' => ['phpredis'],
 
                 'host'  => getenv('REDIS_HOST'),
                 'port'  => getenv('REDIS_PORT'),
@@ -260,7 +260,9 @@ return [
                     'prefix' => $prefix,
                 ],
 
-                'redelivery_delay' => 300,
+                'redelivery_delay'   => 300,
+                'timeout'            => 5,
+                'read_write_timeout' => 5,
             ]);
 
             return $factory->createContext();

@@ -72,10 +72,10 @@ final class EsbPingDaemon extends AbstractDaemon
      * @param \Psr\Log\LoggerInterface                               $logger
      */
     public function __construct(
-        BoundedEventTransportInterface $boundedTransport,
+        BoundedEventTransportInterface  $boundedTransport,
         OutboundEventTransportInterface $outboundTransport,
-        Collector $metrics,
-        LoggerInterface $logger
+        Collector                       $metrics,
+        LoggerInterface                 $logger
     ) {
         $this->outboundTransport = $outboundTransport;
         $this->boundedTransport  = $boundedTransport;
@@ -92,8 +92,8 @@ final class EsbPingDaemon extends AbstractDaemon
             $boundedEvent  = new HeartbeatBoundedEvent;
             $outboundEvent = new HeartbeatOutboundEvent;
 
-            $this->boundedEvents[$boundedEvent->getTimestamp()]   = $boundedEvent;
-            $this->outboundEvents[$outboundEvent->getTimestamp()] = $outboundEvent;
+            $this->boundedEvents[(string)$boundedEvent->getTimestamp()]   = $boundedEvent;
+            $this->outboundEvents[(string)$outboundEvent->getTimestamp()] = $outboundEvent;
 
             $this->boundedTransport->publishBounded($boundedEvent);
             $this->outboundTransport->publishOutbound($outboundEvent);
@@ -154,7 +154,7 @@ final class EsbPingDaemon extends AbstractDaemon
 //            ]);
 
             // Remove event from "pending" list
-            unset($this->boundedEvents[$ts]);
+            unset($this->boundedEvents[(string)$ts]);
 
             $this->metrics->timing('heartbeat.esb.bounded', $ms);
         } catch (Throwable $e) {
@@ -175,7 +175,7 @@ final class EsbPingDaemon extends AbstractDaemon
 //            ]);
 
             // Remove event from "pending" list
-            unset($this->outboundEvents[$ts]);
+            unset($this->outboundEvents[(string)$ts]);
 
             $this->metrics->timing('heartbeat.esb.outbound', $ms);
         } catch (Throwable $e) {
