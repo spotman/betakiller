@@ -56,9 +56,9 @@ final class EsbPingDaemon extends AbstractDaemon
      */
     private array $outboundEvents = [];
 
-    private TimerInterface $heartbeatTimer;
+    private ?TimerInterface $heartbeatTimer = null;
 
-    private TimerInterface $checkTimer;
+    private ?TimerInterface $checkTimer = null;
 
     /**
      * @var \Beberlei\Metrics\Collector\Collector
@@ -92,11 +92,11 @@ final class EsbPingDaemon extends AbstractDaemon
             $boundedEvent  = new HeartbeatBoundedEvent;
             $outboundEvent = new HeartbeatOutboundEvent;
 
-            $this->boundedEvents[(string)$boundedEvent->getTimestamp()]   = $boundedEvent;
-            $this->outboundEvents[(string)$outboundEvent->getTimestamp()] = $outboundEvent;
-
             $this->boundedTransport->publishBounded($boundedEvent);
             $this->outboundTransport->publishOutbound($outboundEvent);
+
+            $this->registerBoundedEvent($boundedEvent);
+            $this->registerOutboundEvent($outboundEvent);
 //            $this->logger->info('Heartbeat sent');
         });
 
@@ -149,12 +149,8 @@ final class EsbPingDaemon extends AbstractDaemon
             $ts = $event->getTimestamp();
             $ms = (microtime(true) - $ts) * 1000;
 
-//            $this->logger->info('Bounded heartbeat received in :ms ms', [
-//                ':ms' => (int)$ms,
-//            ]);
-
             // Remove event from "pending" list
-            unset($this->boundedEvents[(string)$ts]);
+            $this->removeBoundedEvent($event);
 
             $this->metrics->timing('heartbeat.esb.bounded', $ms);
         } catch (Throwable $e) {
@@ -170,12 +166,8 @@ final class EsbPingDaemon extends AbstractDaemon
             $ts = $event->getTimestamp();
             $ms = (microtime(true) - $ts) * 1000;
 
-//            $this->logger->info('Outbound heartbeat received in :ms ms', [
-//                ':ms' => (int)$ms,
-//            ]);
-
             // Remove event from "pending" list
-            unset($this->outboundEvents[(string)$ts]);
+            $this->removeOutboundEvent($event);
 
             $this->metrics->timing('heartbeat.esb.outbound', $ms);
         } catch (Throwable $e) {
@@ -188,26 +180,26 @@ final class EsbPingDaemon extends AbstractDaemon
     private function checkStaleEvents(): void
     {
         try {
-            $threshold      = time() - self::HEARTBEAT_TIMEOUT;
+            $threshold      = microtime(true) - self::HEARTBEAT_TIMEOUT;
             $boundedCounter = $outboundCounter = 0;
 
-            foreach ($this->boundedEvents as $ts => $event) {
+            foreach ($this->boundedEvents as $event) {
                 // Skip pending events
-                if ($ts < $threshold) {
+                if ($event->getTimestamp() < $threshold) {
                     $boundedCounter++;
 
                     // Remove event from "pending" list (to prevent permanent errors notifications)
-                    unset($this->boundedEvents[$ts]);
+                    $this->removeBoundedEvent($event);
                 }
             }
 
-            foreach ($this->outboundEvents as $ts => $event) {
+            foreach ($this->outboundEvents as $event) {
                 // Skip pending events
-                if ($ts < $threshold) {
+                if ($event->getTimestamp() < $threshold) {
                     $outboundCounter++;
 
                     // Remove event from "pending" list (to prevent permanent errors notifications)
-                    unset($this->outboundEvents[$ts]);
+                    $this->removeOutboundEvent($event);
                 }
             }
 
@@ -227,5 +219,25 @@ final class EsbPingDaemon extends AbstractDaemon
         } catch (Throwable $e) {
             LoggerHelper::logRawException($this->logger, $e);
         }
+    }
+
+    private function registerBoundedEvent(HeartbeatBoundedEvent $event): void
+    {
+        $this->boundedEvents[(string)$event->getTimestamp()] = $event;
+    }
+
+    private function registerOutboundEvent(HeartbeatOutboundEvent $event): void
+    {
+        $this->outboundEvents[(string)$event->getTimestamp()] = $event;
+    }
+
+    private function removeBoundedEvent(HeartbeatBoundedEvent $event): void
+    {
+        unset($this->boundedEvents[(string)$event->getTimestamp()]);
+    }
+
+    private function removeOutboundEvent(HeartbeatOutboundEvent $event): void
+    {
+        unset($this->outboundEvents[(string)$event->getTimestamp()]);
     }
 }
