@@ -28,7 +28,7 @@ final class EsbPingDaemon extends AbstractDaemon
 
     // Seconds
     private const HEARTBEAT_TIMEOUT  = 15;
-    private const HEARTBEAT_INTERVAL = 5;
+    private const HEARTBEAT_INTERVAL = 1;
     private const CHECK_INTERVAL     = self::HEARTBEAT_TIMEOUT * 2;
 
     /**
