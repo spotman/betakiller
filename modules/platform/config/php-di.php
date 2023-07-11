@@ -260,9 +260,10 @@ return [
                     'prefix' => $prefix,
                 ],
 
-                'redelivery_delay'   => 300,
-                'timeout'            => 5,
-                'read_write_timeout' => 5,
+                'redelivery_delay'        => 300,
+                'timeout'                 => 15,
+                'read_write_timeout'      => 5,
+                'phpredis_retry_interval' => 5,
             ]);
 
             return $factory->createContext();
