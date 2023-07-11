@@ -107,9 +107,15 @@ class ResponseHelper
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public static function temporaryRedirect(string $url): ResponseInterface
+    public static function temporaryRedirect(string $url, string $cause = null): ResponseInterface
     {
-        return new RedirectResponse($url, 307);
+        $headers = [];
+
+        if ($cause) {
+            $headers['x-cause'] = $cause;
+        }
+
+        return new RedirectResponse($url, 307, $headers);
     }
 
     /**

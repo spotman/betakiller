@@ -16,6 +16,10 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class SchemeMiddleware implements MiddlewareInterface
 {
+    private const CAUSE_SCHEME = 'scheme';
+    private const CAUSE_HOST = 'host';
+    private const CAUSE_SLASH = 'slash';
+
     /**
      * @var \BetaKiller\Config\AppConfigInterface
      */
@@ -65,27 +69,27 @@ class SchemeMiddleware implements MiddlewareInterface
         $currentHost   = $currentUri->getHost();
 
         if ($baseScheme !== $currentScheme) {
-            return $this->redirect($currentUri->withScheme($baseScheme));
+            return $this->redirect($currentUri->withScheme($baseScheme), self::CAUSE_SCHEME);
         }
 
         // Skip domain check in development mode
         if ($baseHost !== $currentHost && !$this->appEnv->inDevelopmentMode()) {
-            return $this->redirect($currentUri->withHost($baseHost));
+            return $this->redirect($currentUri->withHost($baseHost), self::CAUSE_HOST);
         }
 
         $path = $currentUri->getPath();
         $file = \basename($path);
 
         if ($path !== '/' && !str_contains($file, '.')) {
-            $hasSlash       = (str_ends_with($path, '/'));
+            $hasSlash       = str_ends_with($path, '/');
             $isSlashEnabled = $this->appConfig->isTrailingSlashEnabled();
 
-            if ($hasSlash && !$isSlashEnabled) {
-                return $this->redirect($currentUri->withPath(rtrim($path, '/')));
-            }
+            if ($hasSlash !== $isSlashEnabled) {
+                $path = $isSlashEnabled
+                    ? $path.'/'
+                    : rtrim($path, '/');
 
-            if (!$hasSlash && $isSlashEnabled) {
-                return $this->redirect($currentUri->withPath($path.'/'));
+                return $this->redirect($currentUri->withPath($path), self::CAUSE_SLASH);
             }
         }
 
@@ -102,10 +106,10 @@ class SchemeMiddleware implements MiddlewareInterface
         return $handler->handle($request);
     }
 
-    private function redirect(UriInterface $uri): ResponseInterface
+    private function redirect(UriInterface $uri, string $cause): ResponseInterface
     {
         // Keep POST data on redirect
         // @see http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection
-        return ResponseHelper::temporaryRedirect((string)$uri);
+        return ResponseHelper::temporaryRedirect((string)$uri, $cause);
     }
 }
