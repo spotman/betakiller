@@ -5,6 +5,7 @@ namespace BetaKiller\Task\Daemon;
 
 use BetaKiller\Daemon\AbstractDaemon;
 use BetaKiller\ProcessLock\LockInterface;
+use BetaKiller\Task\TaskException;
 use Symfony\Component\Process\Process;
 
 final class Stop extends AbstractDaemonCommandTask
@@ -21,6 +22,12 @@ final class Stop extends AbstractDaemonCommandTask
         $process->run();
 
         // Wait for daemon to be stopped
-        $lock->waitForRelease(AbstractDaemon::SHUTDOWN_TIMEOUT + 3);
+        $isFree = $lock->waitForRelease(AbstractDaemon::SHUTDOWN_TIMEOUT + 3);
+
+        if (!$isFree) {
+            throw new TaskException('Daemon ":name" was not stopped properly', [
+                ':name' => $daemonName,
+            ]);
+        }
     }
 }
