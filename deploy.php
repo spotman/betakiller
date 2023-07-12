@@ -666,8 +666,8 @@ function runMinionTask(string $name, bool $asHttpUser = null, bool $tty = null):
         $cmd .= ' --debug';
     }
 
-    if ($stage !== DEPLOYER_STAGE_DEV && $asHttpUser) {
-        $cmd = 'sudo -u {{http_user}} '.$cmd;
+    if ($stage !== DEPLOYER_STAGE_DEV && $asHttpUser && has('minion_user')) {
+        $cmd = 'sudo -u {{minion_user}} '.$cmd;
     }
 
     $text = run($cmd, [
