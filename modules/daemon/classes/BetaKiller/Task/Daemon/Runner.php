@@ -212,7 +212,7 @@ final class Runner extends AbstractTask
 
         $this->addSignalHandlers();
 
-        $this->pingDB();
+        $this->addPingDatabaseHandlers();
 
         // Flush Monolog buffers to prevent memory leaks
         $this->flushLogsTimer = $this->loop->addPeriodicTimer(5, function () {
@@ -437,9 +437,9 @@ final class Runner extends AbstractTask
         });
     }
 
-    private function pingDB(): void
+    private function addPingDatabaseHandlers(): void
     {
-        $this->pingDbTimer = $this->loop->addPeriodicTimer(60, static function () {
+        $this->pingDbTimer = $this->loop->addPeriodicTimer(10, static function () {
             Database::pingAll();
         });
     }
