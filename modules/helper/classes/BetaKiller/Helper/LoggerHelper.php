@@ -3,6 +3,7 @@ namespace BetaKiller\Helper;
 
 use BetaKiller\Exception;
 use BetaKiller\Model\UserInterface;
+use LogicException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -15,15 +16,15 @@ class LoggerHelper
 
     public static function logUserException(
         LoggerInterface $logger,
-        Throwable $e,
-        UserInterface $user
+        Throwable       $e,
+        UserInterface   $user
     ): void {
         self::addRecord($logger, $e, $user);
     }
 
     public static function logRequestException(
-        LoggerInterface $logger,
-        Throwable $e,
+        LoggerInterface        $logger,
+        Throwable              $e,
         ServerRequestInterface $request
     ): void {
         self::addRecord($logger, $e, null, $request);
@@ -31,15 +32,24 @@ class LoggerHelper
 
     public static function logRawException(
         LoggerInterface $logger,
-        Throwable $e
+        Throwable       $e
     ): void {
         self::addRecord($logger, $e);
     }
 
+    public static function logError(LoggerInterface $logger, string $message, array $subst = null): void
+    {
+        if ($subst) {
+            $message = strtr($message, array_filter($subst, 'is_scalar'));
+        }
+
+        self::logRawException($logger, new LogicException($message));
+    }
+
     private static function addRecord(
-        LoggerInterface $logger,
-        Throwable $e,
-        UserInterface $user = null,
+        LoggerInterface        $logger,
+        Throwable              $e,
+        UserInterface          $user = null,
         ServerRequestInterface $request = null
     ): void {
         try {

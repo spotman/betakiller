@@ -46,7 +46,7 @@ return [
     'cron'         => MODPATH.'cron',                  // Helper for running scheduled tasks
     'error'        => MODPATH.'error',                 // Error handling and logging
     'daemon'       => MODPATH.'daemon',                // Daemon run
-//    'geo'          => MODPATH.'geo',                   // Various geo utilities (geocoder, etc)
+    'geo'          => MODPATH.'geo',                   // Various geo utilities (geocoder, etc)
     'i18n'         => MODPATH.'i18n',                  // Localization and pluralization
     'iface'        => MODPATH.'iface',                 // Dynamic user interfaces
     'maintenance'  => MODPATH.'maintenance',           // Maintenance mode

@@ -160,6 +160,20 @@ class UserRepository extends AbstractHasWorkflowStateRepository implements UserR
         return $this;
     }
 
+    protected function filterPhone(OrmInterface $orm, string $value): self
+    {
+        $orm->where($orm->object_column(User::COL_PHONE), '=', $value);
+
+        return $this;
+    }
+
+    protected function filterEmail(OrmInterface $orm, string $value): self
+    {
+        $orm->where($orm->object_column(User::COL_EMAIL), '=', $value);
+
+        return $this;
+    }
+
     /**
      * Allows a model use both email and username as unique identifiers for login
      *
