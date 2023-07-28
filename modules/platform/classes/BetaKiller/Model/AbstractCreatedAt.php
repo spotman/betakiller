@@ -25,7 +25,7 @@ abstract class AbstractCreatedAt extends ORM implements CreatedAtInterface
     /**
      * @inheritDoc
      */
-    public function setCreatedAt(DateTimeImmutable $value = null): CreatedAtInterface
+    public function setCreatedAt(DateTimeImmutable $value = null): self
     {
         $this->set_datetime_column_value(static::getCreatedAtColumnName(), $value ?? new DateTimeImmutable);
 
