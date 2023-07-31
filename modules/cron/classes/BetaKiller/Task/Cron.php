@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Task;
 
 use BetaKiller\Cron\ConfigItem;
-use BetaKiller\Cron\CronException;
 use BetaKiller\Cron\CronLockFactory;
 use BetaKiller\Cron\CronTask;
 use BetaKiller\Cron\TaskQueue;
@@ -18,14 +17,10 @@ use BetaKiller\ProcessLock\LockInterface;
 use BetaKiller\Repository\CronCommandRepositoryInterface;
 use BetaKiller\Repository\CronLogRepositoryInterface;
 use BetaKiller\Service\MaintenanceModeService;
-use Graze\ParallelProcess\Display\Table;
-use Graze\ParallelProcess\Event\RunEvent;
-use Graze\ParallelProcess\PriorityPool;
-use Graze\ParallelProcess\ProcessRun;
-use Graze\ParallelProcess\RunInterface;
+use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Process\Process;
+use React\ChildProcess\Process;
+use RuntimeException;
 use Symfony\Component\Yaml\Yaml;
 
 class Cron extends AbstractTask
@@ -95,13 +90,13 @@ class Cron extends AbstractTask
      * @param \Psr\Log\LoggerInterface                              $logger
      */
     public function __construct(
-        AppEnvInterface $env,
-        TaskQueue $queue,
-        CronLogRepositoryInterface $logRepo,
+        AppEnvInterface                $env,
+        TaskQueue                      $queue,
+        CronLogRepositoryInterface     $logRepo,
         CronCommandRepositoryInterface $cmdRepo,
-        MaintenanceModeService $maintenanceMode,
-        CronLockFactory $lockFactory,
-        LoggerInterface $logger
+        MaintenanceModeService         $maintenanceMode,
+        CronLockFactory                $lockFactory,
+        LoggerInterface                $logger
     ) {
         $this->env    = $env;
         $this->queue  = $queue;
@@ -170,11 +165,7 @@ class Cron extends AbstractTask
 
             if (!$taskStages) {
                 // No stage means any stage
-                $taskStages = [$this->currentStage];
-            }
-
-            if (!\is_array($taskStages)) {
-                throw new TaskException('Task stage must be an array');
+                $taskStages[] = $this->currentStage;
             }
 
             // Ensure that target stage is reached
@@ -203,7 +194,7 @@ class Cron extends AbstractTask
 
             $this->logDebug('Checking task [:task] is missed after :date', [
                 ':task' => $name,
-                ':date' => $previousRun->setTimezone($tz)->format(\DateTimeImmutable::ATOM),
+                ':date' => $previousRun->setTimezone($tz)->format(DateTimeImmutable::ATOM),
             ]);
 
             $cmd = $this->cmdRepo->findByNameAndParams($name, $params);
@@ -269,37 +260,21 @@ class Cron extends AbstractTask
      */
     private function runQueuedTasks(): void
     {
-        $pool = new PriorityPool();
-        $pool->setMaxSimultaneous(5);
-
         // Select queued tasks where start_at >= current time, limit 5
         // It allows to postpone failed tasks for 5 minutes
         foreach ($this->queue->getReadyToStart() as $task) {
-            $pool->add($this->makeTaskRun($task));
-        }
-
-        if ($this->isHuman) {
-            $verbosity = $this->env->isDebugEnabled()
-                ? ConsoleOutput::VERBOSITY_DEBUG
-                : ConsoleOutput::VERBOSITY_VERY_VERBOSE;
-
-            $output = new ConsoleOutput($verbosity);
-            $table  = new Table($output, $pool);
-
-            $table->run();
-        } else {
-            $pool->run();
+            $this->startTaskProcess($task);
         }
     }
 
-    private function makeTaskRun(CronTask $task): RunInterface
+    private function startTaskProcess(CronTask $task): void
     {
         $this->logDebug('Task [:name] is ready to start', [':name' => $task->getName()]);
 
         $name   = $task->getName();
         $params = $task->getParams();
 
-        $cmd = self::getTaskCmd($this->env, $name, $params);
+        $cmd = self::getTaskCmd($this->env, $name, $params, true);
 
         $command = $this->cmdRepo->findByNameAndParams($name, $params);
 
@@ -322,150 +297,103 @@ class Cron extends AbstractTask
 
         $this->logRepo->save($log);
 
-        // Store fingerprint for simpler task identification upon start
-        $tags = [
-            'name'                => $task->getName(),
-            self::TAG_LOG_ID      => $log->getID(),
-            self::TAG_FINGERPRINT => $task->getFingerprint(),
-        ];
-
         $this->logDebug('Command: :cmd', [
             ':cmd' => $cmd,
         ]);
 
         $docRoot = $this->env->getDocRootPath();
 
-        $run = new ProcessRun(Process::fromShellCommandline($cmd, $docRoot), $tags);
+        $process = new Process($cmd, $docRoot);
 
-        // Listen for UPDATED event coz STARTED is emitted before actual process is started
-        $run->addListener(RunEvent::UPDATED, function (RunEvent $event) {
-            $task = $this->getTaskFromRunEvent($event);
-
-            // Prevent duplicate processing on subsequent UPDATED events
-            if ($task->isRunning()) {
-                return;
-            }
-
-            $process = $this->getProcessFromRunEvent($event);
-
-//            // Wait for the process to be really started
-//            while (!$process->getPid()) {
-//                \usleep(10000);
-//            }
-
-            // Prevent starting of a terminated task (race condition, will be processed by another handler below)
-            if ($process->isTerminated()) {
-                return;
-            }
-
-            $pid = $process->getPid();
-
-            // Already stopped/failed => skip
-            if (!$pid) {
-                return;
-            }
-
-            // Store PID in CronTask record
-            $task->started($pid);
-
-            // Lock ASAP
-            $this->acquireLock($task);
-
-            $this->logDebug('Task [:name] is started with PID :pid', [
-                ':name' => $task->getName(),
-                ':pid'  => $task->getPID(),
+        $process->on('exit', function ($exitCode, $termSignal) use ($task, $log) {
+            $this->logger->debug('Task ":name" exited with :code code and :signal signal', [
+                ':name'   => $task->getName(),
+                ':code'   => $exitCode ?? 'unknown',
+                ':signal' => $termSignal ?? 'unknown',
             ]);
 
-            $log = $this->getLogFromRunEvent($event);
-            $log->markAsStarted();
-            $this->logRepo->save($log);
+            // Can be null in some cases
+            $exitCode   = $exitCode ?? 0;
+            $isSignaled = $termSignal !== null;
+
+            $isOk = $isSignaled || $exitCode === 0;
+
+            if ($isOk) {
+                $this->onProcessDone($task, $log);
+            } else {
+                $this->onProcessFailed($task, $log);
+            }
         });
 
-        $run->addListener(RunEvent::SUCCESSFUL, function (RunEvent $event) {
-            $task = $this->getTaskFromRunEvent($event);
+        try {
+            $process->start();
+            $this->onProcessStarted($process, $task, $log);
+        } catch (RuntimeException) {
+            $this->onProcessFailed($task, $log);
+        }
+    }
 
-            $task->done();
-            $this->queue->dequeue($task);
+    private function onProcessStarted(Process $process, CronTask $task, CronLogInterface $log): void
+    {
+        $pid = $process->getPid();
 
-            $this->logDebug('Task [:name] succeeded', [
-                ':name' => $task->getName(),
-            ]);
+        // Store PID in CronTask record
+        $task->started($pid);
 
-            $log = $this->getLogFromRunEvent($event);
-            $log->markAsSucceeded();
-            $this->logRepo->save($log);
+        // Lock ASAP
+        $this->acquireLock($task);
 
-            // Keep locked until all processing is done
-            $this->releaseLock($task);
+        // Forward output and errors (to collect them in the infrastructure)
+        $process->stdout->on('data', function ($chunk) {
+            fwrite(STDOUT, $chunk);
         });
 
-        $run->addListener(RunEvent::FAILED, function (RunEvent $event) {
-            $task = $this->getTaskFromRunEvent($event);
-
-            $task->failed();
-
-            $till = (new \DateTimeImmutable)->add(new \DateInterval('PT15M'));
-            $task->postpone($till);
-
-            $this->logger->warning('Task [:name] is failed and postponed', [
-                ':name' => $task->getName(),
-            ]);
-
-            // TODO Real enqueue and postpone (use ESB command queue)
-            $log = $this->getLogFromRunEvent($event);
-            $log->markAsFailed();
-            $this->logRepo->save($log);
-
-            // Keep locked until all processing is done
-            $this->releaseLock($task);
+        $process->stderr->on('data', function ($chunk) {
+            fwrite(STDERR, $chunk);
         });
 
-        return $run;
+        $this->logDebug('Task [:name] is started with PID :pid', [
+            ':name' => $task->getName(),
+            ':pid'  => $task->getPID(),
+        ]);
+
+        $log->markAsStarted();
+        $this->logRepo->save($log);
     }
 
-    /**
-     * @param \Graze\ParallelProcess\Event\RunEvent $event
-     *
-     * @return \BetaKiller\Cron\CronTask
-     * @throws \BetaKiller\Cron\CronException
-     */
-    private function getTaskFromRunEvent(RunEvent $event): CronTask
+    private function onProcessDone(CronTask $task, CronLogInterface $log): void
     {
-        $tags        = $event->getRun()->getTags();
-        $fingerprint = $tags[self::TAG_FINGERPRINT] ?? '';
+        $task->done();
+        $this->queue->dequeue($task);
 
-        if (!$fingerprint) {
-            throw new CronException('Missing process fingerprint, tags are :values', [
-                ':values' => \json_encode($tags, JSON_THROW_ON_ERROR),
-            ]);
-        }
+        $this->logDebug('Task [:name] succeeded', [
+            ':name' => $task->getName(),
+        ]);
 
-        return $this->queue->getByFingerprint($fingerprint);
+        $log->markAsSucceeded();
+        $this->logRepo->save($log);
+
+        // Keep locked until all processing is done
+        $this->releaseLock($task);
     }
 
-    private function getProcessFromRunEvent(RunEvent $event): Process
+    private function onProcessFailed(CronTask $task, CronLogInterface $log): void
     {
-        $run = $event->getRun();
+        // TODO Real enqueue and postpone (use ESB command queue)
+        $task->failed();
 
-        if (!$run instanceof ProcessRun) {
-            throw new \LogicException('Event Run must implement ProcessRun');
-        }
+        $till = (new DateTimeImmutable)->add(new \DateInterval('PT15M'));
+        $task->postpone($till);
 
-        return $run->getProcess();
-    }
+        $this->logger->warning('Task [:name] is failed and postponed', [
+            ':name' => $task->getName(),
+        ]);
 
-    private function getLogFromRunEvent(RunEvent $event): CronLogInterface
-    {
-        $tags  = $event->getRun()->getTags();
-        $logID = $tags[self::TAG_LOG_ID] ?? '';
+        $log->markAsFailed();
+        $this->logRepo->save($log);
 
-        if (!$logID) {
-            throw new CronException('Missing process log ID, tags are :values', [
-                ':values' => \json_encode($tags, JSON_THROW_ON_ERROR),
-            ]);
-        }
-
-        return $this->logRepo->getById($logID);
+        // Keep locked until all processing is done
+        $this->releaseLock($task);
     }
 
     private function acquireLock(CronTask $task): bool
