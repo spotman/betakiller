@@ -8,7 +8,6 @@ use BetaKiller\Url\RequestUserInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use BetaKiller\Workflow\HasWorkflowStateInterface;
 use DateTimeImmutable;
-use DateTimeInterface;
 use Spotman\Acl\AclUserInterface;
 
 /**
@@ -51,18 +50,6 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
      * @return bool
      */
     public function isRegistrationClaimed(): bool;
-
-    /**
-     * @param \DateTimeInterface|null $value [optional]
-     *
-     * @return \BetaKiller\Model\UserInterface
-     */
-    public function setCreatedAt(DateTimeInterface $value = null): UserInterface;
-
-    /**
-     * @return \DateTimeImmutable
-     */
-    public function getCreatedAt(): DateTimeImmutable;
 
     /**
      * @param string $value

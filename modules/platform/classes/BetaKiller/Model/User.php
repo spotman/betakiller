@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Model;
 
 use BetaKiller\Auth\AuthorizationRequiredException;
-use BetaKiller\Exception\DomainException;
 use BetaKiller\Workflow\HasWorkflowStateModelOrmTrait;
 use DateTimeImmutable;
 
@@ -14,14 +13,13 @@ use DateTimeImmutable;
  * @package BetaKiller\Model
  * @method UserStateInterface getWorkflowState()
  */
-class User extends \ORM implements UserInterface
+class User extends AbstractCreatedAt implements UserInterface
 {
     use HasWorkflowStateModelOrmTrait;
 
     public const TABLE_NAME            = 'users';
     public const COL_ID                = 'id';
     public const COL_STATUS_ID         = 'status_id';
-    public const COL_CREATED_AT        = 'created_at';
     public const COL_USERNAME          = 'username';
     public const COL_PASSWORD          = 'password';
     public const COL_LANGUAGE_ID       = 'language_id';
@@ -113,58 +111,54 @@ class User extends \ORM implements UserInterface
      */
     public function rules(): array
     {
-        return [
-            self::COL_STATUS_ID       => [
-                ['max_length', [':value', 1]],
-            ],
-            self::COL_EMAIL           => [
-                ['not_empty'],
-                ['email'],
-                [[$this, 'unique'], ['email', ':value']],
-            ],
-            self::COL_USERNAME        => [
+        return parent::rules() + [
+                self::COL_STATUS_ID       => [
+                    ['max_length', [':value', 1]],
+                ],
+                self::COL_EMAIL           => [
+                    ['not_empty'],
+                    ['email'],
+                    [[$this, 'unique'], ['email', ':value']],
+                ],
+                self::COL_USERNAME        => [
 //                ['not_empty'],
-                ['max_length', [':value', 41]],
-                [[$this, 'unique'], ['username', ':value']],
-            ],
-            self::COL_PASSWORD        => [
+                    ['max_length', [':value', 41]],
+                    [[$this, 'unique'], ['username', ':value']],
+                ],
+                self::COL_PASSWORD        => [
 //                ['not_empty'],
-                ['max_length', [':value', 64]],
-            ],
-            self::COL_LANGUAGE_ID     => [
-                ['max_length', [':value', 11]],
-            ],
-            self::COL_FIRST_NAME      => [
-                ['max_length', [':value', 32]],
-            ],
-            self::COL_LAST_NAME       => [
-                ['max_length', [':value', 32]],
-            ],
-            self::COL_MIDDLE_NAME     => [
-                ['max_length', [':value', 32]],
-            ],
-            self::COL_PHONE           => [
-                ['max_length', [':value', 32]],
-            ],
-            self::COL_NOTIFY_BY_EMAIL => [
-                ['max_length', [':value', 1]],
-            ],
-            self::COL_CREATED_AT      => [
-                ['not_empty'],
-                ['date'],
-            ],
-            self::COL_LOGINS          => [
-                ['max_length', [':value', 10]],
-            ],
-            self::COL_LAST_LOGIN      => [
-                ['max_length', [':value', 10]],
-            ],
-            self::COL_CREATED_FROM_IP => [
-                ['not_empty'],
+                    ['max_length', [':value', 64]],
+                ],
+                self::COL_LANGUAGE_ID     => [
+                    ['max_length', [':value', 11]],
+                ],
+                self::COL_FIRST_NAME      => [
+                    ['max_length', [':value', 32]],
+                ],
+                self::COL_LAST_NAME       => [
+                    ['max_length', [':value', 32]],
+                ],
+                self::COL_MIDDLE_NAME     => [
+                    ['max_length', [':value', 32]],
+                ],
+                self::COL_PHONE           => [
+                    ['max_length', [':value', 32]],
+                ],
+                self::COL_NOTIFY_BY_EMAIL => [
+                    ['max_length', [':value', 1]],
+                ],
+                self::COL_LOGINS          => [
+                    ['max_length', [':value', 10]],
+                ],
+                self::COL_LAST_LOGIN      => [
+                    ['max_length', [':value', 10]],
+                ],
+                self::COL_CREATED_FROM_IP => [
+                    ['not_empty'],
 //                ['ip', [':value', true]], // Allow local IPs (not working with local dev)
-                ['max_length', [':value', 46]], // @see https://stackoverflow.com/a/7477384
-            ],
-        ];
+                    ['max_length', [':value', 46]], // @see https://stackoverflow.com/a/7477384
+                ],
+            ];
     }
 //
 //    /**
@@ -216,34 +210,6 @@ class User extends \ORM implements UserInterface
     public function isRegistrationClaimed(): bool
     {
         return (bool)$this->get(self::COL_IS_CLAIMED);
-    }
-
-    /**
-     * @param \DateTimeInterface|null $value [optional]
-     *
-     * @return \BetaKiller\Model\UserInterface
-     */
-    public function setCreatedAt(\DateTimeInterface $value = null): UserInterface
-    {
-        $value = $value ?: new DateTimeImmutable;
-        $this->set_datetime_column_value(self::COL_CREATED_AT, $value);
-
-        return $this;
-    }
-
-    /**
-     * @return \DateTimeImmutable
-     * @throws \BetaKiller\Exception\DomainException
-     */
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        $createdAt = $this->get_datetime_column_value(self::COL_CREATED_AT);
-
-        if (!$createdAt) {
-            throw new DomainException('User::createdAt can not be empty');
-        }
-
-        return $createdAt;
     }
 
     /**
