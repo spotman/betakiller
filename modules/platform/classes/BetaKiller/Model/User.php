@@ -115,11 +115,7 @@ class User extends AbstractCreatedAt implements UserInterface
                 self::COL_STATUS_ID       => [
                     ['max_length', [':value', 1]],
                 ],
-                self::COL_EMAIL           => [
-                    ['not_empty'],
-                    ['email'],
-                    [[$this, 'unique'], ['email', ':value']],
-                ],
+                self::COL_EMAIL           => $this->getColumnRulesEmail(),
                 self::COL_USERNAME        => [
 //                ['not_empty'],
                     ['max_length', [':value', 41]],
@@ -621,5 +617,39 @@ class User extends AbstractCreatedAt implements UserInterface
         return $ts
             ? (new DateTimeImmutable())->setTimestamp($ts)
             : null;
+    }
+
+    protected function isEmailRequired(): bool
+    {
+        return true;
+    }
+
+    protected function isEmailUniqueEnabled(): bool
+    {
+        return true;
+    }
+
+    protected function isEmailRegexEnabled(): bool
+    {
+        return true;
+    }
+
+    private function getColumnRulesEmail(): array
+    {
+        $rules = [];
+
+        if ($this->isEmailRequired()) {
+            $rules[] = ['not_empty'];
+        }
+
+        if ($this->isEmailRegexEnabled()) {
+            $rules[] = ['email'];
+        }
+
+        if ($this->isEmailUniqueEnabled()) {
+            $rules[] = [[$this, 'unique'], ['email', ':value']];
+        }
+
+        return $rules;
     }
 }

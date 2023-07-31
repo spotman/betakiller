@@ -17,7 +17,7 @@ use Spotman\Acl\AclUserInterface;
  * @method UserStateInterface getWorkflowState()
  */
 interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWorkflowStateInterface,
-    MessageTargetInterface, AclUserInterface, EntityWithAclSpecInterface, RequestUserInterface
+    MessageTargetInterface, AclUserInterface, EntityWithAclSpecInterface, RequestUserInterface, CreatedAtInterface
 {
     /**
      * @return \DateTimeImmutable
