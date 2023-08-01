@@ -15,10 +15,7 @@ abstract class AbstractCreatedAt extends ORM implements CreatedAtInterface
     public function rules(): array
     {
         return [
-            static::getCreatedAtColumnName() => [
-                ['not_empty'],
-                ['date'],
-            ],
+            static::getCreatedAtColumnName() => self::getColumnRulesCreatedAt(),
         ];
     }
 
@@ -49,5 +46,23 @@ abstract class AbstractCreatedAt extends ORM implements CreatedAtInterface
     public static function getCreatedAtColumnName(): string
     {
         return 'created_at';
+    }
+
+    public static function isCreatedAtRequired(): bool
+    {
+        return true;
+    }
+
+    protected function getColumnRulesCreatedAt(): array
+    {
+        $rules = [
+            ['date'],
+        ];
+
+        if (self::isCreatedAtRequired()) {
+            $rules[] = ['not_empty'];
+        }
+
+        return $rules;
     }
 }

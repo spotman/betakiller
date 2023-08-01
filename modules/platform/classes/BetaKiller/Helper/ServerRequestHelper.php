@@ -25,7 +25,12 @@ class ServerRequestHelper
     /**
      * @var  array  trusted proxy server IPs
      */
-    private static $trustedProxies = ['127.0.0.1', 'localhost', 'localhost.localdomain'];
+    private static array $trustedProxies = ['127.0.0.1', 'localhost', 'localhost.localdomain'];
+
+    public static function addTrustedProxy(string $proxy): void
+    {
+        self::$trustedProxies[] = $proxy;
+    }
 
     public static function getUserAgent(ServerRequestInterface $request): ?string
     {
@@ -44,9 +49,9 @@ class ServerRequestHelper
      * @return string
      * @throws \BetaKiller\Exception
      */
-    public static function getIpAddress(ServerRequestInterface $request): string
+    public static function getIpAddress(ServerRequestInterface $request = null): string
     {
-        $server = $request->getServerParams();
+        $server = $request ? $request->getServerParams() : $_SERVER;
 
         $xForwardedFor = $server['HTTP_X_FORWARDED_FOR'] ?? null;
         $remoteAddress = $server['REMOTE_ADDR'] ?? null;

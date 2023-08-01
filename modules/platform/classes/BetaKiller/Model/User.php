@@ -116,15 +116,8 @@ class User extends AbstractCreatedAt implements UserInterface
                     ['max_length', [':value', 1]],
                 ],
                 self::COL_EMAIL           => $this->getColumnRulesEmail(),
-                self::COL_USERNAME        => [
-//                ['not_empty'],
-                    ['max_length', [':value', 41]],
-                    [[$this, 'unique'], ['username', ':value']],
-                ],
-                self::COL_PASSWORD        => [
-//                ['not_empty'],
-                    ['max_length', [':value', 64]],
-                ],
+                self::COL_USERNAME        => $this->getColumnRulesUsername(),
+                self::COL_PASSWORD        => $this->getColumnRulesPassword(),
                 self::COL_LANGUAGE_ID     => [
                     ['max_length', [':value', 11]],
                 ],
@@ -149,11 +142,7 @@ class User extends AbstractCreatedAt implements UserInterface
                 self::COL_LAST_LOGIN      => [
                     ['max_length', [':value', 10]],
                 ],
-                self::COL_CREATED_FROM_IP => [
-                    ['not_empty'],
-//                ['ip', [':value', true]], // Allow local IPs (not working with local dev)
-                    ['max_length', [':value', 46]], // @see https://stackoverflow.com/a/7477384
-                ],
+                self::COL_CREATED_FROM_IP => $this->getColumnRulesCreatedFromIp(),
             ];
     }
 //
@@ -619,17 +608,17 @@ class User extends AbstractCreatedAt implements UserInterface
             : null;
     }
 
-    protected function isEmailRequired(): bool
+    public static function isEmailRequired(): bool
     {
         return true;
     }
 
-    protected function isEmailUniqueEnabled(): bool
+    public static function isEmailUniqueEnabled(): bool
     {
         return true;
     }
 
-    protected function isEmailRegexEnabled(): bool
+    public static function isEmailRegexEnabled(): bool
     {
         return true;
     }
@@ -638,16 +627,89 @@ class User extends AbstractCreatedAt implements UserInterface
     {
         $rules = [];
 
-        if ($this->isEmailRequired()) {
+        if (static::isEmailRequired()) {
             $rules[] = ['not_empty'];
         }
 
-        if ($this->isEmailRegexEnabled()) {
+        if (static::isEmailRegexEnabled()) {
             $rules[] = ['email'];
         }
 
-        if ($this->isEmailUniqueEnabled()) {
+        if (static::isEmailUniqueEnabled()) {
             $rules[] = [[$this, 'unique'], ['email', ':value']];
+        }
+
+        return $rules;
+    }
+
+    public static function isIpAddressRequired(): bool
+    {
+        return true;
+    }
+
+    private function getColumnRulesCreatedFromIp(): array
+    {
+        $rules = [
+            ['max_length', [':value', 46]], // @see https://stackoverflow.com/a/7477384
+//            ['ip', [':value', true]], // Allow local IPs (not working with local dev)
+        ];
+
+        if (static::isIpAddressRequired()) {
+            $rules[] = ['not_empty'];
+        }
+
+        return $rules;
+    }
+
+    public static function isUsernameRequired(): bool
+    {
+        return false;
+    }
+
+    public static function isUsernameUniqueEnabled(): bool
+    {
+        return true;
+    }
+
+    private function getColumnRulesUsername(): array
+    {
+        $rules = [
+            ['max_length', [':value', 41]],
+        ];
+
+        if (static::isUsernameRequired()) {
+            $rules[] = ['not_empty'];
+        }
+
+        if (static::isUsernameUniqueEnabled()) {
+            $rules[] = [[$this, 'unique'], ['username', ':value']];
+        }
+
+        return $rules;
+    }
+
+    public static function isPasswordRequired(): bool
+    {
+        return false;
+    }
+
+    public static function isPasswordUniqueEnabled(): bool
+    {
+        return false;
+    }
+
+    private function getColumnRulesPassword(): array
+    {
+        $rules = [
+            ['max_length', [':value', 64]],
+        ];
+
+        if (static::isPasswordRequired()) {
+            $rules[] = ['not_empty'];
+        }
+
+        if (static::isPasswordUniqueEnabled()) {
+            $rules[] = [[$this, 'unique'], ['password', ':value']];
         }
 
         return $rules;
