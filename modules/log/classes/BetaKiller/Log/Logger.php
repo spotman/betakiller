@@ -80,7 +80,7 @@ class Logger implements LoggerInterface
 
         // CLI mode logging
         if ($this->appEnv->isCli()) {
-            $level = $isDebug ? \Monolog\Logger::DEBUG : \Monolog\Logger::INFO;
+            $level = $isDebug ? \Monolog\Logger::DEBUG : \Monolog\Logger::NOTICE;
 
             $monolog->pushHandler(new StdOutHandler($level, $isHuman));
 
