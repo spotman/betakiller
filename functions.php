@@ -240,6 +240,23 @@ if (!function_exists('bootstrapApp')) {
     }
 }
 
+if (!function_exists('bootstrapPlatform')) {
+    function bootstrapPlatform(): ContainerInterface
+    {
+        configureKohana();
+
+        $appEnv = AppEnv::instance();
+
+        $envMode = $appEnv->isAppRunning()
+            ? $appEnv->getModeName()
+            : AppEnvInterface::MODE_DEVELOPMENT;
+
+        bootstrapKohana($envMode);
+
+        return bootstrapApp($appEnv);
+    }
+}
+
 if (!function_exists('runApp')) {
     function runApp(ContainerInterface $container): void
     {
