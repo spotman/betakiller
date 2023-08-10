@@ -138,8 +138,14 @@ class NotificationHelper
      */
     public function debugEmailTarget(string $name = null): MessageTargetInterface
     {
+        $email = getenv('DEBUG_EMAIL_ADDRESS');
+
+        if (!$email) {
+            throw new NotificationException('Missing DEBUG_EMAIL_ADDRESS env var');
+        }
+
         return $this->emailTarget(
-            getenv('DEBUG_EMAIL_ADDRESS'),
+            $email,
             $name ?? 'Email debugger',
             LanguageInterface::ISO_EN // Only English template is available for now
         );
