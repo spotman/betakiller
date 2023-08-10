@@ -33,9 +33,9 @@ final class StatusWorkflow implements StatusWorkflowInterface
      * @param \BetaKiller\Factory\RepositoryFactoryInterface    $repoFactory
      */
     public function __construct(
-        WorkflowConfigInterface $config,
+        WorkflowConfigInterface           $config,
         EntityPermissionResolverInterface $permissionResolver,
-        RepositoryFactoryInterface $repoFactory
+        RepositoryFactoryInterface        $repoFactory
     ) {
         $this->config             = $config;
         $this->repoFactory        = $repoFactory;
@@ -59,11 +59,15 @@ final class StatusWorkflow implements StatusWorkflowInterface
         $targetState      = $this->createStateRepositoryFor($model)->getByCodename($targetStateName);
 
         if (!$this->isTransitionAllowed($model, $transition, $user)) {
-            throw new WorkflowStateException('Transition ":name" in ":model" is not allowed for user ":user"', [
-                ':model' => $model::getModelName(),
-                ':name'  => $transition,
-                ':user'  => $user->getID(),
-            ]);
+            throw new WorkflowStateException(
+                'Transition ":name" in ":model" ID ":id" is not allowed for user ":user"',
+                [
+                    ':model' => $model::getModelName(),
+                    ':id'    => $model->getID(),
+                    ':name'  => $transition,
+                    ':user'  => $user->getID(),
+                ]
+            );
         }
 
         // Update state
@@ -79,8 +83,8 @@ final class StatusWorkflow implements StatusWorkflowInterface
 
     public function isTransitionAllowed(
         HasWorkflowStateInterface $model,
-        string $codename,
-        UserInterface $user
+        string                    $codename,
+        UserInterface             $user
     ): bool {
         return $this->permissionResolver->isAllowed($user, $model, $codename);
     }
