@@ -59,7 +59,7 @@ final class DateTimeHelper
             $lang->getLocale(),
             $format ?? IntlDateFormatter::MEDIUM,
             IntlDateFormatter::NONE,
-            self::getUtcTimezone()
+            $date->getTimezone() ?: self::getUtcTimezone()
         );
 
         return $fmt->format($date);
@@ -76,7 +76,7 @@ final class DateTimeHelper
             $lang->getLocale(),
             IntlDateFormatter::NONE,
             $format ?? IntlDateFormatter::SHORT,
-            self::getUtcTimezone()
+            $time->getTimezone() ?: self::getUtcTimezone()
         );
 
         return $fmt->format($time);
