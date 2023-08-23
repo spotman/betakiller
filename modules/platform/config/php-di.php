@@ -12,6 +12,7 @@ use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
 use BetaKiller\Api\ApiLanguageDetector;
 use BetaKiller\Assets\StaticAssets;
 use BetaKiller\Cache\DoctrineCacheProvider;
+use BetaKiller\CliAppRunnerInterface;
 use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\ConfigProviderInterface;
@@ -44,7 +45,9 @@ use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\MessageBus\EventSerializerInterface;
 use BetaKiller\MessageBus\NativeEventSerializer;
 use BetaKiller\MessageBus\OutboundEventTransportInterface;
+use BetaKiller\MezzioWebAppRunner;
 use BetaKiller\Middleware\CspReportBodyParamsStrategy;
+use BetaKiller\MinionCliAppRunner;
 use BetaKiller\Notification\MessageActionUrlGeneratorInterface;
 use BetaKiller\Notification\MessageRenderer;
 use BetaKiller\Notification\MessageRendererInterface;
@@ -69,6 +72,7 @@ use BetaKiller\View\LayoutViewInterface;
 use BetaKiller\View\TwigLayoutView;
 use BetaKiller\View\TwigViewFactory;
 use BetaKiller\View\ViewFactoryInterface;
+use BetaKiller\WebAppRunnerInterface;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\CacheProvider;
 use Enqueue\Redis\RedisConnectionFactory;
@@ -130,6 +134,9 @@ return [
     'definitions' => [
 
         AppRunnerFactoryInterface::class => autowire(AppRunnerFactory::class),
+
+        CliAppRunnerInterface::class => autowire(MinionCliAppRunner::class),
+        WebAppRunnerInterface::class => autowire(MezzioWebAppRunner::class),
 
         WebConfigInterface::class => autowire(WebConfig::class),
 
