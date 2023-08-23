@@ -5,38 +5,15 @@ namespace BetaKiller;
 
 use Algorithm\DependencyResolver;
 use Algorithm\ResolveBehaviour;
-use BetaKiller\Assets\Middleware\DeleteMiddleware;
-use BetaKiller\Assets\Middleware\DownloadMiddleware;
-use BetaKiller\Assets\Middleware\OriginalMiddleware;
-use BetaKiller\Assets\Middleware\PreviewMiddleware;
-use BetaKiller\Assets\Middleware\UploadInfoMiddleware;
-use BetaKiller\Assets\Middleware\UploadMiddleware;
-use BetaKiller\Assets\Model\AssetsModelImageInterface;
-use BetaKiller\Assets\Provider\AssetsProviderInterface;
-use BetaKiller\Assets\Provider\HasPreviewProviderInterface;
-use BetaKiller\Assets\StaticFilesDeployHandler;
 use BetaKiller\Config\WebConfigInterface;
 use BetaKiller\Dev\StartupProfiler;
-use BetaKiller\HitStat\HitStatMiddleware;
 use BetaKiller\Middleware\ContentNegotiationMiddleware;
-use BetaKiller\Middleware\CustomNotFoundPageMiddleware;
-use BetaKiller\Middleware\DummyMiddleware;
 use BetaKiller\Middleware\FallbackErrorMiddleware;
 use BetaKiller\Middleware\PhpBuiltInServerMiddleware;
 use BetaKiller\Middleware\ProfilerMiddleware;
 use BetaKiller\Middleware\RequestUuidMiddleware;
 use BetaKiller\Middleware\SchemeMiddleware;
-use BetaKiller\Middleware\SitemapRequestHandler;
-use BetaKiller\Middleware\UrlElementDispatchMiddleware;
-use BetaKiller\Middleware\UrlElementRenderMiddleware;
-use BetaKiller\Middleware\UrlHelperMiddleware;
-use BetaKiller\Middleware\UserStatusMiddleware;
-use BetaKiller\RequestHandler\App\I18next\AddMissingTranslationRequestHandler;
-use BetaKiller\RequestHandler\App\I18next\FetchTranslationRequestHandler;
-use BetaKiller\RobotsTxt\RobotsTxtHandler;
-use BetaKiller\Security\CspReportHandler;
 use Mezzio\Application;
-use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
 use Mezzio\Router\Middleware\DispatchMiddleware;
 use Mezzio\Router\Middleware\ImplicitHeadMiddleware;
@@ -44,9 +21,8 @@ use Mezzio\Router\Middleware\ImplicitOptionsMiddleware;
 use Mezzio\Router\Middleware\MethodNotAllowedMiddleware;
 use Mezzio\Router\Middleware\RouteMiddleware;
 use Middlewares\ContentType;
-use Spotman\Api\ApiRequestHandler;
 
-final class WebAppRunner implements AppRunnerInterface
+final class MezzioWebAppRunner implements WebAppRunnerInterface
 {
     /**
      * @var \Mezzio\Application

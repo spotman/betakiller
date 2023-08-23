@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace BetaKiller\Factory;
 
 use BetaKiller\AppRunnerInterface;
-use BetaKiller\CliAppRunner;
+use BetaKiller\CliAppRunnerInterface;
 use BetaKiller\Env\AppEnvInterface;
-use BetaKiller\WebAppRunner;
+use BetaKiller\WebAppRunnerInterface;
 
 final class AppRunnerFactory implements AppRunnerFactoryInterface
 {
@@ -16,17 +16,20 @@ final class AppRunnerFactory implements AppRunnerFactoryInterface
     private AppEnvInterface $appEnv;
 
     /**
-     * @var \BetaKiller\WebAppRunner
+     * @var \BetaKiller\WebAppRunnerInterface
      */
-    private WebAppRunner $webRunner;
+    private WebAppRunnerInterface $webRunner;
 
     /**
-     * @var \BetaKiller\CliAppRunner
+     * @var \BetaKiller\CliAppRunnerInterface
      */
-    private CliAppRunner $cliRunner;
+    private CliAppRunnerInterface $cliRunner;
 
-    public function __construct(AppEnvInterface $appEnv, WebAppRunner $webRunner, CliAppRunner $cliRunner)
-    {
+    public function __construct(
+        AppEnvInterface       $appEnv,
+        WebAppRunnerInterface $webRunner,
+        CliAppRunnerInterface $cliRunner
+    ) {
         $this->appEnv    = $appEnv;
         $this->webRunner = $webRunner;
         $this->cliRunner = $cliRunner;

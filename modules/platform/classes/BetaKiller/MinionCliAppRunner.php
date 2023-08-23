@@ -5,9 +5,8 @@ namespace BetaKiller;
 
 use BetaKiller\Task\TaskFactory;
 
-final class CliAppRunner implements AppRunnerInterface
+final class MinionCliAppRunner implements CliAppRunnerInterface
 {
-
     /**
      * @var \BetaKiller\Task\TaskFactory
      */
