@@ -40,7 +40,7 @@ final class DateTimeHelper
     {
         $fmt = new IntlDateFormatter(
             $lang->getLocale(),
-            IntlDateFormatter::MEDIUM,
+            IntlDateFormatter::RELATIVE_MEDIUM,
             IntlDateFormatter::SHORT,
             self::getUtcTimezone()
         );
@@ -57,7 +57,7 @@ final class DateTimeHelper
     {
         $fmt = new IntlDateFormatter(
             $lang->getLocale(),
-            $format ?? IntlDateFormatter::MEDIUM,
+            $format ?? IntlDateFormatter::RELATIVE_MEDIUM,
             IntlDateFormatter::NONE,
             $date->getTimezone() ?: self::getUtcTimezone()
         );
