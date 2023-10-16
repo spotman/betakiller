@@ -1,10 +1,10 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
+use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\Repository\ContentPostRevisionRepository;
 use BetaKiller\Url\UrlDispatcherException;
-use Caxy\HtmlDiff\HtmlDiff;
 use Psr\Http\Message\ServerRequestInterface;
 
 class PostItemRevisionIFace extends AbstractContentAdminIFace
@@ -26,7 +26,7 @@ class PostItemRevisionIFace extends AbstractContentAdminIFace
      * @param \BetaKiller\Repository\ContentPostRevisionRepository $revisionRepository
      */
     public function __construct(
-        ContentUrlContainerHelper $urlParametersHelper,
+        ContentUrlContainerHelper     $urlParametersHelper,
         ContentPostRevisionRepository $revisionRepository
     ) {
         $this->urlParametersHelper = $urlParametersHelper;
@@ -86,14 +86,6 @@ class PostItemRevisionIFace extends AbstractContentAdminIFace
 
     private function getDiff(?string $oldHtml, ?string $newHtml): string
     {
-        $htmlDiff = new HtmlDiff($oldHtml, $newHtml);
-        $htmlDiff->getConfig()
-            // Pass an instance of \Doctrine\Common\Cache\Cache to cache the calculated diffs.
-            ->setCacheProvider()
-
-            // Set the cache directory that HTMLPurifier should use.
-            ->setPurifierCacheLocation(sys_get_temp_dir());
-
-        return $htmlDiff->build();
+        throw new NotImplementedHttpException();
     }
 }

@@ -3,30 +3,30 @@ declare(strict_types=1);
 
 namespace BetaKiller\I18n;
 
-use Doctrine\Common\Cache\FilesystemCache;
+use Psr\SimpleCache\CacheInterface;
 
 class CachingI18nLoader implements I18nKeysLoaderInterface
 {
     /**
      * @var \BetaKiller\I18n\I18nKeysLoaderInterface
      */
-    private $proxy;
+    private I18nKeysLoaderInterface $proxy;
 
     /**
-     * @var \Doctrine\Common\Cache\Cache
+     * @var CacheInterface
      */
-    private $cache;
+    private CacheInterface $cache;
 
     /**
      * CachingI18nLoader constructor.
      *
      * @param \BetaKiller\I18n\I18nKeysLoaderInterface $loader
-     * @param string                                   $cachePath
+     * @param \Psr\SimpleCache\CacheInterface          $cache
      */
-    public function __construct(I18nKeysLoaderInterface $loader, string $cachePath)
+    public function __construct(I18nKeysLoaderInterface $loader, CacheInterface $cache)
     {
         $this->proxy = $loader;
-        $this->cache = new FilesystemCache($cachePath);
+        $this->cache = $cache;
     }
 
     /**
@@ -36,14 +36,13 @@ class CachingI18nLoader implements I18nKeysLoaderInterface
     {
         $key = 'i18n.keys.cache';
 
-        $data = $this->cache->fetch($key);
+        $data = $this->cache->get($key);
 
         if (!$data) {
             $data = $this->proxy->loadI18nKeys();
-            $this->cache->save($key, $data);
+            $this->cache->set($key, $data);
         }
 
         return $data;
     }
-
 }

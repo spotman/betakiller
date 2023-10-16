@@ -11,7 +11,7 @@ use BetaKiller\Acl\UrlElementAccessResolverInterface;
 use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
 use BetaKiller\Api\ApiLanguageDetector;
 use BetaKiller\Assets\StaticAssets;
-use BetaKiller\Cache\DoctrineCacheProvider;
+use BetaKiller\Cache\SymfonyCacheProvider;
 use BetaKiller\CliAppRunnerInterface;
 use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
@@ -100,6 +100,7 @@ use Mezzio\Router\RouteCollector;
 use Mezzio\Router\RouteCollectorInterface;
 use Mezzio\Router\RouterInterface;
 use Mezzio\Session\SessionPersistenceInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -113,7 +114,6 @@ use Ramsey\Uuid\UuidFactory;
 use Ramsey\Uuid\UuidFactoryInterface;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
-use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
 use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
@@ -121,6 +121,7 @@ use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
 use Spotman\Api\AccessResolver\ApiMethodAccessResolverDetectorInterface;
 use Spotman\Api\ApiLanguageDetectorInterface;
 use Spotman\Defence\Parameter\ParameterProviderFactoryInterface;
+use Symfony\Component\Cache\Psr16Cache;
 use function DI\autowire;
 use function DI\factory;
 use function DI\get;
@@ -311,18 +312,15 @@ return [
             return Loop::get();
         }),
 
-        OrmFactoryInterface::class => autowire(OrmFactory::class),
+        OrmFactoryInterface::class    => autowire(OrmFactory::class),
 
-        // PSR-16 adapter for system-wide Doctrine Cache
-        CacheInterface::class      => DI\factory(function (Cache $doctrineCache) {
-            return new SimpleCacheAdapter($doctrineCache);
+        // PSR-16 adapter for system-wide PSR-6 cache
+        CacheInterface::class         => DI\factory(function (CacheItemPoolInterface $psr6Cache) {
+            return new Psr16Cache($psr6Cache);
         }),
 
-        // Bind Doctrine cache interface to abstract cache provider
-        Cache::class               => DI\get(CacheProvider::class),
-
         // Common cache instance for all
-        CacheProvider::class       => DI\get(DoctrineCacheProvider::class),
+        CacheItemPoolInterface::class => DI\get(SymfonyCacheProvider::class),
 
         AppConfigInterface::class                       => DI\autowire(AppConfig::class),
 

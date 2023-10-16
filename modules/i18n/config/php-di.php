@@ -14,6 +14,7 @@ use BetaKiller\Repository\LanguageRepository;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Repository\TranslationKeyRepository;
 use BetaKiller\Repository\TranslationKeyRepositoryInterface;
+use Psr\SimpleCache\CacheInterface;
 use function DI\autowire;
 use function DI\factory;
 
@@ -23,21 +24,16 @@ return [
         I18nConfigInterface::class => autowire(I18nConfig::class),
 
         I18nKeysLoaderInterface::class => factory(static function (
-            AppEnvInterface $appEnv,
-            LazyAggregateI18nLoader $loader
+            AppEnvInterface         $appEnv,
+            LazyAggregateI18nLoader $loader,
+            CacheInterface          $cache
         ) {
             // Prevent caching in dev mode
             if ($appEnv->inDevelopmentMode()) {
                 return $loader;
             }
 
-            $path = implode(DIRECTORY_SEPARATOR, [
-                $appEnv->getAppRootPath(),
-                'cache',
-                'i18n',
-            ]);
-
-            return new CachingI18nLoader($loader, $path);
+            return new CachingI18nLoader($loader, $cache);
         }),
 
         PluralBagFactoryInterface::class   => autowire(PluralBagFactory::class),
