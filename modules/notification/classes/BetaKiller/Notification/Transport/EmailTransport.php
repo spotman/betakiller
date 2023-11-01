@@ -1,9 +1,13 @@
 <?php
 namespace BetaKiller\Notification\Transport;
 
+use BetaKiller\Config\EmailConfigInterface;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Notification\MessageInterface;
 use BetaKiller\Notification\MessageTargetInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 
 final class EmailTransport extends AbstractTransport
 {
@@ -15,13 +19,27 @@ final class EmailTransport extends AbstractTransport
     private $appEnv;
 
     /**
+     * @var \Symfony\Component\Mailer\MailerInterface
+     */
+    private MailerInterface $mailer;
+
+    /**
+     * @var \BetaKiller\Config\EmailConfigInterface
+     */
+    private EmailConfigInterface $config;
+
+    /**
      * EmailTransport constructor.
      *
-     * @param \BetaKiller\Env\AppEnvInterface $appEnv
+     * @param \BetaKiller\Env\AppEnvInterface           $appEnv
+     * @param \Symfony\Component\Mailer\MailerInterface $mailer
+     * @param \BetaKiller\Config\EmailConfigInterface   $config
      */
-    public function __construct(AppEnvInterface $appEnv)
+    public function __construct(AppEnvInterface $appEnv, MailerInterface $mailer, EmailConfigInterface $config)
     {
         $this->appEnv = $appEnv;
+        $this->mailer = $mailer;
+        $this->config = $config;
     }
 
     public function getName(): string
@@ -66,13 +84,18 @@ final class EmailTransport extends AbstractTransport
      * @throws \BetaKiller\Exception
      */
     public function send(
-        MessageInterface $message,
+        MessageInterface       $message,
         MessageTargetInterface $target,
-        string $body
+        string                 $body
     ): bool {
         $fromUser = $message->getFrom();
 
-        $from        = $fromUser ? $fromUser->getEmail() : null;
+        $sender = new Address($this->config->getFromEmail(), $this->config->getFromName());
+
+        $from = $fromUser
+            ? new Address($fromUser->getEmail(), $fromUser->getFullName())
+            : $sender;
+
         $to          = $target->getEmail();
         $subj        = $message->getSubject();
         $attachments = $message->getAttachments();
@@ -94,7 +117,20 @@ final class EmailTransport extends AbstractTransport
         // Fake delay to prevent blackout of SMTP relay
         sleep(2);
 
-        // Email notification
-        return (bool)\Email::send($from, $to, $subj, $body, true, $attachments);
+        $email = (new Email())
+            ->sender($sender)
+            ->from($from)
+            ->to($to)
+            ->subject($subj)
+            ->html($body)
+            ->priority($message->isCritical() ? 1 : 5);
+
+        foreach ($attachments as $attach) {
+            $email->attachFromPath($attach, basename($attach));
+        }
+
+        $this->mailer->send($email);
+
+        return true;
     }
 }

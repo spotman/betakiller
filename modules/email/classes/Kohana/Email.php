@@ -109,6 +109,7 @@ class Kohana_Email
      * @param array|null   $attach  attach filenames
      *
      * @return int                      number of emails sent
+     * @deprecated
      */
     public static function send($from, $to, string $subject, string $body, bool $html = null, array $attach = null)
     {

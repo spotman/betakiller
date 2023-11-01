@@ -126,8 +126,8 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      * @throws \ReflectionException
      */
     private function storeException(
-        Throwable $exception,
-        ?UserInterface $user,
+        Throwable               $exception,
+        ?UserInterface          $user,
         ?ServerRequestInterface $request
     ): void {
         $class = (new ReflectionClass($exception))->getShortName();
@@ -264,12 +264,10 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             }
 
             // Send plain message
-            Email::send(
-                null,
+            mail(
                 getenv('DEBUG_EMAIL_ADDRESS'),
                 'Exception handling error',
-                nl2br($message),
-                true
+                nl2br($message)
             );
         } catch (Throwable $emailX) {
             // Nothing we can do here, store exceptions in a system log as a last resort

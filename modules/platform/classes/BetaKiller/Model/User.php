@@ -121,15 +121,15 @@ class User extends AbstractCreatedAt implements UserInterface
                 self::COL_LANGUAGE_ID     => [
                     ['max_length', [':value', 11]],
                 ],
-                self::COL_FIRST_NAME      => [
-                    ['max_length', [':value', 32]],
-                ],
-                self::COL_LAST_NAME       => [
-                    ['max_length', [':value', 32]],
-                ],
-                self::COL_MIDDLE_NAME     => [
-                    ['max_length', [':value', 32]],
-                ],
+//                self::COL_FIRST_NAME      => [
+//                    ['max_length', [':value', 32]],
+//                ],
+//                self::COL_LAST_NAME       => [
+//                    ['max_length', [':value', 32]],
+//                ],
+//                self::COL_MIDDLE_NAME     => [
+//                    ['max_length', [':value', 32]],
+//                ],
                 self::COL_PHONE           => [
                     ['max_length', [':value', 32]],
                 ],
