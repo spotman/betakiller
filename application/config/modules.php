@@ -58,7 +58,7 @@ return [
     'security'     => MODPATH.'security',              // Various security helpers
     'sitemap'      => MODPATH.'sitemap',               // Generating sitemap.xml
     'twig'         => MODPATH.'twig',                  // Twig template engine
-    'wamp'         => MODPATH.'wamp',                  // WAMP protocol support (router + client)
+//    'wamp'         => MODPATH.'wamp',                  // WAMP protocol support (router + client)
     'webhooks'     => MODPATH.'webhooks',              // WebHooks control panel
     'workflow'     => MODPATH.'workflow',              // Status workflow processing
 
