@@ -17,18 +17,18 @@ use BetaKiller\Daemon\WampEsbBridgeDaemon;
 
 return [
     // Multiple APi workers in round-robin mode (workers are stateless)
-    ApiWorkerOneDaemon::CODENAME,
-    ApiWorkerTwoDaemon::CODENAME,
-    ApiWorkerThreeDaemon::CODENAME,
-    ApiWorkerFourDaemon::CODENAME,
-    ApiWorkerFiveDaemon::CODENAME,
-    ApiWorkerSixDaemon::CODENAME,
-    ApiWorkerSevenDaemon::CODENAME,
-    ApiWorkerEightDaemon::CODENAME,
-    ApiWorkerNineDaemon::CODENAME,
-    ApiWorkerTenDaemon::CODENAME,
-
-    WampEsbBridgeDaemon::CODENAME,
+//    ApiWorkerOneDaemon::CODENAME,
+//    ApiWorkerTwoDaemon::CODENAME,
+//    ApiWorkerThreeDaemon::CODENAME,
+//    ApiWorkerFourDaemon::CODENAME,
+//    ApiWorkerFiveDaemon::CODENAME,
+//    ApiWorkerSixDaemon::CODENAME,
+//    ApiWorkerSevenDaemon::CODENAME,
+//    ApiWorkerEightDaemon::CODENAME,
+//    ApiWorkerNineDaemon::CODENAME,
+//    ApiWorkerTenDaemon::CODENAME,
+//
+//    WampEsbBridgeDaemon::CODENAME,
     CommandBusWorkerDaemon::CODENAME,
 
     EsbPingDaemon::CODENAME,
