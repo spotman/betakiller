@@ -1,5 +1,7 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
+use BetaKiller\Helper\DebugHelper;
+
 /**
  * Database query wrapper.  See [Parameterized Statements](database/query/parameterized) for usage and examples.
  *
@@ -276,23 +278,11 @@ class Kohana_Database_Query
         }
 
         if (self::$logQueries) {
+            $btr = DebugHelper::findNearestStackTraceItem('orm');
+
+            $sql .= sprintf(' -- %s:%s %s()', $btr->file, $btr->line, $btr->getCallee());
+
             $startedOn = microtime(true);
-
-            $bt  = debug_backtrace();
-            $bti = 1;
-
-            do {
-                $btr = $bt[$bti++];
-
-                $file = mb_strtolower(basename($btr['file']));
-            } while (str_contains($file, 'orm'));
-
-            $sql .= sprintf(
-                ' -- %s:%s %s()',
-                $btr['file'],
-                $btr['line'],
-                isset($btr['class']) ? $btr['class'].'::'.$btr['function'] : $btr['function']
-            );
         }
 
         // Execute the query

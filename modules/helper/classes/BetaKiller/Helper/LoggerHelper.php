@@ -53,10 +53,12 @@ class LoggerHelper
         ServerRequestInterface $request = null
     ): void {
         try {
+            $btr = DebugHelper::findNearestStackTraceItem('logger', $e);
+
             $data = [
                 ':message'                  => $e->getMessage(),
-                ':file'                     => $e->getFile(),
-                ':line'                     => $e->getLine(),
+                ':file'                     => $btr->file,
+                ':line'                     => $btr->line,
                 self::CONTEXT_KEY_EXCEPTION => $e,
             ];
 
