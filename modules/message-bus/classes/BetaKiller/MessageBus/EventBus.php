@@ -31,9 +31,9 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
      * @param \Psr\Log\LoggerInterface                               $logger
      */
     public function __construct(
-        BoundedEventTransportInterface $boundedTransport,
+        BoundedEventTransportInterface  $boundedTransport,
         OutboundEventTransportInterface $outboundTransport,
-        LoggerInterface $logger
+        LoggerInterface                 $logger
     ) {
         $this->boundedTransport  = $boundedTransport;
         $this->outboundTransport = $outboundTransport;
@@ -50,7 +50,7 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
         // Local processing
         $this->handle($message);
 
-        // Process event inside of ESB
+        // Process event inside ESB
         if ($message instanceof BoundedEventMessageInterface) {
             $this->boundedTransport->publishBounded($message);
         }

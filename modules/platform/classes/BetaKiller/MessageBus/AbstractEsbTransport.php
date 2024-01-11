@@ -127,7 +127,7 @@ abstract class AbstractEsbTransport implements EventTransportInterface
         $results = [];
 
         foreach ($handlers as $handler) {
-            $results[] = $this->processEvent($event, $handler);
+            $results[] = $this->processEvent($event, $channel, $handler);
         }
 
         return all($results);
@@ -143,13 +143,13 @@ abstract class AbstractEsbTransport implements EventTransportInterface
 
         $event = $this->serializer->decode($payload);
 
-        return $this->processEvent($event, $handler);
+        return $this->processEvent($event, $pattern, $handler);
     }
 
-    protected function processEvent(EventMessageInterface $event, callable $handler): PromiseInterface
+    protected function processEvent(EventMessageInterface $event, string $channel, callable $handler): PromiseInterface
     {
         try {
-            $result = $handler($event);
+            $result = $handler($event, $channel);
 
             if (!$result instanceof PromiseInterface) {
                 throw new \LogicException(sprintf('Handler must return a Promise for event "%s"', get_class($event)));
@@ -261,8 +261,8 @@ abstract class AbstractEsbTransport implements EventTransportInterface
     {
         // Prefix with app name and environment
         return implode('.', [
-            $this->appEnv->getAppCodename(),
-            $this->appEnv->getModeName(),
+//            $this->appEnv->getAppCodename(),
+//            $this->appEnv->getModeName(),
             $this->getTopicName(),
             $eventName,
         ]);

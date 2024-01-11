@@ -11,13 +11,13 @@ interface OutboundEventTransportInterface extends EventTransportInterface
     public function publishOutbound(OutboundEventMessageInterface $event): void;
 
     /**
-     * @param callable $handler
+     * @param callable(\BetaKiller\MessageBus\OutboundEventMessageInterface): \React\Promise\PromiseInterface $handler
      */
     public function subscribeAnyOutbound(callable $handler): void;
 
     /**
-     * @param string   $eventName Outbound name (heartbeat.outbound)
-     * @param callable $handler   Function to call on incoming event
+     * @param string                                                                                          $eventName Outbound name (heartbeat.outbound)
+     * @param callable(\BetaKiller\MessageBus\OutboundEventMessageInterface): \React\Promise\PromiseInterface $handler   Function to call on incoming event
      */
     public function subscribeOutbound(string $eventName, callable $handler): void;
 }
