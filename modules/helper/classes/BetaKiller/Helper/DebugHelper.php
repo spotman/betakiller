@@ -11,7 +11,7 @@ class DebugHelper
     {
         $bt = $e ? $e->getTrace() : debug_backtrace();
 
-        $i = 1;
+        $i = 0;
 
         do {
             $item = StackTraceItem::fromArray($bt[$i]);
