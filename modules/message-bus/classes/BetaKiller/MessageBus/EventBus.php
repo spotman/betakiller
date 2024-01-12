@@ -40,6 +40,13 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
         $this->logger            = $logger;
     }
 
+    public static function isMessageAllowedTo(EventMessageInterface $message, RestrictionTargetInterface $target): bool
+    {
+        return $message instanceof RestrictedMessageInterface
+            ? $message->getRestriction()->isSatisfiedBy($target)
+            : true;
+    }
+
     /**
      * @param \BetaKiller\MessageBus\EventMessageInterface $message
      *

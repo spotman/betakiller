@@ -12,7 +12,7 @@ namespace BetaKiller\MessageBus;
 interface RestrictedMessageInterface extends MessageInterface
 {
     /**
-     * @return \BetaKiller\MessageBus\MessageRestrictionInterface
+     * @return \BetaKiller\MessageBus\RestrictionInterface
      */
-    public function getRestriction(): MessageRestrictionInterface;
+    public function getRestriction(): RestrictionInterface;
 }

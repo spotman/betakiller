@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
+use BetaKiller\MessageBus\RestrictionTargetInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Url\RequestUserInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
@@ -17,7 +18,8 @@ use Spotman\Acl\AclUserInterface;
  * @method UserStateInterface getWorkflowState()
  */
 interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWorkflowStateInterface,
-    MessageTargetInterface, AclUserInterface, EntityWithAclSpecInterface, RequestUserInterface, CreatedAtInterface
+    MessageTargetInterface, AclUserInterface, EntityWithAclSpecInterface, RequestUserInterface, CreatedAtInterface,
+    RestrictionTargetInterface
 {
     /**
      * @return \DateTimeImmutable

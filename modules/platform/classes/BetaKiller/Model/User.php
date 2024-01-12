@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace BetaKiller\Model;
 
 use BetaKiller\Auth\AuthorizationRequiredException;
+use BetaKiller\Exception\DomainException;
+use BetaKiller\MessageBus\RestrictionTargetInterface;
 use BetaKiller\Workflow\HasWorkflowStateModelOrmTrait;
 use DateTimeImmutable;
 
@@ -606,6 +608,15 @@ class User extends AbstractCreatedAt implements UserInterface
         return $ts
             ? (new DateTimeImmutable())->setTimestamp($ts)
             : null;
+    }
+
+    public function equalsTo(RestrictionTargetInterface $target): bool
+    {
+        if (!$target instanceof self) {
+            throw new DomainException('Restriction target must be instance of UserInterface');
+        }
+
+        return $this->isEqualTo($target);
     }
 
     public static function isEmailRequired(): bool
