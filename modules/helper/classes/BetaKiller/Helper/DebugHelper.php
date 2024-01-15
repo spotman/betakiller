@@ -11,13 +11,16 @@ class DebugHelper
     {
         $bt = $e ? $e->getTrace() : debug_backtrace();
 
-        $i = 0;
+        $i = count($bt) > 1 ? 1 : 0;
 
         do {
             $item = StackTraceItem::fromArray($bt[$i]);
             $file = mb_strtolower(basename($item->file));
+            $callee = mb_strtolower($item->getCallee());
             $i++;
-        } while (str_contains($file, $exclude) && isset($bt[$i]));
+
+            $isExcluded = str_contains($file, $exclude) || str_contains($callee, $exclude);
+        } while ($isExcluded && isset($bt[$i]));
 
         return $item;
     }
