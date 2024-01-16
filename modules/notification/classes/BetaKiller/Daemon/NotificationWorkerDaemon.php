@@ -60,6 +60,8 @@ final class NotificationWorkerDaemon extends AbstractDaemon
      */
     private bool $isFailed = false;
 
+    private ?TimerInterface $failureTimer = null;
+
     /**
      * NotificationWorkerDaemon constructor.
      *
@@ -94,10 +96,12 @@ final class NotificationWorkerDaemon extends AbstractDaemon
         $regularConsumer  = $this->context->createConsumer($regularQueue);
         $priorityConsumer = $this->context->createConsumer($priorityQueue);
 
-        $loop->addPeriodicTimer(1, function (TimerInterface $timer) use ($loop, $regularConsumer, $priorityConsumer) {
+        $loop->addPeriodicTimer(1, function () use ($loop, $regularConsumer, $priorityConsumer) {
             if ($this->isFailed) {
-                $loop->cancelTimer($timer);
-                $this->stopDaemon($loop);
+                $this->failureTimer ??= $loop->addTimer(10, function () {
+                    $this->isFailed     = false;
+                    $this->failureTimer = null;
+                });
 
                 return;
             }
@@ -273,9 +277,9 @@ final class NotificationWorkerDaemon extends AbstractDaemon
 
     public function stopDaemon(LoopInterface $loop): PromiseInterface
     {
-        $this->context->close();
-
         $this->eventTransport->stopConsuming($loop);
+
+        $this->context->close();
 
         return resolve();
     }

@@ -84,10 +84,10 @@ final class DaemonController
      * @param \Psr\Log\LoggerInterface                   $logger
      */
     public function __construct(
-        AppEnvInterface $appEnv,
+        AppEnvInterface         $appEnv,
         ConfigProviderInterface $config,
-        LoopInterface $loop,
-        LoggerInterface $logger
+        LoopInterface           $loop,
+        LoggerInterface         $logger
     ) {
         $this->appEnv = $appEnv;
         $this->config = $config;

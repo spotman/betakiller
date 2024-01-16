@@ -24,9 +24,9 @@ class I18nConfig extends AbstractConfig implements I18nConfigInterface
     /**
      * @inheritDoc
      */
-    public function getFallbackLanguage(): string
+    public function getFallbackLanguage(): ?string
     {
-        return (string)$this->get([self::KEY_FALLBACK], true) ?: LanguageInterface::ISO_EN;
+        return $this->get([self::KEY_FALLBACK], true);
     }
 
     /**

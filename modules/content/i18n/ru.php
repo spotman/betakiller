@@ -2,10 +2,11 @@
 /**
  * Translation file in language: ru
  * Automatically generated from previous translation file.
+ * @todo
  */
 return [
-    'custom_tag.attachment.title' => 'Скачать файл :name',
-    'custom_tag.attachment.alt'   => 'кнопка загрузки файла',
+    'custom-tag.attachment.title' => 'Скачать файл :name',
+    'custom-tag.attachment.alt'   => 'кнопка загрузки файла',
 //    'Enter your name, please'     => 'Пожалуйста, введите Ваше имя',
 //    'Enter your email, please'    => 'Пожалуйста, введите адрес Вашей электронной почты',
 //    'Enter your comment, please'  => 'Пожалуйста, введите Ваш комментарий',

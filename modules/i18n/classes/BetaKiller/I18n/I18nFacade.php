@@ -40,9 +40,9 @@ final class I18nFacade
     private LanguageInterface $primaryLang;
 
     /**
-     * @var LanguageInterface
+     * @var LanguageInterface|null
      */
-    private LanguageInterface $fallbackLang;
+    private ?LanguageInterface $fallbackLang;
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -86,9 +86,9 @@ final class I18nFacade
     public function __construct(
         LanguageRepositoryInterface $langRepo,
         PluralBagFormatterInterface $formatter,
-        I18nKeysLoaderInterface $loader,
-        I18nConfigInterface $config,
-        LoggerInterface $logger
+        I18nKeysLoaderInterface     $loader,
+        I18nConfigInterface         $config,
+        LoggerInterface             $logger
     ) {
         $this->langRepo  = $langRepo;
         $this->loader    = $loader;
@@ -115,8 +115,17 @@ final class I18nFacade
         $this->primaryLang = reset($this->languages);
 
         // Define fallback language for translating missing keys
-        $fallbackIsoCode    = $this->config->getFallbackLanguage();
-        $this->fallbackLang = $this->languages[$fallbackIsoCode];
+        $fallbackIsoCode = $this->config->getFallbackLanguage();
+
+        if ($fallbackIsoCode) {
+            if (!isset($this->languages[$fallbackIsoCode])) {
+                throw new RuntimeException(
+                    sprintf('Can not use "%s" as a fallback language; add it to allowed languages', $fallbackIsoCode)
+                );
+            }
+
+            $this->fallbackLang = $this->languages[$fallbackIsoCode];
+        }
     }
 
     public function hasLanguage(string $lang): bool
@@ -175,10 +184,10 @@ final class I18nFacade
      * @throws \BetaKiller\I18n\I18nException
      */
     public function translateHasKeyName(
-        LanguageInterface $lang,
+        LanguageInterface       $lang,
         HasI18nKeyNameInterface $hasKey,
-        ?array $values = null,
-        ?bool $ignoreMissing = null
+        ?array                  $values = null,
+        ?bool                   $ignoreMissing = null
     ): string {
         return $this->translateKeyName($lang, $hasKey->getI18nKeyName(), $values, $ignoreMissing);
     }
@@ -194,9 +203,9 @@ final class I18nFacade
      */
     public function translateKeyName(
         LanguageInterface $lang,
-        string $keyName,
-        ?array $values = null,
-        ?bool $ignoreMissing = null
+        string            $keyName,
+        ?array            $values = null,
+        ?bool             $ignoreMissing = null
     ): string {
         $key = $this->getKeyByName($keyName);
 
@@ -215,9 +224,9 @@ final class I18nFacade
      */
     public function translateKey(
         LanguageInterface $lang,
-        I18nKeyInterface $key,
-        ?array $values = null,
-        ?bool $ignoreMissing = null
+        I18nKeyInterface  $key,
+        ?array            $values = null,
+        ?bool             $ignoreMissing = null
     ): string {
         $string = $this->translate($key, $lang, false, $ignoreMissing);
 
@@ -234,9 +243,9 @@ final class I18nFacade
      */
     public function translateKeyAny(
         LanguageInterface $lang,
-        I18nKeyInterface $key,
-        ?array $values = null,
-        ?bool $ignoreMissing = null
+        I18nKeyInterface  $key,
+        ?array            $values = null,
+        ?bool             $ignoreMissing = null
     ): string {
         $string = $this->translate($key, $lang, true, $ignoreMissing);
 
@@ -268,8 +277,8 @@ final class I18nFacade
 
     public function translateHasKeyNameAll(
         HasI18nKeyNameInterface $key,
-        array $values = null,
-        bool $ignoreMissing = null
+        array                   $values = null,
+        bool                    $ignoreMissing = null
     ): array {
         $data = [];
 
@@ -297,10 +306,10 @@ final class I18nFacade
      */
     public function pluralizeKeyName(
         LanguageInterface $lang,
-        string $keyName,
-        $form,
-        array $values = null,
-        ?bool $ignoreMissing = null
+        string            $keyName,
+                          $form,
+        array             $values = null,
+        ?bool             $ignoreMissing = null
     ): string {
         $key = $this->getKeyByName($keyName);
 
@@ -430,10 +439,10 @@ final class I18nFacade
      * @return  string
      */
     private function translate(
-        I18nKeyInterface $key,
+        I18nKeyInterface  $key,
         LanguageInterface $lang,
-        bool $any = null,
-        bool $ignoreMissing = null
+        bool              $any = null,
+        bool              $ignoreMissing = null
     ): string {
         if ($any) {
             $value = $key->getI18nValueOrAny($lang);
@@ -441,7 +450,7 @@ final class I18nFacade
             $value = $key->hasI18nValue($lang) ? $key->getI18nValue($lang) : null;
         }
 
-        if (!$value) {
+        if (!$value && $this->fallbackLang) {
             $value = $key->hasI18nValue($this->fallbackLang) ? $key->getI18nValue($this->fallbackLang) : null;
         }
 

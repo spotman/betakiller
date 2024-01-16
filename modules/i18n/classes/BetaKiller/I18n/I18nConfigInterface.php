@@ -11,9 +11,9 @@ interface I18nConfigInterface
     public function getAllowedLanguages(): array;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getFallbackLanguage(): string;
+    public function getFallbackLanguage(): ?string;
 
     /**
      * Returns class names of loaders
