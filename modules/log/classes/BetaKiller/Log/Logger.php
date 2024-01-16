@@ -167,7 +167,7 @@ class Logger implements LoggerInterface
                 $errorHandler,
                 $errorStorage,
                 \Monolog\Logger::NOTICE,
-                300 // Repeat notification in 5 minutes
+                180 // Repeat notification in 3 minutes
             );
         }
 
