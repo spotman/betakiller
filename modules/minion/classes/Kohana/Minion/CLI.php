@@ -127,7 +127,11 @@ class Kohana_Minion_CLI {
 		$options_output = '';
 		if ( ! empty($options))
 		{
-			$options_output = ' [ '.implode(', ', $options).' ]';
+            $labels = array_is_list($options)
+                ? array_values($options)
+                : array_keys($options);
+
+			$options_output = ' [ '.implode(', ', $labels).' ]';
 		}
 
 		fwrite(STDOUT, $text.$options_output.': ');
