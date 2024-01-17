@@ -69,7 +69,7 @@ class SendDirect extends AbstractTask
 
         $this->notification->directMessage(self::NOTIFICATION_TEST_DIRECT, $target, []);
 
-        $this->logger->debug('Message sent to ":email"', [
+        $this->logger->info('Message sent to ":email"', [
             ':email' => $target->getEmail(),
         ]);
     }

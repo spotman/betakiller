@@ -54,6 +54,6 @@ final class SendBroadcast extends AbstractTask
     {
         $this->notification->broadcastMessage(self::NOTIFICATION_TEST_BROADCAST, []);
 
-        $this->logger->debug('Broadcast message sent');
+        $this->logger->info('Broadcast message sent');
     }
 }
