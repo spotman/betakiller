@@ -17,10 +17,12 @@ use BetaKiller\ProcessLock\LockInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Database;
+use JetBrains\PhpStorm\NoReturn;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
+use Throwable;
 use function React\Async\await;
 use function React\Promise\reject;
 use function React\Promise\Timer\timeout;
@@ -66,9 +68,9 @@ final class Runner extends AbstractTask
     private string $codename;
 
     /**
-     * @var \BetaKiller\Daemon\DaemonInterface
+     * @var \BetaKiller\Daemon\DaemonInterface|null
      */
-    private DaemonInterface $daemon;
+    private ?DaemonInterface $daemon = null;
 
     /**
      * @var \React\EventLoop\LoopInterface
@@ -259,7 +261,7 @@ final class Runner extends AbstractTask
             ]);
         });
 
-        $promise->otherwise(function (\Throwable $e = null) {
+        $promise->otherwise(function (Throwable $e = null) {
             $this->setStatus(self::STATUS_STOPPING);
 
             $this->processException($e);
@@ -274,14 +276,14 @@ final class Runner extends AbstractTask
                     $deferred->reject();
                 },
             );
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $deferred->reject($e);
         }
 
         return $promise;
     }
 
-    private function stop(bool $isFailed): PromiseInterface
+    private function stop(bool $isFailed): void
     {
         // Prevent sequential stop calls
         if ($this->isStopping()) {
@@ -289,7 +291,7 @@ final class Runner extends AbstractTask
                 ':name' => $this->codename,
             ]);
 
-            return reject();
+            return;
         }
 
         $this->setStatus(self::STATUS_STOPPING);
@@ -308,7 +310,7 @@ final class Runner extends AbstractTask
             $this->shutdown($exitCode);
         });
 
-        $promise->otherwise(function (\Throwable $e = null) {
+        $promise->otherwise(function (Throwable $e = null) {
             $this->logger->alert('Daemon ":name" had not stopped, force exit applied', [
                 ':name' => $this->codename,
             ]);
@@ -332,22 +334,19 @@ final class Runner extends AbstractTask
             $this->loop->cancelTimer($pollTimer);
 
             try {
-                $this->daemon->stopDaemon($this->loop)->then(
-                    static function () use ($deferred) {
-                        $deferred->resolve();
-                    },
-                    static function () use ($deferred) {
-                        $deferred->reject();
-                    }
-                );
-            } catch (\Throwable $e) {
+                $stopPromise = $this->daemon->stopDaemon($this->loop);
+
+                timeout($stopPromise, AbstractDaemon::SHUTDOWN_TIMEOUT, $this->loop)
+                    ->done(fn() => $deferred->resolve())
+                    ->otherwise(fn() => $deferred->reject());
+            } catch (Throwable $e) {
                 $deferred->reject($e);
             }
         });
 
-        return timeout($promise, AbstractDaemon::SHUTDOWN_TIMEOUT + 2, $this->loop);
     }
 
+    #[NoReturn]
     private function shutdown(int $exitCode): void
     {
         $this->unlock();
@@ -383,7 +382,8 @@ final class Runner extends AbstractTask
         exit($exitCode);
     }
 
-    private function processException(?\Throwable $e): void
+    #[NoReturn]
+    private function processException(?Throwable $e): void
     {
         if (!$e) {
             $this->shutdown(DaemonInterface::EXIT_CODE_FAILED);
@@ -495,7 +495,7 @@ final class Runner extends AbstractTask
                     ':name' => $this->codename,
                 ]);
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             LoggerHelper::logRawException($this->logger, $e);
         }
     }

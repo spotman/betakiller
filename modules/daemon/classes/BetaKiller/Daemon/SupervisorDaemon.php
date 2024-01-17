@@ -35,7 +35,7 @@ final class SupervisorDaemon extends AbstractDaemon
      */
     public function __construct(
         DaemonController $controller,
-        LoggerInterface $logger
+        LoggerInterface  $logger
     ) {
         $this->logger     = $logger;
         $this->controller = $controller;
@@ -80,11 +80,12 @@ final class SupervisorDaemon extends AbstractDaemon
         $stopPromise = $this->controller->stopAll();
 
         // Prevent failed promise exception
-        $stopPromise->then(function () {
-            $this->logger->info('Supervisor is shutting down');
-        });
+        $stopPromise->then(
+            fn() => $this->logger->info('Supervisor is shutting down'),
+            fn() => $this->logger->warning('Some daemons have not been stopped, kill forced'),
+        );
 
-        return $stopPromise;
+        return resolve(); // Daemons will be killed on normal shutdown
     }
 
     /**

@@ -246,7 +246,7 @@ final class DaemonController
         }
 
         // Async stop
-        $allPromise = timeout(all($stopPromises), AbstractDaemon::SHUTDOWN_TIMEOUT + 1, $this->loop);
+        $allPromise = timeout(all($stopPromises), AbstractDaemon::SHUTDOWN_TIMEOUT + 2, $this->loop);
 
         $allPromise->done(function () {
             $this->logger->info('All daemons are stopped');
@@ -605,7 +605,7 @@ final class DaemonController
 //            ]);
 //        }
 
-        $stopTimeout = AbstractDaemon::SHUTDOWN_TIMEOUT;
+        $stopTimeout = AbstractDaemon::SHUTDOWN_TIMEOUT + 1;
 
         $pollingTimer = $this->loop->addPeriodicTimer(0.5, function (TimerInterface $timer) use ($unit, $deferred) {
             // Wait for an actual stop (set by "exit" Process event handler)
