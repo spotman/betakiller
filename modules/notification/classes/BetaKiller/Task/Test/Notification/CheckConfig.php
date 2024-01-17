@@ -36,15 +36,15 @@ class CheckConfig extends AbstractTask
      * @param \Psr\Log\LoggerInterface                       $logger
      */
     public function __construct(
-        EmailConfigInterface $emailConfig,
+        EmailConfigInterface    $emailConfig,
         EventBusConfigInterface $eventBusConfig,
-        LoggerInterface $logger
+        LoggerInterface         $logger
     ) {
         parent::__construct();
 
-        $this->emailConfig = $emailConfig;
+        $this->emailConfig    = $emailConfig;
         $this->eventBusConfig = $eventBusConfig;
-        $this->logger       = $logger;
+        $this->logger         = $logger;
     }
 
     /**
@@ -74,11 +74,15 @@ class CheckConfig extends AbstractTask
         echo '[Email]'.PHP_EOL.PHP_EOL;
 
         $data = [
-            'Host' => $this->emailConfig->getHost(),
-            'Port' => $this->emailConfig->getPort(),
-            'Username' => $this->emailConfig->getUsername(),
-            'Password' => $this->emailConfig->getPassword(),
+            'Host'       => $this->emailConfig->getHost(),
+            'Port'       => $this->emailConfig->getPort(),
+            'Timeout'    => $this->emailConfig->getTimeout(),
+            'Username'   => $this->emailConfig->getUsername(),
+            'Password'   => $this->emailConfig->getPassword(),
             'Encryption' => $this->emailConfig->useEncryption(),
+            'Domain'     => $this->emailConfig->getDomain(),
+            'From.email' => $this->emailConfig->getFromEmail(),
+            'From.name'  => $this->emailConfig->getFromName(),
         ];
 
         foreach ($data as $label => $value) {
