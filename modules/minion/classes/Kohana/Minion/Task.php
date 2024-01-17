@@ -1,6 +1,7 @@
-<?php use BetaKiller\Task\TaskFactory;
+<?php defined('SYSPATH') or die('No direct script access.');
 
-defined('SYSPATH') or die('No direct script access.');
+use BetaKiller\Task\TaskFactory;
+
 /**
  * Interface that all minion tasks must implement
  *
