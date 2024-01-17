@@ -128,7 +128,7 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
             // Fetch all handlers
             foreach ($handlers as $handlerClassName) {
                 // Bind lazy-load wrapper
-                $this->on($eventName, static function ($event) use ($handlerClassName) {
+                $this->on($eventName, function ($event) use ($handlerClassName) {
                     $handler = $this->container->get($handlerClassName);
 
                     $handler($event);
