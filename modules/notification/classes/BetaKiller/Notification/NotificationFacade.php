@@ -609,6 +609,16 @@ final class NotificationFacade
         return $this->groupRepo->getUserGroups($user);
     }
 
+    public function purgePriorityQueue(): void
+    {
+        $this->queueContext->purgeQueue($this->priorityQueue);
+    }
+
+    public function purgeRegularQueue(): void
+    {
+        $this->queueContext->purgeQueue($this->regularQueue);
+    }
+
     private function isMessageEnabledForTarget(
         MessageInterface $message
     ): bool {
