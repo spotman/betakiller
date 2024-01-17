@@ -16,6 +16,7 @@ use BetaKiller\CliAppRunnerInterface;
 use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Config\EventBusConfig;
 use BetaKiller\Config\WebConfig;
 use BetaKiller\Config\WebConfigInterface;
 use BetaKiller\DefenceParameterProviderFactory;
@@ -41,6 +42,7 @@ use BetaKiller\MessageBus\CommandBusInterface;
 use BetaKiller\MessageBus\EsbBoundedEventTransport;
 use BetaKiller\MessageBus\EsbOutboundEventTransport;
 use BetaKiller\MessageBus\EventBus;
+use BetaKiller\MessageBus\EventBusConfigInterface;
 use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\MessageBus\EventSerializerInterface;
 use BetaKiller\MessageBus\NativeEventSerializer;
@@ -352,29 +354,11 @@ return [
         BoundedEventTransportInterface::class  => DI\autowire(EsbBoundedEventTransport::class),
         OutboundEventTransportInterface::class => DI\autowire(EsbOutboundEventTransport::class),
 
-        EventBusInterface::class   => DI\factory(static function (
-            ContainerInterface      $container,
-            EventBus                $bus,
-            ConfigProviderInterface $config
-        ) {
-            // For each event
-            foreach ((array)$config->load(['events']) as $eventName => $handlers) {
-                // Fetch all handlers
-                foreach ($handlers as $handlerClassName) {
-                    // Bind lazy-load wrapper
-                    $bus->on($eventName, static function ($event) use ($container, $handlerClassName) {
-                        $handler = $container->get($handlerClassName);
-
-                        $handler($event);
-                    });
-                }
-            }
-
-            return $bus;
-        }),
+        EventBusConfigInterface::class => DI\autowire(EventBusConfig::class),
+        EventBusInterface::class       => DI\autowire(EventBus::class),
 
         // Handlers will be added in workers
-        CommandBusInterface::class => DI\autowire(CommandBus::class),
+        CommandBusInterface::class     => DI\autowire(CommandBus::class),
     ],
 
 ];

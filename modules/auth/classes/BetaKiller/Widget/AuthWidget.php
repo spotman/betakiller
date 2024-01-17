@@ -38,7 +38,7 @@ class AuthWidget extends AbstractPublicWidget
      */
     public function getData(ServerRequestInterface $request, array $context): array
     {
-        $providers = $this->config->load(['auth', 'providers']);
+        $providers = $this->config->load('auth', ['providers']);
 
         if (!$providers) {
             throw new WidgetException('No auth providers specified in config');

@@ -1,12 +1,15 @@
 <?php
 namespace BetaKiller\MessageBus;
 
+use function count;
+use function get_class;
+
 abstract class AbstractMessageBus implements AbstractMessageBusInterface
 {
     /**
      * @var callable[][]
      */
-    private $bindings = [];
+    private array $bindings = [];
 
     /**
      * @return int
@@ -26,7 +29,7 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
         $limit = $this->getMessageHandlersLimit();
 
         // Limit handlers count for CommandBus
-        if ($limit && \count($this->bindings[$messageClassName]) > $limit) {
+        if ($limit && count($this->bindings[$messageClassName]) > $limit) {
             throw new MessageBusException('Handlers limit exceed for :name message', [
                 ':name' => $messageClassName,
             ]);
@@ -57,6 +60,6 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
 
     protected function getMessageName(MessageInterface $message): string
     {
-        return \get_class($message);
+        return get_class($message);
     }
 }

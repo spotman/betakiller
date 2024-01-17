@@ -73,9 +73,14 @@ final class WebHookRepository extends AbstractConfigBasedDispatchableRepository 
         return new WebHook($codename, $properties);
     }
 
-    protected function getItemsListConfigKey(): array
+    protected function getItemsListConfigGroup(): string
     {
-        return ['webhooks'];
+        return 'webhooks';
+    }
+
+    protected function getItemsListConfigPath(): array
+    {
+        return [];
     }
 
     protected function prepareCodename(string $codename): string

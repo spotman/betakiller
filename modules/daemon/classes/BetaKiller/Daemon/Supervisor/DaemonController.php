@@ -729,7 +729,7 @@ final class DaemonController
 
     private function getDefinedDaemons(): array
     {
-        return \array_unique((array)$this->config->load(['daemons']));
+        return \array_unique((array)$this->config->load('daemons', []));
     }
 
     private function isAutoRestartAllowed(DaemonUnitInterface $unit): bool

@@ -68,7 +68,7 @@ final class Container implements ContainerInterface
             }
         }
 
-        $config = (array)$configProvider->load(['php-di']);
+        $config = (array)$configProvider->load('php-di', []);
 
         $definitions = $config['definitions'] ?? [];
 

@@ -12,6 +12,7 @@ use BetaKiller\Repository\NotificationGroupUserConfigRepository;
 use BetaKiller\Repository\NotificationGroupUserConfigRepositoryInterface;
 use BetaKiller\Repository\NotificationLogRepository;
 use BetaKiller\Repository\NotificationLogRepositoryInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
@@ -33,8 +34,14 @@ return [
 
         MailerInterface::class => autowire(Mailer::class),
 
-        TransportInterface::class => factory(function (EmailConfigInterface $config) {
-            $transport = new EsmtpTransport($config->getHost(), $config->getPort(), $config->useEncryption());
+        TransportInterface::class => factory(function (EmailConfigInterface $config, LoggerInterface $logger) {
+            $transport = new EsmtpTransport(
+                $config->getHost(),
+                $config->getPort(),
+                $config->useEncryption(),
+                null,
+                $logger
+            );
 
             $transport->setLocalDomain($config->getDomain());
 

@@ -76,9 +76,14 @@ class ShortcodeRepository extends AbstractConfigBasedDispatchableRepository
         return $this->findAllByOptionValue(ShortcodeEntityInterface::OPTION_TYPE, $type);
     }
 
-    protected function getItemsListConfigKey(): array
+    protected function getItemsListConfigGroup(): string
     {
-        return ['content', 'shortcodes'];
+        return 'content';
+    }
+
+    protected function getItemsListConfigPath(): array
+    {
+        return ['shortcodes'];
     }
 
     /**

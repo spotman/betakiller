@@ -45,7 +45,7 @@ final class TwigEnvironmentFactory
      */
     public function create(): Environment
     {
-        $config    = (array)$this->config->load(['twig']);
+        $config    = (array)$this->config->load('twig', []);
         $envConfig = $config['environment'];
         $path      = $envConfig['cache'];
         $chmod     = $envConfig['chmod'];

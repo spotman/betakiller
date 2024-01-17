@@ -41,21 +41,21 @@ class Backup extends AbstractTask
 
     public function run(): void
     {
-        $service = (string)$this->config('backup.service');
+        $service = (string)$this->config('service');
 
         $instance = null;
 
         switch ($service) {
             case 'YandexDisk':
-                $instance = new \YandexBackup($this->config('backup.login'), $this->config('backup.password'));
+                $instance = new \YandexBackup($this->config('login'), $this->config('password'));
                 break;
 
             case 'GoogleDisk':
-                $instance = new \GoogleBackup($this->config('backup.login'), $this->config('backup.password'));
+                $instance = new \GoogleBackup($this->config('login'), $this->config('password'));
                 break;
 
             case 'Dav':
-                $instance = new DavBackup($this->config('backup.url'), $this->config('backup.login'), $this->config('backup.password'));
+                $instance = new DavBackup($this->config('url'), $this->config('login'), $this->config('password'));
                 break;
 
             default:
@@ -64,9 +64,9 @@ class Backup extends AbstractTask
 
         $this->logger->debug('Service '.$service.' selected');
 
-        $instance->setType($this->config('backup.type'));
+        $instance->setType($this->config('type'));
 
-        $dbKey    = 'database.'.$this->config('backup.database').'.';
+        $dbKey    = 'database.'.$this->config('database').'.';
         $dbDriver = $this->getDBDriver(mb_strtolower($this->config($dbKey.'type')));
 
         $dbHost = $this->config($dbKey.'connection.hostname');
@@ -96,12 +96,12 @@ class Backup extends AbstractTask
             $dbDriver // driver
         );
 
-        $folder = realpath($this->config('backup.folder'));
+        $folder = realpath($this->config('folder'));
 
         $this->logger->info('Backing up folder '.$folder);
 
-        $prefix            = $this->config('backup.prefix');
-        $timestampedPrefix = (bool)$this->config('backup.useTimestampedPrefix');
+        $prefix            = $this->config('prefix');
+        $timestampedPrefix = (bool)$this->config('useTimestampedPrefix');
 
         $instance
             ->setPath($folder)
@@ -115,16 +115,13 @@ class Backup extends AbstractTask
     }
 
     /**
-     * @param string $group
-     * @param null   $default
+     * @param string $key
      *
-     * @return \Config_Group|string|int|bool|null
+     * @return string|int|bool|null
      */
-    private function config($group, $default = null)
+    private function config(string $key): string|int|bool|null
     {
-        $path = explode('.', $group);
-
-        return $this->configProvider->load($path) ?: $default;
+        return $this->configProvider->load('backup', [$key]);
     }
 
     protected function getDBDriver($driver): string

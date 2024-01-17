@@ -47,7 +47,7 @@ class Zones extends AbstractTask
 
     public function run(): void
     {
-        foreach ((array)$this->config->load(['zones']) as $zoneName) {
+        foreach ((array)$this->config->load('zones', []) as $zoneName) {
             $model = $this->repo->findByName($zoneName);
 
             if (!$model) {

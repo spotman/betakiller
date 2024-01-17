@@ -64,11 +64,11 @@ class AssetsProviderFactory
      */
     public function __construct(
         NamespaceBasedFactoryBuilderInterface $factoryBuilder,
-        ConfigProviderInterface $config,
-        RepositoryFactoryInterface $repositoryFactory,
-        AssetsStorageFactory $storageFactory,
-        AssetsPathStrategyFactory $pathStrategyFactory,
-        AssetsHandlerFactory $handlerFactory
+        ConfigProviderInterface               $config,
+        RepositoryFactoryInterface            $repositoryFactory,
+        AssetsStorageFactory                  $storageFactory,
+        AssetsPathStrategyFactory             $pathStrategyFactory,
+        AssetsHandlerFactory                  $handlerFactory
     ) {
         $this->factory = $factoryBuilder
             ->createFactory()
@@ -107,8 +107,7 @@ class AssetsProviderFactory
 
     private function getModelCodenameByUrlKey(string $key)
     {
-        $providersConfig = $this->config->load([
-            AssetsConfig::CONFIG_KEY,
+        $providersConfig = $this->config->load(AssetsConfig::CONFIG_KEY, [
             AssetsConfig::CONFIG_MODELS_KEY,
         ]);
 
@@ -127,8 +126,7 @@ class AssetsProviderFactory
 
     private function getModelConfig(string $modelName): array
     {
-        return $this->config->load([
-            AssetsConfig::CONFIG_KEY,
+        return $this->config->load(AssetsConfig::CONFIG_KEY, [
             AssetsConfig::CONFIG_MODELS_KEY,
             $modelName,
         ]);

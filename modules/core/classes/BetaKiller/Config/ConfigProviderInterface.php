@@ -4,8 +4,10 @@ namespace BetaKiller\Config;
 interface ConfigProviderInterface
 {
     /**
-     * @param array $group
+     * @param string $group
+     * @param array  $path
+     *
      * @return array|string|int|bool|null
      */
-    public function load(array $group);
+    public function load(string $group, array $path): array|string|int|bool|null;
 }

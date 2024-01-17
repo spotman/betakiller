@@ -70,7 +70,7 @@ class Roles extends AbstractTask
 
     public function run(): void
     {
-        $rolesConfig = $this->config->load([RoleConfig::CONFIG_GROUP_NAME]);
+        $rolesConfig = $this->config->load(RoleConfig::CONFIG_GROUP_NAME, []);
 
         foreach ($rolesConfig as $name => $options) {
             $model = $this->roleRepo->findByName($name);

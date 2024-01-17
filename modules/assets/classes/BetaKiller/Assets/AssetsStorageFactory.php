@@ -81,8 +81,7 @@ class AssetsStorageFactory
      */
     private function getStorageDefaultConfig(string $storageName): ?array
     {
-        return $this->config->load([
-            AssetsConfig::CONFIG_KEY,
+        return $this->config->load(AssetsConfig::CONFIG_KEY,[
             AssetsConfig::CONFIG_STORAGES_KEY,
             $storageName,
         ]);

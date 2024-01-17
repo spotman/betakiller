@@ -38,7 +38,7 @@ class SymfonyCacheProvider extends ProxyAdapter
 
         $this->ns = $nsPrefix.'.default';
 
-        $settings = (array)$config->load(['cache', 'default']);
+        $settings = (array)$config->load('cache', ['default']);
 
         if (!$settings) {
             throw new Exception('App-related cache config is absent');

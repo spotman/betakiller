@@ -79,7 +79,7 @@ final class CommandBusWorkerDaemon extends AbstractDaemon
     public function startDaemon(LoopInterface $loop): PromiseInterface
     {
         // Load all commands from config
-        foreach ((array)$this->config->load(['commands']) as $commandClass => $handlerClass) {
+        foreach ((array)$this->config->load('commands', []) as $commandClass => $handlerClass) {
             // Create handler instance
             $handler = $this->container->get($handlerClass);
 
