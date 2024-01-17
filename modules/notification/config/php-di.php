@@ -43,7 +43,10 @@ return [
                 $logger
             );
 
-            $transport->setLocalDomain($config->getDomain());
+            $transport
+                ->setUsername($config->getUsername())
+                ->setPassword($config->getPassword())
+                ->setLocalDomain($config->getDomain());
 
             return $transport;
         }),

@@ -146,8 +146,7 @@ class NotificationHelper
 
         return $this->emailTarget(
             $email,
-            $name ?? 'Email debugger',
-            LanguageInterface::ISO_EN // Only English template is available for now
+            $name ?? 'Email debugger'
         );
     }
 
