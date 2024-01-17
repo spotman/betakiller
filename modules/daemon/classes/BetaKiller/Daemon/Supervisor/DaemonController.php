@@ -704,17 +704,10 @@ final class DaemonController
             ]);
         }
 
-        // Warning for developers
-        $this->logger->warning('Daemon ":name" had failed and will be restarted immediately', [
-            ':name' => $unit->getName(),
-//            ':times' => $this->failureCounters[$name],
-        ]);
-
         if ($this->isAutoRestartAllowed($unit)) {
             // Warning for developers
             $this->logger->warning('Daemon ":name" had failed and will be restarted immediately', [
                 ':name' => $unit->getName(),
-//            ':times' => $this->failureCounters[$name],
             ]);
 
             if (!$this->appEnv->inProductionMode()) {
@@ -724,6 +717,11 @@ final class DaemonController
 
             // Restart failed task
             $this->restartDaemon($unit, false);
+        } else {
+            // Warning for developers
+            $this->logger->warning('Daemon ":name" had failed and will be stopped', [
+                ':name' => $unit->getName(),
+            ]);
         }
     }
 
