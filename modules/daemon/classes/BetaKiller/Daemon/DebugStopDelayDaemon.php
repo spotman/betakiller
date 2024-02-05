@@ -25,7 +25,7 @@ final class DebugStopDelayDaemon extends AbstractDaemon
     {
         // Test stop
         echo 'Delaying daemon stop (timeout guard check)';
-        sleep(AbstractDaemon::SHUTDOWN_TIMEOUT * 2);
+        sleep($this->getShutdownTimeout() * 2);
         echo 'OK'.\PHP_EOL;
 
         return resolve();

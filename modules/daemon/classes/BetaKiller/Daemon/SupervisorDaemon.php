@@ -8,14 +8,17 @@ use BetaKiller\Helper\LoggerHelper;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Promise\PromiseInterface;
+use Throwable;
 use function React\Promise\resolve;
+use const SIGUSR1;
+use const SIGUSR2;
 
 final class SupervisorDaemon extends AbstractDaemon
 {
     public const CODENAME = 'Supervisor';
 
-    public const SIGNAL_RELOAD  = \SIGUSR1;
-    public const SIGNAL_RESTART = \SIGUSR2;
+    public const SIGNAL_RELOAD  = SIGUSR1;
+    public const SIGNAL_RESTART = SIGUSR2;
 
     /**
      * @var \BetaKiller\Daemon\Supervisor\DaemonController
@@ -47,7 +50,7 @@ final class SupervisorDaemon extends AbstractDaemon
         $loop->addSignal(self::SIGNAL_RELOAD, function () {
             try {
                 $this->controller->restartStopped();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 LoggerHelper::logRawException($this->logger, $e);
             }
         });
@@ -56,7 +59,7 @@ final class SupervisorDaemon extends AbstractDaemon
         $loop->addSignal(self::SIGNAL_RESTART, function () {
             try {
                 $this->controller->restartRunning();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 LoggerHelper::logRawException($this->logger, $e);
             }
         });
@@ -85,7 +88,7 @@ final class SupervisorDaemon extends AbstractDaemon
             fn() => $this->logger->warning('Some daemons have not been stopped, kill forced'),
         );
 
-        return resolve(); // Daemons will be killed on normal shutdown
+        return $stopPromise;
     }
 
     /**
@@ -104,5 +107,17 @@ final class SupervisorDaemon extends AbstractDaemon
     {
         // Supervisor will react to system reboot and shut down all daemons
         return true;
+    }
+
+    public function getStartupTimeout(): int
+    {
+        // Wait for all child processes to be started
+        return AbstractDaemon::STARTUP_TIMEOUT * 2;
+    }
+
+    public function getShutdownTimeout(): int
+    {
+        // Wait for all child processes to be terminated
+        return AbstractDaemon::SHUTDOWN_TIMEOUT * 2;
     }
 }

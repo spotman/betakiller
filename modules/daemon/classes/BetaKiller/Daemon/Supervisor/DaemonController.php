@@ -22,6 +22,8 @@ use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Validator\StateMachineValidator;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\Workflow\WorkflowInterface;
+use Throwable;
+use function in_array;
 use function React\Promise\all;
 use function React\Promise\reject;
 use function React\Promise\resolve;
@@ -173,7 +175,7 @@ final class DaemonController
         }
 
         // Async start
-        $allPromise = timeout(all($startPromises), AbstractDaemon::STARTUP_TIMEOUT + 1, $this->loop);
+        $allPromise = all($startPromises);
 
         $allPromise->done(function () {
             $this->logger->info('All daemons are started');
@@ -245,8 +247,10 @@ final class DaemonController
             $stopPromises[] = $this->stopDaemon($unit);
         }
 
+        $deferred = new Deferred();
+
         // Async stop
-        $allPromise = timeout(all($stopPromises), AbstractDaemon::SHUTDOWN_TIMEOUT + 2, $this->loop);
+        $allPromise = all($stopPromises);
 
         $allPromise->done(function () {
             $this->logger->info('All daemons are stopped');
@@ -256,11 +260,12 @@ final class DaemonController
             $this->logger->warning('Daemons stop failed');
         });
 
-        $allPromise->always(function () {
+        $allPromise->always(function () use ($deferred) {
             $this->isStoppingDaemons = false;
+            $deferred->resolve();
         });
 
-        return $allPromise;
+        return $deferred->promise();
     }
 
     public function restart(string $name): PromiseInterface
@@ -461,8 +466,6 @@ final class DaemonController
             ]);
         }
 
-        $startTimeout = AbstractDaemon::STARTUP_TIMEOUT;
-
         $deferred = new Deferred;
         $promise  = $deferred->promise();
 
@@ -516,28 +519,16 @@ final class DaemonController
         // On successful startup
         $promise->done(function () use ($unit, $name) {
             $this->emitUnitEvent($unit, DaemonUnit::EVENT_STARTED);
-
-            $this->logger->info('Daemon ":name" started', [
-                ':name' => $name,
-            ]);
         });
 
         // On startup error
-        $promise->otherwise(function () use ($unit, $name, $startTimeout) {
+        $promise->otherwise(function () use ($unit, $name) {
             $this->emitUnitEvent($unit, DaemonUnit::EVENT_FAILED);
-
-            $this->logger->warning('Daemon ":name" has not started in :timeout seconds', [
-                ':name'    => $name,
-                ':timeout' => $startTimeout,
-            ]);
-
-            // Prevent timeout exception and keep other daemons running
-            return resolve();
         });
 
         // Ensure task is running
         $pollingTimer = $this->loop->addPeriodicTimer(0.5, function () use ($name, $deferred, $process) {
-            $this->logger->info('Daemon ":name" startup check', [
+            $this->logger->debug('Daemon ":name" startup check', [
                 ':name' => $name,
             ]);
 
@@ -553,9 +544,13 @@ final class DaemonController
 
         $unit->bindToProcess($process);
 
-        $process->start($this->loop);
+        try {
+            $process->start($this->loop);
+        } catch (Throwable) {
+            $deferred->reject();
+        }
 
-        return timeout($promise, $startTimeout, $this->loop);
+        return $promise;
     }
 
     private function stopProcess(DaemonUnitInterface $unit): PromiseInterface
@@ -609,7 +604,7 @@ final class DaemonController
 
         $pollingTimer = $this->loop->addPeriodicTimer(0.5, function (TimerInterface $timer) use ($unit, $deferred) {
             // Wait for an actual stop (set by "exit" Process event handler)
-            if (!$unit->inStatus(DaemonUnit::STATUS_STOPPED)) {
+            if (!$unit->inStatus(DaemonUnit::STATUS_STOPPED) && !$unit->inStatus(DaemonUnit::STATUS_FAILED)) {
                 return;
             }
 
@@ -732,6 +727,6 @@ final class DaemonController
 
     private function isAutoRestartAllowed(DaemonUnitInterface $unit): bool
     {
-        return \in_array($unit->getStatus(), self::AUTO_RESTART_STATUSES, true);
+        return !$this->isStoppingDaemons && in_array($unit->getStatus(), self::AUTO_RESTART_STATUSES, true);
     }
 }

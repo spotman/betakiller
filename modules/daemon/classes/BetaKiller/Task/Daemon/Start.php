@@ -96,7 +96,7 @@ final class Start extends AbstractDaemonCommandTask
         ]);
 
         // Ensure daemon was started
-        $lock->waitForAcquire(AbstractDaemon::STARTUP_TIMEOUT + 3);
+        $lock->waitForAcquire();
 
         $this->logger->debug('Daemon ":name" was successfully started', [
             ':name' => $daemonName,

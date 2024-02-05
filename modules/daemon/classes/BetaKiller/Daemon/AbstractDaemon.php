@@ -6,7 +6,7 @@ namespace BetaKiller\Daemon;
 abstract class AbstractDaemon implements DaemonInterface
 {
     public const STARTUP_TIMEOUT  = 5;
-    public const SHUTDOWN_TIMEOUT = 5;
+    public const SHUTDOWN_TIMEOUT = 10;
 
     private int $processingCounter = 0;
 
@@ -56,5 +56,15 @@ abstract class AbstractDaemon implements DaemonInterface
     {
         // Disabled by default (Use SIGUSR1 instead)
         return false;
+    }
+
+    public function getStartupTimeout(): int
+    {
+        return self::STARTUP_TIMEOUT;
+    }
+
+    public function getShutdownTimeout(): int
+    {
+        return self::SHUTDOWN_TIMEOUT;
     }
 }

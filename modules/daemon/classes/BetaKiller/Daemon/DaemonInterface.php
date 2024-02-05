@@ -47,4 +47,18 @@ interface DaemonInterface
      * @return bool
      */
     public function isShutdownOnSigTermAllowed(): bool;
+
+    /**
+     * Startup timeout in seconds
+     *
+     * @return int
+     */
+    public function getStartupTimeout(): int;
+
+    /**
+     * Shutdown timeout in seconds
+     *
+     * @return int
+     */
+    public function getShutdownTimeout(): int;
 }

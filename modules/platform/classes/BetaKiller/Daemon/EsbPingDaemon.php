@@ -110,16 +110,13 @@ final class EsbPingDaemon extends AbstractDaemon
 
         $this->boundedTransport->subscribeBounded(
             HeartbeatBoundedEvent::getExternalName(),
-            function (HeartbeatBoundedEvent $event) {
-                return $this->proceedBoundedEvent($event);
-            }
+            fn(HeartbeatBoundedEvent $event) => $this->proceedBoundedEvent($event)
         );
 
         $this->outboundTransport->subscribeOutbound(
             HeartbeatOutboundEvent::getExternalName(),
-            function (HeartbeatOutboundEvent $event) {
-                return $this->proceedOutboundEvent($event);
-            });
+            fn(HeartbeatOutboundEvent $event) => $this->proceedOutboundEvent($event)
+        );
 
         $this->boundedTransport->startConsuming($loop);
         $this->outboundTransport->startConsuming($loop);
@@ -145,6 +142,8 @@ final class EsbPingDaemon extends AbstractDaemon
 
     private function proceedBoundedEvent(HeartbeatBoundedEvent $event): PromiseInterface
     {
+        $this->markAsProcessing();
+
         try {
             $ts = $event->getTimestamp();
             $ms = (microtime(true) - $ts) * 1000;
@@ -157,11 +156,15 @@ final class EsbPingDaemon extends AbstractDaemon
             LoggerHelper::logRawException($this->logger, $e);
         }
 
+        $this->markAsIdle();
+
         return resolve();
     }
 
     private function proceedOutboundEvent(HeartbeatOutboundEvent $event): PromiseInterface
     {
+        $this->markAsProcessing();
+
         try {
             $ts = $event->getTimestamp();
             $ms = (microtime(true) - $ts) * 1000;
@@ -173,6 +176,8 @@ final class EsbPingDaemon extends AbstractDaemon
         } catch (Throwable $e) {
             LoggerHelper::logRawException($this->logger, $e);
         }
+
+        $this->markAsIdle();
 
         return resolve();
     }
