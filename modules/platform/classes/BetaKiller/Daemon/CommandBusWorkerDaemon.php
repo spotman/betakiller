@@ -149,7 +149,7 @@ final class CommandBusWorkerDaemon extends AbstractDaemon
             LoggerHelper::logRawException($this->logger, $e);
 
             // Temp fix for failing tasks
-            return false;
+            return true;
         }
     }
 }
