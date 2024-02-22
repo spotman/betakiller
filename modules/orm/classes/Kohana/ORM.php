@@ -580,14 +580,7 @@ class Kohana_ORM extends Model implements Serializable
      */
     public function serialize()
     {
-        $data = [];
-
-        // Store only information about the object
-        foreach ($this->getSerializableProperties() as $var) {
-            $data[$var] = $this->{$var};
-        }
-
-        return serialize($data);
+        return serialize($this->__serialize());
     }
 
     protected function getSerializableProperties()
@@ -619,17 +612,7 @@ class Kohana_ORM extends Model implements Serializable
      */
     public function unserialize($data)
     {
-        // Initialize model
-        $this->_initialize();
-
-        foreach (unserialize($data, [self::class]) as $name => $var) {
-            $this->{$name} = $var;
-        }
-
-        if ($this->_reload_on_wakeup === true) {
-            // Reload the object
-            $this->reload();
-        }
+        $this->__unserialize(unserialize($data, [self::class]));
     }
 
     public function __serialize(): array
@@ -646,6 +629,9 @@ class Kohana_ORM extends Model implements Serializable
 
     public function __unserialize(array $data): void
     {
+        // Initialize model
+        $this->_initialize();
+
         foreach ($data as $name => $var) {
             $this->{$name} = $var;
         }
