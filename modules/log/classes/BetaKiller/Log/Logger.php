@@ -7,6 +7,7 @@ use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\HandlerInterface;
+use Monolog\Handler\NullHandler;
 use Monolog\Handler\SlackWebhookHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\TelegramBotHandler;
@@ -14,6 +15,8 @@ use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\WebProcessor;
 use Psr\Log\LoggerTrait;
+use Throwable;
+use function set_exception_handler;
 
 class Logger implements LoggerInterface
 {
@@ -39,23 +42,70 @@ class Logger implements LoggerInterface
     public function __construct(AppEnvInterface $env)
     {
         $this->appEnv  = $env;
-        $this->monolog = $this->makeMonologInstance();
+        $this->monolog =  new \Monolog\Logger('default');
+
+        $this->init();
     }
 
     /**
-     * @return \Monolog\Logger
      * @throws \Exception
      */
-    private function makeMonologInstance(): \Monolog\Logger
+    private function init(): void
     {
-        $monolog = new \Monolog\Logger('default');
+        $this->registerErrorHandlers();
 
-        $errorHandler = new ErrorHandler($monolog);
+        $this->addProcessors();
+        $this->addLogsHandler();
+        $this->addRealtimeHandler();
+
+        if ($this->appEnv->isDebugEnabled() && !$this->appEnv->inDevelopmentMode()) {
+            $this->monolog->debug('Running :name env', [
+                ':name' => $this->appEnv->getModeName(),
+            ]);
+        }
+    }
+
+    /**
+     * Logs with an arbitrary level.
+     *
+     * @param mixed      $level
+     * @param string     $message
+     * @param array|null $context
+     *
+     * @return void
+     */
+    public function log($level, $message, array $context = null): void
+    {
+        // Proxy to selected logger
+        $this->monolog->log($level, $message, $context ?? []);
+    }
+
+    /**
+     * @param \Monolog\Handler\HandlerInterface $handler
+     */
+    public function pushHandler(HandlerInterface $handler): void
+    {
+        $this->monolog->pushHandler($handler);
+    }
+
+    public function flushBuffers(): void
+    {
+        $this->monolog->close();
+    }
+
+    public function getMonologInstance(): \Monolog\Logger
+    {
+        return $this->monolog;
+    }
+
+    private function registerErrorHandlers(): void
+    {
+        $errorHandler = new ErrorHandler($this->monolog);
         $errorHandler->registerErrorHandler([], $this->appEnv->isCli());
         $errorHandler->registerFatalHandler();
 
         // Do not register Monolog exception handler coz it calls exit()
-        \set_exception_handler(function (\Throwable $e) {
+        set_exception_handler(function (Throwable $e) {
             LoggerHelper::logRawException($this, $e);
 
             // Exit with error code in CLI mode
@@ -63,36 +113,37 @@ class Logger implements LoggerInterface
                 exit(1);
             }
         });
+    }
+
+    private function addProcessors(): void
+    {
+        // Common processors next
+        $this->monolog
+            ->pushProcessor(new KohanaPlaceholderProcessor())
+            ->pushProcessor(new MemoryPeakUsageProcessor())
+            ->pushProcessor(new IntrospectionProcessor($this->monolog::WARNING, [], 3));
 
         $isDebug = $this->appEnv->isDebugEnabled();
         $isHuman = $this->appEnv->isHuman();
-
-//        if (!$isDebug) {
-//            // GDPR processors first
-//            $monolog->pushProcessor(new GdprProcessor());
-//        }
-
-        // Common processors next
-        $monolog
-            ->pushProcessor(new KohanaPlaceholderProcessor())
-            ->pushProcessor(new MemoryPeakUsageProcessor())
-            ->pushProcessor(new IntrospectionProcessor($monolog::WARNING, [], 3));
 
         // CLI mode logging
         if ($this->appEnv->isCli()) {
             $level = $isDebug ? \Monolog\Logger::DEBUG : \Monolog\Logger::NOTICE;
 
-            $monolog->pushHandler(new StdOutHandler($level, $isHuman));
+            $this->monolog->pushHandler(new StdOutHandler($level, $isHuman));
 
             if (DesktopNotificationHandler::isSupported()) {
-                $monolog->pushHandler(new SkipExpectedExceptionsHandler(new DesktopNotificationHandler));
+                $this->monolog->pushHandler(new SkipExpectedExceptionsHandler(new DesktopNotificationHandler));
             }
 
-            $monolog->pushProcessor(new CliProcessor);
+            $this->monolog->pushProcessor(new CliProcessor);
         } else {
-            $monolog->pushProcessor(new WebProcessor());
+            $this->monolog->pushProcessor(new WebProcessor());
         }
+    }
 
+    private function addLogsHandler(): void
+    {
         // File logging
         $logFilePath = $this->appEnv->getLogsPath(implode(DIRECTORY_SEPARATOR, [
             date('Y'),
@@ -100,18 +151,24 @@ class Logger implements LoggerInterface
             date('d').'.log',
         ]));
 
-        $logsLevel = $isDebug ? $monolog::DEBUG : $monolog::NOTICE;
-//        $triggerLevel = $isDebug ? $monolog::DEBUG : $monolog::WARNING;
+        $isDebug = $this->appEnv->isDebugEnabled();
+
+        $logsLevel = $isDebug ? $this->monolog::DEBUG : $this->monolog::NOTICE;
 
         $fileHandler = new StreamHandler($logFilePath, $logsLevel);
         $fileHandler->pushProcessor(new ContextCleanupProcessor);
         $fileHandler->pushProcessor(new ExceptionStacktraceProcessor);
-        $monolog->pushHandler(new SkipExpectedExceptionsHandler($fileHandler));
-//        $monolog->pushHandler(new SkipExpectedExceptionsHandler(new FingersCrossedHandler($fileHandler, $triggerLevel)));
 
+        $this->monolog->pushHandler(new SkipExpectedExceptionsHandler($fileHandler));
+    }
+
+    private function addRealtimeHandler(): void
+    {
         $slackWebHookUrl = $this->appEnv->getEnvVariable('SLACK_ERROR_WEBHOOK');
         $tgApiKey        = $this->appEnv->getEnvVariable('TELEGRAM_ERROR_API_KEY');
         $tgChannel       = $this->appEnv->getEnvVariable('TELEGRAM_ERROR_CHANNEL');
+
+        $isDebug = $this->appEnv->isDebugEnabled();
 
         switch (true) {
             case $slackWebHookUrl:
@@ -151,7 +208,7 @@ class Logger implements LoggerInterface
                 break;
 
             default:
-                throw new \LogicException('Error notification handler must be specified');
+                $errorHandler = new NullHandler;
         }
 
         $errorHandler->pushProcessor(new ContextCleanupProcessor);
@@ -172,47 +229,6 @@ class Logger implements LoggerInterface
             );
         }
 
-        $monolog->pushHandler(new SkipExpectedExceptionsHandler($errorHandler));
-
-        if ($this->appEnv->isDebugEnabled() && !$this->appEnv->inDevelopmentMode()) {
-            $monolog->debug('Running :name env', [
-                ':name' => $this->appEnv->getModeName(),
-            ]);
-        }
-
-        return $monolog;
-    }
-
-    /**
-     * Logs with an arbitrary level.
-     *
-     * @param mixed      $level
-     * @param string     $message
-     * @param array|null $context
-     *
-     * @return void
-     */
-    public function log($level, $message, array $context = null): void
-    {
-        // Proxy to selected logger
-        $this->monolog->log($level, $message, $context ?? []);
-    }
-
-    /**
-     * @param \Monolog\Handler\HandlerInterface $handler
-     */
-    public function pushHandler(HandlerInterface $handler): void
-    {
-        $this->monolog->pushHandler($handler);
-    }
-
-    public function flushBuffers(): void
-    {
-        $this->monolog->close();
-    }
-
-    public function getMonologInstance(): \Monolog\Logger
-    {
-        return $this->monolog;
+        $this->monolog->pushHandler(new SkipExpectedExceptionsHandler($errorHandler));
     }
 }
