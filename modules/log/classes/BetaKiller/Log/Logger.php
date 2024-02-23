@@ -136,7 +136,8 @@ class Logger implements LoggerInterface
                     'HTML',
                     true,
                     false,
-                    false
+                    false,
+                    true
                 );
 
                 $tgFormatter = new LineFormatter(
