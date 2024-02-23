@@ -15,7 +15,9 @@ use Interop\Queue\Queue;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Promise\PromiseInterface;
+use Throwable;
 use function React\Promise\resolve;
+use function unserialize;
 
 final class CommandBusWorkerDaemon extends AbstractDaemon
 {
@@ -62,11 +64,11 @@ final class CommandBusWorkerDaemon extends AbstractDaemon
      * @param \Psr\Log\LoggerInterface                   $logger
      */
     public function __construct(
-        CommandBusInterface $commandBus,
-        ContainerInterface $container,
+        CommandBusInterface     $commandBus,
+        ContainerInterface      $container,
         ConfigProviderInterface $config,
-        Context $context,
-        LoggerInterface $logger
+        Context                 $context,
+        LoggerInterface         $logger
     ) {
         $this->commandBus   = $commandBus;
         $this->config       = $config;
@@ -133,8 +135,10 @@ final class CommandBusWorkerDaemon extends AbstractDaemon
     private function processQueueMessage(Message $queueMessage): bool
     {
         try {
+            $body = $queueMessage->getBody();
+
             // Unserialize message
-            $message = \unserialize($queueMessage->getBody(), [
+            $message = unserialize($body, [
                 CommandMessageInterface::class,
                 AbstractEntityInterface::class,
             ]);
@@ -145,7 +149,8 @@ final class CommandBusWorkerDaemon extends AbstractDaemon
 
             // Local execute
             return $this->commandBus->handle($message);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf('Failed Command body: %s', $body));
             LoggerHelper::logRawException($this->logger, $e);
 
             // Temp fix for failing tasks
