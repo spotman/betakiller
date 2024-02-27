@@ -91,7 +91,7 @@ final class AppEnv implements AppEnvInterface
 
     private function detectCliEnv(): void
     {
-        $debugOption = $this->getCliOption('debug', false);
+        $debugOption = $this->getCliOption(AppEnvInterface::CLI_OPTION_DEBUG, false);
 
         if ($debugOption === 'true') {
             // Set variable
@@ -103,7 +103,7 @@ final class AppEnv implements AppEnvInterface
             putenv(self::APP_DEBUG);
         }
 
-        $stage = $this->getCliOption('stage');
+        $stage = $this->getCliOption(AppEnvInterface::CLI_OPTION_STAGE);
 
         if ($stage) {
             \putenv(self::APP_MODE.'='.$stage);

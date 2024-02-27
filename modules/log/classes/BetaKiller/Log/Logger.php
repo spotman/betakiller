@@ -16,6 +16,8 @@ use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\WebProcessor;
 use Psr\Log\LoggerTrait;
 use Throwable;
+use function chmod;
+use function is_file;
 use function set_exception_handler;
 
 class Logger implements LoggerInterface
@@ -42,7 +44,7 @@ class Logger implements LoggerInterface
     public function __construct(AppEnvInterface $env)
     {
         $this->appEnv  = $env;
-        $this->monolog =  new \Monolog\Logger('default');
+        $this->monolog = new \Monolog\Logger('default');
 
         $this->init();
     }
@@ -55,6 +57,9 @@ class Logger implements LoggerInterface
         $this->registerErrorHandlers();
 
         $this->addProcessors();
+
+        $this->addStdOutHandler();
+        $this->addDesktopHandler();
         $this->addLogsHandler();
         $this->addRealtimeHandler();
 
@@ -123,22 +128,48 @@ class Logger implements LoggerInterface
             ->pushProcessor(new MemoryPeakUsageProcessor())
             ->pushProcessor(new IntrospectionProcessor($this->monolog::WARNING, [], 3));
 
-        $isDebug = $this->appEnv->isDebugEnabled();
-        $isHuman = $this->appEnv->isHuman();
-
         // CLI mode logging
         if ($this->appEnv->isCli()) {
-            $level = $isDebug ? \Monolog\Logger::DEBUG : \Monolog\Logger::NOTICE;
-
-            $this->monolog->pushHandler(new StdOutHandler($level, $isHuman));
-
-            if (DesktopNotificationHandler::isSupported()) {
-                $this->monolog->pushHandler(new SkipExpectedExceptionsHandler(new DesktopNotificationHandler));
-            }
-
             $this->monolog->pushProcessor(new CliProcessor);
         } else {
             $this->monolog->pushProcessor(new WebProcessor());
+        }
+    }
+
+    private function getLogLevel(): int
+    {
+        $isDebug = $this->appEnv->isDebugEnabled();
+
+        $level = $isDebug ? \Monolog\Logger::DEBUG : \Monolog\Logger::NOTICE;
+
+        // CLI override
+        if ($this->appEnv->isCli()) {
+            $cliName = $this->appEnv->getCliOption(AppEnvInterface::CLI_OPTION_LOG_LEVEL);
+
+            if ($cliName) {
+                $level = $this->monolog::toMonologLevel($cliName);
+            }
+        }
+
+        return $level;
+    }
+
+    private function addStdOutHandler(): void
+    {
+        if (!$this->appEnv->isCli()) {
+            return;
+        }
+
+        $logLevel = $this->getLogLevel();
+        $isHuman  = $this->appEnv->isHuman();
+
+        $this->monolog->pushHandler(new StdOutHandler($logLevel, $isHuman));
+    }
+
+    private function addDesktopHandler(): void
+    {
+        if ($this->appEnv->isCli() && DesktopNotificationHandler::isSupported()) {
+            $this->monolog->pushHandler(new SkipExpectedExceptionsHandler(new DesktopNotificationHandler));
         }
     }
 
@@ -151,11 +182,9 @@ class Logger implements LoggerInterface
             date('d').'.log',
         ]));
 
-        $isDebug = $this->appEnv->isDebugEnabled();
+        $logLevel = $this->getLogLevel();
 
-        $logsLevel = $isDebug ? $this->monolog::DEBUG : $this->monolog::NOTICE;
-
-        $fileHandler = new StreamHandler($logFilePath, $logsLevel);
+        $fileHandler = new StreamHandler($logFilePath, $logLevel);
         $fileHandler->pushProcessor(new ContextCleanupProcessor);
         $fileHandler->pushProcessor(new ExceptionStacktraceProcessor);
 
@@ -170,6 +199,8 @@ class Logger implements LoggerInterface
 
         $isDebug = $this->appEnv->isDebugEnabled();
 
+        $logLevel = \Monolog\Logger::NOTICE;
+
         switch (true) {
             case $slackWebHookUrl:
                 $errorHandler = new SlackWebhookHandler(
@@ -180,7 +211,7 @@ class Logger implements LoggerInterface
                     ':interrobang:',
                     true,
                     true,
-                    \Monolog\Logger::NOTICE
+                    $logLevel
                 );
                 break;
 
@@ -188,7 +219,7 @@ class Logger implements LoggerInterface
                 $errorHandler = new TelegramBotHandler(
                     $tgApiKey,
                     $tgChannel,
-                    \Monolog\Logger::NOTICE,
+                    $logLevel,
                     true,
                     'HTML',
                     true,
@@ -217,14 +248,14 @@ class Logger implements LoggerInterface
         if ($isDebug) {
             $errorStorage = $this->appEnv->getTempPath('monolog-deduplication.storage');
 
-            if (!\is_file($errorStorage)) {
-                touch($errorStorage) && \chmod($errorStorage, 0660);
+            if (!is_file($errorStorage)) {
+                touch($errorStorage) && chmod($errorStorage, 0660);
             }
 
             $errorHandler = new DeduplicationHandler(
                 $errorHandler,
                 $errorStorage,
-                \Monolog\Logger::NOTICE,
+                $logLevel,
                 180 // Repeat notification in 3 minutes
             );
         }

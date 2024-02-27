@@ -47,7 +47,7 @@ class UserDetector
     public function detectCliUser(): UserInterface
     {
         // Get username from CLI arguments or use default instead
-        $userName = $this->appEnv->getCliOption('user') ?: AbstractTask::CLI_USER_NAME;
+        $userName = $this->appEnv->getCliOption(AppEnvInterface::CLI_OPTION_USER) ?: AbstractTask::CLI_USER_NAME;
 
         if ($userName === 'guest') {
             return $this->guestFactory->create();

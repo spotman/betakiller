@@ -49,11 +49,6 @@ class Cron extends AbstractTask
     private string $currentStage;
 
     /**
-     * @var bool
-     */
-    private bool $isHuman;
-
-    /**
      * @var \BetaKiller\Repository\CronLogRepositoryInterface
      */
     private CronLogRepositoryInterface $logRepo;
@@ -113,7 +108,7 @@ class Cron extends AbstractTask
     public function defineOptions(): array
     {
         return [
-            'human' => false,
+            // No options
         ];
     }
 
@@ -128,7 +123,6 @@ class Cron extends AbstractTask
             return;
         }
 
-        $this->isHuman      = $this->getOption('human') !== false;
         $this->currentStage = $this->env->getModeName();
 
         // Enqueue all tasks which was missed in past (power outage, script error, etc)
@@ -139,6 +133,8 @@ class Cron extends AbstractTask
 
         // Get all queued tasks and run them one by one
         $this->runQueuedTasks();
+
+        $this->logger->info('CRON tasks processed');
     }
 
     /**
@@ -479,8 +475,6 @@ class Cron extends AbstractTask
 
     private function logDebug(string $message, array $params = null): void
     {
-        if (!$this->isHuman) {
-            $this->logger->debug($message, $params);
-        }
+        $this->logger->debug($message, $params);
     }
 }

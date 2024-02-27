@@ -35,9 +35,10 @@ abstract class AbstractTask extends Minion_Task
     public static function defineCommonOptions(): array
     {
         return [
-            'debug' => null,
-            'stage' => 'development',
-            'user'  => null,
+            AppEnvInterface::CLI_OPTION_STAGE     => AppEnvInterface::MODE_DEVELOPMENT,
+            AppEnvInterface::CLI_OPTION_LOG_LEVEL => null,
+            AppEnvInterface::CLI_OPTION_DEBUG     => null,
+            AppEnvInterface::CLI_OPTION_USER      => null,
         ];
     }
 
@@ -61,7 +62,9 @@ abstract class AbstractTask extends Minion_Task
         $php   = PHP_BINARY;
         $stage = $appEnv->getModeName();
 
-        $cmd = "$php index.php --task=$taskName --stage=$stage";
+        $optionStage = AppEnvInterface::CLI_OPTION_STAGE;
+
+        $cmd = "$php index.php --task=$taskName --$optionStage=$stage";
 
         if ($params) {
             foreach ($params as $optionName => $optionValue) {

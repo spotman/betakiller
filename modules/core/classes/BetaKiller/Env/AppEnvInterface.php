@@ -28,6 +28,11 @@ interface AppEnvInterface
 
     public const DEBUG_EMAIL_ADDRESS = 'DEBUG_EMAIL_ADDRESS';
 
+    public const CLI_OPTION_STAGE     = 'stage';
+    public const CLI_OPTION_LOG_LEVEL = 'loglevel';
+    public const CLI_OPTION_DEBUG     = 'debug';
+    public const CLI_OPTION_USER      = 'user';
+
     /**
      * @param string $name
      *
