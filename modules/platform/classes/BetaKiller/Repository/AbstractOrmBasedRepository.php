@@ -341,6 +341,13 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         return $this;
     }
 
+    protected function orderByPrimaryKey(OrmInterface $orm): static
+    {
+        $orm->order_by($orm->object_primary_key());
+
+        return $this;
+    }
+
     protected function customOrderBy(OrmInterface $orm): void
     {
         // Empty by default
