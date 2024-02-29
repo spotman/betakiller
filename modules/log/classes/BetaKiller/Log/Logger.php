@@ -197,8 +197,6 @@ class Logger implements LoggerInterface
         $tgApiKey        = $this->appEnv->getEnvVariable('TELEGRAM_ERROR_API_KEY');
         $tgChannel       = $this->appEnv->getEnvVariable('TELEGRAM_ERROR_CHANNEL');
 
-        $isDebug = $this->appEnv->isDebugEnabled();
-
         $logLevel = \Monolog\Logger::NOTICE;
 
         switch (true) {
@@ -239,27 +237,23 @@ class Logger implements LoggerInterface
                 break;
 
             default:
-                $errorHandler = new NullHandler;
+                return;
         }
 
         $errorHandler->pushProcessor(new ContextCleanupProcessor);
 
-        // Remove duplicate errors in debugging mode
-        if ($isDebug) {
-            $errorStorage = $this->appEnv->getTempPath('monolog-deduplication.storage');
+        // Remove duplicate errors
+        $errorStorage = $this->appEnv->getTempPath('monolog-deduplication.storage');
 
-            if (!is_file($errorStorage)) {
-                touch($errorStorage) && chmod($errorStorage, 0660);
-            }
-
-            $errorHandler = new DeduplicationHandler(
-                $errorHandler,
-                $errorStorage,
-                $logLevel,
-                180 // Repeat notification in 3 minutes
-            );
+        if (!is_file($errorStorage)) {
+            touch($errorStorage) && chmod($errorStorage, 0660);
         }
 
-        $this->monolog->pushHandler(new SkipExpectedExceptionsHandler($errorHandler));
+        $this->monolog->pushHandler(new SkipExpectedExceptionsHandler(new DeduplicationHandler(
+            $errorHandler,
+            $errorStorage,
+            $logLevel,
+            180 // Repeat notification in 3 minutes
+        )));
     }
 }
