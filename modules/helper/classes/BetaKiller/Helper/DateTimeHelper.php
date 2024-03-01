@@ -109,4 +109,35 @@ final class DateTimeHelper
     {
         return $left->setTime(0, 0, 0, 0) == $right->setTime(0, 0, 0, 0);
     }
+
+    /**
+     * Detects timezones where local time is equal to provided data
+     *
+     * @param int $hour
+     * @param int $minute
+     *
+     * @return array<string, DateTimeZone>
+     * @throws \Exception
+     */
+    public static function localTimeToTimezones(int $hour, int $minute): array
+    {
+        $tzList = [];
+
+        $deviation = new \DateInterval('PT16M');
+
+        foreach (DateTimeZone::listIdentifiers() as $tzName) {
+            $tz    = new DateTimeZone($tzName);
+            $tzNow = new DateTimeImmutable('now', $tz);
+
+            $tzCheck  = $tzNow->setTime($hour, $minute);
+            $tzAfter  = $tzCheck->sub($deviation);
+            $tzBefore = $tzCheck->add($deviation);
+
+            if ($tzNow >= $tzAfter && $tzNow <= $tzBefore) {
+                $tzList[$tzName] = $tz;
+            }
+        }
+
+        return $tzList;
+    }
 }
