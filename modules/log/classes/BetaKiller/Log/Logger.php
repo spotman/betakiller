@@ -122,11 +122,16 @@ class Logger implements LoggerInterface
 
     private function addProcessors(): void
     {
+        $ignoreClasses = [
+            '\\Logger',
+            '\\LoggerHelper',
+        ];
+
         // Common processors next
         $this->monolog
             ->pushProcessor(new KohanaPlaceholderProcessor())
             ->pushProcessor(new MemoryPeakUsageProcessor())
-            ->pushProcessor(new IntrospectionProcessor($this->monolog::WARNING, [], 3));
+            ->pushProcessor(new IntrospectionProcessor($this->monolog::WARNING, $ignoreClasses));
 
         // CLI mode logging
         if ($this->appEnv->isCli()) {
