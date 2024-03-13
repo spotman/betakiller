@@ -10,7 +10,8 @@ use BetaKiller\Workflow\WorkflowStateInterface;
  * @method WorkflowStateInterface[] getAll()
  * @method  save(WorkflowStateInterface $entity)
  */
-class ContentPostStateRepository extends AbstractWorkflowStateRepository implements ContentPostStateRepositoryInterface
+class ContentPostStateRepository extends AbstractWorkflowStateOrmRepository implements
+    ContentPostStateRepositoryInterface
 {
     /**
      * @return string

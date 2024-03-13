@@ -6,7 +6,6 @@ namespace BetaKiller\Model;
 use BetaKiller\Auth\AuthorizationRequiredException;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\MessageBus\RestrictionTargetInterface;
-use BetaKiller\Workflow\HasWorkflowStateModelOrmTrait;
 use DateTimeImmutable;
 
 /**
@@ -17,7 +16,7 @@ use DateTimeImmutable;
  */
 class User extends AbstractCreatedAt implements UserInterface
 {
-    use HasWorkflowStateModelOrmTrait;
+    use HasWorkflowStateOrmModelTrait;
 
     public const TABLE_NAME            = 'users';
     public const COL_ID                = 'id';

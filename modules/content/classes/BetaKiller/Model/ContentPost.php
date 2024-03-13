@@ -2,14 +2,13 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Url\UrlDispatcher;
-use BetaKiller\Workflow\HasWorkflowStateModelOrmTrait;
 use Kohana_Exception;
 use ORM;
 use Validation;
 
 class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentPostInterface
 {
-    use HasWorkflowStateModelOrmTrait,
+    use HasWorkflowStateOrmModelTrait,
         OrmBasedSeoMetaTrait,
         OrmBasedEntityHasWordpressIdTrait;
 

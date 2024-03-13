@@ -14,11 +14,11 @@ abstract class AbstractOrmBasedDispatchableRepository extends AbstractOrmBasedRe
      * @param string                                          $value
      * @param \BetaKiller\Url\Container\UrlContainerInterface $parameters
      *
-     * @return \BetaKiller\Url\Parameter\UrlParameterInterface
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface|null
      * @throws \Kohana_Exception
      */
     public function findItemByUrlKeyValue(
-        string $value,
+        string                $value,
         UrlContainerInterface $parameters
     ): ?UrlParameterInterface {
         $orm = $this->getOrmInstance();

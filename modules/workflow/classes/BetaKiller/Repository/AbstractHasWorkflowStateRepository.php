@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Repository;
 
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
-use BetaKiller\Workflow\HasWorkflowStateInterface;
+use BetaKiller\Model\HasWorkflowStateInterface;
 use BetaKiller\Workflow\WorkflowStateInterface;
 
 abstract class AbstractHasWorkflowStateRepository extends AbstractOrmBasedDispatchableRepository implements

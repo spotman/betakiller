@@ -1,7 +1,7 @@
 <?php
-namespace BetaKiller\Workflow;
+namespace BetaKiller\Model;
 
-use BetaKiller\Model\AbstractEntityInterface;
+use BetaKiller\Workflow\WorkflowStateInterface;
 
 interface HasWorkflowStateInterface extends AbstractEntityInterface
 {

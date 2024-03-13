@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace BetaKiller\Repository;
 
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
-use BetaKiller\Model\AbstractWorkflowStateOrm;
+use BetaKiller\Model\AbstractWorkflowStateOrmModel;
 use BetaKiller\Workflow\WorkflowStateInterface;
 
-abstract class AbstractWorkflowStateRepository extends AbstractOrmBasedDispatchableRepository implements
-    WorkflowStateRepositoryInterface
+abstract class AbstractWorkflowStateOrmRepository extends AbstractOrmBasedDispatchableRepository implements
+    WorkflowStateDbRepositoryInterface
 {
     /**
      * @return \BetaKiller\Workflow\WorkflowStateInterface
@@ -60,9 +60,9 @@ abstract class AbstractWorkflowStateRepository extends AbstractOrmBasedDispatcha
      */
     protected function filterCodenames(OrmInterface $orm, array $codenames, bool $order = null): self
     {
-        $col = $orm->object_column(AbstractWorkflowStateOrm::COL_CODENAME);
+        $col = $orm->object_column(AbstractWorkflowStateOrmModel::COL_CODENAME);
 
-        $orm->where($orm->object_column(AbstractWorkflowStateOrm::COL_CODENAME), 'IN', $codenames);
+        $orm->where($orm->object_column(AbstractWorkflowStateOrmModel::COL_CODENAME), 'IN', $codenames);
 
         if ($order) {
             $orm->order_by_field_sequence($col, $codenames);
@@ -73,14 +73,14 @@ abstract class AbstractWorkflowStateRepository extends AbstractOrmBasedDispatcha
 
     private function filterCodename(OrmInterface $orm, string $codename): self
     {
-        $orm->where($orm->object_column(AbstractWorkflowStateOrm::COL_CODENAME), '=', $codename);
+        $orm->where($orm->object_column(AbstractWorkflowStateOrmModel::COL_CODENAME), '=', $codename);
 
         return $this;
     }
 
     private function filterIsStart(OrmInterface $orm): self
     {
-        $orm->where($orm->object_column(AbstractWorkflowStateOrm::COL_IS_START), '=', true);
+        $orm->where($orm->object_column(AbstractWorkflowStateOrmModel::COL_IS_START), '=', true);
 
         return $this;
     }

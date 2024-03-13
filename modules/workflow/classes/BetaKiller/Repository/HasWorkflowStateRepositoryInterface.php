@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
-use BetaKiller\Workflow\HasWorkflowStateInterface;
+use BetaKiller\Model\HasWorkflowStateInterface;
 
 /**
  * Interface HasWorkflowStateRepositoryInterface

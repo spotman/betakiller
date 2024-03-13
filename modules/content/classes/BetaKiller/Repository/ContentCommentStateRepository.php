@@ -11,7 +11,7 @@ use BetaKiller\Model\ContentCommentState;
  * @method ContentCommentState create()
  * @method ContentCommentState[] getAll()
  */
-class ContentCommentStateRepository extends AbstractWorkflowStateRepository implements
+class ContentCommentStateRepository extends AbstractWorkflowStateOrmRepository implements
     ContentCommentStateRepositoryInterface
 {
     /**

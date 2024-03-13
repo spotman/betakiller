@@ -3,7 +3,6 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Url\ZoneInterface;
-use BetaKiller\Workflow\HasWorkflowStateModelOrmTrait;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
@@ -17,7 +16,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
 {
     use OrmBasedEntityItemRelatedModelTrait;
     use OrmBasedEntityHasWordpressIdTrait;
-    use HasWorkflowStateModelOrmTrait;
+    use HasWorkflowStateOrmModelTrait;
 
     /**
      * Prepares the model database connection, determines the table name,

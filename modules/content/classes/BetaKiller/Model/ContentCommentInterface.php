@@ -2,7 +2,6 @@
 
 namespace BetaKiller\Model;
 
-use BetaKiller\Workflow\HasWorkflowStateInterface;
 use DateTimeImmutable;
 use DateTimeInterface;
 

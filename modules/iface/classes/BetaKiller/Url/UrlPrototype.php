@@ -3,6 +3,8 @@ namespace BetaKiller\Url;
 
 final class UrlPrototype
 {
+    public const KEY_ID = 'id';
+
     public const  REGEX              = '/\{[A-Z]{1}[A-Za-z_]+(\.[A-Za-z_]+(\(\)){0,1}){0,1}\}/';
     private const KEY_SEPARATOR      = '.';
     private const METHOD_CALL_MARKER = '()';
@@ -51,7 +53,7 @@ final class UrlPrototype
             throw new UrlPrototypeException('Empty url prototype string');
         }
 
-        if ($string[0] !== '{' || substr($string, -1) !== '}') {
+        if (!str_starts_with($string, '{') || !str_ends_with($string, '}')) {
             throw new UrlPrototypeException('Prototype string must be surrounded by curly braces');
         }
 
@@ -59,7 +61,7 @@ final class UrlPrototype
 
         $parsed = explode(self::KEY_SEPARATOR, $string, 2);
 
-        if ($parsed === false) {
+        if (!$parsed) {
             throw new UrlPrototypeException('Key separator ":sep" is missing in URL prototype string ":value"', [
                 ':value' => $string,
                 ':sep'   => self::KEY_SEPARATOR,
@@ -97,7 +99,7 @@ final class UrlPrototype
 
     public function hasIdKey(): bool
     {
-        return $this->modelKey === 'id';
+        return $this->modelKey === self::KEY_ID;
     }
 
     /**

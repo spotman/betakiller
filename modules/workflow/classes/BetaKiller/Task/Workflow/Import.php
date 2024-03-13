@@ -7,10 +7,10 @@ use BetaKiller\Config\WorkflowConfigInterface;
 use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Factory\RepositoryFactoryInterface;
 use BetaKiller\Model\WorkflowStateModelInterface;
+use BetaKiller\Repository\WorkflowStateDbRepositoryInterface;
 use BetaKiller\Repository\WorkflowStateRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Workflow\WorkflowStateException;
-use BetaKiller\Workflow\WorkflowStateInterface;
 use Psr\Log\LoggerInterface;
 
 class Import extends AbstractTask
@@ -76,100 +76,112 @@ class Import extends AbstractTask
                 ':name' => $modelName,
             ]);
 
-            // Get state repo
-            $stateModelName = $this->config->getStateModelName($modelName);
-            /** @var WorkflowStateRepositoryInterface $stateRepo */
-            $stateRepo = $this->repoFactory->create($stateModelName);
+            $this->proceedModel($modelName);
+        }
+    }
 
-            if (!$stateRepo instanceof WorkflowStateRepositoryInterface) {
-                throw new WorkflowStateException('Repo ":name" must implement :class', [
-                    ':name'  => $modelName,
-                    ':class' => WorkflowStateRepositoryInterface::class,
+    private function proceedModel(string $modelName): void
+    {
+        // Get state repo
+        $stateModelName = $this->config->getStateModelName($modelName);
+        $stateRepo      = $this->repoFactory->create($stateModelName);
+
+        if (!$stateRepo instanceof WorkflowStateRepositoryInterface) {
+            throw new WorkflowStateException('Repo ":name" must implement :class', [
+                ':name'  => $modelName,
+                ':class' => WorkflowStateRepositoryInterface::class,
+            ]);
+        }
+
+        if (!$stateRepo instanceof WorkflowStateDbRepositoryInterface) {
+            $this->logger->debug('Model :name is not stored in DB, skipping', [
+                ':name' => $modelName,
+            ]);
+
+            return;
+        }
+
+        $configStates = $this->config->getStates($modelName);
+
+        // Add new and update flags
+        foreach ($configStates as $stateName) {
+            $state = $stateRepo->findByCodename($stateName);
+
+            $state ??= $this->entityFactory->create($stateModelName);
+
+            if (!$state instanceof WorkflowStateModelInterface) {
+                throw new WorkflowStateException('Entity ":name" must implement :class', [
+                    ':name'  => $stateName,
+                    ':class' => WorkflowStateModelInterface::class,
                 ]);
             }
 
-            $configStates = $this->config->getStates($modelName);
+            $state->setCodename($stateName);
 
-            // Add new and update flags
-            foreach ($configStates as $stateName) {
-                $state = $stateRepo->findByCodename($stateName);
+            /** @noinspection OneTimeUseVariablesInspection */
+            $transitions = $this->config->getStateTargetTransitions($modelName, $stateName);
 
-                $state ??= $this->entityFactory->create($stateModelName);
-
-                if (!$state instanceof WorkflowStateModelInterface) {
-                    throw new WorkflowStateException('Entity ":name" must implement :class', [
-                        ':name'  => $stateName,
-                        ':class' => WorkflowStateModelInterface::class,
-                    ]);
-                }
-
-                $state->setCodename($stateName);
-
-                /** @noinspection OneTimeUseVariablesInspection */
-                $transitions = $this->config->getStateTargetTransitions($modelName, $stateName);
-
-                // Check state has transitions defined
-                foreach ($transitions as $transitionName => $transitionTarget) {
-                    $this->logger->debug('[:source]--- :name --->[:target] is allowed to: :roles', [
-                        ':name'   => $transitionName,
-                        ':source' => $stateName,
-                        ':target' => $transitionTarget,
-                        ':roles'  => implode(', ', $this->config->getTransitionRoles($modelName, $transitionName)),
-                    ]);
-                }
-
-                // Update flags
-                switch (true) {
-                    case $this->config->isStartState($modelName, $stateName):
-                        $this->logger->debug('Start from ":name" state', [
-                            ':name' => $stateName,
-                        ]);
-
-                        $state->markAsStart();
-                        break;
-
-                    case $this->config->isFinishState($modelName, $stateName):
-                        $this->logger->debug('Finish at ":name" state', [
-                            ':name' => $stateName,
-                        ]);
-
-                        $state->markAsFinish();
-                        break;
-
-                    default:
-                        $state->markAsRegular();
-                }
-
-                $stateRepo->save($state);
-
-                $this->logger->debug('State ":name" imported', [
-                    ':name' => $stateName,
+            // Check state has transitions defined
+            foreach ($transitions as $transitionName => $transitionTarget) {
+                $this->logger->debug('[:source]--- :name --->[:target] is allowed to: :roles', [
+                    ':name'   => $transitionName,
+                    ':source' => $stateName,
+                    ':target' => $transitionTarget,
+                    ':roles'  => implode(', ', $this->config->getTransitionRoles($modelName, $transitionName)),
                 ]);
             }
 
-            // Remove unused states
-            foreach ($stateRepo->getAll() as $existingState) {
-                $stateName = $existingState->getCodename();
-
-                if (!in_array($stateName, $configStates, true)) {
-                    $this->logger->debug('Removing unused state ":name"', [
+            // Update flags
+            switch (true) {
+                case $this->config->isStartState($modelName, $stateName):
+                    $this->logger->debug('Start from ":name" state', [
                         ':name' => $stateName,
                     ]);
 
-                    $stateRepo->delete($existingState);
-                }
+                    $state->markAsStart();
+                    break;
+
+                case $this->config->isFinishState($modelName, $stateName):
+                    $this->logger->debug('Finish at ":name" state', [
+                        ':name' => $stateName,
+                    ]);
+
+                    $state->markAsFinish();
+                    break;
+
+                default:
+                    $state->markAsRegular();
             }
 
-            /** @var \BetaKiller\Repository\HasWorkflowStateRepositoryInterface $modelRepo */
-            $modelRepo = $this->repoFactory->create($modelName);
+            $stateRepo->save($state);
 
-            $startState = $stateRepo->getStartState();
+            $this->logger->debug('State ":name" imported', [
+                ':name' => $stateName,
+            ]);
+        }
 
-            // Fetch models without state and preset start state
-            foreach ($modelRepo->getAllMissingState() as $model) {
-                $model->initWorkflowState($startState);
-                $modelRepo->save($model);
+        // Remove unused states
+        foreach ($stateRepo->getAll() as $existingState) {
+            $stateName = $existingState->getCodename();
+
+            if (!in_array($stateName, $configStates, true)) {
+                $this->logger->debug('Removing unused state ":name"', [
+                    ':name' => $stateName,
+                ]);
+
+                $stateRepo->delete($existingState);
             }
+        }
+
+        /** @var \BetaKiller\Repository\HasWorkflowStateRepositoryInterface $modelRepo */
+        $modelRepo = $this->repoFactory->create($modelName);
+
+        $startState = $stateRepo->getStartState();
+
+        // Fetch models without state and preset start state
+        foreach ($modelRepo->getAllMissingState() as $model) {
+            $model->initWorkflowState($startState);
+            $modelRepo->save($model);
         }
     }
 }

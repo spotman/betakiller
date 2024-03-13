@@ -24,7 +24,7 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractReadOnl
      */
     public function __construct(ConfigProviderInterface $configProvider)
     {
-        $config    = (array)$configProvider->load($this->getItemsListConfigGroup(), $this->getItemsListConfigPath());
+        $config = (array)$configProvider->load($this->getItemsListConfigGroup(), $this->getItemsListConfigPath());
 
         if (!$config) {
             throw new RepositoryException('Empty items list config for :repo repository', [
@@ -247,5 +247,6 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractReadOnl
     ): ConfigBasedDispatchableEntityInterface;
 
     abstract protected function getItemsListConfigGroup(): string;
+
     abstract protected function getItemsListConfigPath(): array;
 }

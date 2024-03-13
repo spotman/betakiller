@@ -2,7 +2,7 @@
 
 namespace BetaKiller\Model;
 
-class ContentPostState extends AbstractWorkflowStateOrm
+class ContentPostState extends AbstractWorkflowStateOrmModel
 {
     public const DRAFT         = 'draft';
     public const PENDING       = 'pending';

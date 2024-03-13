@@ -10,7 +10,7 @@ use BetaKiller\Model\UserStateInterface;
  * @method UserStateInterface findById(string $id)
  * @method UserStateInterface[] getAll()
  */
-class UserStateRepository extends AbstractWorkflowStateRepository implements UserStateRepositoryInterface
+class UserStateRepository extends AbstractWorkflowStateOrmRepository implements UserStateRepositoryInterface
 {
     /**
      * @inheritDoc

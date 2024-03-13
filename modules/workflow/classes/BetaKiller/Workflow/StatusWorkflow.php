@@ -5,6 +5,8 @@ use BetaKiller\Acl\EntityPermissionResolverInterface;
 use BetaKiller\Config\WorkflowConfigInterface;
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Factory\RepositoryFactoryInterface;
+use BetaKiller\Model\HasWorkflowStateInterface;
+use BetaKiller\Model\HasWorkflowStateWithHistoryInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\WorkflowStateRepositoryInterface;
 
@@ -43,9 +45,9 @@ final class StatusWorkflow implements StatusWorkflowInterface
     }
 
     /**
-     * @param \BetaKiller\Workflow\HasWorkflowStateInterface $model
-     * @param string                                         $transition
-     * @param \BetaKiller\Model\UserInterface                $user
+     * @param \BetaKiller\Model\HasWorkflowStateInterface $model
+     * @param string                                      $transition
+     * @param \BetaKiller\Model\UserInterface             $user
      *
      * @throws \BetaKiller\Workflow\WorkflowException
      */

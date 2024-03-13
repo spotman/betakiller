@@ -1,30 +1,11 @@
 <?php
-namespace BetaKiller\Workflow;
+namespace BetaKiller\Model;
 
-trait HasWorkflowStateModelOrmTrait
+use BetaKiller\Workflow\WorkflowStateException;
+use BetaKiller\Workflow\WorkflowStateInterface;
+
+trait HasWorkflowStateBaseTrait
 {
-    protected function configureWorkflowStateRelation(): void
-    {
-        $statusRelationKey = static::getWorkflowStateRelationKey();
-
-        $this->belongs_to([
-            $statusRelationKey => [
-                'model'       => static::getWorkflowStateModelName(),
-                'foreign_key' => static::getWorkflowStateForeignKey(),
-            ],
-        ]);
-
-        $this->load_with([$statusRelationKey]);
-    }
-
-    /**
-     * @return WorkflowStateInterface
-     */
-    public function getWorkflowState(): WorkflowStateInterface
-    {
-        return $this->getRelatedEntity(static::getWorkflowStateRelationKey());
-    }
-
     /**
      * @param \BetaKiller\Workflow\WorkflowStateInterface $target
      *
@@ -45,7 +26,7 @@ trait HasWorkflowStateModelOrmTrait
      * @param \BetaKiller\Workflow\WorkflowStateInterface $status
      *
      * @return void
-     * @throws \BetaKiller\Workflow\WorkflowStateException
+     * @throws \BetaKiller\Workflow\WorkflowStateException|\Kohana_Exception
      */
     public function initWorkflowState(WorkflowStateInterface $status): void
     {
@@ -57,24 +38,6 @@ trait HasWorkflowStateModelOrmTrait
         }
 
         $this->setWorkflowState($status);
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasWorkflowState(): bool
-    {
-        return (bool)$this->get(static::getWorkflowStateForeignKey());
-    }
-
-    /**
-     * @param WorkflowStateInterface $target
-     *
-     * @return void
-     */
-    protected function setWorkflowState(WorkflowStateInterface $target): void
-    {
-        $this->set(static::getWorkflowStateRelationKey(), $target);
     }
 
     /**
@@ -97,13 +60,5 @@ trait HasWorkflowStateModelOrmTrait
         return \in_array($this->getWorkflowState()->getCodename(), $states, true);
     }
 
-    public static function getWorkflowStateRelationKey(): string
-    {
-        return static::getModelName().'_status';
-    }
-
-    /**
-     * @return string
-     */
-    abstract public static function getWorkflowStateForeignKey(): string;
+    abstract protected function setWorkflowState(WorkflowStateInterface $target): void;
 }

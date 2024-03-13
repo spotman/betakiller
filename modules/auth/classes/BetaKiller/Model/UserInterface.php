@@ -7,7 +7,6 @@ use BetaKiller\MessageBus\RestrictionTargetInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Url\RequestUserInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
-use BetaKiller\Workflow\HasWorkflowStateInterface;
 use DateTimeImmutable;
 use Spotman\Acl\AclUserInterface;
 
@@ -22,7 +21,7 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     RestrictionTargetInterface
 {
     /**
-     * @return \DateTimeImmutable
+     * @return \DateTimeImmutable|null
      */
     public function getLastLoggedIn(): ?DateTimeImmutable;
 

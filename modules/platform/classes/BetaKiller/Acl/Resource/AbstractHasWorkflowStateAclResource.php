@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use BetaKiller\Workflow\HasWorkflowStateInterface;
+use BetaKiller\Model\HasWorkflowStateInterface;
 use BetaKiller\Workflow\WorkflowStateException;
 use BetaKiller\Workflow\WorkflowStateInterface;
 

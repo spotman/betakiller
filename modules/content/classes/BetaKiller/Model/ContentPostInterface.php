@@ -2,7 +2,6 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\Workflow\HasWorkflowStateInterface;
 use Spotman\Api\ApiResponseItemInterface;
 
 interface ContentPostInterface extends

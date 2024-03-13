@@ -4,7 +4,7 @@ namespace BetaKiller\Model;
 use BetaKiller\Exception\DomainException;
 use ORM;
 
-abstract class AbstractWorkflowStateOrm extends ORM implements WorkflowStateModelInterface
+abstract class AbstractWorkflowStateOrmModel extends ORM implements WorkflowStateModelInterface
 {
     public const COL_CODENAME  = 'codename';
     public const COL_IS_START  = 'is_start';
