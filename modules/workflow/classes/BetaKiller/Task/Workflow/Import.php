@@ -6,6 +6,7 @@ namespace BetaKiller\Task\Workflow;
 use BetaKiller\Config\WorkflowConfigInterface;
 use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Factory\RepositoryFactoryInterface;
+use BetaKiller\Model\WorkflowStateModelInterface;
 use BetaKiller\Repository\WorkflowStateRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Workflow\WorkflowStateException;
@@ -43,10 +44,10 @@ class Import extends AbstractTask
      * @param \Psr\Log\LoggerInterface                       $logger
      */
     public function __construct(
-        WorkflowConfigInterface $config,
+        WorkflowConfigInterface    $config,
         RepositoryFactoryInterface $repoFactory,
-        EntityFactoryInterface $entityFactory,
-        LoggerInterface $logger
+        EntityFactoryInterface     $entityFactory,
+        LoggerInterface            $logger
     ) {
         parent::__construct();
 
@@ -93,18 +94,16 @@ class Import extends AbstractTask
             foreach ($configStates as $stateName) {
                 $state = $stateRepo->findByCodename($stateName);
 
-                if (!$state) {
-                    $state = $this->entityFactory->create($stateModelName);
+                $state ??= $this->entityFactory->create($stateModelName);
 
-                    if (!$state instanceof WorkflowStateInterface) {
-                        throw new WorkflowStateException('Entity ":name" must implement :class', [
-                            ':name'  => $stateName,
-                            ':class' => WorkflowStateInterface::class,
-                        ]);
-                    }
-
-                    $state->setCodename($stateName);
+                if (!$state instanceof WorkflowStateModelInterface) {
+                    throw new WorkflowStateException('Entity ":name" must implement :class', [
+                        ':name'  => $stateName,
+                        ':class' => WorkflowStateModelInterface::class,
+                    ]);
                 }
+
+                $state->setCodename($stateName);
 
                 /** @noinspection OneTimeUseVariablesInspection */
                 $transitions = $this->config->getStateTargetTransitions($modelName, $stateName);

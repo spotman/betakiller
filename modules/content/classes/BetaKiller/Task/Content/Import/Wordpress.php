@@ -158,10 +158,10 @@ class Wordpress extends AbstractTask
     private $shortcodeFacade;
 
     /**
-     * @var \BetaKiller\Workflow\StatusWorkflowFactory
+     * @var \BetaKiller\Workflow\ContentPostWorkflow
      */
     #[Inject]
-    private $statusWorkflowFactory;
+    private $postWorkflow;
 
     /**
      * @var \BetaKiller\Assets\ContentTypes
@@ -293,8 +293,8 @@ class Wordpress extends AbstractTask
      * @throws \BetaKiller\Task\TaskException
      */
     private function createWordpressAttachment(
-        array $attach,
-        int $entityItemID,
+        array                   $attach,
+        int                     $entityItemID,
         AssetsProviderInterface $provider
     ): WordpressAttachmentInterface {
         $url = $attach['guid'];
@@ -358,8 +358,8 @@ class Wordpress extends AbstractTask
      */
     private function storeAttachment(
         AssetsProviderInterface $provider,
-        string $url,
-        ?int $entityItemID = null
+        string                  $url,
+        ?int                    $entityItemID = null
     ): WordpressAttachmentInterface {
         $repository = $provider->getRepository();
 
@@ -613,10 +613,7 @@ class Wordpress extends AbstractTask
 
             // Auto publishing for new posts (we are importing only published posts)
             if ($isNew) {
-                /** @var \BetaKiller\Workflow\ContentPostWorkflow $workflow */
-                $workflow = $this->statusWorkflowFactory->createFor($model);
-
-                $workflow->complete($model, $this->user); // Publishing would be done automatically
+                $this->postWorkflow->complete($model, $this->user); // Publishing would be done automatically
             }
 
             // Saving updated workflow status

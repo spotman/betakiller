@@ -1,10 +1,10 @@
 <?php
-namespace BetaKiller\Workflow;
+namespace BetaKiller\Model;
 
 use BetaKiller\Exception\DomainException;
 use ORM;
 
-abstract class AbstractWorkflowStateOrm extends ORM implements WorkflowStateInterface
+abstract class AbstractWorkflowStateOrm extends ORM implements WorkflowStateModelInterface
 {
     public const COL_CODENAME  = 'codename';
     public const COL_IS_START  = 'is_start';
@@ -73,12 +73,14 @@ abstract class AbstractWorkflowStateOrm extends ORM implements WorkflowStateInte
      */
     protected function isWorkflowStateCodename(string $value): bool
     {
-        if (!$this->getCodename()) {
+        $codename = $this->getCodename();
+
+        if (empty($codename)) {
             throw new DomainException('Workflow state ":name" codename is empty', [
                 ':name' => $this::getModelName(),
             ]);
         }
 
-        return $this->getCodename() === $value;
+        return $codename === $value;
     }
 }

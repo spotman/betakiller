@@ -3,26 +3,20 @@ namespace BetaKiller\Api\Method\ContentComment;
 
 use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Workflow\StatusWorkflowFactory;
+use BetaKiller\Workflow\ContentCommentWorkflow;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class MarkAsSpamApiMethod extends AbstractEntityBasedApiMethod
+final class MarkAsSpamApiMethod extends AbstractEntityBasedApiMethod
 {
-    /**
-     * @var \BetaKiller\Workflow\StatusWorkflowFactory
-     */
-    private $workflowFactory;
-
     /**
      * MarkAsSpamApiMethod constructor.
      *
-     * @param \BetaKiller\Workflow\StatusWorkflowFactory $workflowFactory
+     * @param \BetaKiller\Workflow\ContentCommentWorkflow $workflow
      */
-    public function __construct(StatusWorkflowFactory $workflowFactory)
+    public function __construct(private readonly ContentCommentWorkflow $workflow)
     {
-        $this->workflowFactory = $workflowFactory;
     }
 
     /**
@@ -50,10 +44,7 @@ class MarkAsSpamApiMethod extends AbstractEntityBasedApiMethod
         /** @var \BetaKiller\Model\ContentCommentInterface $model */
         $model = $this->getEntity($arguments);
 
-        /** @var \BetaKiller\Workflow\ContentCommentWorkflow $workflow */
-        $workflow = $this->workflowFactory->createFor($model);
-
-        $workflow->markAsSpam($model, $user);
+        $this->workflow->markAsSpam($model, $user);
 
         $this->saveEntity($model);
 

@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
-use BetaKiller\Acl\Resource\HasWorkflowStateAclResourceInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
-use BetaKiller\Workflow\AbstractWorkflowStateOrm;
+use BetaKiller\Model\AbstractWorkflowStateOrm;
 use BetaKiller\Workflow\WorkflowStateInterface;
 
 abstract class AbstractWorkflowStateRepository extends AbstractOrmBasedDispatchableRepository implements
@@ -49,29 +48,6 @@ abstract class AbstractWorkflowStateRepository extends AbstractOrmBasedDispatcha
         return $this
             ->filterCodename($orm, $codename)
             ->findOne($orm);
-    }
-
-    /**
-     * @param \BetaKiller\Acl\Resource\HasWorkflowStateAclResourceInterface $resource
-     * @param string|null                                                   $action
-     *
-     * @return \BetaKiller\Workflow\WorkflowStateInterface[]
-     */
-    public function getAllowedStates(HasWorkflowStateAclResourceInterface $resource, string $action = null): array
-    {
-        if (!$action) {
-            $action = $resource::ACTION_READ;
-        }
-
-        $allowedStates = [];
-
-        foreach ($this->getAll() as $state) {
-            if ($resource->isStateActionAllowed($state, $action)) {
-                $allowedStates[] = $state->getCodename();
-            }
-        }
-
-        return $allowedStates;
     }
 
     /**

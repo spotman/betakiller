@@ -2,8 +2,6 @@
 
 namespace BetaKiller\Model;
 
-use BetaKiller\Workflow\AbstractWorkflowStateOrm;
-
 class ContentPostState extends AbstractWorkflowStateOrm
 {
     public const DRAFT         = 'draft';

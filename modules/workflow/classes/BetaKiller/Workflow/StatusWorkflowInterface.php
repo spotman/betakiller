@@ -5,9 +5,6 @@ use BetaKiller\Model\UserInterface;
 
 interface StatusWorkflowInterface
 {
-    public const CLASS_NS     = 'Workflow';
-    public const CLASS_SUFFIX = 'Workflow';
-
     /**
      * @param \BetaKiller\Workflow\HasWorkflowStateInterface $model
      *
@@ -22,7 +19,7 @@ interface StatusWorkflowInterface
      *
      * @throws \BetaKiller\Workflow\WorkflowStateException
      */
-    public function doTransition(HasWorkflowStateInterface $model, string $codename, UserInterface $user): void;
+    public function doTransition(HasWorkflowStateInterface $model, string $transition, UserInterface $user): void;
 
     /**
      * @param \BetaKiller\Workflow\HasWorkflowStateInterface $model

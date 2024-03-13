@@ -1,8 +1,6 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Workflow\AbstractWorkflowStateOrm;
-
 class ContentCommentState extends AbstractWorkflowStateOrm
 {
     public const PENDING  = 'pending';

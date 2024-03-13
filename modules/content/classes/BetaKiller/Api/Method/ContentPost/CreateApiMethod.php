@@ -4,26 +4,20 @@ namespace BetaKiller\Api\Method\ContentPost;
 use BetaKiller\Api\Method\AbstractEntityCreateApiMethod;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Workflow\StatusWorkflowFactory;
+use BetaKiller\Workflow\ContentPostWorkflow;
 use Spotman\Api\ApiMethodException;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class CreateApiMethod extends AbstractEntityCreateApiMethod
+final class CreateApiMethod extends AbstractEntityCreateApiMethod
 {
     private const ARG_DATA = 'data';
 
     private const ARG_LABEL = 'label';
     private const ARG_TYPE  = 'type';
 
-    /**
-     * @var \BetaKiller\Workflow\StatusWorkflowFactory
-     */
-    private $workflowFactory;
-
-    public function __construct(StatusWorkflowFactory $factory)
+    public function __construct(private readonly ContentPostWorkflow $workflow)
     {
-        $this->workflowFactory = $factory;
     }
 
     /**
@@ -54,10 +48,7 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
     {
         $model = new ContentPost();
 
-        /** @var \BetaKiller\Workflow\ContentPostWorkflow $workflow */
-        $workflow = $this->workflowFactory->createFor($model);
-
-        $workflow->draft($model);
+        $this->workflow->draft($model);
 
         $data = $arguments->getArray(self::ARG_DATA);
 

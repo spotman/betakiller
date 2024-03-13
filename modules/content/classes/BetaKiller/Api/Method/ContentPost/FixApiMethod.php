@@ -3,26 +3,20 @@ namespace BetaKiller\Api\Method\ContentPost;
 
 use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Workflow\StatusWorkflowFactory;
+use BetaKiller\Workflow\ContentPostWorkflow;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class FixApiMethod extends AbstractEntityBasedApiMethod
+final class FixApiMethod extends AbstractEntityBasedApiMethod
 {
-    /**
-     * @var \BetaKiller\Workflow\StatusWorkflowFactory
-     */
-    private $workflowFactory;
-
     /**
      * FixApiMethod constructor.
      *
-     * @param \BetaKiller\Workflow\StatusWorkflowFactory $workflowFactory
+     * @param \BetaKiller\Workflow\ContentPostWorkflow $workflow
      */
-    public function __construct(StatusWorkflowFactory $workflowFactory)
+    public function __construct(private readonly ContentPostWorkflow $workflow)
     {
-        $this->workflowFactory = $workflowFactory;
     }
 
     /**
@@ -50,10 +44,7 @@ class FixApiMethod extends AbstractEntityBasedApiMethod
         /** @var \BetaKiller\Model\ContentPostInterface $model */
         $model = $this->getEntity($arguments);
 
-        /** @var \BetaKiller\Workflow\ContentPostWorkflow $workflow */
-        $workflow = $this->workflowFactory->createFor($model);
-
-        $workflow->fix($model, $user);
+        $this->workflow->fix($model, $user);
 
         $this->saveEntity($model);
 

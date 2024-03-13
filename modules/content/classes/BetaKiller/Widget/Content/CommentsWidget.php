@@ -8,7 +8,7 @@ use BetaKiller\Repository\ContentCommentRepository;
 use BetaKiller\Repository\EntityRepository;
 use BetaKiller\Widget\AbstractPublicWidget;
 use BetaKiller\Widget\WidgetException;
-use BetaKiller\Workflow\StatusWorkflowFactory;
+use BetaKiller\Workflow\ContentCommentWorkflow;
 use HTML;
 use Psr\Http\Message\ServerRequestInterface;
 use Valid;
@@ -27,11 +27,6 @@ final class CommentsWidget extends AbstractPublicWidget
     private $entityRepository;
 
     /**
-     * @var \BetaKiller\Workflow\StatusWorkflowFactory
-     */
-    private $workflowFactory;
-
-    /**
      * @var \BetaKiller\IdentityConverterInterface
      */
     private $converter;
@@ -41,19 +36,18 @@ final class CommentsWidget extends AbstractPublicWidget
      *
      * @param \BetaKiller\Repository\ContentCommentRepository $commentRepository
      * @param \BetaKiller\Repository\EntityRepository         $entityRepository
-     * @param \BetaKiller\Workflow\StatusWorkflowFactory      $workflowFactory
+     * @param \BetaKiller\Workflow\ContentCommentWorkflow     $workflow
      * @param \BetaKiller\IdentityConverterInterface          $converter
      */
     public function __construct(
-        ContentCommentRepository $commentRepository,
-        EntityRepository $entityRepository,
-        StatusWorkflowFactory $workflowFactory,
-    IdentityConverterInterface $converter
+        ContentCommentRepository                $commentRepository,
+        EntityRepository                        $entityRepository,
+        private readonly ContentCommentWorkflow $workflow,
+        IdentityConverterInterface              $converter
     ) {
         $this->commentRepository = $commentRepository;
         $this->entityRepository  = $entityRepository;
-        $this->workflowFactory   = $workflowFactory;
-        $this->converter = $converter;
+        $this->converter         = $converter;
     }
 
     /**
@@ -197,10 +191,7 @@ final class CommentsWidget extends AbstractPublicWidget
         $user  = $this->user;
         $model = $this->commentRepository->create();
 
-        /** @var \BetaKiller\Workflow\ContentCommentWorkflow $workflow */
-        $workflow = $this->workflowFactory->createFor($model);
-
-        $workflow->draft($model);
+        $this->workflow->draft($model);
 
         // Linking comment to entity and entity item
         $model

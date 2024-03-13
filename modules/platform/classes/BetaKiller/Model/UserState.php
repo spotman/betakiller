@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-use BetaKiller\Workflow\AbstractWorkflowStateOrm;
-
 final class UserState extends AbstractWorkflowStateOrm implements UserStateInterface
 {
     public const TABLE_NAME = 'user_statuses';
