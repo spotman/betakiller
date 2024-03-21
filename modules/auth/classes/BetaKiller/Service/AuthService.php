@@ -5,8 +5,8 @@ namespace BetaKiller\Service;
 
 use BetaKiller\Acl\Resource\UserResource;
 use BetaKiller\Auth\AccessDeniedException;
+use BetaKiller\Auth\PasswordHasherInterface;
 use BetaKiller\Auth\UserBlockedException;
-use BetaKiller\Config\SessionConfigInterface;
 use BetaKiller\Event\UserPasswordChangedEvent;
 use BetaKiller\Event\UserPasswordChangeRequestedEvent;
 use BetaKiller\Factory\GuestUserFactory;
@@ -23,11 +23,6 @@ class AuthService
 {
     public const PASSWORD_MIN_LENGTH = 8;
     public const PASSWORD_MAX_LENGTH = 50;
-
-    /**
-     * @var \BetaKiller\Config\SessionConfigInterface
-     */
-    private SessionConfigInterface $config;
 
     /**
      * @var \BetaKiller\Repository\UserRepositoryInterface
@@ -55,9 +50,14 @@ class AuthService
     private AclInterface $acl;
 
     /**
+     * @var \BetaKiller\Auth\PasswordHasherInterface
+     */
+    private PasswordHasherInterface $hasher;
+
+    /**
      * AuthService constructor.
      *
-     * @param \BetaKiller\Config\SessionConfigInterface      $config
+     * @param \BetaKiller\Auth\PasswordHasherInterface       $hasher
      * @param \BetaKiller\Session\SessionStorageInterface    $sessionStorage
      * @param \BetaKiller\Factory\GuestUserFactory           $guestUserFactory
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
@@ -65,14 +65,14 @@ class AuthService
      * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
     public function __construct(
-        SessionConfigInterface  $config,
+        PasswordHasherInterface $hasher,
         SessionStorageInterface $sessionStorage,
         GuestUserFactory        $guestUserFactory,
         UserRepositoryInterface $userRepo,
         AclInterface            $acl,
         EventBusInterface       $eventBus
     ) {
-        $this->config           = $config;
+        $this->hasher           = $hasher;
         $this->sessionStorage   = $sessionStorage;
         $this->guestUserFactory = $guestUserFactory;
         $this->userRepo         = $userRepo;
@@ -208,14 +208,12 @@ class AuthService
     }
 
     /**
-     * Perform a hmac hash, using the configured method.
-     *
      * @param string $str string to hash
      *
      * @return  string
      */
     private function makePasswordHash(string $str): string
     {
-        return hash_hmac($this->config->getHashMethod(), $str, $this->config->getHashKey());
+        return $this->hasher->proceed($str);
     }
 }

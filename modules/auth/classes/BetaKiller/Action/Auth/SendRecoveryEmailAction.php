@@ -84,7 +84,7 @@ class SendRecoveryEmailAction extends AbstractAction implements PostRequestActio
         // checking email on duplicate
         $email = $post->getString(self::ARG_EMAIL);
 
-        $user = $this->userRepo->searchBy($email);
+        $user = $this->userRepo->findByEmail($email);
 
         if (!$user) {
             $flash->flash(AccessRecoveryRequestIFace::FLASH_STATUS, AccessRecoveryRequestIFace::FLASH_STATUS_MISSING);

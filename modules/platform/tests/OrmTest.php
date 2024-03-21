@@ -21,7 +21,7 @@ final class OrmTest extends AbstractTestCase
         $orm = \ORM::factory(User::getModelName());
 
         /** @var User $user */
-        $user = $orm->where(User::COL_USERNAME, '=', AbstractTask::CLI_USER_NAME)->find();
+        $user = $orm->where(User::COL_USERNAME, '=', User::CLI_USERNAME)->find();
 
         \Database_Query::resetQueryCount();
 

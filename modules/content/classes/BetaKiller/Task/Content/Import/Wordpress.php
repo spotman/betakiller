@@ -24,6 +24,8 @@ use BetaKiller\Model\ContentYoutubeRecord;
 use BetaKiller\Model\Entity;
 use BetaKiller\Model\Quote;
 use BetaKiller\Model\RoleInterface;
+use BetaKiller\Model\User;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\WordpressAttachmentInterface;
 use BetaKiller\Repository\WordpressAttachmentRepositoryInterface;
 use BetaKiller\Service\UserService;
@@ -183,6 +185,13 @@ class Wordpress extends AbstractTask
 
     private $loadedTmpFiles = [];
 
+    public function __construct(UserInterface $user)
+    {
+        parent::__construct();
+
+        $this->user = $user;
+    }
+
     public function defineOptions(): array
     {
         return [
@@ -204,8 +213,6 @@ class Wordpress extends AbstractTask
      */
     public function run(): void
     {
-        $this->user = $this->getUser();
-
         $skipBefore = $this->getOption('skip-before');
         if ($skipBefore) {
             $this->skipBeforeDate = new DateTimeImmutable($skipBefore);
@@ -1698,13 +1705,13 @@ class Wordpress extends AbstractTask
             $wpLogin = $wpUser['login'];
             $wpEmail = $wpUser['email'];
 
-            $userModel = $this->userRepository->searchBy($wpEmail) ?: $this->userRepository->searchBy($wpLogin);
+            $userModel = $this->userRepository->findByEmail($wpEmail) ?: $this->userRepository->findByUsername($wpLogin);
 
             if (!$userModel) {
                 $userModel = $this->userService->createUser(
                     RoleInterface::LOGIN,
+                    User::DEFAULT_IP,
                     $wpEmail,
-                    UserService::DEFAULT_IP,
                     $wpLogin
                 );
                 $this->logger->info('User :login successfully imported', [':login' => $userModel->getEmail()]);

@@ -9,6 +9,8 @@ interface CreatedAtInterface
 {
     public const API_KEY_CREATED_AT_ISO = 'created_at_iso'; // DateTime in ISO-8601 format
 
+    public static function isCreatedAtRequired(): bool;
+
     /**
      * @param \DateTimeImmutable|null $value [optional]
      *

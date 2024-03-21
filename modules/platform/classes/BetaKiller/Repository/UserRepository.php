@@ -8,6 +8,7 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\UserState;
 use BetaKiller\Utils\Kohana\ORM;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
+use function mb_strtolower;
 
 /**
  * Class UserRepository
@@ -59,6 +60,36 @@ class UserRepository extends AbstractHasWorkflowStateRepository implements UserR
 //            \DB::expr(sprintf('REGEXP_REPLACE(`%s`, "[^0-9]+", "")', $relName.'.'.User::COL_PHONE)),
         ];
     }
+
+    public function findByEmail(string $email): ?UserInterface
+    {
+        $orm = $this->getOrmInstance();
+
+        // Lowercase to prevent collisions
+        return $this
+            ->filterEmail($orm, mb_strtolower($email))
+            ->findOne($orm);
+    }
+
+    public function findByUsername(string $username): ?UserInterface
+    {
+        $orm = $this->getOrmInstance();
+
+        // Lowercase to prevent collisions
+        return $this
+            ->filterUsername($orm, mb_strtolower($username))
+            ->findOne($orm);
+    }
+
+    public function findByPhone(string $phone): ?UserInterface
+    {
+        $orm = $this->getOrmInstance();
+
+        return $this
+            ->filterPhone($orm, $phone)
+            ->findOne($orm);
+    }
+
     /**
      * Search for user by username or e-mail
      *
@@ -72,7 +103,7 @@ class UserRepository extends AbstractHasWorkflowStateRepository implements UserR
         $orm = $this->getOrmInstance();
 
         // Lowercase to prevent collisions
-        $loginOrEmail = \mb_strtolower($loginOrEmail);
+        $loginOrEmail = mb_strtolower($loginOrEmail);
 
         $orm->where($this->getUniqueKey($loginOrEmail), '=', $loginOrEmail);
 
@@ -82,39 +113,25 @@ class UserRepository extends AbstractHasWorkflowStateRepository implements UserR
     /**
      * @param \BetaKiller\Model\RoleInterface $role
      *
-     * @param bool|null                       $checkNested
      *
      * @return UserInterface[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getUsersWithRole(RoleInterface $role, bool $checkNested = null): array
+    public function getUsersWithRole(RoleInterface $role): array
     {
-        return $this->getUsersWithRoles([$role], $checkNested);
+        return $this->getUsersWithRoles([$role]);
     }
 
     /**
      * @param \BetaKiller\Model\RoleInterface[] $roles
      *
-     * @param bool|null                         $checkNested
      *
      * @return UserInterface[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getUsersWithRoles(array $roles, bool $checkNested = null): array
+    public function getUsersWithRoles(array $roles): array
     {
         $orm = $this->getOrmInstance();
-
-        if ($checkNested) {
-            $nestedRoles = [];
-
-            foreach ($roles as $role) {
-                foreach ($role->getAllChilds() as $childRole) {
-                    $nestedRoles[] = $childRole;
-                }
-            }
-
-            $roles = array_merge($roles, $nestedRoles);
-        }
 
         // Multiple roles => possible duplicates
         $orm->group_by_primary_key();
@@ -170,6 +187,13 @@ class UserRepository extends AbstractHasWorkflowStateRepository implements UserR
     protected function filterEmail(OrmInterface $orm, string $value): self
     {
         $orm->where($orm->object_column(User::COL_EMAIL), '=', $value);
+
+        return $this;
+    }
+
+    protected function filterUsername(OrmInterface $orm, string $value): self
+    {
+        $orm->where($orm->object_column(User::COL_USERNAME), '=', $value);
 
         return $this;
     }

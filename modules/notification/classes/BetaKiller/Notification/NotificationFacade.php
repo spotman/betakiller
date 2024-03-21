@@ -19,6 +19,7 @@ use BetaKiller\Repository\NotificationFrequencyRepositoryInterface;
 use BetaKiller\Repository\NotificationGroupRepositoryInterface;
 use BetaKiller\Repository\NotificationGroupUserConfigRepositoryInterface;
 use BetaKiller\Repository\NotificationLogRepositoryInterface;
+use BetaKiller\Repository\RoleRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 use DateTimeImmutable;
 use Interop\Queue\Context;
@@ -112,6 +113,11 @@ final class NotificationFacade
     private $userRepo;
 
     /**
+     * @var \BetaKiller\Repository\RoleRepositoryInterface
+     */
+    private RoleRepositoryInterface $roleRepo;
+
+    /**
      * @var \Spotman\Acl\AclInterface
      */
     private AclInterface $acl;
@@ -128,26 +134,31 @@ final class NotificationFacade
      * @param \BetaKiller\Repository\NotificationGroupUserConfigRepositoryInterface $userConfigRepo
      * @param \BetaKiller\Repository\NotificationFrequencyRepositoryInterface       $freqRepo
      * @param \BetaKiller\Repository\UserRepositoryInterface                        $userRepo
+     * @param \BetaKiller\Repository\RoleRepositoryInterface                        $roleRepo
      * @param \Interop\Queue\Context                                                $queueContext
      * @param \BetaKiller\Notification\MessageSerializer                            $serializer
      * @param \BetaKiller\Notification\MessageActionUrlGeneratorInterface           $actionUrlGenerator
+     * @param \Spotman\Acl\AclInterface                                             $acl
      * @param \Psr\Log\LoggerInterface                                              $logger
+     *
+     * @throws \Interop\Queue\Exception\TimeToLiveNotSupportedException
      */
     public function __construct(
-        TransportFactory $transportFactory,
-        MessageFactory $messageFactory,
-        MessageRendererInterface $renderer,
-        NotificationConfigInterface $config,
-        NotificationGroupRepositoryInterface $groupRepo,
-        NotificationLogRepositoryInterface $logRepo,
+        TransportFactory                               $transportFactory,
+        MessageFactory                                 $messageFactory,
+        MessageRendererInterface                       $renderer,
+        NotificationConfigInterface                    $config,
+        NotificationGroupRepositoryInterface           $groupRepo,
+        NotificationLogRepositoryInterface             $logRepo,
         NotificationGroupUserConfigRepositoryInterface $userConfigRepo,
-        NotificationFrequencyRepositoryInterface $freqRepo,
-        UserRepositoryInterface $userRepo,
-        Context $queueContext,
-        MessageSerializer $serializer,
-        MessageActionUrlGeneratorInterface $actionUrlGenerator,
-        AclInterface $acl,
-        LoggerInterface $logger
+        NotificationFrequencyRepositoryInterface       $freqRepo,
+        UserRepositoryInterface                        $userRepo,
+        RoleRepositoryInterface                        $roleRepo,
+        Context                                        $queueContext,
+        MessageSerializer                              $serializer,
+        MessageActionUrlGeneratorInterface             $actionUrlGenerator,
+        AclInterface                                   $acl,
+        LoggerInterface                                $logger
     ) {
         $this->transportFactory   = $transportFactory;
         $this->messageFactory     = $messageFactory;
@@ -158,6 +169,7 @@ final class NotificationFacade
         $this->config             = $config;
         $this->groupRepo          = $groupRepo;
         $this->userRepo           = $userRepo;
+        $this->roleRepo           = $roleRepo;
         $this->renderer           = $renderer;
         $this->freqRepo           = $freqRepo;
         $this->logRepo            = $logRepo;
@@ -181,10 +193,10 @@ final class NotificationFacade
      * @throws \BetaKiller\Notification\NotificationException
      */
     public function createMessage(
-        string $messageCodename,
+        string                 $messageCodename,
         MessageTargetInterface $target,
-        array $data,
-        array $attachments = null
+        array                  $data,
+        array                  $attachments = null
     ): MessageInterface {
         $transportName = $this->config->getMessageTransport($messageCodename);
         $isCritical    = $this->config->isMessageCritical($messageCodename);
@@ -464,7 +476,7 @@ final class NotificationFacade
      * @return \BetaKiller\Notification\MessageTargetInterface[]
      */
     public function getGroupTargets(
-        NotificationGroupInterface $group,
+        NotificationGroupInterface     $group,
         NotificationFrequencyInterface $freq = null
     ): array {
         if ($freq && !$group->isFrequencyControlEnabled()) {
@@ -479,7 +491,7 @@ final class NotificationFacade
         $users = [];
 
         // Get Users with provided roles (pre-fetch)
-        foreach ($this->userRepo->getUsersWithRoles($roles, true) as $user) {
+        foreach ($this->userRepo->getUsersWithRoles($roles) as $user) {
             // Exclude blocked users and users without confirmed email
             if ($user->isBlocked() || !$user->isEmailConfirmed()) {
                 continue;
@@ -530,7 +542,7 @@ final class NotificationFacade
 
     public function getGroupUserConfig(
         NotificationGroupInterface $group,
-        UserInterface $user
+        UserInterface              $user
     ): NotificationGroupUserConfigInterface {
         $config = $this->userConfigRepo->findByUserAndGroup($group, $user);
 
@@ -548,7 +560,7 @@ final class NotificationFacade
 
     public function getGroupFrequency(
         NotificationGroupInterface $group,
-        UserInterface $user
+        UserInterface              $user
     ): NotificationFrequencyInterface {
         if (!$group->isFrequencyControlEnabled()) {
             throw new NotificationException('Frequency control of group ":name" is not allowed', [
@@ -564,8 +576,8 @@ final class NotificationFacade
     }
 
     public function setGroupFrequency(
-        NotificationGroupInterface $group,
-        UserInterface $user,
+        NotificationGroupInterface     $group,
+        UserInterface                  $user,
         NotificationFrequencyInterface $freq
     ): void {
         if (!$group->isFrequencyControlEnabled()) {
@@ -606,7 +618,9 @@ final class NotificationFacade
      */
     public function getUserGroups(UserInterface $user): array
     {
-        return $this->groupRepo->getUserGroups($user);
+        $roles = $this->roleRepo->getAllUserRoles($user);
+
+        return $this->groupRepo->getRolesGroups($roles);
     }
 
     public function purgePriorityQueue(): void

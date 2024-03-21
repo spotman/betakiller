@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Import;
 
-use BetaKiller\Config\RoleConfig;
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Config\RoleConfig;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Model\Role;
@@ -46,8 +46,8 @@ class Roles extends AbstractTask
     public function __construct(
         ConfigProviderInterface $config,
         RoleRepositoryInterface $roleRepo,
-        EntityFactoryInterface $entityFactory,
-        LoggerInterface $logger
+        EntityFactoryInterface  $entityFactory,
+        LoggerInterface         $logger
     ) {
         $this->config        = $config;
         $this->roleRepo      = $roleRepo;
@@ -117,10 +117,10 @@ class Roles extends AbstractTask
             }
 
             /** @var RoleInterface $parentRole */
-            foreach ($model->getParents() as $parentRole) {
+            foreach ($this->roleRepo->getParents($model) as $parentRole) {
                 if (!\in_array($parentRole->getName(), $inherits, true)) {
                     // Unused parent role, remove it
-                    $model->removeParent($parentRole);
+                    $this->roleRepo->removeParent($model, $parentRole);
 
                     $this->logger->info('Role ":role" parent ":parent" removed', [
                         ':role'   => $name,
@@ -133,8 +133,8 @@ class Roles extends AbstractTask
             foreach ($inherits as $inheritName) {
                 $inheritModel = $this->roleRepo->getByName($inheritName);
 
-                if (!$model->hasParent($inheritModel)) {
-                    $model->addParent($inheritModel);
+                if (!$this->roleRepo->hasParent($model, $inheritModel)) {
+                    $this->roleRepo->addParent($model, $inheritModel);
                     $this->logger->info('Role ":role" parent ":parent" added', [
                         ':role'   => $name,
                         ':parent' => $inheritName,

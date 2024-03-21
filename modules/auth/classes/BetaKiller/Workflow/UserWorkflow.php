@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Workflow;
 
+use BetaKiller\Auth\PasswordHasherInterface;
 use BetaKiller\Event\UserBlockedEvent;
 use BetaKiller\Event\UserConfirmationEmailRequestedEvent;
 use BetaKiller\Event\UserCreatedEvent;
@@ -15,9 +16,12 @@ use BetaKiller\Event\UserSuspendedEvent;
 use BetaKiller\Event\UserUnlockedEvent;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Factory\EntityFactoryInterface;
+use BetaKiller\Factory\UserFactoryInterface;
+use BetaKiller\Factory\UserInfo;
 use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Repository\RoleRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 
@@ -34,33 +38,9 @@ final class UserWorkflow
     public const TRANSITION_RESUME_SUSPENDED = 'resume';
 
     /**
-     * @var \BetaKiller\Workflow\StatusWorkflowInterface
-     */
-    private StatusWorkflowInterface $state;
-
-    /**
-     * @var \BetaKiller\Repository\UserRepositoryInterface
-     */
-    private UserRepositoryInterface $userRepo;
-
-    /**
-     * @var \BetaKiller\MessageBus\EventBusInterface
-     */
-    private EventBusInterface $eventBus;
-
-    /**
-     * @var \BetaKiller\Repository\RoleRepositoryInterface
-     */
-    private RoleRepositoryInterface $roleRepo;
-
-    /**
-     * @var \BetaKiller\Factory\EntityFactoryInterface
-     */
-    private EntityFactoryInterface $entityFactory;
-
-    /**
      * UserWorkflow constructor.
      *
+     * @param \BetaKiller\Factory\UserFactoryInterface       $userFactory
      * @param \BetaKiller\Workflow\StatusWorkflowInterface   $workflow
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
      * @param \BetaKiller\Repository\RoleRepositoryInterface $roleRepo
@@ -68,70 +48,69 @@ final class UserWorkflow
      * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
     public function __construct(
-        StatusWorkflowInterface $workflow,
-        UserRepositoryInterface $userRepo,
-        RoleRepositoryInterface $roleRepo,
-        EntityFactoryInterface $entityFactory,
-        EventBusInterface $eventBus
+        private UserFactoryInterface    $userFactory,
+        private PasswordHasherInterface $hasher,
+        private StatusWorkflowInterface $state,
+        private UserRepositoryInterface $userRepo,
+        private RoleRepositoryInterface $roleRepo,
+        private EventBusInterface       $eventBus
     ) {
-        $this->state         = $workflow;
-        $this->userRepo      = $userRepo;
-        $this->roleRepo      = $roleRepo;
-        $this->entityFactory = $entityFactory;
-
-        $this->eventBus = $eventBus;
     }
 
-    public function create(
-        string $email,
-        string $primaryRoleName,
-        string $createdFromIp,
-        string $username = null,
-        callable $callback = null
-    ): UserInterface {
-        if ($this->userRepo->searchBy($email)) {
+    public function create(UserInfo $info): UserInterface
+    {
+        $primaryRole = $info->role
+            ? $this->roleRepo->getByName($info->role)
+            : null;
+
+        if ($primaryRole) {
+            $loginRole = $this->roleRepo->getLoginRole();
+
+            if (!$this->roleRepo->isInherits($primaryRole, $loginRole)) {
+                throw new DomainException('Role ":name" must inherit ":login" role', [
+                    ':name'  => $primaryRole->getName(),
+                    ':login' => $loginRole->getName(),
+                ]);
+            }
+        }
+
+        $user = $this->userFactory->create($info);
+
+        if ($user::isEmailUniqueEnabled() && $info->email && $this->userRepo->findByEmail($info->email)) {
             throw new DomainException('User ":email" already exists', [
-                ':email' => $email,
+                ':email' => $info->email,
             ]);
         }
 
-        $primaryRole = $this->roleRepo->getByName($primaryRoleName);
-        $loginRole   = $this->roleRepo->getLoginRole();
-
-        if (!$primaryRole->isInherits($loginRole)) {
-            throw new DomainException('Role ":name" must inherit ":login" role', [
-                ':name'  => $primaryRole->getName(),
-                ':login' => $loginRole->getName(),
+        if ($user::isPhoneUniqueEnabled() && $info->phone && $this->userRepo->findByPhone($info->phone)) {
+            throw new DomainException('User ":email" already exists', [
+                ':email' => $info->email,
             ]);
         }
 
-        /** @var UserInterface $user */
-        $user = $this->entityFactory->create(User::getModelName());
+        if ($user::isUsernameUniqueEnabled() && $info->username && $this->userRepo->findByUsername($info->username)) {
+            throw new DomainException('User ":email" already exists', [
+                ':email' => $info->username,
+            ]);
+        }
 
-        $user->setCreatedAt();
-
-        $user
-            ->setEmail($email)
-            ->setCreatedFromIP($createdFromIp);
-
-        if ($username) {
-            $user->setUsername($username);
+        if ($user::isPasswordEnabled() && $info->password) {
+            $hash = $this->hasher->proceed($info->password);
+            $user->setPassword($hash);
         }
 
         // Enable email notifications by default
-        $user->enableEmailNotification();
+        if ($user instanceof MessageTargetInterface) {
+            $user->enableEmailNotification();
+        }
 
         $this->state->setStartState($user);
 
         // Create new model via save so ID will be populated for adding roles
         $this->userRepo->save($user);
 
-        $user->addRole($primaryRole);
-
-        // Call custom callback and save User
-        if ($callback) {
-            $callback($user);
-            $this->userRepo->save($user);
+        if ($primaryRole) {
+            $user->addRole($primaryRole);
         }
 
         $this->eventBus->emit(new UserCreatedEvent($user));

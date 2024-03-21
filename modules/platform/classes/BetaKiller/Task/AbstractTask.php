@@ -3,27 +3,17 @@ namespace BetaKiller\Task;
 
 use Beberlei\Metrics\Collector\Collector;
 use BetaKiller\Env\AppEnvInterface;
-use BetaKiller\Helper\UserDetector;
-use BetaKiller\Model\UserInterface;
 use DI\Attribute\Inject;
 use Minion_CLI;
 use Minion_Task;
 
 abstract class AbstractTask extends Minion_Task
 {
-    public const CLI_USER_NAME = 'minion';
-
     /**
      * @var \Beberlei\Metrics\Collector\Collector
      */
     #[Inject]
     private Collector $metrics;
-
-    /**
-     * @var \BetaKiller\Helper\UserDetector
-     */
-    #[Inject]
-    private UserDetector $userDetector;
 
     public function __construct()
     {
@@ -163,10 +153,5 @@ abstract class AbstractTask extends Minion_Task
     protected function password(string $message): string
     {
         return Minion_CLI::password($message);
-    }
-
-    protected function getUser(): UserInterface
-    {
-        return $this->userDetector->detectCliUser();
     }
 }

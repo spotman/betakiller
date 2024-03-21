@@ -64,7 +64,7 @@ class SendDirect extends AbstractTask
         $userName = (string)$this->getOption('target', false);
 
         $target = $userName
-            ? $this->userRepo->searchBy($userName)
+            ? $this->userRepo->findByEmail($userName)
             : $this->notification->debugEmailTarget();
 
         $this->notification->directMessage(self::NOTIFICATION_TEST_DIRECT, $target, []);

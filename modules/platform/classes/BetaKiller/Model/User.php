@@ -6,13 +6,13 @@ namespace BetaKiller\Model;
 use BetaKiller\Auth\AuthorizationRequiredException;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\MessageBus\RestrictionTargetInterface;
+use BetaKiller\Task\AbstractTask;
 use DateTimeImmutable;
 
 /**
  * Class User
  *
  * @package BetaKiller\Model
- * @method UserStateInterface getWorkflowState()
  */
 class User extends AbstractCreatedAt implements UserInterface
 {
@@ -36,15 +36,12 @@ class User extends AbstractCreatedAt implements UserInterface
     public const COL_CREATED_FROM_IP   = 'created_from_ip';
     public const COL_IS_CLAIMED        = 'is_reg_claimed';
 
-    public const  REL_LANGUAGE = 'language';
-    public const  REL_ROLES    = 'roles';
-    public const  REL_SESSIONS = 'sessions';
+    public const  REL_LANGUAGE  = 'language';
+    public const  REL_ROLES     = 'roles';
+    public const  REL_SESSIONS  = 'sessions';
 
-    /**
-     * @var array
-     * @deprecated Remove after several deployments since 4 July 2021
-     */
-    protected array $allUserRolesNames = [];
+    public const  DEFAULT_IP   = '127.0.0.1';
+    public const  CLI_USERNAME = 'minion';
 
     private array $cachedRoles = [];
 
@@ -119,6 +116,10 @@ class User extends AbstractCreatedAt implements UserInterface
                 self::COL_EMAIL           => $this->getColumnRulesEmail(),
                 self::COL_USERNAME        => $this->getColumnRulesUsername(),
                 self::COL_PASSWORD        => $this->getColumnRulesPassword(),
+                self::COL_PHONE           => $this->getColumnRulesPhone(),
+                self::COL_FIRST_NAME      => $this->getColumnRulesFirstName(),
+                self::COL_LAST_NAME       => $this->getColumnRulesLastName(),
+                self::COL_CREATED_FROM_IP => $this->getColumnRulesCreatedFromIp(),
                 self::COL_LANGUAGE_ID     => [
                     ['max_length', [':value', 11]],
                 ],
@@ -131,9 +132,6 @@ class User extends AbstractCreatedAt implements UserInterface
 //                self::COL_MIDDLE_NAME     => [
 //                    ['max_length', [':value', 32]],
 //                ],
-                self::COL_PHONE           => [
-                    ['max_length', [':value', 32]],
-                ],
                 self::COL_NOTIFY_BY_EMAIL => [
                     ['max_length', [':value', 1]],
                 ],
@@ -143,7 +141,6 @@ class User extends AbstractCreatedAt implements UserInterface
                 self::COL_LAST_LOGIN      => [
                     ['max_length', [':value', 10]],
                 ],
-                self::COL_CREATED_FROM_IP => $this->getColumnRulesCreatedFromIp(),
             ];
     }
 //
@@ -160,13 +157,17 @@ class User extends AbstractCreatedAt implements UserInterface
 //            'password' => 'password',
 //        ];
 //    }
+    public function isMinion(): bool
+    {
+        return $this->hasUsername() && $this->getUsername() === self::CLI_USERNAME;
+    }
 
     /**
      * @return bool
      */
     public function isEmailConfirmed(): bool
     {
-        return $this->getWorkflowState()->isConfirmed();
+        return $this->isInWorkflowState(UserState::EMAIL_CONFIRMED);
     }
 
     /**
@@ -174,7 +175,7 @@ class User extends AbstractCreatedAt implements UserInterface
      */
     public function isBlocked(): bool
     {
-        return $this->getWorkflowState()->isBlocked();
+        return $this->isInWorkflowState(UserState::BLOCKED);
     }
 
     /**
@@ -182,7 +183,7 @@ class User extends AbstractCreatedAt implements UserInterface
      */
     public function isSuspended(): bool
     {
-        return $this->getWorkflowState()->isSuspended();
+        return $this->isInWorkflowState(UserState::SUSPENDED);
     }
 
     public function markAsRegistrationClaimed(): void
@@ -268,13 +269,7 @@ class User extends AbstractCreatedAt implements UserInterface
      */
     public function isDeveloper(): bool
     {
-        foreach ($this->getRoles() as $role) {
-            if ($role->getName() === RoleInterface::DEVELOPER) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->hasRoleName(RoleInterface::DEVELOPER);
     }
 
     /**
@@ -296,25 +291,6 @@ class User extends AbstractCreatedAt implements UserInterface
     public function getRoles(): array
     {
         return $this->cachedRoles ?: $this->cachedRoles = $this->getAllRelated(self::REL_ROLES);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getAllRoles(): array
-    {
-        $roles = [];
-
-        foreach ($this->getRoles() as $role) {
-            $roles[$role->getName()] = $role;
-
-            /** @var \BetaKiller\Model\RoleInterface $parent */
-            foreach ($role->getAllParents() as $parent) {
-                $roles[$parent->getName()] = $parent;
-            }
-        }
-
-        return \array_values($roles);
     }
 
     /**
@@ -370,9 +346,12 @@ class User extends AbstractCreatedAt implements UserInterface
             return false;
         }
 
-        $state = $this->getWorkflowState();
-
-        return $state->isCreated() || $state->isConfirmed() || $state->isEmailChanged() || $state->isResumed();
+        return $this->isInWorkflowStates([
+            UserState::CREATED,
+            UserState::EMAIL_CONFIRMED,
+            UserState::EMAIL_CHANGED,
+            UserState::RESUMED,
+        ]);
     }
 
     /**
@@ -618,6 +597,11 @@ class User extends AbstractCreatedAt implements UserInterface
         return $this->isEqualTo($target);
     }
 
+    public static function isEmailEnabled(): bool
+    {
+        return true;
+    }
+
     public static function isEmailRequired(): bool
     {
         return true;
@@ -635,6 +619,10 @@ class User extends AbstractCreatedAt implements UserInterface
 
     private function getColumnRulesEmail(): array
     {
+        if (!static::isEmailEnabled()) {
+            return [];
+        }
+
         $rules = [];
 
         if (static::isEmailRequired()) {
@@ -646,10 +634,15 @@ class User extends AbstractCreatedAt implements UserInterface
         }
 
         if (static::isEmailUniqueEnabled()) {
-            $rules[] = [[$this, 'unique'], ['email', ':value']];
+            $rules[] = [[$this, 'unique'], [self::COL_EMAIL, ':value']];
         }
 
         return $rules;
+    }
+
+    public static function isIpAddressEnabled(): bool
+    {
+        return true;
     }
 
     public static function isIpAddressRequired(): bool
@@ -659,6 +652,10 @@ class User extends AbstractCreatedAt implements UserInterface
 
     private function getColumnRulesCreatedFromIp(): array
     {
+        if (!static::isIpAddressEnabled()) {
+            return [];
+        }
+
         $rules = [
             ['max_length', [':value', 46]], // @see https://stackoverflow.com/a/7477384
 //            ['ip', [':value', true]], // Allow local IPs (not working with local dev)
@@ -669,6 +666,11 @@ class User extends AbstractCreatedAt implements UserInterface
         }
 
         return $rules;
+    }
+
+    public static function isUsernameEnabled(): bool
+    {
+        return true;
     }
 
     public static function isUsernameRequired(): bool
@@ -683,6 +685,10 @@ class User extends AbstractCreatedAt implements UserInterface
 
     private function getColumnRulesUsername(): array
     {
+        if (!static::isUsernameEnabled()) {
+            return [];
+        }
+
         $rules = [
             ['max_length', [':value', 41]],
         ];
@@ -692,10 +698,15 @@ class User extends AbstractCreatedAt implements UserInterface
         }
 
         if (static::isUsernameUniqueEnabled()) {
-            $rules[] = [[$this, 'unique'], ['username', ':value']];
+            $rules[] = [[$this, 'unique'], [self::COL_USERNAME, ':value']];
         }
 
         return $rules;
+    }
+
+    public static function isPasswordEnabled(): bool
+    {
+        return true;
     }
 
     public static function isPasswordRequired(): bool
@@ -710,6 +721,10 @@ class User extends AbstractCreatedAt implements UserInterface
 
     private function getColumnRulesPassword(): array
     {
+        if (!static::isPasswordEnabled()) {
+            return [];
+        }
+
         $rules = [
             ['max_length', [':value', 64]],
         ];
@@ -719,9 +734,110 @@ class User extends AbstractCreatedAt implements UserInterface
         }
 
         if (static::isPasswordUniqueEnabled()) {
-            $rules[] = [[$this, 'unique'], ['password', ':value']];
+            $rules[] = [[$this, 'unique'], [self::COL_PASSWORD, ':value']];
         }
 
         return $rules;
+    }
+
+    public static function isPhoneEnabled(): bool
+    {
+        return true;
+    }
+
+    public static function isPhoneRequired(): bool
+    {
+        return false;
+    }
+
+    public static function isPhoneUniqueEnabled(): bool
+    {
+        return true;
+    }
+
+    private function getColumnRulesPhone(): array
+    {
+        if (!static::isPhoneEnabled()) {
+            return [];
+        }
+
+        $rules = [
+            ['max_length', [':value', 32]],
+        ];
+
+        if (static::isPhoneRequired()) {
+            $rules[] = ['not_empty'];
+        }
+
+        if (static::isPhoneUniqueEnabled()) {
+            $rules[] = [[$this, 'unique'], [self::COL_PHONE, ':value']];
+        }
+
+        return $rules;
+    }
+
+    public static function isFirstNameEnabled(): bool
+    {
+        return true;
+    }
+
+    public static function isFirstNameRequired(): bool
+    {
+        return true;
+    }
+
+    private function getColumnRulesFirstName(): array
+    {
+        if (!static::isFirstNameEnabled()) {
+            return [];
+        }
+
+        $rules = [
+            ['max_length', [':value', 16]],
+        ];
+
+        if (static::isFirstNameRequired()) {
+            $rules[] = ['not_empty'];
+        }
+
+        return $rules;
+    }
+
+    public static function isLastNameEnabled(): bool
+    {
+        return true;
+    }
+
+    public static function isLastNameRequired(): bool
+    {
+        return true;
+    }
+
+    private function getColumnRulesLastName(): array
+    {
+        if (!static::isLastNameEnabled()) {
+            return [];
+        }
+
+        $rules = [
+            ['max_length', [':value', 16]],
+        ];
+
+        if (static::islastNameRequired()) {
+            $rules[] = ['not_empty'];
+        }
+
+        return $rules;
+    }
+
+    protected function hasRoleName(string $name): bool
+    {
+        foreach ($this->getRoles() as $role) {
+            if ($role->getName() === $name) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

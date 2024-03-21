@@ -114,7 +114,7 @@ class RegularLoginAction extends AbstractAction implements PostRequestActionInte
             throw new BadRequestHttpException('No username or password sent');
         }
 
-        $user = $this->userRepo->searchBy($login);
+        $user = $this->userRepo->findByUsername($login);
 
         if (!$user) {
             throw new IncorrectCredentialsException;

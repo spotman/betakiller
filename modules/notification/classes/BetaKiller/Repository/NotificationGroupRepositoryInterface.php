@@ -38,11 +38,11 @@ interface NotificationGroupRepositoryInterface extends DispatchableRepositoryInt
     public function getScheduledGroups(): array;
 
     /**
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \BetaKiller\Model\RoleInterface[] $roles
      *
-     * @param bool|null                       $includeSystem
+     * @param bool|null                         $includeSystem
      *
      * @return \BetaKiller\Model\NotificationGroupInterface[]
      */
-    public function getUserGroups(UserInterface $user, bool $includeSystem = null): array;
+    public function getRolesGroups(array $roles, bool $includeSystem = null): array;
 }

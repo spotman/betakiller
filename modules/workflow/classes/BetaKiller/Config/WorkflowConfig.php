@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Config;
 
 use BetaKiller\Workflow\WorkflowStateException;
+use BetaKiller\Workflow\WorkflowStateInterface;
 
 final class WorkflowConfig extends AbstractConfig implements WorkflowConfigInterface
 {
@@ -187,7 +188,7 @@ final class WorkflowConfig extends AbstractConfig implements WorkflowConfigInter
     {
         foreach ($this->getStateTargetTransitions($model, $state) as $trans => $target) {
             if ($trans === $transition) {
-                return $target;
+                return $target instanceof WorkflowStateInterface ? $target->getCodename() : $target;
             }
         }
 

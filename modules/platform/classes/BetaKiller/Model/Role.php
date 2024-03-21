@@ -38,6 +38,11 @@ class Role extends AbstractOrmBasedMultipleParentsTreeModel implements RoleInter
         ];
     }
 
+    public static function createFromName(string $name): RoleInterface
+    {
+        return new Role(['name' => $name]);
+    }
+
     /**
      * @param string $value
      *

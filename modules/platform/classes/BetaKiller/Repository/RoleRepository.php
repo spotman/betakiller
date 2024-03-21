@@ -4,6 +4,7 @@ namespace BetaKiller\Repository;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\Role;
 use BetaKiller\Model\RoleInterface;
+use BetaKiller\Model\UserInterface;
 
 /**
  * Class RoleRepository
@@ -96,7 +97,7 @@ class RoleRepository extends AbstractOrmBasedMultipleParentsTreeRepository imple
      */
     public function getChildParentsPairs(): array
     {
-        $childCol = Role::getChildIdColumnName();
+        $childCol  = Role::getChildIdColumnName();
         $parentCol = Role::getParentIdColumnName();
 
         $data = \DB::select($childCol, $parentCol)
@@ -107,7 +108,7 @@ class RoleRepository extends AbstractOrmBasedMultipleParentsTreeRepository imple
         $pairs = [];
 
         foreach ($data as $row) {
-            $childId = $row[$childCol];
+            $childId  = $row[$childCol];
             $parentId = $row[$parentCol];
 
             $pairs[$childId] = $pairs[$childId] ?? [];
@@ -116,6 +117,28 @@ class RoleRepository extends AbstractOrmBasedMultipleParentsTreeRepository imple
         }
 
         return $pairs;
+    }
+
+    /**
+     * Get all user`s roles objects (include parent roles)
+     * BEWARE: CPU/DB hungry operation
+     *
+     * @inheritDoc
+     */
+    public function getAllUserRoles(UserInterface $user): array
+    {
+        $roles = [];
+
+        foreach ($user->getRoles() as $role) {
+            $roles[$role->getName()] = $role;
+
+            /** @var \BetaKiller\Model\RoleInterface $parent */
+            foreach ($this->getAllParents($role) as $parent) {
+                $roles[$parent->getName()] = $parent;
+            }
+        }
+
+        return \array_values($roles);
     }
 
     /**

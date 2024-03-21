@@ -2,6 +2,7 @@
 namespace BetaKiller\Repository;
 
 use BetaKiller\Model\RoleInterface;
+use BetaKiller\Model\UserInterface;
 
 /**
  * Class RoleRepositoryInterface
@@ -55,4 +56,11 @@ interface RoleRepositoryInterface extends MultipleParentsTreeRepositoryInterface
      * @return string[][]
      */
     public function getChildParentsPairs(): array;
+
+    /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return RoleInterface[]
+     */
+    public function getAllUserRoles(UserInterface $user): array;
 }

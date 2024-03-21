@@ -15,11 +15,17 @@ abstract class AbstractUserEventTask extends AbstractTask
      */
     private EventBusInterface $eventBus;
 
-    public function __construct(EventBusInterface $eventBus)
+    /**
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private UserInterface $user;
+
+    public function __construct(EventBusInterface $eventBus, UserInterface $user)
     {
         parent::__construct();
 
         $this->eventBus = $eventBus;
+        $this->user     = $user;
     }
 
     /**
@@ -34,7 +40,7 @@ abstract class AbstractUserEventTask extends AbstractTask
 
     public function run(): void
     {
-        $event = $this->makeEvent($this->getUser());
+        $event = $this->makeEvent($this->user);
 
         $this->eventBus->emit($event);
     }

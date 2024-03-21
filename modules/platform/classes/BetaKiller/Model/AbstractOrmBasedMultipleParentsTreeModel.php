@@ -5,8 +5,8 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
 {
     abstract protected function getTreeModelThroughTableName(): string;
 
-    protected const REL_PARENTS = 'parents';
-    protected const REL_CHILDS  = 'childs';
+    public const REL_PARENTS  = 'parents';
+    public const REL_CHILDREN = 'children';
 
     protected function configure(): void
     {
@@ -18,7 +18,7 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
                 'through'     => $this->getTreeModelThroughTableName(),
             ],
 
-            self::REL_CHILDS => [
+            self::REL_CHILDREN => [
                 'model'       => static::getModelName(),
                 'foreign_key' => static::getParentIdColumnName(),
                 'far_key'     => static::getChildIdColumnName(),
@@ -39,148 +39,5 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
     public static function getParentIdColumnName(): string
     {
         return 'parent_id';
-    }
-
-    /**
-     * Return parents model or null
-     *
-     * @return $this[]
-     * @throws \Kohana_Exception
-     */
-    public function getParents(): array
-    {
-        return $this->getAllRelated(self::REL_PARENTS);
-    }
-
-    /**
-     * Return direct children
-     *
-     * @return \BetaKiller\Model\MultipleParentsTreeModelInterface[]
-     */
-    public function getChilds(): array
-    {
-        return $this->getAllRelated(self::REL_CHILDS);
-    }
-
-    /**
-     * Return all parent models including in hierarchy
-     *
-     * @return \BetaKiller\Model\MultipleParentsTreeModelInterface[]
-     */
-    public function getAllParents(): array
-    {
-        return $this->getAllParentsRecursively($this);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getAllChilds(): array
-    {
-        return $this->getAllChildsRecursively($this);
-    }
-
-    /**
-     * @param \BetaKiller\Model\MultipleParentsTreeModelInterface $child
-     *
-     * @return \BetaKiller\Model\MultipleParentsTreeModelInterface[]
-     */
-    protected function getAllParentsRecursively(MultipleParentsTreeModelInterface $child): array
-    {
-        $parents = [];
-
-        foreach ($child->getParents() as $parent) {
-            $parents[] = $parent;
-
-            foreach ($this->getAllParentsRecursively($parent) as $grandParent) {
-                $parents[] = $grandParent;
-            }
-        }
-
-        return $parents;
-    }
-
-    /**
-     * @param \BetaKiller\Model\MultipleParentsTreeModelInterface $parent
-     *
-     * @return \BetaKiller\Model\MultipleParentsTreeModelInterface[]
-     */
-    protected function getAllChildsRecursively(MultipleParentsTreeModelInterface $parent): array
-    {
-        $childs = [];
-
-        foreach ($parent->getChilds() as $child) {
-            $childs[] = $child;
-
-            foreach ($this->getAllChildsRecursively($child) as $grandChild) {
-                $childs[] = $grandChild;
-            }
-        }
-
-        return $childs;
-    }
-
-    /**
-     * @param array|null $parentIDs
-     *
-     * @throws \Kohana_Exception
-     */
-    protected function filterParentIDs(array $parentIDs = null)
-    {
-        $parentsTableNameAlias = $this->table_name().'_parents';
-
-        $this->join_related(self::REL_PARENTS, $parentsTableNameAlias);
-
-        $parentIdCol = $parentsTableNameAlias.'.'.static::getParentIdColumnName();
-
-        if ($parentIDs) {
-            $this->where($parentIdCol, 'IN', $parentIDs);
-        } else {
-            $this->where($parentIdCol, 'IS', null);
-        }
-    }
-
-    /**
-     * @param MultipleParentsTreeModelInterface $parent
-     *
-     * @return void
-     */
-    public function addParent(MultipleParentsTreeModelInterface $parent): void
-    {
-        $this->add(self::REL_PARENTS, $parent);
-    }
-
-    /**
-     * @param MultipleParentsTreeModelInterface $parent
-     *
-     * @return void
-     */
-    public function removeParent(MultipleParentsTreeModelInterface $parent): void
-    {
-        $this->remove(self::REL_PARENTS, $parent);
-    }
-
-    /**
-     * @param MultipleParentsTreeModelInterface $parent
-     *
-     * @return bool
-     */
-    public function hasParent(MultipleParentsTreeModelInterface $parent): bool
-    {
-        return $this->has(self::REL_PARENTS, $parent);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function isInherits(MultipleParentsTreeModelInterface $parent): bool
-    {
-        foreach ($this->getAllParentsRecursively($this) as $item) {
-            if ($item->getID() === $parent->getID()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

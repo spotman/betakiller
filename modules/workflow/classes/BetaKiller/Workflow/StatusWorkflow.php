@@ -28,6 +28,11 @@ final class StatusWorkflow implements StatusWorkflowInterface
     private EntityPermissionResolverInterface $permissionResolver;
 
     /**
+     * @var array<string, WorkflowStateRepositoryInterface>
+     */
+    private array $stateRepoCache = [];
+
+    /**
      * StatusWorkflow constructor.
      *
      * @param \BetaKiller\Config\WorkflowConfigInterface        $config
@@ -58,7 +63,7 @@ final class StatusWorkflow implements StatusWorkflowInterface
         // Detect target state (if defined)
         $currentStateName = $model->getWorkflowState()->getCodename();
         $targetStateName  = $this->config->getStateTransitionTarget($modelName, $currentStateName, $transition);
-        $targetState      = $this->createStateRepositoryFor($model)->getByCodename($targetStateName);
+        $targetState      = $this->getStateRepositoryFor($model)->getByCodename($targetStateName);
 
         if (!$this->isTransitionAllowed($model, $transition, $user)) {
             throw new WorkflowStateException(
@@ -104,15 +109,21 @@ final class StatusWorkflow implements StatusWorkflowInterface
             );
         }
 
-        $startState = $this->createStateRepositoryFor($model)->getStartState();
+        $startState = $this->getStateRepositoryFor($model)->getStartState();
 
         $model->initWorkflowState($startState);
     }
 
-    private function createStateRepositoryFor(HasWorkflowStateInterface $model): WorkflowStateRepositoryInterface
+    private function getStateRepositoryFor(HasWorkflowStateInterface $model): WorkflowStateRepositoryInterface
     {
         $stateModelName = $model::getWorkflowStateModelName();
-        $stateRepo      = $this->repoFactory->create($stateModelName);
+
+        return $this->stateRepoCache[$stateModelName] ??= $this->createStateRepositoryFor($stateModelName);
+    }
+
+    private function createStateRepositoryFor(string $stateModelName): WorkflowStateRepositoryInterface
+    {
+        $stateRepo = $this->repoFactory->create($stateModelName);
 
         if (!$stateRepo instanceof WorkflowStateRepositoryInterface) {
             throw new WorkflowStateException('Repo ":name" must implement :class', [

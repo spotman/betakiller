@@ -63,7 +63,7 @@ final class DismissDirect extends AbstractTask
         $messageName = (string)$this->getOption('message', true);
         $userName    = (string)$this->getOption('target', true);
 
-        $target = $this->userRepo->searchBy($userName);
+        $target = $this->userRepo->findByEmail($userName);
 
         $this->notification->dismissDirect($messageName, $target);
 

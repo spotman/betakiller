@@ -8,6 +8,7 @@ use BetaKiller\Daemon\AbstractApiWorkerDaemon;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\SessionHelper;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\MaintenanceModeService;
 use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Task\AbstractTask;
@@ -69,13 +70,15 @@ class IsAlive extends AbstractTask
      * @param \BetaKiller\Env\AppEnvInterface             $appEnv
      * @param \BetaKiller\Service\MaintenanceModeService  $maintenance
      * @param \Psr\Log\LoggerInterface                    $logger
+     * @param \BetaKiller\Model\UserInterface             $user
      */
     public function __construct(
         SessionStorageInterface $sessionStorage,
         WampClientBuilder       $clientFactory,
         AppEnvInterface         $appEnv,
         MaintenanceModeService  $maintenance,
-        LoggerInterface         $logger
+        LoggerInterface         $logger,
+        UserInterface           $user
     ) {
         parent::__construct();
 
@@ -84,6 +87,7 @@ class IsAlive extends AbstractTask
         $this->appEnv         = $appEnv;
         $this->logger         = $logger;
         $this->maintenance    = $maintenance;
+        $this->user           = $user;
     }
 
     /**
@@ -103,8 +107,6 @@ class IsAlive extends AbstractTask
         if ($this->maintenance->isEnabled()) {
             return;
         }
-
-        $this->user = $this->getUser();
 
         $this->createSession();
 

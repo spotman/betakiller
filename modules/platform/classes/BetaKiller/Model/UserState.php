@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-final class UserState extends AbstractWorkflowStateOrmModel implements UserStateInterface
+use BetaKiller\Workflow\WorkflowStateInterface;
+
+final class UserState extends AbstractWorkflowStateOrmModel implements WorkflowStateInterface
 {
     public const TABLE_NAME = 'user_statuses';
 
@@ -43,57 +45,5 @@ final class UserState extends AbstractWorkflowStateOrmModel implements UserState
     public function getI18nKeyName(): string
     {
         return 'user.status.'.$this->getCodename();
-    }
-
-    /**
-     * @return bool
-     * @throws \BetaKiller\Exception\DomainException
-     */
-    public function isCreated(): bool
-    {
-        return $this->isWorkflowStateCodename(self::CREATED);
-    }
-
-    /**
-     * @return bool
-     * @throws \BetaKiller\Exception\DomainException
-     */
-    public function isConfirmed(): bool
-    {
-        return $this->isWorkflowStateCodename(self::EMAIL_CONFIRMED);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function isEmailChanged(): bool
-    {
-        return $this->isWorkflowStateCodename(self::EMAIL_CHANGED);
-    }
-
-    /**
-     * @return bool
-     * @throws \BetaKiller\Exception\DomainException
-     */
-    public function isBlocked(): bool
-    {
-        return $this->isWorkflowStateCodename(self::BLOCKED);
-    }
-
-    /**
-     * @return bool
-     * @throws \BetaKiller\Exception\DomainException
-     */
-    public function isSuspended(): bool
-    {
-        return $this->isWorkflowStateCodename(self::SUSPENDED);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isResumed(): bool
-    {
-        return $this->isWorkflowStateCodename(self::RESUMED);
     }
 }

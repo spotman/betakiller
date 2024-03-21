@@ -111,10 +111,10 @@ final class ForceLoginAction extends AbstractAction
             $this->auth->logout($session);
         }
 
-        // Fetch User name from request URL (no direct User model binding via ID coz ID is obfuscated in stage)
+        // Fetch Username from request URL (no direct User model binding via ID coz ID is obfuscated in stage)
         $userName = ServerRequestHelper::getParameter($request, UserNameUrlParameter::class);
 
-        $user = $this->userRepo->searchBy($userName->getValue());
+        $user = $this->userRepo->findByUsername($userName->getValue());
 
         if (!$user) {
             throw new IncorrectCredentialsException;

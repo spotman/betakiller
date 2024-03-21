@@ -90,14 +90,14 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
     }
 
     /**
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param array     $roles
      *
-     * @param bool|null                       $includeSystem
+     * @param bool|null $includeSystem
      *
      * @return \BetaKiller\Model\NotificationGroupInterface[]
-     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getUserGroups(UserInterface $user, bool $includeSystem = null): array
+    public function getRolesGroups(array $roles, bool $includeSystem = null): array
     {
         $orm = $this->getOrmInstance();
 
@@ -107,7 +107,7 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
 
         return $this
             ->filterGroupIsEnabled($orm, true)
-            ->filterRoles($orm, $user->getAllRoles()) // Fetch all nested roles
+            ->filterRoles($orm, $roles) // Fetch all nested roles
             ->orderByPlace($orm)
             ->findAll($orm);
     }

@@ -14,12 +14,51 @@ use Spotman\Acl\AclUserInterface;
  * Interface UserInterface
  *
  * @package BetaKiller\Model
- * @method UserStateInterface getWorkflowState()
  */
 interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWorkflowStateInterface,
     MessageTargetInterface, AclUserInterface, EntityWithAclSpecInterface, RequestUserInterface, CreatedAtInterface,
     RestrictionTargetInterface
 {
+    public static function isIpAddressEnabled(): bool;
+
+    public static function isIpAddressRequired(): bool;
+
+    public static function isEmailEnabled(): bool;
+
+    public static function isEmailRequired(): bool;
+
+    public static function isEmailUniqueEnabled(): bool;
+
+    public static function isEmailRegexEnabled(): bool;
+
+    public static function isPhoneEnabled(): bool;
+
+    public static function isPhoneRequired(): bool;
+
+    public static function isPhoneUniqueEnabled(): bool;
+
+    public static function isUsernameEnabled(): bool;
+
+    public static function isUsernameRequired(): bool;
+
+    public static function isUsernameUniqueEnabled(): bool;
+
+    public static function isPasswordEnabled(): bool;
+
+    public static function isPasswordRequired(): bool;
+
+    public static function isPasswordUniqueEnabled(): bool;
+
+    public static function isFirstNameEnabled(): bool;
+
+    public static function isFirstNameRequired(): bool;
+
+    public static function isLastNameEnabled(): bool;
+
+    public static function isLastNameRequired(): bool;
+
+    public function isMinion(): bool;
+
     /**
      * @return \DateTimeImmutable|null
      */
@@ -108,19 +147,11 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     public function addRole(RoleInterface $role): UserInterface;
 
     /**
-     * Get all user`s roles objects (direct only, exclude parent roles)
+     * Get user`s roles objects (direct only, exclude parent roles)
      *
      * @return \BetaKiller\Model\RoleInterface[]
      */
     public function getRoles(): array;
-
-    /**
-     * Get all user`s roles objects (include parent roles)
-     * BEWARE: CPU/DB hungry operation
-     *
-     * @return \BetaKiller\Model\RoleInterface[]
-     */
-    public function getAllRoles(): array;
 
     /**
      * @param \BetaKiller\Model\LanguageInterface $languageModel
