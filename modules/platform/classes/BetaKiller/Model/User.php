@@ -288,9 +288,17 @@ class User extends AbstractCreatedAt implements UserInterface
     /**
      * @inheritDoc
      */
-    public function getRoles(): array
+    final public function getRoles(): array
     {
-        return $this->cachedRoles ?: $this->cachedRoles = $this->getAllRelated(self::REL_ROLES);
+        return $this->cachedRoles ?: $this->cachedRoles = $this->fetchRoles();
+    }
+
+    /**
+     * @return \BetaKiller\Model\RoleInterface[]
+     */
+    protected function fetchRoles(): array
+    {
+        return $this->getAllRelated(self::REL_ROLES);
     }
 
     /**
