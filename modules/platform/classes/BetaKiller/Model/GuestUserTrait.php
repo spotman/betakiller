@@ -41,7 +41,7 @@ trait GuestUserTrait
     /**
      * @inheritDoc
      */
-    public function getRoles(): array
+    protected function fetchRoles(): array
     {
         return [
             Role::createFromName(RoleInterface::GUEST),
