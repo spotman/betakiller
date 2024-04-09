@@ -5,6 +5,7 @@ namespace BetaKiller\Helper;
 
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\UserInterface;
+use DateInterval;
 use DateTimeImmutable;
 use DateTimeZone;
 use IntlDateFormatter;
@@ -123,7 +124,7 @@ final class DateTimeHelper
     {
         $tzList = [];
 
-        $deviation = new \DateInterval('PT16M');
+        $deviation = new DateInterval('PT16M');
 
         foreach (DateTimeZone::listIdentifiers() as $tzName) {
             $tz    = new DateTimeZone($tzName);
@@ -139,5 +140,13 @@ final class DateTimeHelper
         }
 
         return $tzList;
+    }
+
+    public static function dateIntervalToSeconds(DateInterval $interval): int
+    {
+        $now = new DateTimeImmutable;
+        $ref = $now->add($interval);
+
+        return abs($ref->getTimestamp() - $now->getTimestamp());
     }
 }
