@@ -17,7 +17,7 @@ class SessionHelper
 {
     public const CREATED_AT   = 'created_at';
     public const PERSISTENT   = 'persistent';
-    public const AUTH_USER_ID = 'auth_user';
+    public const AUTH_USER_ID = 'auth_user_id';
     public const ORIGIN_URL   = 'origin_url';
     public const ORIGIN_UUID  = 'origin_uuid';
     public const TOKEN_HASH   = 'token';

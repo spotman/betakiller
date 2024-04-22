@@ -91,7 +91,7 @@ class ContentCommentRepository extends AbstractHasWorkflowStateRepository
             ->filterLastRecords($orm, new DateInterval($key))
             ->filterIpAddress($orm, $ipAddress);
 
-        return $orm->count_all();
+        return $this->countAll($orm);
     }
 
     /**
@@ -173,7 +173,7 @@ class ContentCommentRepository extends AbstractHasWorkflowStateRepository
             $this->filterState($orm, $status);
         }
 
-        return $orm->compile_as_subquery_and_count_all();
+        return $this->countAll($orm);
     }
 
     /**
