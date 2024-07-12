@@ -7,8 +7,14 @@ final readonly class StackTraceItem
 {
     public static function fromArray(array $data): self
     {
-        return new self($data['file'], $data['line'], $data['class'] ?? null, $data['function']);
+        return new self(
+            $data['file'] ?? 'unknown',
+            $data['line'] ?? 0,
+            $data['class'] ?? null,
+            $data['function']
+        );
     }
+
     public function __construct(public string $file, public int $line, public ?string $class, public string $function)
     {
     }
