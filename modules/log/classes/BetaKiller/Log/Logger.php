@@ -7,7 +7,6 @@ use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\HandlerInterface;
-use Monolog\Handler\NullHandler;
 use Monolog\Handler\SlackWebhookHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\TelegramBotHandler;
@@ -144,8 +143,13 @@ class Logger implements LoggerInterface
     private function getLogLevel(): int
     {
         $isDebug = $this->appEnv->isDebugEnabled();
+        $isHuman = $this->appEnv->isHuman();
 
-        $level = $isDebug ? \Monolog\Logger::DEBUG : \Monolog\Logger::NOTICE;
+        $level = match (true) {
+            $isDebug => \Monolog\Logger::DEBUG,
+            $isHuman => \Monolog\Logger::INFO,
+            default => \Monolog\Logger::NOTICE,
+        };
 
         // CLI override
         if ($this->appEnv->isCli()) {
