@@ -131,6 +131,21 @@ class TextHelper
             : $haystack;
     }
 
+    public static function maskWord(string $str, string $symbol = null): string
+    {
+        $symbol ??= '*';
+
+        $len = mb_strlen($str);
+
+        // Do not modify short strings
+        if ($len <= 3) {
+            return $str;
+        }
+
+        // Keep first and last letters, mask others
+        return mb_substr($str, 0, 1).str_repeat($symbol, $len - 2).mb_substr($str, -1, 1);
+    }
+
     public static function maskEmail(string $address): string
     {
         [$login, $host] = explode('@', $address);
@@ -138,23 +153,8 @@ class TextHelper
         // Process each domain level
         $domains = explode('.', $host);
 
-        $domains = array_map(fn(string $part) => maskLetters($part), $domains);
+        $domains = array_map(fn(string $part) => self::maskWord($part), $domains);
 
-        return maskLetters($login).'@'.implode('.', $domains);
-
-        function maskLetters(string $str, string $symbol = null): string
-        {
-            $symbol ??= '*';
-
-            $len = mb_strlen($str);
-
-            // Do not modify short strings
-            if ($len <= 3) {
-                return $str;
-            }
-
-            // Keep first and last letters, mask others
-            return mb_substr($str, 0, 1).str_repeat($symbol, $len - 2).mb_substr($str, -1, 1);
-        }
+        return self::maskWord($login).'@'.implode('.', $domains);
     }
 }
