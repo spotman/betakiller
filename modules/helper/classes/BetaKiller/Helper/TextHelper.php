@@ -130,4 +130,31 @@ class TextHelper
             ? substr_replace($haystack, $replace, $pos, strlen($needle))
             : $haystack;
     }
+
+    public static function maskEmail(string $address): string
+    {
+        [$login, $host] = explode('@', $address);
+
+        // Process each domain level
+        $domains = explode('.', $host);
+
+        $domains = array_map(fn(string $part) => maskLetters($part), $domains);
+
+        return maskLetters($login).'@'.implode('.', $domains);
+
+        function maskLetters(string $str, string $symbol = null): string
+        {
+            $symbol ??= '*';
+
+            $len = mb_strlen($str);
+
+            // Do not modify short strings
+            if ($len <= 3) {
+                return $str;
+            }
+
+            // Keep first and last letters, mask others
+            return mb_substr($str, 0, 1).str_repeat($symbol, $len - 2).mb_substr($str, -1, 1);
+        }
+    }
 }
