@@ -298,7 +298,7 @@ class Kohana_Database_Query
         if (self::$logQueries) {
             $endedOn = microtime(true);
 
-            self::$queries[(string)$endedOn] = [
+            self::$queries[(string)$startedOn] = [
                 'query'    => $sql,
                 'duration' => $endedOn - $startedOn,
             ];
