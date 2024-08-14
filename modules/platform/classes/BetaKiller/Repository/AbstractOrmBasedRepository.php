@@ -246,8 +246,8 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
      */
     protected function findAllResults(
         ExtendedOrmInterface $orm,
-        int $currentPage,
-        int $itemsPerPage
+        int                  $currentPage,
+        int                  $itemsPerPage
     ): SearchResultsInterface {
         try {
             // Wrap in a pager
@@ -286,10 +286,10 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
      * @throws \BetaKiller\Repository\RepositoryException
      */
     protected function filterRelated(
-        OrmInterface $orm,
-        string $relationName,
+        OrmInterface            $orm,
+        string                  $relationName,
         AbstractEntityInterface $relatedModel,
-        bool $or = null
+        bool                    $or = null
     ): self {
         if (!$relatedModel instanceof OrmInterface) {
             throw new RepositoryException('Related model :name must implement :must', [
@@ -313,8 +313,8 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
      */
     protected function filterRelatedMultiple(
         OrmInterface $orm,
-        string $relationName,
-        array $relatedModels
+        string       $relationName,
+        array        $relatedModels
     ): self {
         foreach ($relatedModels as $model) {
             if (!$model instanceof OrmInterface) {
@@ -351,5 +351,12 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     protected function customOrderBy(OrmInterface $orm): void
     {
         // Empty by default
+    }
+
+    protected function cacheFor(OrmInterface $orm, int $ttl): self
+    {
+        $orm->cached($ttl);
+
+        return $this;
     }
 }
