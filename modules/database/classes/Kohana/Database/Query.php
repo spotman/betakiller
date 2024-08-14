@@ -280,15 +280,26 @@ class Kohana_Database_Query
         if (self::$logQueries) {
             $btr = DebugHelper::findNearestStackTraceItem('orm');
 
-            $sql .= sprintf(' -- %s:%s %s()', $btr->file, $btr->line, $btr->getCallee());
+            $sql .= $btr->oneLiner();
 
-            $startedOn = microtime(true);
+            $startedOn     = microtime(true);
+            $memoryOnStart = memory_get_usage(true);
+
+            self::$queries[(string)$startedOn] = [
+                'query' => $sql,
+            ];
         }
 
         // Execute the query
         try {
             $result = $db->query($this->_type, $sql, $as_object, $object_params);
         } catch (Throwable $e) {
+            if (self::$logQueries) {
+                self::$queries[(string)$startedOn] += [
+                    'error' => $e,
+                ];
+            }
+
             throw \BetaKiller\Exception::wrap($e, sprintf('%s | %s', $e->getMessage(), htmlspecialchars($sql)));
         }
 
@@ -300,11 +311,12 @@ class Kohana_Database_Query
         }
 
         if (self::$logQueries) {
-            $endedOn = microtime(true);
+            $endedOn     = microtime(true);
+            $memoryOnEnd = memory_get_usage(true);
 
-            self::$queries[(string)$startedOn] = [
-                'query'    => $sql,
+            self::$queries[(string)$startedOn] += [
                 'duration' => $endedOn - $startedOn,
+                'memory'   => $memoryOnEnd - $memoryOnStart,
             ];
         }
 

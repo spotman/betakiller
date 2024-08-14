@@ -25,4 +25,9 @@ final readonly class StackTraceItem
             ? $this->class.'::'.$this->function
             : $this->function;
     }
+
+    public function oneLiner(): string
+    {
+        return sprintf(' -- %s() @ %s:%s', $this->getCallee(), $this->file, $this->line);
+    }
 }
