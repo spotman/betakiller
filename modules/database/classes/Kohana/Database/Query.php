@@ -286,7 +286,11 @@ class Kohana_Database_Query
         }
 
         // Execute the query
-        $result = $db->query($this->_type, $sql, $as_object, $object_params);
+        try {
+            $result = $db->query($this->_type, $sql, $as_object, $object_params);
+        } catch (Throwable $e) {
+            throw \BetaKiller\Exception::wrap($e, sprintf('%s | %s', $e->getMessage(), htmlspecialchars($sql)));
+        }
 
         self::$queryCounter++;
 
