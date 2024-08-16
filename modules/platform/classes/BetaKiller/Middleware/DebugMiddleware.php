@@ -31,8 +31,6 @@ use Twig\Environment;
 
 final class DebugMiddleware implements MiddlewareInterface
 {
-    public const DEBUGBAR_TIME_COLLECTOR = 'time';
-
     /**
      * @var \Psr\Http\Message\ResponseFactoryInterface
      */
