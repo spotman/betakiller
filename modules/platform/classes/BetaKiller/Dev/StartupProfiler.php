@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Dev;
 
+use Symfony\Component\Stopwatch\StopwatchEvent;
+
 final class StartupProfiler extends AbstractProfiler
 {
     /**
@@ -27,5 +29,15 @@ final class StartupProfiler extends AbstractProfiler
     public function getCreatedAt(): float
     {
         return $this->createdAt;
+    }
+
+    public static function begin(string $label): StopwatchEvent
+    {
+        return self::getInstance()->start($label);
+    }
+
+    public static function end(StopwatchEvent $event): void
+    {
+        self::getInstance()->stop($event);
     }
 }

@@ -277,15 +277,18 @@ class Kohana_Database_Query
             }
         }
 
-        if (self::$logQueries) {
+        $startedOn = microtime(true);
+
+        $logKey = self::$logQueries ? (string)$startedOn : null;
+
+        if ($logKey) {
             $btr = DebugHelper::findNearestStackTraceItem('orm');
 
             $sql .= $btr->oneLiner();
 
-            $startedOn     = microtime(true);
             $memoryOnStart = memory_get_usage(true);
 
-            self::$queries[(string)$startedOn] = [
+            self::$queries[$logKey] = [
                 'query' => $sql,
             ];
         }
@@ -294,8 +297,8 @@ class Kohana_Database_Query
         try {
             $result = $db->query($this->_type, $sql, $as_object, $object_params);
         } catch (Throwable $e) {
-            if (self::$logQueries) {
-                self::$queries[(string)$startedOn] += [
+            if ($logKey) {
+                self::$queries[$logKey] += [
                     'error' => $e,
                 ];
             }
@@ -310,11 +313,11 @@ class Kohana_Database_Query
             Kohana::cache($cache_key, $result->as_array(), $this->_lifetime);
         }
 
-        if (self::$logQueries) {
+        if ($logKey) {
             $endedOn     = microtime(true);
             $memoryOnEnd = memory_get_usage(true);
 
-            self::$queries[(string)$startedOn] += [
+            self::$queries[$logKey] += [
                 'duration' => $endedOn - $startedOn,
                 'memory'   => $memoryOnEnd - $memoryOnStart,
             ];

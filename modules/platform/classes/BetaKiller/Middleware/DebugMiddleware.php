@@ -3,22 +3,20 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Dev\AbstractProfiler;
 use BetaKiller\Dev\DebugBarCookiesDataCollector;
 use BetaKiller\Dev\DebugBarHttpDriver;
 use BetaKiller\Dev\DebugBarSessionDataCollector;
+use BetaKiller\Dev\DebugBarTimeDataCollector;
 use BetaKiller\Dev\DebugBarTwigDataCollector;
 use BetaKiller\Dev\DebugBarUserDataCollector;
 use BetaKiller\Dev\DebugServerRequestHelper;
 use BetaKiller\Dev\RequestProfiler;
-use BetaKiller\Dev\StartupProfiler;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Log\LoggerInterface;
 use DebugBar\Bridge\MonologCollector;
 use DebugBar\DataCollector\MemoryCollector;
-use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DebugBar;
 use DebugBar\JavascriptRenderer;
 use DebugBar\Storage\FileStorage;
@@ -71,7 +69,7 @@ final class DebugMiddleware implements MiddlewareInterface
      */
     public function __construct(
         AppEnvInterface          $appEnv,
-        Environment $twigEnv,
+        Environment              $twigEnv,
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface   $streamFactory,
         LoggerInterface          $logger
@@ -80,7 +78,7 @@ final class DebugMiddleware implements MiddlewareInterface
         $this->streamFactory   = $streamFactory;
         $this->appEnv          = $appEnv;
         $this->twigEnv         = $twigEnv;
-        $this->logger = $logger;
+        $this->logger          = $logger;
     }
 
     /**
@@ -122,7 +120,7 @@ final class DebugMiddleware implements MiddlewareInterface
         $debugBar->setHttpDriver($httpDriver);
 
         $debugBar
-            ->addCollector(new TimeDataCollector(RequestProfiler::getRequestStartTime($request)))
+            ->addCollector(new DebugBarTimeDataCollector($request))
             ->addCollector(new DebugBarCookiesDataCollector($request))
             ->addCollector(new DebugBarSessionDataCollector($session))
             ->addCollector(new DebugBarUserDataCollector($request))
@@ -158,7 +156,7 @@ final class DebugMiddleware implements MiddlewareInterface
         RequestProfiler::end($ps);
 
         // Forward call
-        $response = $middleware->process($request, $this->getFakeHandler($handler));
+        $response = $middleware->process($request, $handler);
 
         // DebugBar generates inline tags and images so configuring CSP
         $this->addCspRules($renderer, $request);
@@ -177,7 +175,7 @@ final class DebugMiddleware implements MiddlewareInterface
 
         $inlineJs  = $renderer->getAssets('inline_js');
         $inlineCss = $renderer->getAssets('inline_css');
-        $initJs    = \str_replace(['<script type="text/javascript">', '</script>'], '', \trim($renderer->render()));
+        $initJs    = str_replace(['<script type="text/javascript">', '</script>'], '', trim($renderer->render()));
 
         foreach ($inlineJs as $js) {
             $csp->cspHash('script', $js);
@@ -192,72 +190,5 @@ final class DebugMiddleware implements MiddlewareInterface
 
         // Inline images in PhpDebugBar
         $csp->csp('image', 'data:');
-    }
-
-    private function getFakeHandler(RequestHandlerInterface $handler): RequestHandlerInterface
-    {
-        return new class($handler) implements RequestHandlerInterface {
-            /**
-             * @var \Psr\Http\Server\RequestHandlerInterface
-             */
-            private $handler;
-
-            public function __construct(RequestHandlerInterface $handler)
-            {
-                $this->handler = $handler;
-            }
-
-            /**
-             * @inheritDoc
-             */
-            public function handle(ServerRequestInterface $request): ResponseInterface
-            {
-                $response = $this->handler->handle($request);
-
-                $requestProfiler = RequestProfiler::fetch($request);
-
-                if ($requestProfiler) {
-                    $debugBar = DebugServerRequestHelper::getDebugBar($request);
-
-                    if (!$debugBar->hasCollector(DebugMiddleware::DEBUGBAR_TIME_COLLECTOR)) {
-                        throw new \LogicException('RequestProfiler requires DebugBar TimeDataCollector');
-                    }
-
-                    $startupProfiler = StartupProfiler::getInstance();
-
-                    /** @var \DebugBar\DataCollector\TimeDataCollector $collector */
-                    $collector = $debugBar->getCollector(DebugMiddleware::DEBUGBAR_TIME_COLLECTOR);
-
-                    $collector->addMeasure('Boot', $collector->getRequestStartTime(), $startupProfiler->getCreatedAt());
-
-                    // Push startup measures to DebugBar
-                    $this->transferMeasuresToDebugBar($startupProfiler, $collector);
-
-                    // Push request measures to DebugBar
-                    $this->transferMeasuresToDebugBar($requestProfiler, $collector);
-                }
-
-                return $response;
-            }
-
-            private function transferMeasuresToDebugBar(AbstractProfiler $profiler, TimeDataCollector $collector): void
-            {
-                // Iterate sections
-                foreach ($profiler->getStopwatchSections() as $section) {
-                    // iterate section events
-                    foreach ($section->getEvents() as $name => $event) {
-                        $start = $event->getOrigin();
-                        $end   = $event->getOrigin() + $event->getDuration();
-
-                        // Push measure to DebugBar
-                        $collector->addMeasure(
-                            $name,
-                            $start / 1000,
-                            $end / 1000
-                        );
-                    }
-                }
-            }
-        };
     }
 }

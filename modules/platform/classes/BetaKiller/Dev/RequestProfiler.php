@@ -41,8 +41,10 @@ final class RequestProfiler extends AbstractProfiler
         return $request->getAttribute(RequestProfiler::class);
     }
 
-    public static function getRequestStartTime(ServerRequestInterface $request): float
+    public static function getRequestStartTime(ServerRequestInterface $request = null): float
     {
-        return $request->getServerParams()['REQUEST_TIME_FLOAT'] ?? $_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true);
+        $data = $request?->getServerParams() ?? $_SERVER;
+
+        return $data['REQUEST_TIME_FLOAT'] ?? microtime(true);
     }
 }

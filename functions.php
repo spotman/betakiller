@@ -181,7 +181,9 @@ if (!function_exists('bootstrapKohana')) {
 if (!function_exists('bootstrapApp')) {
     function bootstrapApp(AppEnvInterface $appEnv): ContainerInterface
     {
-        $p = StartupProfiler::getInstance()->start('Bootstrap App');
+        $profiler = StartupProfiler::getInstance();
+
+        $p = $profiler->start('Bootstrap App');
 
         /*
         - AppEnv
@@ -218,8 +220,12 @@ if (!function_exists('bootstrapApp')) {
         // Instantiate config provider
         $configProvider = new KohanaConfigProvider();
 
+        $pc = $profiler->start('Init Container');
+
         // Initialize container and push AppEnv and ConfigProvider into DIC
         $container = Container::factory($appEnv, $configProvider);
+
+        $profiler->stop($pc);
 
         // Init core modules first
         initKohanaModules(Kohana::modules(), $container);
@@ -234,7 +240,7 @@ if (!function_exists('bootstrapApp')) {
             proceedAppInitFile($appRootPath);
         }
 
-        StartupProfiler::getInstance()->stop($p);
+        $profiler->stop($p);
 
         return $container;
     }
@@ -324,6 +330,10 @@ if (!function_exists('prependKohanaPath')) {
 if (!function_exists('initKohanaModules')) {
     function initKohanaModules(array $modules, ContainerInterface $container): void
     {
+        $profiler = StartupProfiler::getInstance();
+
+        $pm = $profiler->start(sprintf('Init modules (%d)', count($modules)));
+
         // Execute init.php in each module (if exists)
         foreach ($modules as $modulePath) {
             $initFile = rtrim($modulePath, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'init.php';
@@ -332,12 +342,16 @@ if (!function_exists('initKohanaModules')) {
                 proceedModuleInit($initFile, $container);
             }
         }
+
+        $profiler->stop($pm);
     }
 }
 
 if (!function_exists('proceedModuleInit')) {
     function proceedModuleInit(string $initFilePath, ContainerInterface $container): void
     {
+        $pmi = StartupProfiler::begin('Init module '.$initFilePath);
+
         // Include the module initialization file once
         $className = include_once $initFilePath;
 
@@ -347,6 +361,8 @@ if (!function_exists('proceedModuleInit')) {
 
             $initializer->initModule();
         }
+
+        StartupProfiler::end($pmi);
     }
 }
 
