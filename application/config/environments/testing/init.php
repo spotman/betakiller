@@ -18,6 +18,6 @@
 
 return [
     'errors'  => true,
-    'profile' => true,
+    'profile' => false,
     'caching' => false,
 ];
