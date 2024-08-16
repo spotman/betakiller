@@ -113,7 +113,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         }
 
         // Force updating all related models with IDs
-        $entity->reload();
+//        $entity->reload();
     }
 
     /**
