@@ -1,43 +1,29 @@
 <?php
 namespace BetaKiller\Url;
 
-final class UrlPrototype
+final readonly class UrlPrototype
 {
     public const KEY_ID = 'id';
 
-    public const  REGEX              = '/\{[A-Z]{1}[A-Za-z_]+(\.[A-Za-z_]+(\(\)){0,1}){0,1}\}/';
+    public const  REGEX              = '/{([A-Z][A-Za-z_]+)(\.([A-Za-z_]+)(\(\))?)?}/';
     private const KEY_SEPARATOR      = '.';
     private const METHOD_CALL_MARKER = '()';
 
     /**
-     * @var string
-     */
-    private $modelName;
-
-    /**
-     * @var string
-     */
-    private $modelKey;
-
-    /**
-     * @var bool
-     */
-    private $isMethodCall = false;
-
-    /**
      * UrlPrototype constructor.
      *
-     * @param string $modelName
-     * @param string $modelKey
-     * @param bool   $isMethodCall
+     * @param string      $modelName
+     * @param string|null $modelKey
+     * @param bool        $isMethodCall
+     *
+     * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function __construct(string $modelName, string $modelKey, ?bool $isMethodCall = null)
+    public function __construct(private string $modelName, private ?string $modelKey, private bool $isMethodCall)
     {
-        $this->setModelName($modelName);
-        $this->setModelKey($modelKey);
-
-        if ($isMethodCall) {
-            $this->markAsMethodCall();
+        if (!$this->modelKey && $this->isMethodCall) {
+            throw new UrlPrototypeException('Missing model key in ":model" method call', [
+                ':value' => $this->modelName,
+            ]);
         }
     }
 
@@ -54,39 +40,22 @@ final class UrlPrototype
         }
 
         if (!str_starts_with($string, '{') || !str_ends_with($string, '}')) {
-            throw new UrlPrototypeException('Prototype string must be surrounded by curly braces');
-        }
-
-        $string = trim($string, '{}');
-
-        $parsed = explode(self::KEY_SEPARATOR, $string, 2);
-
-        if (!$parsed) {
-            throw new UrlPrototypeException('Key separator ":sep" is missing in URL prototype string ":value"', [
+            throw new UrlPrototypeException('Prototype string ":value" must be surrounded by curly braces', [
                 ':value' => $string,
-                ':sep'   => self::KEY_SEPARATOR,
             ]);
         }
 
-        $modelName = $parsed[0];
-        $keyPart   = $parsed[1] ?? null;
+        if (!preg_match(self::REGEX, $string, $matches, PREG_UNMATCHED_AS_NULL)) {
+            throw new UrlPrototypeException('Malformed UrlPrototype string ":value"', [
+                ':value' => $string,
+            ]);
+        }
 
-        $key          = str_replace(self::METHOD_CALL_MARKER, '', $keyPart);
-        $isMethodCall = substr($keyPart, -2) === self::METHOD_CALL_MARKER;
+        $modelName    = $matches[1];
+        $key          = $matches[3];
+        $isMethodCall = !empty($matches[4]);
 
         return new self($modelName, $key, $isMethodCall);
-    }
-
-    /**
-     * @param string $modelKey
-     *
-     * @return UrlPrototype
-     */
-    private function setModelKey(string $modelKey): UrlPrototype
-    {
-        $this->modelKey = $modelKey;
-
-        return $this;
     }
 
     /**
@@ -119,18 +88,6 @@ final class UrlPrototype
     }
 
     /**
-     * @param string $modelName
-     *
-     * @return UrlPrototype
-     */
-    private function setModelName(string $modelName): UrlPrototype
-    {
-        $this->modelName = $modelName;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getDataSourceName(): string
@@ -152,22 +109,12 @@ final class UrlPrototype
 
         if ($this->hasModelKey()) {
             $str .= self::KEY_SEPARATOR.$this->getModelKey();
+
+            if ($this->isMethodCall()) {
+                $str .= self::METHOD_CALL_MARKER;
+            }
         }
 
-        if ($this->isMethodCall()) {
-            $str .= self::METHOD_CALL_MARKER;
-        }
-
-        return $str;
-    }
-
-    /**
-     * @return UrlPrototype
-     */
-    private function markAsMethodCall(): UrlPrototype
-    {
-        $this->isMethodCall = true;
-
-        return $this;
+        return '{'.$str.'}';
     }
 }

@@ -178,12 +178,12 @@ if (!function_exists('bootstrapKohana')) {
     }
 }
 
-if (!function_exists('bootstrapApp')) {
-    function bootstrapApp(AppEnvInterface $appEnv): ContainerInterface
+if (!function_exists('bootstrapCore')) {
+    function bootstrapCore(AppEnvInterface $appEnv): ContainerInterface
     {
         $profiler = StartupProfiler::getInstance();
 
-        $p = $profiler->start('Bootstrap App');
+        $p = $profiler->start('Bootstrap Core');
 
         /*
         - AppEnv
@@ -204,13 +204,13 @@ if (!function_exists('bootstrapApp')) {
             // Include Composer dependencies first (they may be used in site-related modules)
             includeComposerAutoloader($appRootPath);
 
-            // Add site-related modules to CFS first so it would be placed on top of core but under site app
+            // Add site-related modules to CFS first, so it would be placed on top of core but under site app
             if ($appModules) {
                 prependModulesToCfs($appModules);
             }
 
-            // Connecting per-site directory to CFS so it becomes top level path (it overrides /application/ and all modules)
-            // Placing it after initializing modules so it would be placed first (prepended)
+            // Connecting per-site directory to CFS, so it becomes top level path (it overrides /application/ and all modules)
+            // Placing it after initializing modules, so it would be placed first (prepended)
             prependKohanaPath($appRootPath);
 
             // Repeat init after adding site-related config directory via CFS
@@ -251,7 +251,7 @@ if (!function_exists('bootstrapPlatform')) {
     {
         configureKohana();
 
-        $appEnv = AppEnv::instance();
+        $appEnv = AppEnv::createFrom($_ENV, $_SERVER);
 
         $envMode = $appEnv->isAppRunning()
             ? $appEnv->getModeName()
@@ -259,7 +259,7 @@ if (!function_exists('bootstrapPlatform')) {
 
         bootstrapKohana($envMode);
 
-        return bootstrapApp($appEnv);
+        return bootstrapCore($appEnv);
     }
 }
 

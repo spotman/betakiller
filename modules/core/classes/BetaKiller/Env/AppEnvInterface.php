@@ -25,6 +25,7 @@ interface AppEnvInterface
     public const APP_MODE     = 'APP_ENV';
     public const APP_REVISION = 'APP_REVISION';
     public const APP_DEBUG    = 'APP_DEBUG';
+    public const APP_CACHE    = 'APP_CACHE';
 
     public const DEBUG_EMAIL_ADDRESS = 'DEBUG_EMAIL_ADDRESS';
 
@@ -207,4 +208,9 @@ interface AppEnvInterface
      * @return void
      */
     public function validateEnvVariables(): void;
+
+    /**
+     * @return bool
+     */
+    public function isCachingEnabled(): bool;
 }

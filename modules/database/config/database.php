@@ -1,56 +1,30 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
+<?php
 
-return array
-(
-	'default' => array
-	(
-		'type'       => 'MySQL',
-		'connection' => array(
-			/**
-			 * The following options are available for MySQL:
-			 *
-			 * string   hostname     server hostname, or socket
-			 * string   database     database name
-			 * string   username     database username
-			 * string   password     database password
-			 * boolean  persistent   use persistent connections?
-			 * array    variables    system variables as "key => value" pairs
-			 *
-			 * Ports and sockets may be appended to the hostname.
-			 */
-			'hostname'   => 'localhost',
-			'database'   => 'kohana',
-			'username'   => FALSE,
-			'password'   => FALSE,
-			'persistent' => FALSE,
-		),
-		'table_prefix' => '',
-		'charset'      => 'utf8',
-		'caching'      => FALSE,
-	),
-	'alternate' => array(
-		'type'       => 'PDO',
-		'connection' => array(
-			/**
-			 * The following options are available for PDO:
-			 *
-			 * string   dsn         Data Source Name
-			 * string   username    database username
-			 * string   password    database password
-			 * boolean  persistent  use persistent connections?
-			 */
-			'dsn'        => 'mysql:host=localhost;dbname=kohana',
-			'username'   => 'root',
-			'password'   => 'r00tdb',
-			'persistent' => FALSE,
-		),
-		/**
-		 * The following extra options are available for PDO:
-		 *
-		 * string   identifier  set the escaping identifier
-		 */
-		'table_prefix' => '',
-		'charset'      => 'utf8',
-		'caching'      => FALSE,
-	),
-);
+return [
+    'default' => [
+        'type'         => 'MySQLi',
+        'connection'   => [
+            /**
+             * The following options are available for MySQL:
+             *
+             * string   hostname     server hostname, or socket
+             * string   database     db name
+             * string   username     db username
+             * string   password     db password
+             * boolean  persistent   use persistent connections?
+             * array    variables    system variables as "key => value" pairs
+             *
+             * Ports and sockets may be appended to the hostname.
+             */
+            'hostname'   => getenv('MYSQL_HOST'),
+            'database'   => getenv('MYSQL_DB'),
+            'username'   => getenv('MYSQL_USER'),
+            'password'   => getenv('MYSQL_PASS'),
+            'port'       => getenv('MYSQL_PORT'),
+            'persistent' => false,
+        ],
+        'table_prefix' => '',
+        'charset'      => 'utf8mb4',
+        'caching'      => !empty(getenv('APP_CACHE')),
+    ],
+];

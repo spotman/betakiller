@@ -1,5 +1,7 @@
 <?php
 
+use BetaKiller\Env\AppEnv;
+
 return [
 
     /**
@@ -12,7 +14,7 @@ return [
         /**
          * Enable caching of directories list
          */
-        'cache'      => Kohana::$environment === Kohana::PRODUCTION,
+        'cache'      => AppEnv::instance()->inProductionMode(),
 
         /**
          * Namespaces to add
@@ -36,8 +38,8 @@ return [
      * http://twig.sensiolabs.org/doc/api.html#environment-options
      */
     'environment' => [
-        'auto_reload'         => Kohana::$environment === Kohana::DEVELOPMENT,
-        'debug'               => Kohana::$environment === Kohana::DEVELOPMENT,
+        'auto_reload'         => AppEnv::instance()->inDevelopmentMode(),
+        'debug'               => AppEnv::instance()->inDevelopmentMode(),
         'autoescape'          => true,
         'base_template_class' => Twig_Template::class,
         'cache'               => null,

@@ -1,11 +1,12 @@
 <?php
 
+use BetaKiller\Test\AbstractTestCase;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementStack;
 
-class UrlElementStackTest extends \BetaKiller\Test\AbstractTestCase
+class UrlElementStackTest extends AbstractTestCase
 {
     private const FIRST_IFACE_CODENAME  = 'FirstCodename';
     private const SECOND_IFACE_CODENAME = 'SecondTestCodename';

@@ -2,6 +2,7 @@
 namespace BetaKiller\Env;
 
 use Dotenv\Dotenv;
+use LogicException;
 use function stream_isatty;
 
 /**
@@ -33,6 +34,8 @@ final class AppEnv implements AppEnvInterface
      */
     private string $revision;
 
+    private string $coreRootPath;
+
     /**
      * @var string
      */
@@ -42,19 +45,31 @@ final class AppEnv implements AppEnvInterface
 
     private bool $isAppRunning;
 
+    private bool $isCli;
+
+    private bool $isCachingEnabled;
+
+    public static function createFrom(array $envVars, array $serverVars): self
+    {
+        return self::$instance = new self($envVars, $serverVars);
+    }
+
     public static function instance(): AppEnvInterface
     {
         if (!self::$instance) {
-            self::$instance = new self;
+            throw new LogicException('AppEnv must be initialized before calling AppEnv::instance()');
         }
 
         return self::$instance;
     }
 
-    private function __construct()
+    private function __construct(private readonly array $envVars, private readonly array $serverVars)
     {
+        $this->isCli = $this->detectCli();
+
+        $this->coreRootPath = realpath(DOCROOT);
         $this->docRootPath  = $this->detectDocRoot();
-        $this->isAppRunning = $this->docRootPath !== $this->getCoreRootPath();
+        $this->isAppRunning = !str_starts_with($this->docRootPath, $this->coreRootPath);
         $this->appRootPath  = $this->detectAppRoot();
 
         if ($this->isCli()) {
@@ -65,6 +80,7 @@ final class AppEnv implements AppEnvInterface
         $this->detectAppUrl();
         $this->detectAppRevision();
         $this->detectDebugMode();
+        $this->detectCaching();
     }
 
     private function detectDebugMode(): void
@@ -110,6 +126,11 @@ final class AppEnv implements AppEnvInterface
         }
     }
 
+    private function detectCaching(): void
+    {
+        $this->isCachingEnabled = $this->hasEnvVariable(self::APP_CACHE);
+    }
+
     /**
      * @inheritDoc
      */
@@ -132,7 +153,7 @@ final class AppEnv implements AppEnvInterface
         $value = getenv($name);
 
         if (!$value && $required) {
-            throw new \LogicException('Missing :name env variable', [':name' => $name]);
+            throw new LogicException('Missing :name env variable', [':name' => $name]);
         }
 
         return (string)$value;
@@ -202,11 +223,16 @@ final class AppEnv implements AppEnvInterface
         return $this->isAppRunning;
     }
 
+    public function isCli(): bool
+    {
+        return $this->isCli;
+    }
+
     /**
      * @see https://stackoverflow.com/a/25967493
      * @return bool
      */
-    public function isCli(): bool
+    private function detectCli(): bool
     {
         if ($this->isInternalWebServer()) {
             return false;
@@ -214,10 +240,10 @@ final class AppEnv implements AppEnvInterface
 
         switch (true) {
             case PHP_SAPI === 'cli':
-            case \defined('STDIN'):
-            case array_key_exists('SHELL', $_ENV):
-            case empty($_SERVER['REMOTE_ADDR']) && empty($_SERVER['HTTP_USER_AGENT']) && \count($_SERVER['argv']) > 0:
-            case !array_key_exists('REQUEST_METHOD', $_SERVER):
+            case defined('STDIN'):
+            case array_key_exists('SHELL', $this->envVars):
+            case empty($this->serverVars['REMOTE_ADDR']) && empty($this->serverVars['HTTP_USER_AGENT']) && count($this->serverVars['argv']) > 0:
+            case !array_key_exists('REQUEST_METHOD', $this->serverVars):
                 return true;
 
             default:
@@ -270,7 +296,7 @@ final class AppEnv implements AppEnvInterface
         $options = \getopt('', [$key]);
 
         if ($options === false) {
-            throw new \LogicException('CLI arguments parsing error');
+            throw new LogicException('CLI arguments parsing error');
         }
 
         return $options[$name] ?? $default;
@@ -382,6 +408,11 @@ final class AppEnv implements AppEnvInterface
         $this->debugEnabled = false;
     }
 
+    public function isCachingEnabled(): bool
+    {
+        return $this->isCachingEnabled;
+    }
+
     public function validateEnvVariables(): void
     {
         $dotEnv = Dotenv::create($this->getAppRootPath());
@@ -409,31 +440,38 @@ final class AppEnv implements AppEnvInterface
         }
     }
 
+    private function getServerScriptFilename(): string
+    {
+        return realpath($this->serverVars['SCRIPT_FILENAME']);
+    }
+
+    private function getServerDocumentRoot(): ?string
+    {
+        return $this->serverVars['DOCUMENT_ROOT'] ?? null;
+    }
+
     private function detectDocRoot(): string
     {
-        $path = dirname(realpath($_SERVER['SCRIPT_FILENAME']));
-
-        // Use current dir if vendor/bin script is used
-        if (str_contains($path, DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR)) {
-            $path = getcwd().DIRECTORY_SEPARATOR.'public';
-
-            if (!file_exists($path)) {
-                throw new \LogicException('Missing "public" directory '.$path);
-            }
+        // Web requests must use http server variables
+        if (!$this->isCli) {
+            return $this->getServerDocumentRoot();
         }
 
-        return $path;
+        // CLI calls must use initial script` directory
+        return dirname($this->getServerScriptFilename());
     }
 
     private function detectAppRoot(): string
     {
-        return $this->isAppRunning
-            ? realpath($this->docRootPath.DIRECTORY_SEPARATOR.'..') // parent o public dir
-            : $this->getCoreRootPath();
-    }
+        if (!$this->isAppRunning) {
+            return $this->coreRootPath;
+        }
 
-    private function getCoreRootPath(): string
-    {
-        return realpath(DOCROOT);
+        if (!str_ends_with($this->docRootPath, DIRECTORY_SEPARATOR.'public')) {
+            throw new LogicException('Application document root must be set to "public" subdirectory');
+        }
+
+        // Parent of public dir
+        return realpath($this->docRootPath.DIRECTORY_SEPARATOR.'..');
     }
 }
