@@ -256,8 +256,10 @@ final class Runner extends AbstractTask
     {
         $this->lock = $this->lockFactory->create($this->codename);
 
+        $pid = getmypid();
+
         // Check if it is running already and exit if so
-        if ($this->lock->isValid()) {
+        if ($this->lock->isValid() && $this->lock->getPid() !== $pid) {
             // It is not normal to have multiple instances
             throw new DaemonException('Daemon ":name" is already running', [
                 ':name' => $this->codename,
@@ -274,7 +276,7 @@ final class Runner extends AbstractTask
             ]);
         }
 
-        if (!$this->lock->acquire(getmypid())) {
+        if (!$this->lock->acquire($pid)) {
             throw new DaemonException('Can not acquire lock for daemon ":name"', [
                 ':name' => $this->codename,
             ]);
