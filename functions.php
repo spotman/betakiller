@@ -418,7 +418,9 @@ if (!function_exists('fallbackExceptionHandler')) {
         ob_get_length() && ob_end_clean();
         http_response_code(500);
 
-        $appEnv = class_exists(AppEnv::class) ? AppEnv::instance() : null;
+        $appEnv = (class_exists(AppEnv::class, false) && AppEnv::isInitialized())
+            ? AppEnv::instance()
+            : null;
 
         $showDetails = $appEnv && $appEnv->isAppRunning() && !$appEnv->inProductionMode();
 

@@ -54,6 +54,11 @@ final class AppEnv implements AppEnvInterface
         return self::$instance = new self($envVars, $serverVars);
     }
 
+    public static function isInitialized(): bool
+    {
+        return (bool)self::$instance;
+    }
+
     public static function instance(): AppEnvInterface
     {
         if (!self::$instance) {
@@ -465,6 +470,10 @@ final class AppEnv implements AppEnvInterface
     {
         if (!$this->isAppRunning) {
             return $this->coreRootPath;
+        }
+
+        if ($this->isCli && str_contains($this->docRootPath, implode(DIRECTORY_SEPARATOR, ['vendor', 'bin']))) {
+            return getcwd();
         }
 
         if (!str_ends_with($this->docRootPath, DIRECTORY_SEPARATOR.'public')) {
