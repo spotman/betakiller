@@ -236,7 +236,7 @@ return [
             $stack->push(
                 Middleware::log(
                     $logger,
-                    new \GuzzleHttp\MessageFormatter('{req_headers} => {res_headers}'),
+                    new \GuzzleHttp\MessageFormatter('{req_headers} {req_body} => {res_headers}'),
                     LogLevel::DEBUG
                 )
             );
