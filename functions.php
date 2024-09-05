@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use BetaKiller\Config\KohanaConfigProvider;
@@ -9,6 +10,7 @@ use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Env\FakeConfigReader;
 use BetaKiller\Factory\AppRunnerFactoryInterface;
 use BetaKiller\ModuleInitializerInterface;
+use JetBrains\PhpStorm\NoReturn;
 use Psr\Container\ContainerInterface;
 
 if (!function_exists('configureKohana')) {
@@ -127,11 +129,9 @@ if (!function_exists('configureKohana')) {
 }
 
 if (!function_exists('bootstrapKohana')) {
-    function bootstrapKohana(string $envMode): void
+    function bootstrapKohana(AppEnvInterface $appEnv): void
     {
-        // Load the core Kohana class
-        require MODPATH.'platform/classes/BetaKiller/Dev/AbstractProfiler.php';
-        require MODPATH.'platform/classes/BetaKiller/Dev/StartupProfiler.php';
+        $envMode = $appEnv->getModeName();
 
         $p = StartupProfiler::getInstance()->start('Bootstrap Kohana');
 
@@ -181,6 +181,8 @@ if (!function_exists('bootstrapKohana')) {
 if (!function_exists('bootstrapCore')) {
     function bootstrapCore(AppEnvInterface $appEnv): ContainerInterface
     {
+        registerExceptionHandler();
+
         $profiler = StartupProfiler::getInstance();
 
         $p = $profiler->start('Bootstrap Core');
@@ -253,11 +255,7 @@ if (!function_exists('bootstrapPlatform')) {
 
         $appEnv = AppEnv::createFrom($_ENV, $_SERVER);
 
-        $envMode = $appEnv->isAppRunning()
-            ? $appEnv->getModeName()
-            : AppEnvInterface::MODE_DEVELOPMENT;
-
-        bootstrapKohana($envMode);
+        bootstrapKohana($appEnv);
 
         return bootstrapCore($appEnv);
     }
@@ -407,37 +405,70 @@ if (!function_exists('patchKohana')) {
     }
 }
 
+if (!function_exists('registerExceptionHandler')) {
+    function registerExceptionHandler(): void
+    {
+        // Preload pretty stacktrace renderer (used in fallbackExceptionHandler)
+        spl_autoload_call(Debug::class);
+
+        set_exception_handler(function (Throwable $e) {
+            fallbackExceptionHandler($e);
+        });
+    }
+}
+
 if (!function_exists('fallbackExceptionHandler')) {
     /**
      * @param \Throwable $e
      *
      * @return void
      */
+    #[NoReturn]
     function fallbackExceptionHandler(Throwable $e): void
     {
-        ob_get_length() && ob_end_clean();
-        http_response_code(500);
-
         $appEnv = (class_exists(AppEnv::class, false) && AppEnv::isInitialized())
             ? AppEnv::instance()
             : null;
 
-        $showDetails = $appEnv && $appEnv->isAppRunning() && !$appEnv->inProductionMode();
+        $isCli       = $appEnv ? $appEnv->isCli() : PHP_SAPI === 'cli';
+        $showDetails = $appEnv?->isAppRunning() && !$appEnv->inProductionMode();
 
-        $message  = $e->getMessage().PHP_EOL.PHP_EOL.$e->getTraceAsString();
-        $previous = $e->getPrevious();
-
-        if ($previous) {
-            $message .= PHP_EOL.$previous->getMessage().PHP_EOL.PHP_EOL.$previous->getTraceAsString();
-        }
-
-        if ($showDetails) {
-            // Show to dev
-            echo (PHP_SAPI === 'cli') ? $message : nl2br($message);
-        } else {
+        if (!$showDetails) {
             // Write to default log
             /** @noinspection ForgottenDebugOutputInspection */
-            error_log($message);
+            error_log($e->getMessage());
+
+            return;
         }
+
+        $message = trim(
+            implode(
+                PHP_EOL.PHP_EOL,
+                array_filter([
+                    $e->getMessage(),
+                    $e->getTraceAsString(),
+                    $e->getPrevious()?->getMessage(),
+                    $e->getPrevious()?->getTraceAsString(),
+                ])
+            )
+        );
+
+        if (!$isCli) {
+            ob_get_length() && ob_end_clean();
+
+            if (!headers_sent()) {
+                http_response_code(500);
+                header('Content-Type: text/html; charset=utf-8');
+            }
+
+            $message = class_exists(Debug::class, false)
+                ? Debug::htmlStackTrace($e)
+                : nl2br($message);
+        }
+
+        echo $message;
+
+        // Exit with error code in CLI mode
+        exit(1);
     }
 }

@@ -1,8 +1,10 @@
 <?php
+
 namespace BetaKiller\Env;
 
 use Dotenv\Dotenv;
 use LogicException;
+
 use function stream_isatty;
 
 /**
@@ -97,7 +99,9 @@ final class AppEnv implements AppEnvInterface
 
     private function detectAppMode(): void
     {
-        $this->mode = $this->getEnvVariable(self::APP_MODE);
+        $this->mode = $this->isAppRunning
+            ? $this->getEnvVariable(self::APP_MODE)
+            : AppEnvInterface::MODE_DEVELOPMENT;
     }
 
     private function detectAppUrl(): void
@@ -247,7 +251,9 @@ final class AppEnv implements AppEnvInterface
             case PHP_SAPI === 'cli':
             case defined('STDIN'):
             case array_key_exists('SHELL', $this->envVars):
-            case empty($this->serverVars['REMOTE_ADDR']) && empty($this->serverVars['HTTP_USER_AGENT']) && count($this->serverVars['argv']) > 0:
+            case empty($this->serverVars['REMOTE_ADDR']) && empty($this->serverVars['HTTP_USER_AGENT']) && count(
+                    $this->serverVars['argv']
+                ) > 0:
             case !array_key_exists('REQUEST_METHOD', $this->serverVars):
                 return true;
 

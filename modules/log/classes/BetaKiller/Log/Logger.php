@@ -1,8 +1,8 @@
 <?php
+
 namespace BetaKiller\Log;
 
 use BetaKiller\Env\AppEnvInterface;
-use BetaKiller\Helper\LoggerHelper;
 use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\DeduplicationHandler;
@@ -14,10 +14,9 @@ use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\WebProcessor;
 use Psr\Log\LoggerTrait;
-use Throwable;
+
 use function chmod;
 use function is_file;
-use function set_exception_handler;
 
 class Logger implements LoggerInterface
 {
@@ -108,15 +107,9 @@ class Logger implements LoggerInterface
         $errorHandler->registerErrorHandler([], $this->appEnv->isCli());
         $errorHandler->registerFatalHandler();
 
-        // Do not register Monolog exception handler coz it calls exit()
-        set_exception_handler(function (Throwable $e) {
-            LoggerHelper::logRawException($this, $e);
-
-            // Exit with error code in CLI mode
-            if ($this->appEnv->isCli()) {
-                exit(1);
-            }
-        });
+        // Exception object will be saved in context
+        // Call previous handler for generating proper response
+        $errorHandler->registerExceptionHandler();
     }
 
     private function addProcessors(): void
@@ -134,7 +127,7 @@ class Logger implements LoggerInterface
 
         // CLI mode logging
         if ($this->appEnv->isCli()) {
-            $this->monolog->pushProcessor(new CliProcessor);
+            $this->monolog->pushProcessor(new CliProcessor());
         } else {
             $this->monolog->pushProcessor(new WebProcessor());
         }
@@ -178,24 +171,26 @@ class Logger implements LoggerInterface
     private function addDesktopHandler(): void
     {
         if ($this->appEnv->isCli() && DesktopNotificationHandler::isSupported()) {
-            $this->monolog->pushHandler(new SkipExpectedExceptionsHandler(new DesktopNotificationHandler));
+            $this->monolog->pushHandler(new SkipExpectedExceptionsHandler(new DesktopNotificationHandler()));
         }
     }
 
     private function addLogsHandler(): void
     {
         // File logging
-        $logFilePath = $this->appEnv->getLogsPath(implode(DIRECTORY_SEPARATOR, [
-            date('Y'),
-            date('m'),
-            date('d').'.log',
-        ]));
+        $logFilePath = $this->appEnv->getLogsPath(
+            implode(DIRECTORY_SEPARATOR, [
+                date('Y'),
+                date('m'),
+                date('d').'.log',
+            ])
+        );
 
         $logLevel = $this->getLogLevel();
 
         $fileHandler = new StreamHandler($logFilePath, $logLevel);
-        $fileHandler->pushProcessor(new ContextCleanupProcessor);
-        $fileHandler->pushProcessor(new ExceptionStacktraceProcessor);
+        $fileHandler->pushProcessor(new ContextCleanupProcessor());
+        $fileHandler->pushProcessor(new ExceptionStacktraceProcessor());
 
         $this->monolog->pushHandler(new SkipExpectedExceptionsHandler($fileHandler));
     }
@@ -249,7 +244,7 @@ class Logger implements LoggerInterface
                 return;
         }
 
-        $errorHandler->pushProcessor(new ContextCleanupProcessor);
+        $errorHandler->pushProcessor(new ContextCleanupProcessor());
 
         // Remove duplicate errors
         $errorStorage = $this->appEnv->getTempPath('monolog-deduplication.storage');
@@ -258,11 +253,15 @@ class Logger implements LoggerInterface
             touch($errorStorage) && chmod($errorStorage, 0660);
         }
 
-        $this->monolog->pushHandler(new SkipExpectedExceptionsHandler(new DeduplicationHandler(
-            $errorHandler,
-            $errorStorage,
-            $logLevel,
-            180 // Repeat notification in 3 minutes
-        )));
+        $this->monolog->pushHandler(
+            new SkipExpectedExceptionsHandler(
+                new DeduplicationHandler(
+                    $errorHandler,
+                    $errorStorage,
+                    $logLevel,
+                    180 // Repeat notification in 3 minutes
+                )
+            )
+        );
     }
 }

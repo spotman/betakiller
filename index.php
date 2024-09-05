@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 if (PHP_SAPI === 'cli-server') {
@@ -15,7 +16,6 @@ try {
     $container = include __DIR__.'/bootstrap.php';
 } catch (Throwable $e) {
     fallbackExceptionHandler($e);
-    exit;
 }
 
 runApp($container);
