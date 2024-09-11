@@ -1,7 +1,6 @@
 <?php
 
 use BetaKiller\Exception\HttpExceptionInterface;
-use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\View\ViewInterface;
 use Laminas\Diactoros\Response\HtmlResponse;

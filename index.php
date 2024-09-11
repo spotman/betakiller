@@ -12,10 +12,6 @@ if (PHP_SAPI === 'cli-server') {
     }
 }
 
-try {
-    $container = include __DIR__.'/bootstrap.php';
-} catch (Throwable $e) {
-    fallbackExceptionHandler($e);
-}
+$container = include __DIR__.'/bootstrap.php';
 
 runApp($container);

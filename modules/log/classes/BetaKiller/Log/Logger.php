@@ -3,6 +3,7 @@
 namespace BetaKiller\Log;
 
 use BetaKiller\Env\AppEnvInterface;
+use BetaKiller\Helper\LoggerHelper;
 use Monolog\ErrorHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\DeduplicationHandler;
@@ -14,6 +15,8 @@ use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\WebProcessor;
 use Psr\Log\LoggerTrait;
+
+use Throwable;
 
 use function chmod;
 use function is_file;
@@ -31,6 +34,11 @@ class Logger implements LoggerInterface
      * @var \BetaKiller\Env\AppEnvInterface
      */
     private AppEnvInterface $appEnv;
+
+    /**
+     * @var callable|null
+     */
+    private $previousExceptionHandler = null;
 
     /**
      * Logger constructor.
@@ -103,13 +111,20 @@ class Logger implements LoggerInterface
 
     private function registerErrorHandlers(): void
     {
+        $isCli = $this->appEnv->isCli();
+
         $errorHandler = new ErrorHandler($this->monolog);
-        $errorHandler->registerErrorHandler([], $this->appEnv->isCli());
+        $errorHandler->registerErrorHandler([], $isCli);
         $errorHandler->registerFatalHandler();
 
-        // Exception object will be saved in context
-        // Call previous handler for generating proper response
-        $errorHandler->registerExceptionHandler();
+        // Do not use Monolog exception handler coz we need custom logic here
+        $this->previousExceptionHandler = set_exception_handler(function (Throwable $e) {
+            // Store exception data in logs
+            LoggerHelper::logRawException($this, $e);
+
+            // Call previous handler if exists
+            $this->previousExceptionHandler && ($this->previousExceptionHandler)($e);
+        });
     }
 
     private function addProcessors(): void
@@ -165,6 +180,7 @@ class Logger implements LoggerInterface
         $logLevel = $this->getLogLevel();
         $isHuman  = $this->appEnv->isHuman();
 
+        // Exceptions will be processed via exception handler
         $this->monolog->pushHandler(new StdOutHandler($logLevel, $isHuman));
     }
 

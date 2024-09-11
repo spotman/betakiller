@@ -426,49 +426,46 @@ if (!function_exists('fallbackExceptionHandler')) {
     #[NoReturn]
     function fallbackExceptionHandler(Throwable $e): void
     {
+        // Drop any output
+        ob_get_length() && ob_end_clean();
+
         $appEnv = (class_exists(AppEnv::class, false) && AppEnv::isInitialized())
             ? AppEnv::instance()
             : null;
 
-        $isCli       = $appEnv ? $appEnv->isCli() : PHP_SAPI === 'cli';
-        $showDetails = $appEnv?->isAppRunning() && !$appEnv->inProductionMode();
-
-        if (!$showDetails) {
+        if (!$appEnv || !class_exists(Debug::class, false)) {
             // Write to default log
             /** @noinspection ForgottenDebugOutputInspection */
-            error_log($e->getMessage());
-
-            return;
+            error_log('Startup error: '.$e->getMessage());
+            exit(1);
         }
 
-        $message = trim(
-            implode(
-                PHP_EOL.PHP_EOL,
-                array_filter([
-                    $e->getMessage(),
-                    $e->getTraceAsString(),
-                    $e->getPrevious()?->getMessage(),
-                    $e->getPrevious()?->getTraceAsString(),
-                ])
-            )
-        );
+        $isCli   = $appEnv->isCli();
+        $isDebug = $appEnv->isDebugEnabled();
+        $inProd  = $appEnv->inProductionMode();
 
-        if (!$isCli) {
-            ob_get_length() && ob_end_clean();
-
-            if (!headers_sent()) {
-                http_response_code(500);
-                header('Content-Type: text/html; charset=utf-8');
-            }
-
-            $message = class_exists(Debug::class, false)
-                ? Debug::htmlStackTrace($e)
-                : nl2br($message);
+        if (!$isCli && !headers_sent()) {
+            http_response_code(500);
+            header('Content-Type: text/html; charset=utf-8');
         }
 
-        echo $message;
+        // Detect root exception
+        while ($e->getPrevious()) {
+            $e = $e->getPrevious();
+        }
 
-        // Exit with error code in CLI mode
+        echo match (true) {
+            // cli
+            $isCli => PHP_EOL.$e->getMessage().PHP_EOL.PHP_EOL.$e->getTraceAsString().PHP_EOL.PHP_EOL,
+
+            // non-cli in dev-friendly env
+            !$inProd && $isDebug => Debug::htmlStackTrace($e),
+
+            // non-cli without debug
+            default => 'System error occurred.',
+        };
+
+        // Exit with error code
         exit(1);
     }
 }
