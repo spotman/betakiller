@@ -1,4 +1,5 @@
 <?php
+
 namespace Deployer;
 
 use Deployer\Exception\Exception;
@@ -35,6 +36,10 @@ option('to', null, InputOption::VALUE_OPTIONAL, 'Target migration');
 
 // Option for Minion tasks direct calls
 //option('task', null, InputOption::VALUE_OPTIONAL, 'Minion task name');
+
+// Optional branches for staging/testing env
+option('app-branch', null, InputOption::VALUE_OPTIONAL, 'Target branch for the app repo');
+option('core-branch', null, InputOption::VALUE_OPTIONAL, 'Target branch for the core repo');
 
 
 \define('DEPLOYER_STAGE_DEV', 'development');
@@ -82,15 +87,23 @@ task('check', static function () {
 
     $host = Context::get()->getHost();
 
-    $appBranch  = $host->has('app_branch') ? $host->get('app_branch') : null;
-    $coreBranch = $host->has('core_branch') ? $host->get('core_branch') : null;
+    $appBranch  = $host->has('app_branch') ? $host->get('app_branch') : input()->getOption('app-branch');
+    $coreBranch = $host->has('core_branch') ? $host->get('core_branch') : input()->getOption('core-branch');
 
     if (!$appBranch) {
-        $appBranch = askForLocalBranch();
+        $appBranch = askForRemoteBranch('app');
     }
 
     if (!$coreBranch) {
-        throw new RuntimeException('Core target branch must be set in hosts.yml');
+        $coreBranch = askForRemoteBranch('core');
+    }
+
+    if (!$appBranch) {
+        throw new RuntimeException('App target branch must be set in hosts.yml or provided via args');
+    }
+
+    if (!$coreBranch) {
+        throw new RuntimeException('Core target branch must be set in hosts.yml or provided via args');
     }
 
     set('app_branch', $appBranch);
@@ -98,7 +111,7 @@ task('check', static function () {
 
     // Check is assets:build task defined
 //    task('assets:build');
-});
+})->shallow();
 
 // Prepare app env
 task('deploy:repository:prepare:app', static function () {
@@ -114,27 +127,27 @@ task('deploy:repository:prepare:betakiller', static function () {
     set('repository_branch', get('core_branch'));
 })->desc('Prepare BetaKiller repository');
 
-function askForLocalBranch(): string
+function askForRemoteBranch(string $scope): string
 {
-    // Fetch branches from remote
-    runLocally('git fetch --all');
+    $gitRepo = match($scope) {
+        'app' => get('app_repository'),
+        'core' => get('core_repository'),
+        default => throw new Exception('Wrong project scope')
+    };
+
+    // Filter real branches only
+    $refToken = 'refs/heads/';
 
     // List all branches
-    $listResult = runLocally('git branch -r');
+    $gitOutput = runLocally("git ls-remote $gitRepo | grep $refToken"); //, null, true, false);
 
-    $branches = explode(PHP_EOL, $listResult);
+    // Split into lines
+    $gitLines = explode(PHP_EOL, $gitOutput);
 
-    // Filter real branches only, reset indexes
-    $branches = array_values(array_filter($branches, static function (string $name) {
-        return $name && strpos($name, 'HEAD') === false;
-    }));
+    // Cleanup
+    $branches = array_map(fn(string $line) => explode($refToken, $line, 2)[1], $gitLines);
 
-    // Map names (cut "origin/")
-    $branches = array_map(static function (string $name) {
-        return mb_substr($name, mb_strpos($name, '/') + 1);
-    }, $branches);
-
-    $selected = ask('Select target branch', $branches[0], $branches);
+    $selected = ask("Select $scope target branch", $branches[0], $branches);
 
     if (!$selected) {
         throw new Exception('Target branch is required');
@@ -512,7 +525,7 @@ task('import:notification', static function () {
  */
 task('deploy:started', static function () {
     writeln('<info>Deploying to <comment>https://{{hostname}}</comment></info>');
-});
+})->shallow();
 
 /**
  * Success message
@@ -520,7 +533,7 @@ task('deploy:started', static function () {
 task('deploy:done', static function () use ($tz) {
     $dateTime = (new \DateTimeImmutable())->setTimezone($tz)->format('H:i:s T');
     writeln('<info>Successfully deployed to <comment>https://{{hostname}}</comment> at '.$dateTime.'!</info>');
-});
+})->shallow();
 
 /**
  * Keep maintenance mode in case ofo failure
@@ -605,9 +618,9 @@ task('bk:deploy:migrate', [
 ]);
 
 task('bk:deploy:finalize', [
+    'deploy:clear_paths',
     'cleanup',
     'deploy:unlock',
-    'deploy:done',
 ]);
 
 /**
@@ -623,6 +636,7 @@ task('bk:deploy', [
     'bk:deploy:assets',
     'bk:deploy:migrate',
     'bk:deploy:finalize',
+    'deploy:done',
 ])->desc('Deploy app bundle')->onStage(
     DEPLOYER_STAGE_STAGING,
     DEPLOYER_STAGE_PRODUCTION,
@@ -691,12 +705,19 @@ function runMinionTask(string $name, bool $asHttpUser = null, bool $tty = null):
  * @return string
  * @throws \Deployer\Exception\Exception
  */
-function runGitCommand(string $gitCmd, string $path = null, ?bool $silent = null): string
+function runGitCommand(string $gitCmd, string $path = null, ?bool $silent = null, ?bool $cd = null): string
 {
     $path   = $path ?: getRepoPath();
     $silent = $silent ?? false;
+    $cd     = $cd ?? true;
 
-    $exec   = sprintf(get('git_exec'), "cd $path && git $gitCmd");
+    $gitCmd = "git $gitCmd";
+
+    if ($cd) {
+        $gitCmd = "cd $path && $gitCmd";
+    }
+
+    $exec   = sprintf(get('git_exec'), $gitCmd);
     $result = run($exec);
 
     if (!$silent) {
