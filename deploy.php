@@ -7,6 +7,8 @@ use Deployer\Task\Context;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Exception\RuntimeException;
 
+use function dirname;
+
 require 'recipe/common.php';
 
 set('git_tty', true); // [Optional] Allocate tty for git on first deployment
@@ -22,7 +24,7 @@ set('core_repository', 'git@github.com:spotman/betakiller.git');
 set('app_path', 'app');
 set('app_git_root', 'app');
 
-set('git_exec', '%s'); // Nothing by default, just change dir on the server and call git comand directly
+set('git_exec', '%s'); // Nothing by default, just change dir on the server and call git command directly
 
 set('repo_base_path', function () {
     return getLatestReleasePath();
@@ -364,7 +366,7 @@ task('git:checkout', static function () {
  * Create table with migrations
  */
 task('migrations:install', static function () {
-    runMinionTask('migrations:install', false, true);
+    runMinionTask('migrations:install');
 })->desc('Install migrations table');
 
 /**
@@ -387,28 +389,32 @@ task('migrations:create', static function () {
 
     $output = runMinionTask("migrations:create --name=$name --description=$desc --scope=$scope", false, true);
 
-    $outArr = explode('Done! Check ', $output);
-
-    if ($outArr && \count($outArr) === 2) {
-        $filePath = trim($outArr[1]);
-
-        if (file_exists($filePath)) {
-            $dir = \dirname($filePath);
-            runGitCommand('add .', $dir);
-        } else {
-            writeln('Can not parse output, add migration file to git by yourself');
-        }
-    } else {
-        writeln('Can not parse output, add migration file to git by yourself');
+    if (!$output) {
+        throw new Exception('Empty output from Minion task');
     }
-})->onStage(DEPLOYER_STAGE_DEV)->desc('Create migration');
+
+    $outArr = explode('Done! Check ', $output, 2);
+
+    $filePath = $outArr ? trim($outArr[1]) : null;
+
+    if (!$filePath) {
+        throw new Exception('Can not detect migration file path');
+    }
+
+    if (!file_exists($filePath)) {
+        throw new Exception('Migration file does not exists on '.$filePath);
+    }
+
+    $dir = dirname($filePath);
+    runGitCommand('add .', $dir, true);
+})->onStage(DEPLOYER_STAGE_DEV)->desc('Create migration')->shallow();
 
 /**
  * Apply migrations
  */
 task('migrations:up', static function () {
     runMinionTask('migrations:up');
-})->desc('Apply migrations');
+})->desc('Apply migrations')->shallow();
 
 /**
  * Rollback migrations
@@ -645,7 +651,7 @@ task('bk:deploy', [
 
 task('update', [
     'migrate',
-])->desc('Update local workspace')->onHosts('dev')->onStage(\DEPLOYER_STAGE_DEV);
+])->desc('Update local workspace')->onStage(\DEPLOYER_STAGE_DEV);
 
 task('load:errors', static function () {
     download('{{release_path}}/{{core_path}}/application/logs/errors.sqlite', __DIR__.'/application/logs/');
@@ -656,13 +662,12 @@ task('load:errors', static function () {
  *
  * @param string    $name
  * @param bool|null $asHttpUser
- * @param bool|null $tty
+ * @param bool|null $silent
  *
  * @return string
  * @throws \Deployer\Exception\Exception
- * @throws \Deployer\Exception\RuntimeException
  */
-function runMinionTask(string $name, bool $asHttpUser = null, bool $tty = null): string
+function runMinionTask(string $name, bool $asHttpUser = null, bool $silent = null): string
 {
     $currentPath = getcwd();
     $path        = getRepoPath();
@@ -685,10 +690,10 @@ function runMinionTask(string $name, bool $asHttpUser = null, bool $tty = null):
     }
 
     $text = run($cmd, [
-        'tty' => (bool)$tty,
+//        'tty' => (bool)$tty,
     ]);
 
-    if ($text) {
+    if ($text && !$silent) {
         write($text);
     }
 
@@ -711,7 +716,7 @@ function runGitCommand(string $gitCmd, string $path = null, ?bool $silent = null
     $silent = $silent ?? false;
     $cd     = $cd ?? true;
 
-    $gitCmd = "git $gitCmd";
+    $gitCmd = "{{bin/git}} $gitCmd";
 
     if ($cd) {
         $gitCmd = "cd $path && $gitCmd";
