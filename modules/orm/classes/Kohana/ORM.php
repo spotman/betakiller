@@ -961,7 +961,7 @@ class Kohana_ORM extends Model implements Serializable
                 break;
             case Database::DELETE:
                 // Cannot use an alias for DELETE queries
-                $this->_db_builder = DB::delete($this->_table_name);
+                $this->_db_builder = DB::delete([$this->_table_name, $this->_object_name]);
         }
 
         // Process pending database method calls
