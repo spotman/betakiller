@@ -183,6 +183,11 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         return $orm->count_all();
     }
 
+    protected function deleteAll(OrmInterface $orm): void
+    {
+        $orm->delete_all();
+    }
+
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      *
