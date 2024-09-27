@@ -183,9 +183,9 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         return $orm->count_all();
     }
 
-    protected function deleteAll(OrmInterface $orm): void
+    protected function deleteAll(OrmInterface $orm): int
     {
-        $orm->delete_all();
+        return $orm->delete_all();
     }
 
     /**
