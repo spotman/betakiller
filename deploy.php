@@ -11,7 +11,7 @@ use function dirname;
 
 require 'recipe/common.php';
 
-set('git_tty', true); // [Optional] Allocate tty for git on first deployment
+set('git_tty', false); // [Optional] Allocate tty for git on first deployment
 set('ssh_multiplexing', true);
 
 $tzName = date_default_timezone_get();
