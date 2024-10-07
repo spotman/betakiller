@@ -1,10 +1,13 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Import;
 
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Config\RoleConfig;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Model\Role;
@@ -46,29 +49,29 @@ class Roles extends AbstractTask
     public function __construct(
         ConfigProviderInterface $config,
         RoleRepositoryInterface $roleRepo,
-        EntityFactoryInterface  $entityFactory,
-        LoggerInterface         $logger
+        EntityFactoryInterface $entityFactory,
+        LoggerInterface $logger
     ) {
         $this->config        = $config;
         $this->roleRepo      = $roleRepo;
         $this->entityFactory = $entityFactory;
         $this->logger        = $logger;
-
-        parent::__construct();
     }
 
     /**
      * Put cli arguments with their default values here
      * Format: "optionName" => "defaultValue"
      *
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @return array
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         $rolesConfig = $this->config->load(RoleConfig::CONFIG_GROUP_NAME, []);
 

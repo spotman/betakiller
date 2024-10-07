@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Import;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\I18n\FilesystemI18nKeysLoader;
@@ -17,6 +20,8 @@ use Psr\Log\LoggerInterface;
 
 class I18n extends AbstractTask
 {
+    private const ARG_FORCE = 'force';
+
     public const NOTIFICATION_NEW_KEYS = 'translator/i18n/new-keys';
 
     /**
@@ -87,24 +92,19 @@ class I18n extends AbstractTask
         $this->logger           = $logger;
         $this->notification     = $notificationHelper;
         $this->urlHelperFactory = $urlHelperFactory;
-
-        parent::__construct();
     }
 
     /**
-     * Put cli arguments with their default values here
-     * Format: "optionName" => "defaultValue"
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            'force' => false,
+            $builder->bool(self::ARG_FORCE),
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         // No DB editing for now => force update
         $force = true;

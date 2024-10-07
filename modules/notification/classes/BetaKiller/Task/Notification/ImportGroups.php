@@ -1,9 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Notification;
 
 use BetaKiller\Config\NotificationConfigInterface;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Model\NotificationGroup;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Notification\DismissBroadcastOnEventMessageInterface;
@@ -65,22 +68,17 @@ class ImportGroups extends AbstractTask
         $this->roleRepo         = $roleRepo;
         $this->transportFactory = $transportFactory;
         $this->logger           = $logger;
-
-        parent::__construct();
     }
 
     /**
-     * Put cli arguments with their default values here
-     * Format: "optionName" => "defaultValue"
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         $groupCodenames = $this->config->getGroups();
 
@@ -215,7 +213,8 @@ class ImportGroups extends AbstractTask
                     'Message ":message" has dismiss_on events but transport ":transport" is not dismissible', [
                     ':message'   => $messageCodename,
                     ':transport' => $transportCodename,
-                ]);
+                ]
+                );
             }
 
             $targetEventType = $isBroadcast
@@ -229,7 +228,8 @@ class ImportGroups extends AbstractTask
                         ':message' => $messageCodename,
                         ':event'   => $dismissOn,
                         ':must'    => $targetEventType,
-                    ]);
+                    ]
+                    );
                 }
             }
         }

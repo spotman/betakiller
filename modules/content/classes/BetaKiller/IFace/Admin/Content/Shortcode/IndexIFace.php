@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\IFace\Admin\Content\Shortcode;
 
 use BetaKiller\Content\Shortcode\ShortcodeEntityInterface;
@@ -20,8 +21,6 @@ class IndexIFace extends AbstractAdminIFace
      */
     public function __construct(ShortcodeRepository $repo)
     {
-//        parent::__construct();
-
         $this->repo = $repo;
     }
 

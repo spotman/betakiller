@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Daemon\Supervisor;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Daemon\DaemonLockFactory;
 use BetaKiller\Daemon\SupervisorDaemon;
 use BetaKiller\Task\AbstractTask;
@@ -23,22 +26,17 @@ abstract class AbstractSupervisorSignalTask extends AbstractTask
     public function __construct(DaemonLockFactory $lockFactory)
     {
         $this->lockFactory = $lockFactory;
-
-        parent::__construct();
     }
 
     /**
-     * Put cli arguments with their default values here
-     * Format: "optionName" => "defaultValue"
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         // Get lock
         $lock = $this->lockFactory->create(SupervisorDaemon::CODENAME);

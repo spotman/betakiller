@@ -1,13 +1,19 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Test;
 
 use BetaKiller\Api\ApiFacade;
+use BetaKiller\Console\ConsoleInput;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Task\AbstractTask;
+use BetaKiller\Task\TaskException;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
+
 use const JSON_PRETTY_PRINT;
 
 class Api extends AbstractTask
@@ -46,33 +52,33 @@ class Api extends AbstractTask
         $this->api    = $api;
         $this->logger = $logger;
         $this->user   = $user;
-
-        parent::__construct();
     }
 
     /**
      * Put cli arguments with their default values here
      * Format: "optionName" => "defaultValue"
      *
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @return array
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            self::ARG_TARGET => null,
-            self::ARG_REQ    => null,
-            self::ARG_P1     => null,
-            self::ARG_P2     => null,
-            self::ARG_P3     => null,
-            self::ARG_P4     => null,
+            $builder->string(self::ARG_TARGET)->required(),
+            $builder->string(self::ARG_REQ),
+            $builder->string(self::ARG_P1),
+            $builder->string(self::ARG_P2),
+            $builder->string(self::ARG_P3),
+            $builder->string(self::ARG_P4),
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
-        $targetString = (string)$this->getOption(self::ARG_TARGET, true);
+        $targetString = $params->getString(self::ARG_TARGET);
 
-        $arguments = $this->getCallArguments();
+        $arguments = $this->getCallArguments($params);
 
         [$resourceName, $methodName] = explode('.', $targetString, 2);
 
@@ -121,7 +127,7 @@ class Api extends AbstractTask
         }
     }
 
-    private function getCallArguments(): array
+    private function getCallArguments(ConsoleInputInterface $input): array
     {
         /** @see https://stackoverflow.com/a/30740680 */
         $fh = fopen('php://stdin', 'rb');
@@ -132,7 +138,7 @@ class Api extends AbstractTask
             return (array)json_decode($stdin, true, 5, \JSON_THROW_ON_ERROR);
         }
 
-        $req = $this->getOption(self::ARG_REQ, false);
+        $req = $input->getString(self::ARG_REQ);
 
         if ($req) {
             return (array)json_decode($req, true, 5, \JSON_THROW_ON_ERROR);
@@ -148,17 +154,18 @@ class Api extends AbstractTask
         $output = [];
 
         foreach ($names as $name) {
-            $value = $this->getOption($name, false);
-
-            if (is_numeric($value)) {
-                $output[] = $value + 0;
-            } elseif (in_array($value, ['true', 'false'])) {
-                $output[] = $value === 'true';
-            } elseif ($value && strpos($value, ',') !== false) {
-                $output[] = explode(',', $value);
-            } elseif ($value !== null) {
-                $output[] = $value;
+            if (!$input->has($name)) {
+                continue;
             }
+
+            $output[] = match (true) {
+                $input->isString($name) => $input->getString($name),
+                $input->isInt($name) => $input->getInt($name),
+                $input->isBool($name) => $input->getBool($name),
+                default => throw new TaskException('Unknown argument type of option ":name"', [
+                    ':name' => $name,
+                ])
+            };
         }
 
         return $output;

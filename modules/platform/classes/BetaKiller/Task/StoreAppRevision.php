@@ -1,14 +1,19 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Env\AppEnvInterface;
 use Psr\Log\LoggerInterface;
 use Spotman\DotEnv\DotEnv;
 
 class StoreAppRevision extends AbstractTask
 {
+    private const ARG_REVISION = 'revision';
+
     /**
      * @var \BetaKiller\Env\AppEnvInterface
      */
@@ -36,24 +41,18 @@ class StoreAppRevision extends AbstractTask
         $this->appEnv = $appEnv;
         $this->dotEnv = $dotEnv;
         $this->logger = $logger;
-
-        parent::__construct();
     }
 
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            'revision' => null,
+            $builder->string(self::ARG_REVISION)->required()->label('Revision key'),
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
-        $revision = $this->getOption('revision');
-
-        if (!$revision) {
-            throw new TaskException('Missing revision number');
-        }
+        $revision = $params->getString(self::ARG_REVISION);
 
         $dotEnvFile = $this->appEnv->getAppRootPath().DIRECTORY_SEPARATOR.'.env';
 

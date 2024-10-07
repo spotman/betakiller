@@ -106,14 +106,19 @@ interface AppEnvInterface
     public function getAppCodename(): string;
 
     /**
-     * @param string      $name
-     * @param bool|null   $required
-     *
-     * @param string|null $default
+     * @param string    $name
+     * @param bool|null $required
      *
      * @return null|string
      */
-    public function getCliOption(string $name, bool $required = null, string $default = null): ?string;
+    public function getCliOption(string $name, bool $required = null): ?string;
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasCliOption(string $name): bool;
 
     /**
      * Returns false if this is a core run (core console commands, CI tests, etc)

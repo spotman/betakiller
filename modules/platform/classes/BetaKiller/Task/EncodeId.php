@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Factory\RepositoryFactoryInterface;
 use BetaKiller\IdentityConverterInterface;
 
@@ -29,27 +32,27 @@ final class EncodeId extends AbstractTask
      */
     public function __construct(RepositoryFactoryInterface $repoFactory, IdentityConverterInterface $identityConverter)
     {
-        parent::__construct();
-
         $this->repoFactory       = $repoFactory;
         $this->identityConverter = $identityConverter;
     }
 
     /**
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            self::ARG_ENTITY => null,
-            self::ARG_ID     => null,
+            $builder->string(self::ARG_ENTITY)->required()->label('Entity codename'),
+            $builder->string(self::ARG_ID)->required()->label('Entity ID'),
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
-        $entityName = $this->getOption(self::ARG_ENTITY, true);
-        $id         = $this->getOption(self::ARG_ID, true);
+        $entityName = $params->getString(self::ARG_ENTITY);
+        $id         = $params->getString(self::ARG_ID);
 
         $entity = $this->repoFactory->create($entityName)->getById($id);
 

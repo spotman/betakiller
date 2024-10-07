@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\I18n;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\LanguageInterface;
@@ -34,21 +37,21 @@ final class ExportToExcel extends AbstractTask
      */
     public function __construct(I18nFacade $i18n, AppEnvInterface $appEnv)
     {
-        parent::__construct();
-
         $this->appEnv = $appEnv;
         $this->i18n   = $i18n;
     }
 
     /**
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         // Generate sheet
         $spreadsheet = $this->createSpreadSheet();

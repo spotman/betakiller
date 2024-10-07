@@ -5,5 +5,5 @@ namespace BetaKiller;
 
 interface AppRunnerInterface
 {
-    public function run();
+    public function run(): void;
 }

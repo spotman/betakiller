@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\HitStat;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Repository\HitRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
@@ -21,22 +24,22 @@ final class Cleanup extends AbstractTask
      */
     public function __construct(HitRepositoryInterface $hitRepo)
     {
-        parent::__construct();
-
         $this->hitRepo = $hitRepo;
     }
 
     /**
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
             // No options
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         $before = new \DateTimeImmutable('- 30 days');
 

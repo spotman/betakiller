@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Assets;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
@@ -11,6 +14,8 @@ use Psr\Log\LoggerInterface;
 
 class Deploy extends AbstractTask
 {
+    private const ARG_TARGET = 'target';
+
     /**
      * @var \BetaKiller\Env\AppEnvInterface
      */
@@ -31,22 +36,20 @@ class Deploy extends AbstractTask
     {
         $this->appEnv = $appEnv;
         $this->logger = $logger;
-
-        parent::__construct();
     }
 
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            'target' => null,
+            $builder->string(self::ARG_TARGET)->optional('assets'.DIRECTORY_SEPARATOR.'static'),
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         $staticFilesList = Kohana::list_files('static-files');
 
-        $relativeDir = $this->getOption('target', false) ?: 'assets'.DIRECTORY_SEPARATOR.'static';
+        $relativeDir = $params->getString(self::ARG_TARGET);
         $targetDir   = $this->appEnv->getDocRootPath().DIRECTORY_SEPARATOR.$relativeDir;
 
         $this->logger->debug('Build target dir is :dir', [':dir' => $targetDir]);

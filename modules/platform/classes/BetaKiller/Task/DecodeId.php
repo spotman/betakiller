@@ -1,14 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\IdentityConverterInterface;
 
 final class DecodeId extends AbstractTask
 {
     private const ARG_ENTITY = 'entity';
-    private const ARG_ID = 'id';
+    private const ARG_ID     = 'id';
 
     /**
      * @var \BetaKiller\IdentityConverterInterface
@@ -22,26 +25,24 @@ final class DecodeId extends AbstractTask
      */
     public function __construct(IdentityConverterInterface $identityConverter)
     {
-        parent::__construct();
-
         $this->identityConverter = $identityConverter;
     }
 
     /**
      * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            self::ARG_ENTITY => null,
-            self::ARG_ID => null,
+            $builder->string(self::ARG_ENTITY)->required()->label('Entity codename'),
+            $builder->string(self::ARG_ID)->required()->label('Entity ID'),
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
-        $entity = $this->getOption(self::ARG_ENTITY, true);
-        $id = $this->getOption(self::ARG_ID, true);
+        $entity = $params->getString(self::ARG_ENTITY);
+        $id     = $params->getString(self::ARG_ID);
 
         echo 'Decoded value is: '.$this->identityConverter->decode($entity, $id).PHP_EOL;
     }

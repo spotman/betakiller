@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Test\Event;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\MessageBus\EventMessageInterface;
 use BetaKiller\Model\UserInterface;
@@ -22,8 +25,6 @@ abstract class AbstractUserEventTask extends AbstractTask
 
     public function __construct(EventBusInterface $eventBus, UserInterface $user)
     {
-        parent::__construct();
-
         $this->eventBus = $eventBus;
         $this->user     = $user;
     }
@@ -31,14 +32,14 @@ abstract class AbstractUserEventTask extends AbstractTask
     /**
      * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
             // No options
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         $event = $this->makeEvent($this->user);
 

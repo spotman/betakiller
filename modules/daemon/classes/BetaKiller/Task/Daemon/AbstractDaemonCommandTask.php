@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Daemon;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Daemon\DaemonLockFactory;
 use BetaKiller\ProcessLock\LockInterface;
 use BetaKiller\Task\AbstractTask;
@@ -10,6 +13,8 @@ use BetaKiller\Task\TaskException;
 
 abstract class AbstractDaemonCommandTask extends AbstractTask
 {
+    private const ARG_NAME = 'name';
+
     /**
      * @var \BetaKiller\Daemon\DaemonLockFactory
      */
@@ -23,26 +28,21 @@ abstract class AbstractDaemonCommandTask extends AbstractTask
     public function __construct(DaemonLockFactory $lockFactory)
     {
         $this->lockFactory = $lockFactory;
-
-        parent::__construct();
     }
 
     /**
-     * Put cli arguments with their default values here
-     * Format: "optionName" => "defaultValue"
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            'name' => null,
+            $builder->string(self::ARG_NAME)->required(),
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
-        $name = \ucfirst((string)$this->getOption('name', true));
+        $name = \ucfirst($params->getString(self::ARG_NAME));
 
         if (!$name) {
             throw new \LogicException('Daemon codename is not defined');
@@ -51,7 +51,7 @@ abstract class AbstractDaemonCommandTask extends AbstractTask
         // Get lock
         $lock = $this->lockFactory->create($name);
 
-        $this->proceedCommand($name, $lock);
+        $this->proceedCommand($name, $lock, $params);
     }
 
     protected function checkLockExists(string $daemonName, LockInterface $lock): void
@@ -74,5 +74,5 @@ abstract class AbstractDaemonCommandTask extends AbstractTask
         }
     }
 
-    abstract protected function proceedCommand(string $daemonName, LockInterface $lock): void;
+    abstract protected function proceedCommand(string $daemonName, LockInterface $lock, ConsoleInputInterface $params): void;
 }

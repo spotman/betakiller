@@ -1,62 +1,16 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Daemon;
 
-use BetaKiller\Daemon\DaemonLockFactory;
-use BetaKiller\Env\AppEnvInterface;
-use BetaKiller\Task\AbstractTask;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\ProcessLock\LockInterface;
 
-class Status extends AbstractTask
+class Status extends AbstractDaemonCommandTask
 {
-    /**
-     * @var \BetaKiller\Env\AppEnvInterface
-     */
-    private $appEnv;
-
-    /**
-     * @var \BetaKiller\Daemon\DaemonLockFactory
-     */
-    private $lockFactory;
-
-    /**
-     * Start constructor.
-     *
-     * @param \BetaKiller\Daemon\DaemonLockFactory $lockFactory
-     * @param \BetaKiller\Env\AppEnvInterface      $appEnv
-     */
-    public function __construct(DaemonLockFactory $lockFactory, AppEnvInterface $appEnv)
+    protected function proceedCommand(string $daemonName, LockInterface $lock, ConsoleInputInterface $params): void
     {
-        $this->appEnv = $appEnv;
-        $this->lockFactory = $lockFactory;
-
-        parent::__construct();
-    }
-
-    /**
-     * Put cli arguments with their default values here
-     * Format: "optionName" => "defaultValue"
-     *
-     * @return array
-     */
-    public function defineOptions(): array
-    {
-        return [
-            'name' => null,
-        ];
-    }
-
-    public function run(): void
-    {
-        $name = \ucfirst((string)$this->getOption('name', true));
-
-        if (!$name) {
-            throw new \LogicException('Daemon codename is not defined');
-        }
-
-        // Get lock
-        $lock = $this->lockFactory->create($name);
-
         if ($lock->isAcquired() && $lock->isValid()) {
             echo sprintf('Daemon is running on pid %s'.PHP_EOL, $lock->getPid());
         } elseif ($lock->isAcquired()) {

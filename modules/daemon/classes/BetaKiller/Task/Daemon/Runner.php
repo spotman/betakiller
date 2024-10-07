@@ -1,9 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Daemon;
 
-use BetaKiller\Daemon\AbstractDaemon;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Daemon\DaemonException;
 use BetaKiller\Daemon\DaemonFactory;
 use BetaKiller\Daemon\DaemonInterface;
@@ -22,6 +24,7 @@ use React\EventLoop\TimerInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use Throwable;
+
 use function basename;
 use function gc_collect_cycles;
 use function gc_enabled;
@@ -32,6 +35,7 @@ use function pcntl_async_signals;
 use function React\Async\await;
 use function React\Promise\Timer\timeout;
 use function ucfirst;
+
 use const SIGHUP;
 use const SIGINT;
 use const SIGPROF;
@@ -41,6 +45,8 @@ use const SIGUSR1;
 
 final class Runner extends AbstractTask
 {
+    private const ARG_NAME = 'name';
+
     public const SIGNAL_PROFILE  = SIGPROF;
     public const SIGNAL_SHUTDOWN = SIGUSR1;
 
@@ -160,13 +166,13 @@ final class Runner extends AbstractTask
      * @param \BetaKiller\Log\LoggerInterface      $logger
      */
     public function __construct(
-        DaemonFactory     $daemonFactory,
+        DaemonFactory $daemonFactory,
         DaemonLockFactory $lockFactory,
-        AppEnvInterface   $appEnv,
-        FsWatcher         $fsWatcher,
-        MemoryProfiler    $memProf,
-        LoopInterface     $loop,
-        LoggerInterface   $logger
+        AppEnvInterface $appEnv,
+        FsWatcher $fsWatcher,
+        MemoryProfiler $memProf,
+        LoopInterface $loop,
+        LoggerInterface $logger
     ) {
         $this->daemonFactory = $daemonFactory;
         $this->lockFactory   = $lockFactory;
@@ -177,31 +183,28 @@ final class Runner extends AbstractTask
         $this->logger        = $logger;
 
         $this->maxMemoryIncrease = (int)$appEnv->getEnvVariable('DAEMON_MAX_MEMORY_USAGE', true);
-
-        parent::__construct();
     }
 
     /**
-     * Put cli arguments with their default values here
-     * Format: "optionName" => "defaultValue"
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            'name' => null,
+            $builder->string(self::ARG_NAME)->required(),
         ];
     }
 
     /**
+     * @param \BetaKiller\Console\ConsoleInputInterface $params *
+     *
      * @return void
      * @throws \BetaKiller\Daemon\DaemonException
      * @throws \BetaKiller\Task\TaskException
      */
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
-        $this->codename = ucfirst((string)$this->getOption('name', true));
+        $this->codename = ucfirst($params->getString('name'));
 
         if (!$this->codename) {
             throw new DaemonException('Daemon codename is not defined');
@@ -568,10 +571,12 @@ final class Runner extends AbstractTask
 
     private function dumpMemory(): void
     {
-        $this->memProf->dump(implode('.', [
-            'daemon',
-            $this->codename,
-        ]));
+        $this->memProf->dump(
+            implode('.', [
+                'daemon',
+                $this->codename,
+            ])
+        );
     }
 
     private function setStatus(string $value): void

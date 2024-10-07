@@ -1,14 +1,15 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Daemon\Supervisor;
 
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Console\ConsoleTaskLocatorInterface;
 use BetaKiller\Daemon\AbstractDaemon;
 use BetaKiller\Daemon\DaemonException;
 use BetaKiller\Daemon\DaemonInterface;
 use BetaKiller\Env\AppEnvInterface;
-use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\Daemon\Runner;
 use Psr\Log\LoggerInterface;
 use React\ChildProcess\Process;
@@ -23,11 +24,11 @@ use Symfony\Component\Workflow\Validator\StateMachineValidator;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\Workflow\WorkflowInterface;
 use Throwable;
+
 use function in_array;
 use function React\Promise\all;
 use function React\Promise\reject;
 use function React\Promise\resolve;
-use function React\Promise\Timer\timeout;
 
 final class DaemonController
 {
@@ -80,16 +81,18 @@ final class DaemonController
     /**
      * DaemonController constructor.
      *
-     * @param \BetaKiller\Env\AppEnvInterface            $appEnv
-     * @param \BetaKiller\Config\ConfigProviderInterface $config
-     * @param \React\EventLoop\LoopInterface             $loop
-     * @param \Psr\Log\LoggerInterface                   $logger
+     * @param \BetaKiller\Console\ConsoleTaskLocatorInterface $taskLocator
+     * @param \BetaKiller\Env\AppEnvInterface                 $appEnv
+     * @param \BetaKiller\Config\ConfigProviderInterface      $config
+     * @param \React\EventLoop\LoopInterface                  $loop
+     * @param \Psr\Log\LoggerInterface                        $logger
      */
     public function __construct(
-        AppEnvInterface         $appEnv,
+        private ConsoleTaskLocatorInterface $taskLocator,
+        AppEnvInterface $appEnv,
         ConfigProviderInterface $config,
-        LoopInterface           $loop,
-        LoggerInterface         $logger
+        LoopInterface $loop,
+        LoggerInterface $logger
     ) {
         $this->appEnv = $appEnv;
         $this->config = $config;
@@ -475,7 +478,7 @@ final class DaemonController
             ':name' => $name,
         ]);
 
-        $cmd = AbstractTask::getTaskCmd($this->appEnv, 'daemon:runner', [
+        $cmd = $this->taskLocator->getTaskCmd('daemon:runner', [
             'name' => $name,
         ]);
 
@@ -616,7 +619,8 @@ final class DaemonController
         });
 
         // Stop timeout timer
-        $timeoutTimer = $this->loop->addTimer($stopTimeout,
+        $timeoutTimer = $this->loop->addTimer(
+            $stopTimeout,
             function () use ($pollingTimer, $deferred, $name, $process, $stopTimeout) {
                 // Stop polling
                 $this->loop->cancelTimer($pollingTimer);
@@ -632,7 +636,8 @@ final class DaemonController
 
                     $deferred->reject();
                 }
-            });
+            }
+        );
 
         $promise->always(function () use ($timeoutTimer, $pollingTimer) {
             $this->loop->cancelTimer($pollingTimer);

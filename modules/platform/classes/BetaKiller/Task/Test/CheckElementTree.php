@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Test;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Exception;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Url\ActionModelInterface;
@@ -37,8 +40,6 @@ final class CheckElementTree extends AbstractTask
      */
     public function __construct(UrlElementTreeInterface $tree)
     {
-        parent::__construct();
-
         $this->tree = $tree;
     }
 
@@ -46,14 +47,16 @@ final class CheckElementTree extends AbstractTask
      * Put cli arguments with their default values here
      * Format: "optionName" => "defaultValue"
      *
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @return array
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         // Validate first
         $this->tree->validate();
@@ -93,19 +96,23 @@ final class CheckElementTree extends AbstractTask
 
         // Link to parent and root
         if ($this->currentElement) {
-            $menu->addItem(new SelectableItem('Root', function (CliMenu $menu) {
-                $this->currentElement = null;
+            $menu->addItem(
+                new SelectableItem('Root', function (CliMenu $menu) {
+                    $this->currentElement = null;
 
-                $this->drawCurrentElement($menu);
-                $menu->redraw();
-            }));
+                    $this->drawCurrentElement($menu);
+                    $menu->redraw();
+                })
+            );
 
-            $menu->addItem(new SelectableItem('Return to parent', function (CliMenu $menu) {
-                $this->currentElement = $this->tree->getParent($this->currentElement);
+            $menu->addItem(
+                new SelectableItem('Return to parent', function (CliMenu $menu) {
+                    $this->currentElement = $this->tree->getParent($this->currentElement);
 
-                $this->drawCurrentElement($menu);
-                $menu->redraw();
-            }));
+                    $this->drawCurrentElement($menu);
+                    $menu->redraw();
+                })
+            );
 
             $menu->addItem(new LineBreakItem());
         }
@@ -124,23 +131,25 @@ final class CheckElementTree extends AbstractTask
         }
 
         // Search
-        $menu->addItem(new SelectableItem('Search', function (CliMenu $menu) {
-            $result = $menu->askText()
-                ->setPromptText('Enter codename')
+        $menu->addItem(
+            new SelectableItem('Search', function (CliMenu $menu) {
+                $result = $menu->askText()
+                    ->setPromptText('Enter codename')
 //                ->setPlaceholderText('Jane Doe')
-                ->setValidationFailedText('Please enter codename')
-                ->ask();
+                    ->setValidationFailedText('Please enter codename')
+                    ->ask();
 
-            $codename = $result->fetch();
+                $codename = $result->fetch();
 
-            try {
-                $this->currentElement = $this->tree->getByCodename($codename);
-                $this->drawCurrentElement($menu);
-                $menu->redraw();
-            } catch (\Throwable $e) {
-                $menu->confirm($e->getMessage())->display('OK');
-            }
-        }));
+                try {
+                    $this->currentElement = $this->tree->getByCodename($codename);
+                    $this->drawCurrentElement($menu);
+                    $menu->redraw();
+                } catch (\Throwable $e) {
+                    $menu->confirm($e->getMessage())->display('OK');
+                }
+            })
+        );
 
         // Exit
         $menu->addItem(new SelectableItem('Exit', new ExitAction));

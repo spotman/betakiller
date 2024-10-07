@@ -1,12 +1,13 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Test\Notification;
 
 use BetaKiller\Config\EmailConfigInterface;
-use BetaKiller\Helper\NotificationHelper;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\MessageBus\EventBusConfigInterface;
-use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 use Minion_CLI;
 use Psr\Log\LoggerInterface;
@@ -36,12 +37,10 @@ class CheckConfig extends AbstractTask
      * @param \Psr\Log\LoggerInterface                       $logger
      */
     public function __construct(
-        EmailConfigInterface    $emailConfig,
+        EmailConfigInterface $emailConfig,
         EventBusConfigInterface $eventBusConfig,
-        LoggerInterface         $logger
+        LoggerInterface $logger
     ) {
-        parent::__construct();
-
         $this->emailConfig    = $emailConfig;
         $this->eventBusConfig = $eventBusConfig;
         $this->logger         = $logger;
@@ -51,16 +50,18 @@ class CheckConfig extends AbstractTask
      * Put cli arguments with their default values here
      * Format: "optionName" => "defaultValue"
      *
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @return array
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
             // No options here
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         $this->showEmailConfig();
 

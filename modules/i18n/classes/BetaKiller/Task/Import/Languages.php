@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Import;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\I18n\I18nConfigInterface;
 use BetaKiller\Model\Language;
 use BetaKiller\Repository\LanguageRepositoryInterface;
@@ -33,22 +36,22 @@ class Languages extends AbstractTask
     ) {
         $this->langRepo = $langRepo;
         $this->config   = $config;
-
-        parent::__construct();
     }
 
     /**
      * Put cli arguments with their default values here
      * Format: "optionName" => "defaultValue"
      *
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @return array
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         // "lang" => "locale"
         $configLanguages = $this->config->getAllowedLanguages();

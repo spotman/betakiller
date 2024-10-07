@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Test\Wamp\Event;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Wamp\WampClient;
 use BetaKiller\Wamp\WampClientBuilder;
@@ -11,6 +14,8 @@ use Thruway\ClientSession;
 
 abstract class AbstractEventTest extends AbstractTask
 {
+    private const ARG_TOPIC = 'topic';
+
     /**
      * @var \BetaKiller\Wamp\WampClientBuilder
      */
@@ -31,8 +36,6 @@ abstract class AbstractEventTest extends AbstractTask
         WampClientBuilder $clientFactory,
         LoggerInterface $logger
     ) {
-        parent::__construct();
-
         $this->clientBuilder = $clientFactory;
         $this->logger        = $logger;
     }
@@ -41,19 +44,21 @@ abstract class AbstractEventTest extends AbstractTask
      * Put cli arguments with their default values here
      * Format: "optionName" => "defaultValue"
      *
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @return array
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
+            $builder->string(self::ARG_TOPIC)->optional('test.event')->label('Topic codename'),
 //            'public' => false,
-            'topic' => null,
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
-        $topicName = $this->getOption('topic', false) ?: 'test.event';
+        $topicName = $params->getString(self::ARG_TOPIC);
 //        $isPublic  = $this->getOption('public', false) !== false;
 
 //        if ($isPublic) {

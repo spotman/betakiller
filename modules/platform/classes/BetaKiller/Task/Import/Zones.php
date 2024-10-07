@@ -1,9 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Import;
 
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Model\UrlElementZone;
 use BetaKiller\Repository\UrlElementZoneRepository;
 use BetaKiller\Task\AbstractTask;
@@ -28,8 +31,6 @@ class Zones extends AbstractTask
      */
     public function __construct(ConfigProviderInterface $config, UrlElementZoneRepository $repo)
     {
-        parent::__construct();
-
         $this->config = $config;
         $this->repo   = $repo;
     }
@@ -38,14 +39,16 @@ class Zones extends AbstractTask
      * Put cli arguments with their default values here
      * Format: "optionName" => "defaultValue"
      *
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @return array
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         foreach ((array)$this->config->load('zones', []) as $zoneName) {
             $model = $this->repo->findByName($zoneName);

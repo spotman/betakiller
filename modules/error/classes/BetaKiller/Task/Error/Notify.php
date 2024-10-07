@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Error;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\PhpExceptionModelInterface;
@@ -54,22 +57,22 @@ class Notify extends AbstractTask
         $this->repository   = $repository;
         $this->notification = $notificationHelper;
         $this->logger       = $logger;
-
-        parent::__construct();
     }
 
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         // No cli arguments
         return [];
     }
 
     /**
+     * @param \BetaKiller\Console\ConsoleInputInterface $params *
+     *
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Exception\ValidationException
      */
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         // Repository returns filtered notifications
         $exceptions = $this->repository->getRequiredNotification();

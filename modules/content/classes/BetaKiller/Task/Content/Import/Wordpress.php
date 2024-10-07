@@ -5,6 +5,8 @@ namespace BetaKiller\Task\Content\Import;
 use Arr;
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Content\Shortcode\AttachmentShortcode;
 use BetaKiller\Content\Shortcode\GalleryShortcode;
 use BetaKiller\Content\Shortcode\ImageShortcode;
@@ -28,7 +30,6 @@ use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\WordpressAttachmentInterface;
 use BetaKiller\Repository\WordpressAttachmentRepositoryInterface;
-use BetaKiller\Service\UserService;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use DateTime;
@@ -48,6 +49,7 @@ class Wordpress extends AbstractTask
     private const ATTACH_PARSING_MODE_HTTP  = 'http';
     private const ATTACH_PARSING_MODE_LOCAL = 'local';
 
+    private const ARG_SKIP_BEFORE        = 'skip-before';
     private const WP_OPTION_PARSING_MODE = 'betakiller_parsing_mode';
     private const WP_OPTION_PARSING_PATH = 'betakiller_parsing_path';
 
@@ -187,19 +189,19 @@ class Wordpress extends AbstractTask
 
     public function __construct(UserInterface $user)
     {
-        parent::__construct();
-
         $this->user = $user;
     }
 
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            'skip-before' => null,
+            $builder->string(self::ARG_SKIP_BEFORE)->optional(),
         ];
     }
 
     /**
+     * @param \BetaKiller\Console\ConsoleInputInterface $params *
+     *
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\UrlElementException
@@ -211,10 +213,11 @@ class Wordpress extends AbstractTask
      * @throws \Kohana_Exception
      * @throws \BetaKiller\Exception\ValidationException
      */
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
-        $skipBefore = $this->getOption('skip-before');
-        if ($skipBefore) {
+        if ($params->has(self::ARG_SKIP_BEFORE)) {
+            $skipBefore = $params->getString(self::ARG_SKIP_BEFORE);
+
             $this->skipBeforeDate = new DateTimeImmutable($skipBefore);
         }
 
@@ -300,8 +303,8 @@ class Wordpress extends AbstractTask
      * @throws \BetaKiller\Task\TaskException
      */
     private function createWordpressAttachment(
-        array                   $attach,
-        int                     $entityItemID,
+        array $attach,
+        int $entityItemID,
         AssetsProviderInterface $provider
     ): WordpressAttachmentInterface {
         $url = $attach['guid'];
@@ -342,7 +345,6 @@ class Wordpress extends AbstractTask
 
         // Set title for images
         if ($model instanceof AssetsModelImageInterface) {
-
             if (!$model->getTitle()) {
                 $title = $wpData['post_excerpt'] ?: $wpData['post_title'];
                 $model->setTitle($title);
@@ -365,8 +367,8 @@ class Wordpress extends AbstractTask
      */
     private function storeAttachment(
         AssetsProviderInterface $provider,
-        string                  $url,
-        ?int                    $entityItemID = null
+        string $url,
+        ?int $entityItemID = null
     ): WordpressAttachmentInterface {
         $repository = $provider->getRepository();
 

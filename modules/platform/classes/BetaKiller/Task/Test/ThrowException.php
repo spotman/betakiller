@@ -1,25 +1,30 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Test;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Exception\ServerErrorHttpException;
 use BetaKiller\Task\AbstractTask;
 
 class ThrowException extends AbstractTask
 {
-    public function defineOptions(): array
+    private const ARG_MESSAGE = 'message';
+
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            'message' => null,
+            $builder->string(self::ARG_MESSAGE)->optional('Test CLI exceptions handling'),
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
-        $message = $this->getOption('message', false);
+        $message = $params->getString(self::ARG_MESSAGE);
 
-        $this->throwException($message ?: 'Test CLI exceptions handling');
+        $this->throwException($message);
     }
 
     private function throwException(string $message): void

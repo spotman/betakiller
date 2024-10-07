@@ -1,9 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Cache;
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Middleware\PhpBuiltInServerMiddleware;
 use BetaKiller\Service\HttpClientService;
@@ -87,16 +90,14 @@ class Warmup extends AbstractTask
         $this->logger       = $logger;
 
         $this->cookieJar = new CookieJar();
-
-        parent::__construct();
     }
 
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         $this->serverHost = (string)\getenv('WARMUP_HOST');
         $this->serverPort = (int)\getenv('WARMUP_PORT');
@@ -279,8 +280,10 @@ class Warmup extends AbstractTask
                 ':status' => $status,
             ]);
         } elseif (\in_array($status, [401, 403], true)) {
-            throw new TaskException('Access denied with :status status for :url',
-                [':url' => $url, ':status' => $status]);
+            throw new TaskException(
+                'Access denied with :status status for :url',
+                [':url' => $url, ':status' => $status]
+            );
         } else {
             throw new TaskException('Got :status status for URL :url', [':url' => $url, ':status' => $status]);
         }

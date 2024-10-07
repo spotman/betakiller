@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Test\Notification;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
@@ -10,6 +13,9 @@ use Psr\Log\LoggerInterface;
 
 final class DismissDirect extends AbstractTask
 {
+    private const ARG_MESSAGE = 'message';
+    private const ARG_TARGET  = 'target';
+
     /**
      * @var \BetaKiller\Helper\NotificationHelper
      */
@@ -37,8 +43,6 @@ final class DismissDirect extends AbstractTask
         UserRepositoryInterface $userRepo,
         LoggerInterface $logger
     ) {
-        parent::__construct();
-
         $this->notification = $notification;
         $this->userRepo     = $userRepo;
         $this->logger       = $logger;
@@ -48,22 +52,24 @@ final class DismissDirect extends AbstractTask
      * Put cli arguments with their default values here
      * Format: "optionName" => "defaultValue"
      *
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @return array
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            'message' => null,
-            'target'  => null,
+            $builder->string(self::ARG_MESSAGE)->required()->label('Message codename'),
+            $builder->string(self::ARG_TARGET)->required()->label('User email'),
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
-        $messageName = (string)$this->getOption('message', true);
-        $userName    = (string)$this->getOption('target', true);
+        $messageName = $params->getString(self::ARG_MESSAGE);
+        $userEmail   = $params->getString(self::ARG_TARGET);
 
-        $target = $this->userRepo->findByEmail($userName);
+        $target = $this->userRepo->findByEmail($userEmail);
 
         $this->notification->dismissDirect($messageName, $target);
 

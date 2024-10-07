@@ -1,20 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Error;
 
-use BetaKiller\Factory\UrlHelperFactory;
-use BetaKiller\Helper\NotificationHelper;
-use BetaKiller\Model\PhpExceptionModelInterface;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Repository\PhpExceptionRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
-use BetaKiller\Url\ZoneInterface;
 use DateTimeImmutable;
-use Psr\Log\LoggerInterface;
 
 final class Cleanup extends AbstractTask
 {
-
     /**
      * @var \BetaKiller\Repository\PhpExceptionRepositoryInterface
      */
@@ -27,18 +24,16 @@ final class Cleanup extends AbstractTask
      */
     public function __construct(PhpExceptionRepositoryInterface $repo)
     {
-        $this->repo   = $repo;
-
-        parent::__construct();
+        $this->repo = $repo;
     }
 
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         // No cli arguments
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         $before = new DateTimeImmutable('- 2 weeks');
 

@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Test\Notification;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
@@ -31,8 +34,6 @@ final class SendBroadcast extends AbstractTask
         NotificationHelper $notification,
         LoggerInterface $logger
     ) {
-        parent::__construct();
-
         $this->notification = $notification;
         $this->logger       = $logger;
     }
@@ -41,16 +42,18 @@ final class SendBroadcast extends AbstractTask
      * Put cli arguments with their default values here
      * Format: "optionName" => "defaultValue"
      *
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @return array
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
             // No options
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         $this->notification->broadcastMessage(self::NOTIFICATION_TEST_BROADCAST, []);
 

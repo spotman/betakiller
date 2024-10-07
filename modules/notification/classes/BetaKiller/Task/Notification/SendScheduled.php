@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Notification;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\NotificationFacade;
@@ -15,6 +18,8 @@ use Psr\Log\LoggerInterface;
 
 final class SendScheduled extends AbstractTask
 {
+    private const ARG_FREQ = 'freq';
+
     /**
      * @var \BetaKiller\Notification\NotificationFacade
      */
@@ -49,8 +54,6 @@ final class SendScheduled extends AbstractTask
         ScheduleTargetSpecInterface $targetSpec,
         LoggerInterface $logger
     ) {
-        parent::__construct();
-
         $this->notification     = $notification;
         $this->processorFactory = $processorFactory;
         $this->logger           = $logger;
@@ -58,18 +61,20 @@ final class SendScheduled extends AbstractTask
     }
 
     /**
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            'freq' => null,
+            $builder->string(self::ARG_FREQ)->required(),
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
-        $freqCodename = (string)$this->getOption('freq', true);
+        $freqCodename = $params->getString(self::ARG_FREQ);
 
         $freq = $this->notification->getFrequencyByCodename($freqCodename);
 
@@ -86,10 +91,14 @@ final class SendScheduled extends AbstractTask
             $messages = $this->notification->getGroupMessagesCodenames($group);
 
             if (count($messages) > 1) {
-                LoggerHelper::logRawException($this->logger, new TaskException(
-                    'Multiple messages in scheduled group ":name" are not allowed', [
-                    ':name' => $group->getCodename(),
-                ]));
+                LoggerHelper::logRawException(
+                    $this->logger,
+                    new TaskException(
+                        'Multiple messages in scheduled group ":name" are not allowed', [
+                        ':name' => $group->getCodename(),
+                    ]
+                    )
+                );
                 continue;
             }
 

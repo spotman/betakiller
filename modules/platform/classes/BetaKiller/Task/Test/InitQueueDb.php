@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Test;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Enqueue\Dbal\DbalContext;
@@ -17,25 +20,20 @@ class InitQueueDb extends AbstractTask
 
     public function __construct(Context $context)
     {
-        parent::__construct();
-
         $this->context = $context;
     }
 
     /**
-     * Put cli arguments with their default values here
-     * Format: "optionName" => "defaultValue"
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            'targetUser' => null,
+            // No options here
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         if (!$this->context instanceof DbalContext) {
             throw new TaskException('Wrong queue context');

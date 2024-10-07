@@ -1,17 +1,16 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Cache;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\Task\AbstractTask;
 use Psr\SimpleCache\CacheInterface;
 
-class Clear extends \BetaKiller\Task\AbstractTask
+class Clear extends AbstractTask
 {
-    public function defineOptions(): array
-    {
-        return [];
-    }
-
     /**
      * @var \Psr\SimpleCache\CacheInterface
      */
@@ -25,11 +24,14 @@ class Clear extends \BetaKiller\Task\AbstractTask
     public function __construct(CacheInterface $cache)
     {
         $this->cache = $cache;
-
-        parent::__construct();
     }
 
-    public function run(): void
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
+    {
+        return [];
+    }
+
+    public function run(ConsoleInputInterface $params): void
     {
         $this->cache->clear();
     }

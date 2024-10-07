@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Test\Notification;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
@@ -10,6 +13,8 @@ use Psr\Log\LoggerInterface;
 
 class SendDirect extends AbstractTask
 {
+    private const ARG_TARGET = 'target';
+
     public const NOTIFICATION_TEST_DIRECT = 'developer/test/direct';
 
     /**
@@ -39,8 +44,6 @@ class SendDirect extends AbstractTask
         UserRepositoryInterface $userRepo,
         LoggerInterface $logger
     ) {
-        parent::__construct();
-
         $this->notification = $notification;
         $this->userRepo     = $userRepo;
         $this->logger       = $logger;
@@ -50,21 +53,25 @@ class SendDirect extends AbstractTask
      * Put cli arguments with their default values here
      * Format: "optionName" => "defaultValue"
      *
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @return array
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            'target' => null,
+            $builder->string(self::ARG_TARGET)->optional()->label('User email'),
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
-        $userName = (string)$this->getOption('target', false);
+        $userEmail = $params->has(self::ARG_TARGET)
+            ? $params->getString(self::ARG_TARGET)
+            : null;
 
-        $target = $userName
-            ? $this->userRepo->findByEmail($userName)
+        $target = $userEmail
+            ? $this->userRepo->findByEmail($userEmail)
             : $this->notification->debugEmailTarget();
 
         $this->notification->directMessage(self::NOTIFICATION_TEST_DIRECT, $target, []);

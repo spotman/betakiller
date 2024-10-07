@@ -1,11 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task;
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Console\ConsoleTaskInterface;
 use BetaKiller\Env\AppEnvInterface;
-use BetaKiller\Exception;
 use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
 use BetaKiller\Factory\NamespaceBasedFactoryInterface;
@@ -40,11 +41,10 @@ class TaskFactory
         private readonly GuestUserFactory $guestFactory,
         private readonly AppConfigInterface $appConfig,
         private readonly UserWorkflow $userWorkflow
-    )
-    {
+    ) {
         $this->factory = $factoryBuilder
             ->createFactory()
-            ->setExpectedInterface(AbstractTask::class);
+            ->setExpectedInterface(ConsoleTaskInterface::class);
     }
 
     /**
@@ -79,14 +79,16 @@ class TaskFactory
         $host  = $this->appConfig->getBaseUri()->getHost();
         $email = $userName.'@'.$host;
 
-        $user = $this->userWorkflow->create(new UserInfo(
-            User::DEFAULT_IP,
-            $email,
-            null,
-            $userName,
-            null,
-            RoleInterface::CLI
-        ));
+        $user = $this->userWorkflow->create(
+            new UserInfo(
+                User::DEFAULT_IP,
+                $email,
+                null,
+                $userName,
+                null,
+                RoleInterface::CLI
+            )
+        );
 
         // No notification for cron user
         $user->disableEmailNotification();

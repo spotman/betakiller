@@ -3,12 +3,13 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Daemon;
 
+use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\ProcessLock\LockInterface;
 use Symfony\Component\Process\Process;
 
 final class Stop extends AbstractDaemonCommandTask
 {
-    protected function proceedCommand(string $daemonName, LockInterface $lock): void
+    protected function proceedCommand(string $daemonName, LockInterface $lock, ConsoleInputInterface $params): void
     {
         $this->checkLockExists($daemonName, $lock);
 

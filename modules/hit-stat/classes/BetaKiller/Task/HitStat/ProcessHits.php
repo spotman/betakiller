@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\HitStat;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\HitInterface;
@@ -102,20 +105,20 @@ class ProcessHits extends AbstractTask
         $this->service        = $service;
         $this->notification   = $notification;
         $this->logger         = $logger;
-
-        parent::__construct();
     }
 
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         // No cli arguments
         return [];
     }
 
     /**
+     * @param \BetaKiller\Console\ConsoleInputInterface $params *
+     *
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         // Run every 5 minutes
 

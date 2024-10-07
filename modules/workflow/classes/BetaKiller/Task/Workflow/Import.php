@@ -1,9 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Workflow;
 
 use BetaKiller\Config\WorkflowConfigInterface;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Factory\RepositoryFactoryInterface;
 use BetaKiller\Model\WorkflowStateModelInterface;
@@ -44,13 +47,11 @@ class Import extends AbstractTask
      * @param \Psr\Log\LoggerInterface                       $logger
      */
     public function __construct(
-        WorkflowConfigInterface    $config,
+        WorkflowConfigInterface $config,
         RepositoryFactoryInterface $repoFactory,
-        EntityFactoryInterface     $entityFactory,
-        LoggerInterface            $logger
+        EntityFactoryInterface $entityFactory,
+        LoggerInterface $logger
     ) {
-        parent::__construct();
-
         $this->config        = $config;
         $this->logger        = $logger;
         $this->repoFactory   = $repoFactory;
@@ -62,14 +63,16 @@ class Import extends AbstractTask
      * Put cli arguments with their default values here
      * Format: "optionName" => "defaultValue"
      *
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @return array
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         foreach ($this->config->getModels() as $modelName) {
             $this->logger->debug('Processing model ":name"', [

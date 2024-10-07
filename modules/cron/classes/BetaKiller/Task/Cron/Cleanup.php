@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Cron;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Repository\CronLogRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 
@@ -20,20 +23,18 @@ final class Cleanup extends AbstractTask
      */
     public function __construct(CronLogRepositoryInterface $repo)
     {
-        parent::__construct();
-
         $this->repo = $repo;
     }
 
     /**
      * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         $this->repo->removeRecordsOlderThan(new \DateTimeImmutable('-60 days'));
     }

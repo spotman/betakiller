@@ -18,6 +18,10 @@ use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\EventBusConfig;
 use BetaKiller\Config\WebConfig;
 use BetaKiller\Config\WebConfigInterface;
+use BetaKiller\Console\ConsoleOptionBuilder;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\Console\ConsoleTaskLocator;
+use BetaKiller\Console\ConsoleTaskLocatorInterface;
 use BetaKiller\DefenceParameterProviderFactory;
 use BetaKiller\DummyIdentityConverter;
 use BetaKiller\Env\AppEnvInterface;
@@ -120,6 +124,7 @@ use Spotman\Api\AccessResolver\ApiMethodAccessResolverDetectorInterface;
 use Spotman\Api\ApiLanguageDetectorInterface;
 use Spotman\Defence\Parameter\ParameterProviderFactoryInterface;
 use Symfony\Component\Cache\Psr16Cache;
+
 use function DI\autowire;
 use function DI\factory;
 use function DI\get;
@@ -150,8 +155,8 @@ return [
 
         RequestHandlerRunner::class => factory(static function (
             MiddlewarePipeInterface $pipe,
-            EmitterInterface        $emitter,
-            LoggerInterface         $logger
+            EmitterInterface $emitter,
+            LoggerInterface $logger
         ) {
             return new RequestHandlerRunner(
                 $pipe,
@@ -172,7 +177,7 @@ return [
         }),
 
         ImplicitHeadMiddleware::class => factory(static function (
-            RouterInterface        $router,
+            RouterInterface $router,
             StreamFactoryInterface $factory
         ) {
             return new ImplicitHeadMiddleware($router, static function () use ($factory) {
@@ -192,7 +197,7 @@ return [
             });
         }),
 
-//        RequestIdMiddleware::class => DI\factory(function () {
+//        RequestIdMiddleware::class => \DI\factory(function () {
 //            $generator         = new \PhpMiddleware\RequestId\Generator\PhpUniqidGenerator();
 //            $requestIdProvider = new \PhpMiddleware\RequestId\RequestIdProviderFactory($generator);
 //
@@ -249,7 +254,7 @@ return [
 
         ClientInterface::class => autowire(\Http\Adapter\Guzzle7\Client::class),
 
-        Context::class => DI\factory(static function (AppEnvInterface $appEnv) {
+        Context::class => factory(static function (AppEnvInterface $appEnv) {
             $prefix = implode('.', [
                 $appEnv->getAppCodename(),
                 $appEnv->getRevisionKey(),
@@ -313,48 +318,51 @@ return [
         OrmFactoryInterface::class    => autowire(OrmFactory::class),
 
         // PSR-16 adapter for system-wide PSR-6 cache
-        CacheInterface::class         => DI\factory(function (CacheItemPoolInterface $psr6Cache) {
+        CacheInterface::class         => factory(function (CacheItemPoolInterface $psr6Cache) {
             return new Psr16Cache($psr6Cache);
         }),
 
         // Common cache instance for all
-        CacheItemPoolInterface::class => DI\get(SymfonyCacheProvider::class),
+        CacheItemPoolInterface::class => get(SymfonyCacheProvider::class),
 
-        AppConfigInterface::class                       => DI\autowire(AppConfig::class),
+        AppConfigInterface::class                       => autowire(AppConfig::class),
 
         // Acl roles, resources, permissions and resource factory
-        AclRolesCollectorInterface::class               => DI\autowire(AclRolesCollector::class),
-        AclResourcesCollectorInterface::class           => DI\autowire(AclResourcesCollector::class),
-        AclRulesCollectorInterface::class               => DI\autowire(AclRulesCollector::class),
-        AclResourceFactoryInterface::class              => DI\autowire(AclResourceFactory::class),
+        AclRolesCollectorInterface::class               => autowire(AclRolesCollector::class),
+        AclResourcesCollectorInterface::class           => autowire(AclResourcesCollector::class),
+        AclRulesCollectorInterface::class               => autowire(AclRulesCollector::class),
+        AclResourceFactoryInterface::class              => autowire(AclResourceFactory::class),
 
         // Use Twig as default view
-        ViewFactoryInterface::class                     => DI\autowire(TwigViewFactory::class),
+        ViewFactoryInterface::class                     => autowire(TwigViewFactory::class),
         // Use Twig in layouts
-        LayoutViewInterface::class                      => DI\autowire(TwigLayoutView::class),
+        LayoutViewInterface::class                      => autowire(TwigLayoutView::class),
 
         // Custom access resolver detector
-        ApiMethodAccessResolverDetectorInterface::class => DI\autowire(CustomApiMethodAccessResolverDetector::class),
+        ApiMethodAccessResolverDetectorInterface::class => autowire(CustomApiMethodAccessResolverDetector::class),
 
         // Use default renderer for notification messages
-        MessageRendererInterface::class                 => DI\autowire(MessageRenderer::class),
+        MessageRendererInterface::class                 => autowire(MessageRenderer::class),
 
-        Meta::class => \DI\factory(function () {
+        Meta::class => factory(function () {
             throw new LogicException('DI injection of class Meta is deprecated');
         }),
 
-        StaticAssets::class => \DI\factory(function () {
+        StaticAssets::class => factory(function () {
             throw new LogicException('DI injection of class StaticAssets is deprecated');
         }),
 
-        BoundedEventTransportInterface::class  => DI\autowire(EsbBoundedEventTransport::class),
-        OutboundEventTransportInterface::class => DI\autowire(EsbOutboundEventTransport::class),
+        BoundedEventTransportInterface::class  => autowire(EsbBoundedEventTransport::class),
+        OutboundEventTransportInterface::class => autowire(EsbOutboundEventTransport::class),
 
-        EventBusConfigInterface::class => DI\autowire(EventBusConfig::class),
-        EventBusInterface::class       => DI\autowire(EventBus::class),
+        EventBusConfigInterface::class => autowire(EventBusConfig::class),
+        EventBusInterface::class       => autowire(EventBus::class),
 
         // Handlers will be added in workers
-        CommandBusInterface::class     => DI\autowire(CommandBus::class),
+        CommandBusInterface::class     => autowire(CommandBus::class),
+
+        ConsoleOptionBuilderInterface::class => autowire(ConsoleOptionBuilder::class),
+        ConsoleTaskLocatorInterface::class   => autowire(ConsoleTaskLocator::class),
     ],
 
 ];

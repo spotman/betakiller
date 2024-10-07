@@ -116,7 +116,7 @@ final class AppEnv implements AppEnvInterface
 
     private function detectCliEnv(): void
     {
-        $debugOption = $this->getCliOption(AppEnvInterface::CLI_OPTION_DEBUG, false);
+        $debugOption = $this->getCliOption(AppEnvInterface::CLI_OPTION_DEBUG);
 
         if ($debugOption === 'true') {
             // Set variable
@@ -293,14 +293,12 @@ final class AppEnv implements AppEnvInterface
     }
 
     /**
-     * @param string      $name
-     *
-     * @param bool|null   $required
-     * @param string|null $default
+     * @param string    $name
+     * @param bool|null $required
      *
      * @return null|string
      */
-    public function getCliOption(string $name, bool $required = null, string $default = null): ?string
+    public function getCliOption(string $name, bool $required = null): ?string
     {
         $key = $required ? $name : $name.'::';
 
@@ -310,7 +308,12 @@ final class AppEnv implements AppEnvInterface
             throw new LogicException('CLI arguments parsing error');
         }
 
-        return $options[$name] ?? $default;
+        return $options[$name] ?? null;
+    }
+
+    public function hasCliOption(string $name): bool
+    {
+        return $this->getCliOption($name) !== null;
     }
 
     /**

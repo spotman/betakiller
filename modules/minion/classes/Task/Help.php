@@ -1,28 +1,42 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
+
+use BetaKiller\Console\ConsoleHelper;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\Task\AbstractTask;
+
 /**
  * Help task to display general instructons and list all tasks
  *
- * @package    Kohana
- * @category   Helpers
- * @author     Kohana Team
+ * @package        Kohana
+ * @category       Helpers
+ * @author         Kohana Team
  * @copyright  (c) 2009-2011 Kohana Team
- * @license    http://kohanaframework.org/license
+ * @license        http://kohanaframework.org/license
  */
-class Task_Help extends Minion_Task
+class Task_Help extends AbstractTask
 {
-	/**
-	 * Generates a help list for all tasks
-	 *
-	 * @return void
-	 */
-	protected function _execute(array $params)
-	{
-		$tasks = $this->_compile_task_list(Kohana::list_files('classes/Task'));
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
+    {
+        return [];
+    }
 
-		$view = View::factory('minion/help/list');
+    /**
+     * Generates a help list for all tasks
+     *
+     * @param \BetaKiller\Console\ConsoleInputInterface $params
+     *
+     * @return void
+     * @throws \View_Exception
+     */
+    public function run(ConsoleInputInterface $params): void
+    {
+        $tasks = ConsoleHelper::_compile_task_list(Kohana::list_files('classes/Task'));
 
-		$view->set('tasks', $tasks);
+        $view = View::factory('minion/help/list');
 
-		echo $view->render();
-	}
+        $view->set('tasks', $tasks);
+
+        echo $view->render();
+    }
 }

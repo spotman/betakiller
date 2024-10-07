@@ -1,9 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Wamp;
 
 use BetaKiller\Api\Method\WampTest\DataApiMethod;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Daemon\AbstractApiWorkerDaemon;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
@@ -74,14 +77,12 @@ class IsAlive extends AbstractTask
      */
     public function __construct(
         SessionStorageInterface $sessionStorage,
-        WampClientBuilder       $clientFactory,
-        AppEnvInterface         $appEnv,
-        MaintenanceModeService  $maintenance,
-        LoggerInterface         $logger,
-        UserInterface           $user
+        WampClientBuilder $clientFactory,
+        AppEnvInterface $appEnv,
+        MaintenanceModeService $maintenance,
+        LoggerInterface $logger,
+        UserInterface $user
     ) {
-        parent::__construct();
-
         $this->sessionStorage = $sessionStorage;
         $this->clientBuilder  = $clientFactory;
         $this->appEnv         = $appEnv;
@@ -94,14 +95,16 @@ class IsAlive extends AbstractTask
      * Put cli arguments with their default values here
      * Format: "optionName" => "defaultValue"
      *
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @return array
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         // Skip checks during maintenance (API is down during maintenance)
         if ($this->maintenance->isEnabled()) {

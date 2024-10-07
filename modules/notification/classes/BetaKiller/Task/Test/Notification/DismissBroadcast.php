@@ -1,14 +1,19 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Test\Notification;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
 
 final class DismissBroadcast extends AbstractTask
 {
+    private const ARG_MESSAGE = 'message';
+
     /**
      * @var \BetaKiller\Helper\NotificationHelper
      */
@@ -29,8 +34,6 @@ final class DismissBroadcast extends AbstractTask
         NotificationHelper $notification,
         LoggerInterface $logger
     ) {
-        parent::__construct();
-
         $this->notification = $notification;
         $this->logger       = $logger;
     }
@@ -39,18 +42,20 @@ final class DismissBroadcast extends AbstractTask
      * Put cli arguments with their default values here
      * Format: "optionName" => "defaultValue"
      *
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @return array
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            'message' => null,
+            $builder->string(self::ARG_MESSAGE)->required()->label('Message codename'),
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
-        $messageName = (string)$this->getOption('message', true);
+        $messageName = $params->getString(self::ARG_MESSAGE);
 
         $this->notification->dismissBroadcast($messageName);
 

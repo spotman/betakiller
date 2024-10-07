@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Auth;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Service\AuthService;
 use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
@@ -29,17 +32,15 @@ class ChangePassword extends AbstractTask
     {
         $this->auth   = $auth;
         $this->logger = $logger;
-
-        parent::__construct();
     }
 
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         // No cli arguments
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         $username = $this->read('Enter username or e-mail');
 

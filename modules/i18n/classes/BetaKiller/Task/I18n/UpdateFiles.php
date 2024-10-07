@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\I18n;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\LanguageInterface;
@@ -12,6 +15,8 @@ use Symfony\Component\Yaml\Yaml;
 
 final class UpdateFiles extends AbstractTask
 {
+    private const ARG_FORCE = 'force';
+
     /**
      * @var \BetaKiller\Env\AppEnvInterface
      */
@@ -39,27 +44,27 @@ final class UpdateFiles extends AbstractTask
         I18nFacade $facade,
         TranslationKeyRepositoryInterface $keyRepo
     ) {
-        parent::__construct();
-
         $this->appEnv  = $appEnv;
         $this->facade  = $facade;
         $this->keyRepo = $keyRepo;
     }
 
     /**
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
             // Use DB as a primary source
-            'force' => false,
+            $builder->bool(self::ARG_FORCE),
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
-        $force = $this->getOption('force', false) !== false;
+        $force = $params->getBool(self::ARG_FORCE);
 
         // Merge or override
         $keys = $force

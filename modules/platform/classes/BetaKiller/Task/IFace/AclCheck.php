@@ -1,9 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\IFace;
 
 use BetaKiller\Acl\UrlElementAccessResolverInterface;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Url\ElementFilter\AggregateUrlElementFilter;
@@ -39,25 +42,25 @@ class AclCheck extends AbstractTask
         UrlElementAccessResolverInterface $elementAccessResolver,
         UserInterface $user
     ) {
-        parent::__construct();
-
         $this->tree                  = $tree;
         $this->elementAccessResolver = $elementAccessResolver;
-        $this->user = $user;
+        $this->user                  = $user;
     }
 
     /**
      * Put cli arguments with their default values here
      * Format: "optionName" => "defaultValue"
      *
+     * @param \BetaKiller\Console\ConsoleOptionBuilderInterface $builder *
+     *
      * @return array
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         $filter = new AggregateUrlElementFilter([
             new IFaceUrlElementFilter,

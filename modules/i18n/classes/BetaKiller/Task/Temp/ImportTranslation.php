@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Temp;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Repository\TranslationKeyRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
@@ -11,6 +14,8 @@ use Psr\Log\LoggerInterface;
 
 final class ImportTranslation extends AbstractTask
 {
+    private const ARG_TABLE = 'table';
+
     /**
      * @var \Psr\Log\LoggerInterface
      */
@@ -35,29 +40,24 @@ final class ImportTranslation extends AbstractTask
      */
     public function __construct(I18nFacade $i18n, TranslationKeyRepositoryInterface $keyRepo, LoggerInterface $logger)
     {
-        parent::__construct();
-
         $this->keyRepo = $keyRepo;
         $this->logger  = $logger;
         $this->i18n    = $i18n;
     }
 
     /**
-     * Put cli arguments with their default values here
-     * Format: "optionName" => "defaultValue"
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
-            'table' => null,
+            $builder->string(self::ARG_TABLE)->required(),
         ];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
-        $table  = $this->getOption('table', true);
+        $table  = $params->getString(self::ARG_TABLE);
         $result = \DB::select()->from($table)->execute();
 
         $this->logger->debug('Found :count rows', [

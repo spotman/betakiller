@@ -1,16 +1,21 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Test;
 
-class TriggerError extends \BetaKiller\Task\AbstractTask
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\Task\AbstractTask;
+
+class TriggerError extends AbstractTask
 {
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         trigger_error('Test CLI error handling', \E_USER_WARNING);
     }

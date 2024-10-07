@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Url\ActionModelInterface;
 use BetaKiller\Url\DummyModelInterface;
 use BetaKiller\Url\IFaceModelInterface;
@@ -32,11 +35,9 @@ class IFaceList extends AbstractTask
     {
         $this->tree   = $tree;
         $this->logger = $logger;
-
-        parent::__construct();
     }
 
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         // No cli arguments
         return [];
@@ -44,9 +45,11 @@ class IFaceList extends AbstractTask
 
     /**
      *
+     * @param \BetaKiller\Console\ConsoleInputInterface $params *
+     *
      * @throws \BetaKiller\Url\UrlElementException
      */
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         foreach ($this->tree->getRecursiveIteratorIterator() as $model) {
             switch (true) {

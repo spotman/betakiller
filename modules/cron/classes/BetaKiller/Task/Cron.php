@@ -1,8 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task;
 
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\Console\ConsoleTaskLocatorInterface;
 use BetaKiller\Cron\ConfigItem;
 use BetaKiller\Cron\CronLockFactory;
 use BetaKiller\Cron\CronTask;
@@ -76,6 +80,7 @@ class Cron extends AbstractTask
     /**
      * Cron constructor.
      *
+     * @param \BetaKiller\Console\ConsoleTaskLocatorInterface       $taskLocator
      * @param \BetaKiller\Env\AppEnvInterface                       $env
      * @param \BetaKiller\Cron\TaskQueue                            $queue
      * @param \BetaKiller\Repository\CronLogRepositoryInterface     $logRepo
@@ -85,13 +90,14 @@ class Cron extends AbstractTask
      * @param \Psr\Log\LoggerInterface                              $logger
      */
     public function __construct(
-        AppEnvInterface                $env,
-        TaskQueue                      $queue,
-        CronLogRepositoryInterface     $logRepo,
+        private ConsoleTaskLocatorInterface $taskLocator,
+        AppEnvInterface $env,
+        TaskQueue $queue,
+        CronLogRepositoryInterface $logRepo,
         CronCommandRepositoryInterface $cmdRepo,
-        MaintenanceModeService         $maintenanceMode,
-        CronLockFactory                $lockFactory,
-        LoggerInterface                $logger
+        MaintenanceModeService $maintenanceMode,
+        CronLockFactory $lockFactory,
+        LoggerInterface $logger
     ) {
         $this->env    = $env;
         $this->queue  = $queue;
@@ -101,11 +107,9 @@ class Cron extends AbstractTask
         $this->cmdRepo         = $cmdRepo;
         $this->maintenanceMode = $maintenanceMode;
         $this->lockFactory     = $lockFactory;
-
-        parent::__construct();
     }
 
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
             // No options
@@ -113,9 +117,11 @@ class Cron extends AbstractTask
     }
 
     /**
+     * @param \BetaKiller\Console\ConsoleInputInterface $params *
+     *
      * @throws \BetaKiller\Task\TaskException
      */
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         if ($this->maintenanceMode->isEnabled()) {
             $this->logger->debug('CRON jobs would not be processed coz of maintenance mode');
@@ -270,7 +276,7 @@ class Cron extends AbstractTask
         $name   = $task->getName();
         $params = $task->getParams();
 
-        $cmd = self::getTaskCmd($this->env, $name, $params, true);
+        $cmd = $this->taskLocator->getTaskCmd($name, $params, true);
 
         $command = $this->cmdRepo->findByNameAndParams($name, $params);
 

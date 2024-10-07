@@ -1,10 +1,13 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task;
 
 use BetaKiller\Backup\DavBackup;
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use Psr\Log\LoggerInterface;
 
 class Backup extends AbstractTask
@@ -29,17 +32,15 @@ class Backup extends AbstractTask
     {
         $this->configProvider = $configProvider;
         $this->logger         = $logger;
-
-        parent::__construct();
     }
 
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         // No cli arguments
         return [];
     }
 
-    public function run(): void
+    public function run(ConsoleInputInterface $params): void
     {
         $service = (string)$this->config('service');
 

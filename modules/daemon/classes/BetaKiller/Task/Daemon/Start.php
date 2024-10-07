@@ -1,9 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Task\Daemon;
 
-use BetaKiller\Daemon\AbstractDaemon;
+use BetaKiller\Console\ConsoleInputInterface;
+use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\Console\ConsoleTaskLocatorInterface;
 use BetaKiller\Daemon\DaemonLockFactory;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\ProcessLock\LockInterface;
@@ -13,6 +16,8 @@ use Symfony\Component\Process\Process;
 
 final class Start extends AbstractDaemonCommandTask
 {
+    private const ARG_IGNORE_RUNNING = 'ignore-running';
+
     /**
      * @var \BetaKiller\Env\AppEnvInterface
      */
@@ -26,12 +31,17 @@ final class Start extends AbstractDaemonCommandTask
     /**
      * Start constructor.
      *
-     * @param \BetaKiller\Daemon\DaemonLockFactory $lockFactory
-     * @param \BetaKiller\Env\AppEnvInterface      $appEnv
-     * @param \Psr\Log\LoggerInterface             $logger
+     * @param \BetaKiller\Console\ConsoleTaskLocatorInterface $taskLocator
+     * @param \BetaKiller\Daemon\DaemonLockFactory            $lockFactory
+     * @param \BetaKiller\Env\AppEnvInterface                 $appEnv
+     * @param \Psr\Log\LoggerInterface                        $logger
      */
-    public function __construct(DaemonLockFactory $lockFactory, AppEnvInterface $appEnv, LoggerInterface $logger)
-    {
+    public function __construct(
+        private ConsoleTaskLocatorInterface $taskLocator,
+        DaemonLockFactory $lockFactory,
+        AppEnvInterface $appEnv,
+        LoggerInterface $logger
+    ) {
         $this->appEnv = $appEnv;
         $this->logger = $logger;
 
@@ -39,24 +49,20 @@ final class Start extends AbstractDaemonCommandTask
     }
 
     /**
-     * Put cli arguments with their default values here
-     * Format: "optionName" => "defaultValue"
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function defineOptions(): array
+    public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
-        return [
-            'name'           => null,
-            'ignore-running' => false,
-        ];
+        return array_merge(parent::defineOptions($builder), [
+            $builder->bool(self::ARG_IGNORE_RUNNING),
+        ]);
     }
 
-    protected function proceedCommand(string $daemonName, LockInterface $lock): void
+    protected function proceedCommand(string $daemonName, LockInterface $lock, ConsoleInputInterface $params): void
     {
         // Check lock file exists and points to a valid pid
         if ($lock->isValid()) {
-            if ($this->getOption('ignore-running')) {
+            if ($params->getBool(self::ARG_IGNORE_RUNNING)) {
                 return;
             }
 
@@ -70,7 +76,7 @@ final class Start extends AbstractDaemonCommandTask
             $lock->release();
         }
 
-        $cmd = self::getTaskCmd($this->appEnv, 'daemon:runner', [
+        $cmd = $this->taskLocator->getTaskCmd('daemon:runner', [
             'name' => $daemonName,
         ], false, true);
 
