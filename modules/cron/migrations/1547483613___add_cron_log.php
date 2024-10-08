@@ -1,6 +1,8 @@
 <?php
 
-class Migration1547483613_Add_Cron_Log extends Migration
+use BetaKiller\Migration\AbstractMigration;
+
+class Migration1547483613_Add_Cron_Log extends AbstractMigration
 {
 
     /**

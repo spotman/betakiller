@@ -1,9 +1,10 @@
 <?php
 
+use BetaKiller\Migration\AbstractMigration;
 use BetaKiller\Model\CronCommand;
 use BetaKiller\Model\CronLog;
 
-class Migration1601284493_Implement_Cron_Commands extends Migration {
+class Migration1601284493_Implement_Cron_Commands extends AbstractMigration {
 
 	/**
 	 * Returns migration ID

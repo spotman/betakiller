@@ -1,6 +1,8 @@
 <?php
 
-class Migration1586944713_Create_Content_Tables extends Migration
+use BetaKiller\Migration\AbstractMigration;
+
+class Migration1586944713_Create_Content_Tables extends AbstractMigration
 {
 
     /**
