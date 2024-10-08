@@ -405,8 +405,11 @@ task('migrations:create', static function () {
         throw new Exception('Migration file does not exists on '.$filePath);
     }
 
-    $dir = dirname($filePath);
-    runGitCommand('add .', $dir, true);
+//    $isGit = runGitCommand('rev-parse --is-inside-work-tree 2>/dev/null && echo "true"', null, true, true) === 'true';
+//
+//    if ($isGit) {
+//        runGitCommand('add .', dirname($filePath), true);
+//    }
 })->onStage(DEPLOYER_STAGE_DEV)->desc('Create migration')->shallow();
 
 /**
