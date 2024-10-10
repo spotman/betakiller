@@ -12,7 +12,6 @@ use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
 use BetaKiller\Api\ApiLanguageDetector;
 use BetaKiller\Assets\StaticAssets;
 use BetaKiller\Cache\SymfonyCacheProvider;
-use BetaKiller\CliAppRunnerInterface;
 use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\EventBusConfig;
@@ -52,7 +51,6 @@ use BetaKiller\MessageBus\NativeEventSerializer;
 use BetaKiller\MessageBus\OutboundEventTransportInterface;
 use BetaKiller\MezzioWebAppRunner;
 use BetaKiller\Middleware\CspReportBodyParamsStrategy;
-use BetaKiller\MinionCliAppRunner;
 use BetaKiller\Notification\MessageActionUrlGeneratorInterface;
 use BetaKiller\Notification\MessageRenderer;
 use BetaKiller\Notification\MessageRendererInterface;
@@ -139,7 +137,6 @@ return [
 
         AppRunnerFactoryInterface::class => autowire(AppRunnerFactory::class),
 
-        CliAppRunnerInterface::class => autowire(MinionCliAppRunner::class),
         WebAppRunnerInterface::class => autowire(MezzioWebAppRunner::class),
 
         WebConfigInterface::class => autowire(WebConfig::class),

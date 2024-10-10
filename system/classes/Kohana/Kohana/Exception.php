@@ -40,26 +40,10 @@ class Kohana_Kohana_Exception extends Exception
      *
      *     echo $exception;
      *
-     * @uses    Kohana_Exception::text
      * @return  string
      */
     public function __toString()
     {
-        return Kohana_Exception::text($this);
-    }
-
-    /**
-     * Get a single line of text representing the exception:
-     *
-     * Error [ Code ]: Message ~ File [ Line ]
-     *
-     * @param   \Throwable $e
-     *
-     * @return  string
-     */
-    public static function text(Throwable $e)
-    {
-        return sprintf('%s [ %s ]: %s ~ %s [ %d ]',
-            get_class($e), $e->getCode(), strip_tags($e->getMessage()), Debug::path($e->getFile()), $e->getLine());
+        return \BetaKiller\Exception::oneLiner($this);
     }
 } // End Kohana_Exception

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Test\Notification;
 
+use BetaKiller\Console\ConsoleHelper;
 use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
-use Minion_CLI;
 use Psr\Log\LoggerInterface;
 
 final class PurgeMessages extends AbstractTask
@@ -54,13 +54,13 @@ final class PurgeMessages extends AbstractTask
 
     public function run(ConsoleInputInterface $params): void
     {
-        $name = Minion_CLI::read('Select queue', [
-            Minion_CLI::color(self::QUEUE_PRIORITY, 'blue') => self::QUEUE_PRIORITY,
-            Minion_CLI::color(self::QUEUE_REGULAR, 'green') => self::QUEUE_REGULAR,
-            Minion_CLI::color(self::QUEUE_ANY, 'red')       => self::QUEUE_ANY,
+        $name = ConsoleHelper::read('Select queue', [
+            ConsoleHelper::color(self::QUEUE_PRIORITY, 'blue') => self::QUEUE_PRIORITY,
+            ConsoleHelper::color(self::QUEUE_REGULAR, 'green') => self::QUEUE_REGULAR,
+            ConsoleHelper::color(self::QUEUE_ANY, 'red')       => self::QUEUE_ANY,
         ]);
 
-        $confirm = Minion_CLI::read(sprintf('All messages in %s queue will be deleted. Are you sure?', $name), [
+        $confirm = ConsoleHelper::read(sprintf('All messages in %s queue will be deleted. Are you sure?', $name), [
             'yes',
             'no',
         ]);

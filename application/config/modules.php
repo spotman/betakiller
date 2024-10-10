@@ -16,7 +16,7 @@ return [
 //    'i18n-plural'  => MODPATH.'i18n-plural',           // International pluralization
     'message-bus'  => MODPATH.'message-bus',           // Event and command buses
     'meta-tags'    => MODPATH.'meta-tags',             // HTML meta tags helper
-    'minion'       => MODPATH.'minion',                // CLI Tasks
+    'console'      => MODPATH.'console',               // CLI Tasks
 //    'security-headers'      => MODPATH.'security-headers',      // Send CSP and other security headers
 
     // Database layer with Kohana dependencies

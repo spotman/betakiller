@@ -5,6 +5,7 @@ namespace BetaKiller\Task\Content\Import;
 use Arr;
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
+use BetaKiller\Console\ConsoleHelper;
 use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Content\Shortcode\AttachmentShortcode;
@@ -254,7 +255,7 @@ class Wordpress extends AbstractTask
         $parsingMode = $this->wp->getOption(self::WP_OPTION_PARSING_MODE);
 
         if (!$parsingMode) {
-            $parsingMode = $this->read('Select parsing mode', [
+            $parsingMode = ConsoleHelper::read('Select parsing mode', [
                 self::ATTACH_PARSING_MODE_HTTP,
                 self::ATTACH_PARSING_MODE_LOCAL,
             ]);
@@ -267,7 +268,7 @@ class Wordpress extends AbstractTask
 
         if (!$parsingPath) {
             if ($parsingMode === self::ATTACH_PARSING_MODE_HTTP) {
-                $parsingPath = $this->read('Input fully qualified project URL');
+                $parsingPath = ConsoleHelper::read('Input fully qualified project URL');
 
                 $parsingPath = rtrim($parsingPath, '/').'/';
 
@@ -275,7 +276,7 @@ class Wordpress extends AbstractTask
                     throw new TaskException('Incorrect project URL');
                 }
             } elseif ($parsingMode === self::ATTACH_PARSING_MODE_LOCAL) {
-                $parsingPath = $this->read('Input absolute project path');
+                $parsingPath = ConsoleHelper::read('Input absolute project path');
 
                 $parsingPath = '/'.trim($parsingPath, '/');
 

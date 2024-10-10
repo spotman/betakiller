@@ -1,5 +1,6 @@
 <?php
 
+use BetaKiller\Exception;
 use BetaKiller\Exception\HttpExceptionInterface;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\View\ViewInterface;
@@ -38,7 +39,7 @@ class Debug extends Kohana_Debug
     {
         try {
             if (!\interface_exists(ViewInterface::class)) {
-                return Kohana_Kohana_Exception::text($e);
+                return Exception::oneLiner($e);
             }
 
             // Get the exception information
@@ -109,7 +110,7 @@ class Debug extends Kohana_Debug
             // Set the response body
             return $view->render();
         } catch (Throwable $e) {
-            return Kohana_Kohana_Exception::text($e);
+            return Exception::oneLiner($e);
         }
     }
 

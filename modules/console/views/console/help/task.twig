@@ -1,0 +1,33 @@
+Usage
+=======
+
+php minion.php --task={{ task }} [--option1=value1] [--option2=value2]
+
+
+Options
+=======
+
+{% for option in options %}
+  --{{ option.name }} [{{ option.type }}] {{ option.required }} {{ option.default ? "default=" ~ option.default : "" }}
+{% else %}
+  No options
+{% endfor %}
+
+{% if tags|default and tags|length > 0 %}
+
+Details
+=======
+
+{% for name, content in tags %}
+  {{ name|capitalize }}: {{ content }}
+{% endfor %}
+
+{% endif %}
+{% if description|default %}
+
+Description
+===========
+
+{{ description }}
+
+{% endif %}

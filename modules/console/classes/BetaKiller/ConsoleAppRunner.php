@@ -11,14 +11,15 @@ use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskFactory;
-use InvalidArgumentException;
+use BetaKiller\View\ViewFactoryInterface;
 
-final readonly class MinionCliAppRunner implements CliAppRunnerInterface
+final readonly class ConsoleAppRunner implements CliAppRunnerInterface
 {
     public function __construct(
         private AppEnvInterface $appEnv,
         private TaskFactory $taskFactory,
         private ConsoleOptionBuilderInterface $optionBuilder,
+        private ViewFactoryInterface $viewFactory,
         private Collector $metrics
     ) {
     }
@@ -34,25 +35,23 @@ final readonly class MinionCliAppRunner implements CliAppRunnerInterface
         $start = microtime(true);
 
         // If we didn't get a valid task, generate the help
-        $taskName = $this->appEnv->getCliOption('task') ?? 'help';
+        $taskName = $this->appEnv->getCliOption('task');
 
-        $taskName = trim($taskName);
-
-        if (empty($taskName)) {
-            throw new InvalidArgumentException('Missing "task" option');
+        if (empty($taskName) || str_starts_with($taskName, '--')) {
+            $taskName = 'help';
         }
 
         $requestValues = ConsoleHelper::getRequestOptions();
 
         $className = ConsoleHelper::convert_task_to_class_name($taskName);
-        $instance = $this->taskFactory->create($className);
+        $instance  = $this->taskFactory->create($className);
+
+        $taskOptions = $instance->getDefinedOptions($this->optionBuilder);
 
         // Show the help page for this task if requested
         if ($this->appEnv->hasCliOption('help')) {
-            ConsoleHelper::displayHelp($instance);
+            ConsoleHelper::displayTaskHelp($instance, $taskOptions, $this->viewFactory);
         } else {
-            $taskOptions = $instance->getDefinedOptions($this->optionBuilder);
-
             $input = ConsoleInput::createFrom($requestValues, $taskOptions);
 
             $instance->run($input);

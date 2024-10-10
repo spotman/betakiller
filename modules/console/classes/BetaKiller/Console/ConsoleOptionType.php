@@ -9,4 +9,9 @@ enum ConsoleOptionType: string
     case Bool = 'bool';
     case Int = 'int';
     case String = 'string';
+
+    public function codename(): string
+    {
+        return $this->value;
+    }
 }

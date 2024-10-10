@@ -92,7 +92,7 @@ class Kohana_Database_Query
             // Return the SQL string
             return $this->compile(Database::instance());
         } catch (Throwable $e) {
-            return Kohana_Exception::text($e);
+            return \BetaKiller\Exception::oneLiner($e);
         }
     }
 

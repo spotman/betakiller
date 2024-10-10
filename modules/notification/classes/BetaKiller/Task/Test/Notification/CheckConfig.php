@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Test\Notification;
 
 use BetaKiller\Config\EmailConfigInterface;
+use BetaKiller\Console\ConsoleHelper;
 use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\MessageBus\EventBusConfigInterface;
 use BetaKiller\Task\AbstractTask;
-use Minion_CLI;
 use Psr\Log\LoggerInterface;
 
 class CheckConfig extends AbstractTask
@@ -87,7 +87,7 @@ class CheckConfig extends AbstractTask
         ];
 
         foreach ($data as $label => $value) {
-            echo sprintf('%s: %s'.PHP_EOL, $label, Minion_CLI::color($value, 'green'));
+            echo sprintf('%s: %s'.PHP_EOL, $label, ConsoleHelper::color($value, 'green'));
         }
     }
 
@@ -96,15 +96,15 @@ class CheckConfig extends AbstractTask
         echo '[Events]'.PHP_EOL.PHP_EOL;
 
         foreach ($this->eventBusConfig->getEventsMap() as $eventName => $eventHandlers) {
-            echo sprintf("%s:".PHP_EOL, Minion_CLI::color($eventName, 'blue'));
+            echo sprintf("%s:".PHP_EOL, ConsoleHelper::color($eventName, 'blue'));
 
             if (!$eventHandlers) {
-                echo Minion_CLI::color('  No handlers defined', 'red').PHP_EOL.PHP_EOL;
+                echo ConsoleHelper::color('  No handlers defined', 'red').PHP_EOL.PHP_EOL;
                 continue;
             }
 
             foreach ($eventHandlers as $handler) {
-                echo sprintf('  %s'.PHP_EOL, Minion_CLI::color($handler, 'green'));
+                echo sprintf('  %s'.PHP_EOL, ConsoleHelper::color($handler, 'green'));
             }
 
             echo PHP_EOL;

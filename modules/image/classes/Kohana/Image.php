@@ -138,7 +138,7 @@ abstract class Kohana_Image {
 			if (is_object(Kohana::$log))
 			{
 				// Get the text of the exception
-				$error = Kohana_Exception::text($e);
+				$error = \BetaKiller\Exception::oneLiner($e);
 
 				// Add this exception to the log
 				Kohana::$log->add(Log::ERROR, $error);

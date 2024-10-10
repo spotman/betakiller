@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Auth;
 
+use BetaKiller\Console\ConsoleHelper;
 use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Service\AuthService;
@@ -42,7 +43,7 @@ class ChangePassword extends AbstractTask
 
     public function run(ConsoleInputInterface $params): void
     {
-        $username = $this->read('Enter username or e-mail');
+        $username = ConsoleHelper::read('Enter username or e-mail');
 
         $user = $this->auth->searchBy($username);
 
@@ -52,8 +53,8 @@ class ChangePassword extends AbstractTask
             return;
         }
 
-        $password = $this->password('Enter new password');
-        $confirm  = $this->password('Enter new password again');
+        $password = ConsoleHelper::password('Enter new password');
+        $confirm  = ConsoleHelper::password('Enter new password again');
 
         if ($password !== $confirm) {
             $this->logger->warning('Passwords are not identical');

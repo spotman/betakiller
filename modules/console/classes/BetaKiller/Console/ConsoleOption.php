@@ -44,6 +44,11 @@ class ConsoleOption implements ConsoleOptionInterface
         return $this->name;
     }
 
+    public function getType(): ConsoleOptionType
+    {
+        return $this->type;
+    }
+
     public function isBool(): bool
     {
         return $this->type === ConsoleOptionType::Bool;

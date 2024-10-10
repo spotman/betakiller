@@ -9,9 +9,12 @@ interface ConsoleOptionInterface
     public function required(): ConsoleOptionInterface;
 
     public function optional(string|int|bool $defaultValue = null): ConsoleOptionInterface;
+
     public function label(string $label): ConsoleOptionInterface;
 
     public function getName(): string;
+
+    public function getType(): ConsoleOptionType;
 
     public function isBool(): bool;
 
