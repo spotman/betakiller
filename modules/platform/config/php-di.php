@@ -35,7 +35,6 @@ use BetaKiller\Factory\OrmFactory;
 use BetaKiller\Factory\RepositoryFactory;
 use BetaKiller\Factory\RepositoryFactoryInterface;
 use BetaKiller\Helper\I18nHelper;
-use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\IdentityConverterInterface;
 use BetaKiller\MessageBus\BoundedEventTransportInterface;
@@ -75,23 +74,17 @@ use BetaKiller\View\LayoutViewInterface;
 use BetaKiller\View\TwigLayoutView;
 use BetaKiller\View\TwigViewFactory;
 use BetaKiller\View\ViewFactoryInterface;
+use BetaKiller\Web\ServerRequestErrorResponseGenerator;
 use BetaKiller\WebAppRunnerInterface;
 use Enqueue\Redis\RedisConnectionFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use Interop\Queue\Context;
-use Laminas\Diactoros\RequestFactory;
-use Laminas\Diactoros\Response\TextResponse;
 use Laminas\Diactoros\ResponseFactory;
-use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\StreamFactory;
 use Laminas\Diactoros\UriFactory;
-use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
-use Laminas\HttpHandlerRunner\Emitter\SapiStreamEmitter;
-use Laminas\HttpHandlerRunner\RequestHandlerRunner;
-use Laminas\Stratigility\MiddlewarePipe;
-use Laminas\Stratigility\MiddlewarePipeInterface;
+use Mezzio\ConfigProvider as MezzioConfigProvider;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
 use Mezzio\Router\FastRouteRouter;
 use Mezzio\Router\Middleware\ImplicitHeadMiddleware;
@@ -103,7 +96,6 @@ use Mezzio\Router\RouterInterface;
 use Mezzio\Session\SessionPersistenceInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
@@ -131,6 +123,19 @@ $deprecatedFactory = factory(static function () {
     throw new LogicException('Deprecated');
 });
 
+$mezzioConfig = (new MezzioConfigProvider())->getDependencies();
+
+$mezzioFactories = $mezzioConfig['factories'];
+$mezzioAliases   = $mezzioConfig['aliases'];
+
+array_walk($mezzioFactories, function (&$value) {
+    $value = factory($value);
+});
+
+array_walk($mezzioAliases, function (&$value) {
+    $value = get($value);
+});
+
 return [
 
     'definitions' => [
@@ -143,35 +148,14 @@ return [
 
         RouteCollectorInterface::class  => autowire(RouteCollector::class),
         RouterInterface::class          => autowire(FastRouteRouter::class),
-        EmitterInterface::class         => autowire(SapiStreamEmitter::class),
-        MiddlewarePipeInterface::class  => autowire(MiddlewarePipe::class),
-        RequestFactoryInterface::class  => autowire(RequestFactory::class),
+        UriFactoryInterface::class      => autowire(UriFactory::class),
         ResponseFactoryInterface::class => autowire(ResponseFactory::class),
         StreamFactoryInterface::class   => autowire(StreamFactory::class),
-        UriFactoryInterface::class      => autowire(UriFactory::class),
 
-        RequestHandlerRunner::class => factory(static function (
-            MiddlewarePipeInterface $pipe,
-            EmitterInterface $emitter,
-            LoggerInterface $logger
-        ) {
-            return new RequestHandlerRunner(
-                $pipe,
-                $emitter,
-                static function () {
-                    return ServerRequestFactory::fromGlobals();
-                },
-                static function (Throwable $e) use ($logger) {
-                    // Log exception to developers
-                    $logger->alert(Exception::oneLiner($e), [
-                        LoggerHelper::CONTEXT_KEY_EXCEPTION => $e,
-                    ]);
+        ...$mezzioFactories,
+        ...$mezzioAliases,
 
-                    // No exception info here for security reasons
-                    return new TextResponse('System error', 500);
-                }
-            );
-        }),
+        'Mezzio\Response\ServerRequestErrorResponseGenerator' => autowire(ServerRequestErrorResponseGenerator::class),
 
         ImplicitHeadMiddleware::class => factory(static function (
             RouterInterface $router,
