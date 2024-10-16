@@ -247,7 +247,7 @@ class ConsoleHelper
                 // Separate the name and value
                 [$opt, $value] = explode('=', $opt, 2);
             } else {
-                $value = true;
+                $value = 'true';
             }
 
             $values[$opt] = $value;
