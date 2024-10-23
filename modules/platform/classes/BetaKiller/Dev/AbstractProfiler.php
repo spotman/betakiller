@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Dev;
@@ -37,5 +38,16 @@ abstract class AbstractProfiler
     public function stop(StopwatchEvent $event): void
     {
         $event->stop();
+    }
+
+    public function measure(string $label, callable $fn): mixed
+    {
+        $m = $this->start($label);
+
+        $result = $fn();
+
+        $this->stop($m);
+
+        return $result;
     }
 }
