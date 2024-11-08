@@ -12,6 +12,7 @@ use BetaKiller\IFace\Auth\RegistrationClaimThanksIFace;
 use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\Workflow\UserWorkflow;
 use Psr\Http\Message\ResponseInterface;
@@ -93,7 +94,7 @@ class ClaimRegistrationAction extends AbstractAction
             $this->facade->broadcastMessage(self::NOTIFICATION, [
                 'email'             => $log->getTargetString(),
                 'ip'                => ServerRequestHelper::getIpAddress($request),
-                'notification_url'  => $urlHelper->getReadEntityUrl($log, ZoneInterface::ADMIN),
+                'notification_url'  => $urlHelper->getReadEntityUrl($log, Zone::Admin),
                 'notification_hash' => $log->getHash(),
             ]);
 

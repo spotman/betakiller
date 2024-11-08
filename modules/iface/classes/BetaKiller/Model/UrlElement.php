@@ -94,10 +94,7 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements Entity
     }
 
     /**
-     * Returns key-value pairs for "query param name" => "Url parameter binding"
-     * Example: [ "u" => "User.id", "r" => "Role.codename" ]
-     *
-     * @return array
+     * @inheritDoc
      */
     public function getQueryParams(): array
     {

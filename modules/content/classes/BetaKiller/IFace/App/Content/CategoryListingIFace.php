@@ -1,11 +1,12 @@
 <?php
+
 namespace BetaKiller\IFace\App\Content;
 
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Repository\ContentCategoryRepository;
-use BetaKiller\Url\ZoneInterface;
+use BetaKiller\Url\Zone;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class CategoryListingIFace extends AbstractAppBase
@@ -64,7 +65,7 @@ final class CategoryListingIFace extends AbstractAppBase
     {
         return [
             'label'    => $category->getLabel(),
-            'url'      => $urlHelper->getReadEntityUrl($category, ZoneInterface::PUBLIC),
+            'url'      => $urlHelper->getReadEntityUrl($category, Zone::Public),
             'children' => $this->getCategoriesData($urlHelper, $category),
         ];
     }

@@ -1,25 +1,23 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Dev\DebugBarCookiesDataCollector;
+use BetaKiller\Dev\DebugBarAccessControlInterface;
 use BetaKiller\Dev\DebugBarHttpDriver;
-use BetaKiller\Dev\DebugBarSessionDataCollector;
-use BetaKiller\Dev\DebugBarTimeDataCollector;
-use BetaKiller\Dev\DebugBarTwigDataCollector;
-use BetaKiller\Dev\DebugBarUserDataCollector;
 use BetaKiller\Dev\DebugServerRequestHelper;
+use BetaKiller\Dev\DebugBarFactoryInterface;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Env\AppEnvInterface;
+use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
-use BetaKiller\Log\LoggerInterface;
-use DebugBar\Bridge\MonologCollector;
-use DebugBar\DataCollector\MemoryCollector;
-use DebugBar\DebugBar;
+use Database_Query;
 use DebugBar\JavascriptRenderer;
-use DebugBar\Storage\FileStorage;
+use DebugBar\OpenHandler;
+use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\Response\TextResponse;
 use PhpMiddleware\PhpDebugBar\PhpDebugBarMiddleware;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -27,56 +25,25 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Twig\Environment;
 
-final class DebugMiddleware implements MiddlewareInterface
+final readonly class DebugMiddleware implements MiddlewareInterface
 {
-    /**
-     * @var \Psr\Http\Message\ResponseFactoryInterface
-     */
-    private $responseFactory;
-
-    /**
-     * @var \Psr\Http\Message\StreamFactoryInterface
-     */
-    private $streamFactory;
-
-    /**
-     * @var \BetaKiller\Env\AppEnvInterface
-     */
-    private $appEnv;
-
-    /**
-     * @var \BetaKiller\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var \Twig\Environment
-     */
-    private $twigEnv;
+    public const BASE_URL = '/phpDebugBar';
 
     /**
      * DebugMiddleware constructor.
      *
-     * @param \BetaKiller\Env\AppEnvInterface            $appEnv
-     * @param \Twig\Environment                          $twigEnv
-     * @param \Psr\Http\Message\ResponseFactoryInterface $responseFactory
-     * @param \Psr\Http\Message\StreamFactoryInterface   $streamFactory
-     * @param \BetaKiller\Log\LoggerInterface            $logger
+     * @param \BetaKiller\Dev\DebugBarAccessControlInterface $accessControl
+     * @param \Psr\Http\Message\ResponseFactoryInterface     $responseFactory
+     * @param \Psr\Http\Message\StreamFactoryInterface       $streamFactory
+     * @param \BetaKiller\Dev\DebugBarFactoryInterface       $debugBarFactory
      */
     public function __construct(
-        AppEnvInterface          $appEnv,
-        Environment              $twigEnv,
-        ResponseFactoryInterface $responseFactory,
-        StreamFactoryInterface   $streamFactory,
-        LoggerInterface          $logger
+        private DebugBarAccessControlInterface $accessControl,
+        private ResponseFactoryInterface $responseFactory,
+        private StreamFactoryInterface $streamFactory,
+        private DebugBarFactoryInterface $debugBarFactory
     ) {
-        $this->responseFactory = $responseFactory;
-        $this->streamFactory   = $streamFactory;
-        $this->appEnv          = $appEnv;
-        $this->twigEnv         = $twigEnv;
-        $this->logger          = $logger;
     }
 
     /**
@@ -91,19 +58,7 @@ final class DebugMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $debugEnabled = $this->appEnv->isDebugEnabled();
-
-        // Fetch actual session
-        $session = ServerRequestHelper::getSession($request);
-
-        // Detect debug mode enabled for session
-        // Do not fetch User here to allow lazy loading
-        if (SessionHelper::isDebugEnabled($session)) {
-            $debugEnabled = true;
-        }
-
-        // Prevent displaying DebugBar in prod mode
-        if (!$debugEnabled || $this->appEnv->inProductionMode()) {
+        if (!$this->accessControl->isAllowedFor($request)) {
             // Forward call
             return $handler->handle($request);
         }
@@ -111,56 +66,55 @@ final class DebugMiddleware implements MiddlewareInterface
         $ps = RequestProfiler::begin($request, 'Debug middleware (start up)');
 
         // Fresh instance for every request
-        $debugBar = new DebugBar();
+        $debugBar = $this->debugBarFactory->create($request, self::BASE_URL);
 
-        // Initialize http driver
-        $httpDriver = new DebugBarHttpDriver($session);
-        $debugBar->setHttpDriver($httpDriver);
+        RequestProfiler::end($ps);
 
-        $debugBar
-            ->addCollector(new DebugBarTimeDataCollector($request))
-            ->addCollector(new DebugBarCookiesDataCollector($request))
-            ->addCollector(new DebugBarSessionDataCollector($session))
-            ->addCollector(new DebugBarUserDataCollector($request))
-            ->addCollector(new MemoryCollector())
-            ->addCollector(new MonologCollector($this->logger->getMonologInstance()));
+        $uriPath = $request->getUri()->getPath();
 
-        if (ServerRequestHelper::isHtmlPreferred($request)) {
-            $debugBar->addCollector(new DebugBarTwigDataCollector($this->twigEnv));
+        // Process OpenHandler
+        if ($uriPath === self::BASE_URL) {
+            $openHandler = new OpenHandler($debugBar);
+            $openJson    = $openHandler->handle($request->getQueryParams(), false);
+
+            return $debugBar->getHttpDriver()->applyHeaders(new TextResponse($openJson));
         }
 
-        // Storage for processing data for AJAX calls and redirects
-        $debugBar->setStorage(new FileStorage($this->appEnv->getTempPath('debugbar-storage')));
+        $isAjax = ServerRequestHelper::isAjax($request);
+        $isStatic = str_starts_with($uriPath, self::BASE_URL);
 
-        // Prepare renderer
-        $renderer = $debugBar->getJavascriptRenderer('/phpDebugBar');
-        $renderer->setEnableJqueryNoConflict(false); // No jQuery
-        $renderer->addInlineAssets([
-            '.phpdebugbar-widgets-measure:hover { background: #dcdbdb }'.
-            '.phpdebugbar-widgets-measure:hover .phpdebugbar-widgets-label { color: #222 !important }'.
-            '.phpdebugbar-widgets-measure:hover .phpdebugbar-widgets-value { background: #009bda }'.
-            'div.phpdebugbar-header, a.phpdebugbar-restore-btn { background: #efefef }'.
-            'div.phpdebugbar-header { padding-left: 0 }'.
-            'a.phpdebugbar-restore-btn { text-align: center }'.
-            'a.phpdebugbar-restore-btn:before { content: "{}"; font-size: 16px; color: #333; font-weight: bold }',
-        ], [], []);
+        $renderer = $debugBar->getJavascriptRenderer();
 
         $middleware = new PhpDebugBarMiddleware($renderer, $this->responseFactory, $this->streamFactory);
 
         // Inject DebugBar instance
         $request = DebugServerRequestHelper::withDebugBar($request, $debugBar);
 
-        // Stop profiler before call forward
-        RequestProfiler::end($ps);
-
         // Forward call
-        $response = $middleware->process($request, $handler);
+        $response = match(true) {
+            $isAjax => $handler->handle($request),
+            default => $middleware->process($request, $handler),
+        };
 
-        // DebugBar generates inline tags and images so configuring CSP
-        $this->addCspRules($renderer, $request);
+        $isRedirect = ResponseHelper::isRedirect($response);
+
+        if ($isRedirect) {
+            // Keep data for next non-redirect call
+            $debugBar->stackData();
+        }
+
+        if ($isAjax) {
+            // Use storage for ajax calls (skip PhpDebugBar static files)
+            $debugBar->sendDataInHeaders(true);
+        }
+
+        if (!$isStatic && !$isAjax && !$isRedirect) {
+            // DebugBar generates inline tags and images so configuring CSP
+            $this->addCspRules($renderer, $request);
+        }
 
         // Add headers injected by DebugBar
-        return $httpDriver->applyHeaders($response);
+        return $debugBar->getHttpDriver()->applyHeaders($response);
     }
 
     private function addCspRules(JavascriptRenderer $renderer, ServerRequestInterface $request): void

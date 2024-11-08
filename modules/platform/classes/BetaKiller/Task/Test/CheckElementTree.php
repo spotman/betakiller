@@ -13,6 +13,7 @@ use BetaKiller\Url\DummyModelInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
+use BetaKiller\Url\UrlElementTreeValidatorInterface;
 use PhpSchool\CliMenu\Action\ExitAction;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
 use PhpSchool\CliMenu\CliMenu;
@@ -24,11 +25,6 @@ use PhpSchool\CliMenu\MenuItem\StaticItem;
 final class CheckElementTree extends AbstractTask
 {
     /**
-     * @var \BetaKiller\Url\UrlElementTreeInterface
-     */
-    private $tree;
-
-    /**
      * @var UrlElementInterface|null
      */
     private $currentElement;
@@ -36,11 +32,11 @@ final class CheckElementTree extends AbstractTask
     /**
      * CheckElementTree constructor.
      *
-     * @param \BetaKiller\Url\UrlElementTreeInterface $tree
+     * @param \BetaKiller\Url\UrlElementTreeInterface          $tree
+     * @param \BetaKiller\Url\UrlElementTreeValidatorInterface $validator
      */
-    public function __construct(UrlElementTreeInterface $tree)
+    public function __construct(private readonly UrlElementTreeInterface $tree, private readonly UrlElementTreeValidatorInterface $validator)
     {
-        $this->tree = $tree;
     }
 
     /**
@@ -59,7 +55,7 @@ final class CheckElementTree extends AbstractTask
     public function run(ConsoleInputInterface $params): void
     {
         // Validate first
-        $this->tree->validate();
+        $this->validator->validate($this->tree);
 
         /** @see https://stackoverflow.com/a/2204201 */
         $menu = (new CliMenuBuilder)

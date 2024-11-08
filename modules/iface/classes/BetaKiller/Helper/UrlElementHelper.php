@@ -10,6 +10,7 @@ use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlElementWithLabelInterface;
 use BetaKiller\Url\UrlElementWithLayoutInterface;
+use BetaKiller\Url\ZoneInterface;
 
 class UrlElementHelper
 {
@@ -58,18 +59,18 @@ class UrlElementHelper
     }
 
     /**
-     * @param string                          $zone
+     * @param \BetaKiller\Url\ZoneInterface   $zone
      * @param \BetaKiller\Url\UrlElementStack $stack
      *
      * @return bool
      * @throws \BetaKiller\Url\UrlElementException
      */
-    public static function isCurrentZone(string $zone, UrlElementStack $stack): bool
+    public static function isCurrentZone(ZoneInterface $zone, UrlElementStack $stack): bool
     {
         $currentIFace = self::getCurrentIFaceModel($stack);
-        $currentZone  = $currentIFace ? $currentIFace->getZoneName() : null;
+        $currentZone  = $currentIFace?->getZoneName();
 
-        return $currentZone === $zone;
+        return $currentZone === $zone->getName();
     }
 
     /**

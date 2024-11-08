@@ -1,25 +1,19 @@
 <?php
+
 namespace BetaKiller\Url\ModelProvider;
 
 use BetaKiller\Model\UrlElement;
 use BetaKiller\Repository\UrlElementRepository;
-use BetaKiller\Url\UrlElementInterface;
 
-class UrlElementProviderDatabase implements UrlElementProviderInterface
+readonly class UrlElementProviderDatabase implements UrlElementProviderInterface
 {
-    /**
-     * @var \BetaKiller\Repository\UrlElementRepository
-     */
-    private $repository;
-
     /**
      * UrlElementProviderDatabase constructor.
      *
      * @param \BetaKiller\Repository\UrlElementRepository $repository
      */
-    public function __construct(UrlElementRepository $repository)
+    public function __construct(private UrlElementRepository $repository)
     {
-        $this->repository = $repository;
     }
 
     /**
@@ -31,22 +25,11 @@ class UrlElementProviderDatabase implements UrlElementProviderInterface
     {
         $models = [];
 
+        /** @var UrlElement $item */
         foreach ($this->repository->getFullTree() as $item) {
-
-            $models[] = $this->detectDedicatedObject($item);
+            $models[] = $item->getDedicatedObject();
         }
 
         return $models;
-    }
-
-    /**
-     * @param \BetaKiller\Model\UrlElement $element
-     *
-     * @return \BetaKiller\Url\UrlElementInterface
-     * @throws \BetaKiller\Url\UrlElementException
-     */
-    private function detectDedicatedObject(UrlElement $element): UrlElementInterface
-    {
-        return $element->getDedicatedObject();
     }
 }

@@ -10,17 +10,17 @@ class MissingUrlElementException extends UrlElementException
     /**
      * @var \BetaKiller\Url\UrlElementInterface|null
      */
-    private $parentElement;
+    private ?UrlElementInterface $parentElement;
 
     /**
      * @var bool
      */
-    private $redirect;
+    private bool $redirect;
 
     /**
      * @var \BetaKiller\Url\Container\UrlContainerInterface
      */
-    private $params;
+    private UrlContainerInterface $params;
 
     /**
      * MissingUrlElementException constructor.
@@ -54,7 +54,7 @@ class MissingUrlElementException extends UrlElementException
     /**
      * @return bool
      */
-    public function getRedirectToParent(): bool
+    public function isRedirectToParentAllowed(): bool
     {
         return $this->redirect;
     }

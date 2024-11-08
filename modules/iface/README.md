@@ -52,10 +52,10 @@ Example:
 - `AppPostItem` IFace has `Public` zone, `Post` Entity and `read` action
 - `AdminPostItem` IFace has `Admin` zone, `Post` Entity and `read` action
 
-Now you'll be able to generate URL for editing `Post` entity right from it's instance!
+Now you'll be able to generate URL for editing `Post` entity right from its instance!
 
-- public URL via `UrlElementHelper::getReadEntityUrl($entity, ZoneInterface::PUBLIC)`
-- admin editing URL via `UrlElementHelper::getReadEntityUrl($entity, ZoneInterface::ADMIN)`
+- public URL via `UrlElementHelper::getReadEntityUrl($entity, Zone::Public)`
+- admin editing URL via `UrlElementHelper::getReadEntityUrl($entity, Zone::Admin)`
 
 You may omit zone constant if you are creating a URL for current iface's zone. For different zone you need to pass it anyway.
 

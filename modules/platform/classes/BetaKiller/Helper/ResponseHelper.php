@@ -129,6 +129,11 @@ class ResponseHelper
         return new RedirectResponse($url, $status ?? 302);
     }
 
+    public static function isRedirect(ResponseInterface $response): bool
+    {
+        return $response->hasHeader('location');
+    }
+
     public static function disableCaching(ResponseInterface $response): ResponseInterface
     {
         $expiresAt = (new DateTimeImmutable())->sub(new DateInterval('PT1H'));

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Url\Parameter;
@@ -6,7 +7,17 @@ namespace BetaKiller\Url\Parameter;
 interface RawUrlParameterInterface extends UrlParameterInterface
 {
     public const CLASS_NS     = ['Url', 'Parameter'];
-    public const CLASS_SUFFIX = 'UrlParameter';
+    public const CLASS_SUFFIX = ''; // 'UrlParameter'
+
+    /**
+     * Creates instance from uri value
+     *
+     * @param string $value
+     *
+     * @return static
+     * @throws \BetaKiller\Url\Parameter\UrlParameterException
+     */
+    public static function fromUriValue(string $value): static;
 
     /**
      * Returns composed uri for current state
@@ -14,9 +25,4 @@ interface RawUrlParameterInterface extends UrlParameterInterface
      * @return string
      */
     public function exportUriValue(): string;
-
-    /**
-     * @return mixed
-     */
-    public function getValue();
 }

@@ -1,9 +1,11 @@
 <?php
 namespace BetaKiller\Url\ElementProcessor;
 
+use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Url\DummyInstance;
+use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementInstanceInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,6 +22,8 @@ class DummyUrlElementProcessor implements UrlElementProcessorInterface
      * @param \Psr\Http\Message\ServerRequestInterface    $request
      *
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \BetaKiller\Url\ElementProcessor\UrlElementProcessorException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function process(UrlElementInstanceInterface $instance, ServerRequestInterface $request): ResponseInterface
     {
@@ -33,9 +37,14 @@ class DummyUrlElementProcessor implements UrlElementProcessorInterface
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
         $element   = $instance->getModel();
 
-        $redirectElement = $urlHelper->detectDummyTarget($element);
+        $redirectElement = $urlHelper->detectDummyRedirectTarget($element);
 
-        // Redirect
-        return ResponseHelper::redirect($urlHelper->makeUrl($redirectElement));
+        // Redirect if defined
+        if ($redirectElement) {
+            return ResponseHelper::redirect($urlHelper->makeUrl($redirectElement));
+        }
+
+        // Fallback to HTTP 404
+        throw new NotFoundHttpException();
     }
 }

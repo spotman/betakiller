@@ -3,6 +3,7 @@ namespace BetaKiller\IFace\Admin\Error;
 
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Repository\PhpExceptionRepository;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -52,7 +53,7 @@ abstract class AbstractPhpExceptionIndex extends AbstractErrorAdminIFace
 
             $exceptionsData[] = [
                 'hash'       => $model->getHash(),
-                'showUrl'    => $urlHelper->getReadEntityUrl($model, ZoneInterface::ADMIN),
+                'showUrl'    => $urlHelper->getReadEntityUrl($model, Zone::Admin),
                 'urls'       => $model->getUrls(),
                 'paths'      => $paths,
                 'modules'    => $model->getModules(),

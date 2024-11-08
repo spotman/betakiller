@@ -25,11 +25,6 @@ interface UrlElementTreeInterface
     public function has(string $codename): bool;
 
     /**
-     * @throws \BetaKiller\Url\UrlElementException
-     */
-    public function validate(): void;
-
-    /**
      * Returns default iface model
      *
      * @return \BetaKiller\Url\UrlElementInterface
@@ -74,26 +69,26 @@ interface UrlElementTreeInterface
     public function getByCodename(string $codename): UrlElementInterface;
 
     /**
-     * @param string $action
-     * @param string $zone
+     * @param string                        $action
+     * @param \BetaKiller\Url\ZoneInterface $zone
      *
      * @return \BetaKiller\Url\EntityLinkedUrlElementInterface[]
      */
-    public function getByActionAndZone(string $action, string $zone): array;
+    public function getByActionAndZone(string $action, ZoneInterface $zone): array;
 
     /**
      * Search for UrlElement linked to provided entity, entity action and zone
      *
-     * @param string $entityName
-     * @param string $action
-     * @param string $zone
+     * @param string                        $entityName
+     * @param string                        $action
+     * @param \BetaKiller\Url\ZoneInterface $zone
      *
      * @return \BetaKiller\Url\EntityLinkedUrlElementInterface
      */
     public function getByEntityActionAndZone(
         string $entityName,
         string $action,
-        string $zone
+        ZoneInterface $zone
     ): EntityLinkedUrlElementInterface;
 
     /**

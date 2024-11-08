@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Helper;
@@ -11,13 +12,13 @@ use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\DummyModelInterface;
-use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\Parameter\CommonUrlParameterInterface;
 use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlPrototypeService;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 
 class UrlHelper implements UrlHelperInterface
@@ -173,7 +174,7 @@ class UrlHelper implements UrlHelperInterface
 
         // Make link to Dummy redirect target (prevent browser redirects)
         if ($urlElement instanceof DummyModelInterface) {
-            $urlElement = $this->detectDummyTarget($urlElement);
+            $urlElement = $this->detectDummyRedirectTarget($urlElement) ?? $urlElement;
         }
 
         if ($removeCyclingLinks && $this->stack->isCurrent($urlElement, $params)) {
@@ -216,10 +217,15 @@ class UrlHelper implements UrlHelperInterface
 
     private function makeQueryData(UrlElementInterface $element, UrlContainerInterface $params): array
     {
-        $data = [];
+        $data        = [];
         $boundParams = [];
 
         foreach ($element->getQueryParams() as $key => $binding) {
+            // Skip frontend-only keys
+            if ($binding === null) {
+                continue;
+            }
+
             $proto = $this->prototypeService->createPrototypeFromString(sprintf('{%s}', $binding));
 
             if ($this->prototypeService->hasProtoInParameters($proto, $params)) {
@@ -253,7 +259,7 @@ class UrlHelper implements UrlHelperInterface
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
      * @param string                                        $action
-     * @param string                                        $zone
+     * @param \BetaKiller\Url\ZoneInterface                 $zone
      *
      * @param bool|null                                     $removeCycling
      *
@@ -263,7 +269,7 @@ class UrlHelper implements UrlHelperInterface
     public function getEntityUrl(
         DispatchableEntityInterface $entity,
         string $action,
-        string $zone,
+        ZoneInterface $zone,
         ?bool $removeCycling = null
     ): string {
         $params = $this->createUrlContainer();
@@ -278,7 +284,7 @@ class UrlHelper implements UrlHelperInterface
     public function getEntityNameUrl(
         string $entityName,
         string $action,
-        string $zone,
+        ZoneInterface $zone,
         ?UrlContainerInterface $params = null,
         ?bool $removeCycling = null
     ): string {
@@ -289,20 +295,20 @@ class UrlHelper implements UrlHelperInterface
     }
 
     /**
-     * @param string $entityName
-     * @param string $zone
+     * @param string                        $entityName
+     * @param \BetaKiller\Url\ZoneInterface $zone
      *
      * @return string
      * @throws \BetaKiller\Url\UrlElementException
      */
-    public function getCreateEntityUrl(string $entityName, string $zone): string
+    public function getCreateEntityUrl(string $entityName, ZoneInterface $zone): string
     {
         return $this->getEntityNameUrl($entityName, CrudlsActionsInterface::ACTION_CREATE, $zone);
     }
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param string                                        $zone
+     * @param \BetaKiller\Url\ZoneInterface                 $zone
      *
      * @param bool|null                                     $removeCycling
      *
@@ -311,7 +317,7 @@ class UrlHelper implements UrlHelperInterface
      */
     public function getReadEntityUrl(
         DispatchableEntityInterface $entity,
-        string $zone,
+        ZoneInterface $zone,
         ?bool $removeCycling = null
     ): string {
         return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, $zone, $removeCycling);
@@ -319,31 +325,31 @@ class UrlHelper implements UrlHelperInterface
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param string                                        $zone
+     * @param \BetaKiller\Url\ZoneInterface                 $zone
      *
      * @return string
      * @throws \BetaKiller\Url\UrlElementException
      */
-    public function getUpdateEntityUrl(DispatchableEntityInterface $entity, string $zone): string
+    public function getUpdateEntityUrl(DispatchableEntityInterface $entity, ZoneInterface $zone): string
     {
         return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_UPDATE, $zone);
     }
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param string                                        $zone
+     * @param \BetaKiller\Url\ZoneInterface                 $zone
      *
      * @return string
      * @throws \BetaKiller\Url\UrlElementException
      */
-    public function getDeleteEntityUrl(DispatchableEntityInterface $entity, string $zone): string
+    public function getDeleteEntityUrl(DispatchableEntityInterface $entity, ZoneInterface $zone): string
     {
         return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_DELETE, $zone);
     }
 
     /**
      * @param string                                               $entityName
-     * @param string                                               $zone
+     * @param \BetaKiller\Url\ZoneInterface                        $zone
      *
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
@@ -351,14 +357,14 @@ class UrlHelper implements UrlHelperInterface
      * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      */
-    public function getListEntityUrl(string $entityName, string $zone, ?UrlContainerInterface $params = null): string
+    public function getListEntityUrl(string $entityName, ZoneInterface $zone, ?UrlContainerInterface $params = null): string
     {
         return $this->getEntityNameUrl($entityName, CrudlsActionsInterface::ACTION_LIST, $zone, $params);
     }
 
     /**
      * @param string                                               $entityName
-     * @param string                                               $zone
+     * @param \BetaKiller\Url\ZoneInterface                        $zone
      *
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
@@ -366,7 +372,7 @@ class UrlHelper implements UrlHelperInterface
      * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      */
-    public function getSearchEntityUrl(string $entityName, string $zone, ?UrlContainerInterface $params = null): string
+    public function getSearchEntityUrl(string $entityName, ZoneInterface $zone, ?UrlContainerInterface $params = null): string
     {
         return $this->getEntityNameUrl($entityName, CrudlsActionsInterface::ACTION_SEARCH, $zone, $params);
     }
@@ -379,70 +385,75 @@ class UrlHelper implements UrlHelperInterface
      */
     public function getPreviewEntityUrl(DispatchableEntityInterface $entity): ?string
     {
-        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, ZoneInterface::PREVIEW);
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, Zone::Preview);
     }
 
-    public function detectDummyTarget(DummyModelInterface $element): UrlElementInterface
+    public function detectDummyRedirectTarget(DummyModelInterface $dummy): ?UrlElementInterface
     {
-        $redirectElement = $element;
-
-        $counter = 0;
-
-        $searchPath = [];
+        // No redirect if forward target defined
+        if ($dummy->getForwardTarget()) {
+            return null;
+        }
 
         // Process chained dummies to prevent multiple redirects in browser
-        do {
-            // Keep current element if forward target defined
-            if ($redirectElement->getForwardTarget()) {
-                return $redirectElement;
-            }
-
-            $redirectTarget = $redirectElement->getRedirectTarget();
-
-            // Fallback to parent if redirect is not defined
-            $redirectElement = $redirectTarget
-                ? $this->getUrlElementByCodename($redirectTarget)
-                : $this->tree->getParent($redirectElement);
-
-            // Redirect root dummies to default element
-            if (!$redirectElement) {
-                $redirectElement = $this->tree->getDefault();
-            }
-            $counter++;
-
-            $searchPath[] = $redirectElement;
-        } while ($redirectElement instanceof DummyModelInterface && !$redirectElement->isDefault() && $counter < 20);
-
-        if ($counter > 10) {
-            throw new UrlElementException('Possible circular reference for ":name" UrlElement: :path', [
-                ':name' => $element->getRedirectTarget(),
-                ':path' => implode(', ', array_map(static function(UrlElementInterface $el) {
-                    return $el->getCodename();
-                }, $searchPath)),
-            ]);
-        }
-
-        if ($redirectElement instanceof DummyModelInterface) {
-            $redirectElement = $this->getDummyParentTarget($redirectElement);
-        }
-
-        return $redirectElement;
+        return $this->traverseDummyTarget($dummy, false, fn(DummyModelInterface $model) => $model->getRedirectTarget());
     }
 
-    private function getDummyParentTarget(UrlElementInterface $model): IFaceModelInterface
+    /**
+     * @throws \BetaKiller\Url\UrlElementException
+     */
+    public function detectDummyForwardTarget(DummyModelInterface $dummy): ?UrlElementInterface
     {
-        // Find nearest IFace or Action
-        foreach ($this->tree->getReverseBreadcrumbsIterator($model) as $parent) {
-            if ($parent instanceof DummyModelInterface) {
-                continue;
-            }
-
-            return $parent;
+        // No forwarding if redirect is defined
+        if ($dummy->getRedirectTarget()) {
+            return null;
         }
 
-        throw new UrlElementException('No target UrlElement found found for Dummy ":name"', [
-            ':name' => $model->getCodename(),
-        ]);
+        return $this->traverseDummyTarget($dummy, true, fn(DummyModelInterface $model) => $model->getForwardTarget());
+    }
+
+    /**
+     * @param \BetaKiller\Url\DummyModelInterface    $dummy
+     * @param bool                                   $useParent
+     * @param callable(DummyModelInterface): ?string $fn
+     *
+     * @return \BetaKiller\Url\UrlElementInterface|null
+     * @throws \BetaKiller\Url\UrlElementException
+     */
+    private function traverseDummyTarget(DummyModelInterface $dummy, bool $useParent, callable $fn): ?UrlElementInterface
+    {
+        $checkElement = $dummy;
+
+        $probed = [];
+
+        // Process chained dummies
+        do {
+            $checkedCodename = $checkElement->getCodename();
+
+            $targetCodename = $fn($checkElement);
+
+            $targetElement = $targetCodename
+                ? $this->getUrlElementByCodename($targetCodename)
+                : null;
+
+            // Fallback to parent if allowed
+            if (!$targetElement && $useParent) {
+                $targetElement = $this->tree->getParent($checkElement);
+            }
+
+            if (in_array($checkedCodename, $probed, true)) {
+                throw new UrlElementException('Circular reference for ":name" UrlElement: :probed', [
+                    ':name'   => $checkedCodename,
+                    ':probed' => implode(', ', $probed),
+                ]);
+            }
+
+            $probed[] = $checkedCodename;
+
+            $checkElement = $targetElement;
+        } while ($checkElement instanceof DummyModelInterface);
+
+        return $checkElement;
     }
 
     private function makeAbsoluteUrl(string $relativeUrl): string

@@ -7,6 +7,7 @@ use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Factory\UrlElementInstanceFactory;
 use BetaKiller\Factory\UrlElementProcessorFactory;
+use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -15,33 +16,25 @@ class UrlElementRenderer implements UrlElementRendererInterface
     /**
      * @var \BetaKiller\Factory\UrlElementProcessorFactory
      */
-    private $processorFactory;
+    private UrlElementProcessorFactory $processorFactory;
 
     /**
      * @var \BetaKiller\Factory\UrlElementInstanceFactory
      */
-    private $instanceFactory;
-
-    /**
-     * @var \BetaKiller\Url\UrlElementTreeInterface
-     */
-    private $tree;
+    private UrlElementInstanceFactory $instanceFactory;
 
     /**
      * UrlElementRenderMiddleware constructor.
      *
      * @param \BetaKiller\Factory\UrlElementProcessorFactory $processorFactory
      * @param \BetaKiller\Factory\UrlElementInstanceFactory  $instanceFactory
-     * @param \BetaKiller\Url\UrlElementTreeInterface        $tree
      */
     public function __construct(
         UrlElementProcessorFactory $processorFactory,
-        UrlElementInstanceFactory $instanceFactory,
-        UrlElementTreeInterface $tree
+        UrlElementInstanceFactory $instanceFactory
     ) {
         $this->processorFactory = $processorFactory;
         $this->instanceFactory  = $instanceFactory;
-        $this->tree             = $tree;
     }
 
     /**
@@ -50,17 +43,20 @@ class UrlElementRenderer implements UrlElementRendererInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Exception\FoundHttpException
+     * @throws \BetaKiller\Url\UrlElementException
      */
     public function render(UrlElementInterface $urlElement, ServerRequestInterface $request): ResponseInterface
     {
         $pid = RequestProfiler::begin($request, 'UrlElement processing');
 
-        // Use forward target if Dummy defined it
+        // Use forward target for Dummy
         if ($urlElement instanceof DummyModelInterface) {
-            $targetCodename = $urlElement->getForwardTarget();
+            $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-            if ($targetCodename) {
-                $urlElement = $this->tree->getByCodename($targetCodename);
+            $forwardTarget = $urlHelper->detectDummyForwardTarget($urlElement);
+
+            if ($forwardTarget) {
+                $urlElement = $forwardTarget;
             }
         }
 
@@ -75,14 +71,14 @@ class UrlElementRenderer implements UrlElementRendererInterface
         $instance     = $this->instanceFactory->createFromUrlElement($urlElement);
 
         // Starting hook
-        if ($instance && $instance instanceof BeforeRequestProcessingInterface) {
+        if ($instance instanceof BeforeRequestProcessingInterface) {
             $instance->beforeProcessing($request);
         }
 
         $response = $urlProcessor->process($instance, $request);
 
         // Final hook
-        if ($instance && $instance instanceof AfterRequestProcessingInterface) {
+        if ($instance instanceof AfterRequestProcessingInterface) {
             $instance->afterProcessing($request);
         }
 

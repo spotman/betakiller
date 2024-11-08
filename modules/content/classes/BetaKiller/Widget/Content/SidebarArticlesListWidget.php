@@ -6,6 +6,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Model\ContentPostInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\Widget\AbstractPublicWidget;
 use Psr\Http\Message\ServerRequestInterface;
@@ -68,12 +69,12 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
      */
     abstract protected function getArticlesList($exclude_id, $limit): array;
 
-    protected function getCurrentArticleID(UrlContainerInterface $urlContainer)
+    protected function getCurrentArticleID(UrlContainerInterface $urlContainer): ?string
     {
         /** @var ContentPostInterface|null $currentArticle */
         $currentArticle = $urlContainer->getEntityByClassName(ContentPostInterface::class);
 
-        return $currentArticle ? $currentArticle->getID() : null;
+        return $currentArticle?->getID();
     }
 
     protected function getArticleData(ContentPostInterface $article, UrlHelperInterface $urlHelper): array
@@ -84,8 +85,8 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
         return [
             'label'     => $article->getLabel(),
             'thumbnail' => $this->assetsHelper->getAttributesForImgTag($thumbnail, $thumbnail::SIZE_PREVIEW),
-            'url'       => $urlHelper->getReadEntityUrl($article, ZoneInterface::PUBLIC),
-            'date'      => $createdAt ? $createdAt->format('d.m.Y') : null,
+            'url'       => $urlHelper->getReadEntityUrl($article, Zone::Public),
+            'date'      => $createdAt?->format('d.m.Y'),
         ];
     }
 }

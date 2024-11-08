@@ -11,6 +11,7 @@ use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Repository\PhpExceptionRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
@@ -105,7 +106,7 @@ class Notify extends AbstractTask
             'message'  => $model->getMessage(),
             'urls'     => $model->getUrls(),
             'paths'    => $model->getPaths(),
-            'adminUrl' => $this->urlHelper->getReadEntityUrl($model, ZoneInterface::ADMIN),
+            'adminUrl' => $this->urlHelper->getReadEntityUrl($model, Zone::Admin),
         ]);
 
         // Saving last notification timestamp

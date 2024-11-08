@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace BetaKiller\Dev;
 
+use BetaKiller\Helper\ServerRequestHelper;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
 use Mezzio\Session\SessionIdentifierAwareInterface;
 use Mezzio\Session\SessionInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class DebugBarSessionDataCollector extends DataCollector implements Renderable
 {
@@ -18,11 +20,11 @@ class DebugBarSessionDataCollector extends DataCollector implements Renderable
     /**
      * DebugBarSessionDataCollector constructor.
      *
-     * @param \Mezzio\Session\SessionInterface $session
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      */
-    public function __construct(SessionInterface $session)
+    public function __construct(ServerRequestInterface $request)
     {
-        $this->session = $session;
+        $this->session = ServerRequestHelper::getSession($request);
     }
 
     /**
@@ -73,7 +75,7 @@ class DebugBarSessionDataCollector extends DataCollector implements Renderable
 
     /**
      * Returns a hash where keys are control names and their values
-     * an array of options as defined in {@see DebugBar\JavascriptRenderer::addControl()}
+     * an array of options as defined in {@see \DebugBar\JavascriptRenderer::addControl()}
      *
      * @return array
      */

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Helper;
@@ -7,6 +8,7 @@ use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\DummyModelInterface;
 use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\ZoneInterface;
 
 interface UrlHelperInterface
 {
@@ -54,9 +56,9 @@ interface UrlHelperInterface
      * @throws \BetaKiller\Url\UrlElementException
      */
     public function makeCodenameUrl(
-        string                 $codename,
+        string $codename,
         ?UrlContainerInterface $params = null,
-        ?bool                  $removeCyclingLinks = null
+        ?bool $removeCyclingLinks = null
     ): string;
 
     /**
@@ -68,15 +70,15 @@ interface UrlHelperInterface
      * @throws \BetaKiller\Url\UrlElementException
      */
     public function makeUrl(
-        UrlElementInterface    $urlElement,
+        UrlElementInterface $urlElement,
         ?UrlContainerInterface $params = null,
-        ?bool                  $removeCyclingLinks = null
+        ?bool $removeCyclingLinks = null
     ): string;
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
      * @param string                                        $action
-     * @param string                                        $zone
+     * @param \BetaKiller\Url\ZoneInterface                 $zone
      *
      * @param bool|null                                     $removeCycling
      *
@@ -85,31 +87,31 @@ interface UrlHelperInterface
      */
     public function getEntityUrl(
         DispatchableEntityInterface $entity,
-        string                      $action,
-        string                      $zone,
-        ?bool                       $removeCycling = null
+        string $action,
+        ZoneInterface $zone,
+        ?bool $removeCycling = null
     ): string;
 
     public function getEntityNameUrl(
-        string                 $entityName,
-        string                 $action,
-        string                 $zone,
+        string $entityName,
+        string $action,
+        ZoneInterface $zone,
         ?UrlContainerInterface $params = null,
-        ?bool                  $removeCycling = null
+        ?bool $removeCycling = null
     ): string;
 
     /**
-     * @param string $entityName
-     * @param string $zone
+     * @param string                        $entityName
+     * @param \BetaKiller\Url\ZoneInterface $zone
      *
      * @return string
      * @throws \BetaKiller\Url\UrlElementException
      */
-    public function getCreateEntityUrl(string $entityName, string $zone): string;
+    public function getCreateEntityUrl(string $entityName, ZoneInterface $zone): string;
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param string                                        $zone
+     * @param \BetaKiller\Url\ZoneInterface                 $zone
      *
      * @param bool|null                                     $removeCycling
      *
@@ -118,31 +120,31 @@ interface UrlHelperInterface
      */
     public function getReadEntityUrl(
         DispatchableEntityInterface $entity,
-        string                      $zone,
-        ?bool                       $removeCycling = null
+        ZoneInterface $zone,
+        ?bool $removeCycling = null
     ): string;
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param string                                        $zone
+     * @param \BetaKiller\Url\ZoneInterface                 $zone
      *
      * @return string
      * @throws \BetaKiller\Url\UrlElementException
      */
-    public function getUpdateEntityUrl(DispatchableEntityInterface $entity, string $zone): string;
+    public function getUpdateEntityUrl(DispatchableEntityInterface $entity, ZoneInterface $zone): string;
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param string                                        $zone
+     * @param \BetaKiller\Url\ZoneInterface                 $zone
      *
      * @return string
      * @throws \BetaKiller\Url\UrlElementException
      */
-    public function getDeleteEntityUrl(DispatchableEntityInterface $entity, string $zone): string;
+    public function getDeleteEntityUrl(DispatchableEntityInterface $entity, ZoneInterface $zone): string;
 
     /**
      * @param string                                               $entityName
-     * @param string                                               $zone
+     * @param \BetaKiller\Url\ZoneInterface                        $zone
      *
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
@@ -150,11 +152,11 @@ interface UrlHelperInterface
      * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      */
-    public function getListEntityUrl(string $entityName, string $zone, ?UrlContainerInterface $params = null): string;
+    public function getListEntityUrl(string $entityName, ZoneInterface $zone, ?UrlContainerInterface $params = null): string;
 
     /**
      * @param string                                               $entityName
-     * @param string                                               $zone
+     * @param \BetaKiller\Url\ZoneInterface                        $zone
      *
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
@@ -162,7 +164,7 @@ interface UrlHelperInterface
      * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      */
-    public function getSearchEntityUrl(string $entityName, string $zone, ?UrlContainerInterface $params = null): string;
+    public function getSearchEntityUrl(string $entityName, ZoneInterface $zone, ?UrlContainerInterface $params = null): string;
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
@@ -173,9 +175,14 @@ interface UrlHelperInterface
     public function getPreviewEntityUrl(DispatchableEntityInterface $entity): ?string;
 
     /**
-     * @param \BetaKiller\Url\DummyModelInterface $element
+     * @param \BetaKiller\Url\DummyModelInterface $dummy
      *
-     * @return \BetaKiller\Url\UrlElementInterface
+     * @return \BetaKiller\Url\UrlElementInterface|null
      */
-    public function detectDummyTarget(DummyModelInterface $element): UrlElementInterface;
+    public function detectDummyRedirectTarget(DummyModelInterface $dummy): ?UrlElementInterface;
+
+    /**
+     * @throws \BetaKiller\Url\UrlElementException
+     */
+    public function detectDummyForwardTarget(DummyModelInterface $dummy): ?UrlElementInterface;
 }

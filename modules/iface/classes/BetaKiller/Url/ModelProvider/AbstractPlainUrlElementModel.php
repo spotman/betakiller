@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Url\ModelProvider;
@@ -44,7 +45,7 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     private string $uri;
 
     /**
-     * @var string[]
+     * @var array<string, string|null>
      */
     private array $query = [];
 
@@ -125,10 +126,7 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     }
 
     /**
-     * Returns key-value pairs for "query param name" => "Url parameter binding"
-     * Example: [ "u" => "User.id", "r" => "Role.codename" ]
-     *
-     * @return array
+     * @inheritDoc
      */
     public function getQueryParams(): array
     {
@@ -341,7 +339,10 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
         $values = array_filter(array_map('trim', $values));
 
         foreach ($values as $value) {
-            [$queryName, $binding] = explode('=', $value, 2);
+            $split = explode('=', $value, 2);
+
+            $queryName = $split[0];
+            $binding   = $split[1] ?? null;
 
             $query[$queryName] = $binding;
         }
@@ -354,7 +355,10 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
         $items = [];
 
         foreach ($this->query as $name => $binding) {
-            $items[] = sprintf('%s=%s', $name, $binding);
+            // Skip frontend-only keys
+            $items[] = $binding !== null
+                ? sprintf('%s=%s', $name, $binding)
+                : $name;
         }
 
         return implode(',', $items);

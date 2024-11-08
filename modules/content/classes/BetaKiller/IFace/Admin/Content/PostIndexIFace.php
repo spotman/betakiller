@@ -3,7 +3,7 @@ namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Repository\ContentPostRepository;
-use BetaKiller\Url\ZoneInterface;
+use BetaKiller\Url\Zone;
 use Psr\Http\Message\ServerRequestInterface;
 
 class PostIndexIFace extends AbstractContentAdminIFace
@@ -46,7 +46,7 @@ class PostIndexIFace extends AbstractContentAdminIFace
         foreach ($articles as $article) {
             $data[] = [
                 'id'    => $article->getID(),
-                'url'   => $urlHelper->getReadEntityUrl($article, ZoneInterface::ADMIN),
+                'url'   => $urlHelper->getReadEntityUrl($article, Zone::Admin),
                 'label' => $article->getLabel(),
             ];
         }

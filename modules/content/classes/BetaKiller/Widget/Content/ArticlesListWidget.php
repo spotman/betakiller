@@ -11,6 +11,7 @@ use BetaKiller\Model\ContentPost;
 use BetaKiller\Repository\ContentCategoryRepository;
 use BetaKiller\Repository\ContentPostRepository;
 use BetaKiller\Search\SearchResultsInterface;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\Widget\AbstractPublicWidget;
 use HTML;
@@ -151,7 +152,7 @@ final class ArticlesListWidget extends AbstractPublicWidget
                     'original' => $this->assetsHelper->getAttributesForImgTag($thumbnail, $thumbnail::SIZE_ORIGINAL),
                     'preview'  => $this->assetsHelper->getAttributesForImgTag($thumbnail, $thumbnail::SIZE_PREVIEW),
                 ],
-                'url'        => $helper->getReadEntityUrl($article, ZoneInterface::PUBLIC),
+                'url'        => $helper->getReadEntityUrl($article, Zone::Public),
                 'label'      => $article->getLabel(),
                 'title'      => $article->getTitle(),
                 'text'       => $this->contentHelper->getPostContentPreview($article),

@@ -22,6 +22,10 @@ use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Console\ConsoleTaskLocator;
 use BetaKiller\Console\ConsoleTaskLocatorInterface;
 use BetaKiller\DefenceParameterProviderFactory;
+use BetaKiller\Dev\DebugBarAccessControl;
+use BetaKiller\Dev\DebugBarAccessControlInterface;
+use BetaKiller\Dev\DebugBarFactory;
+use BetaKiller\Dev\DebugBarFactoryInterface;
 use BetaKiller\DummyIdentityConverter;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Exception;
@@ -344,6 +348,9 @@ return [
 
         ConsoleOptionBuilderInterface::class => autowire(ConsoleOptionBuilder::class),
         ConsoleTaskLocatorInterface::class   => autowire(ConsoleTaskLocator::class),
+
+        DebugBarFactoryInterface::class       => autowire(DebugBarFactory::class),
+        DebugBarAccessControlInterface::class => autowire(DebugBarAccessControl::class),
     ],
 
 ];

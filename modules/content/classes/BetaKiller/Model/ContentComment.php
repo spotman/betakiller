@@ -1,8 +1,9 @@
 <?php
+
 namespace BetaKiller\Model;
 
 use BetaKiller\Helper\UrlHelperInterface;
-use BetaKiller\Url\ZoneInterface;
+use BetaKiller\Url\Zone;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
@@ -126,7 +127,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
     {
         $relatedEntity = $this->getRelatedEntityInstance();
 
-        return $helper->getReadEntityUrl($relatedEntity, ZoneInterface::PUBLIC);
+        return $helper->getReadEntityUrl($relatedEntity, Zone::Public);
     }
 
     /**

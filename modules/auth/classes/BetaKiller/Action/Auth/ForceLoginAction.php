@@ -15,7 +15,7 @@ use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Service\AuthService;
-use BetaKiller\Url\Parameter\UserNameUrlParameter;
+use BetaKiller\Url\Parameter\UserName;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Spotman\Acl\AclInterface;
@@ -112,7 +112,7 @@ final class ForceLoginAction extends AbstractAction
         }
 
         // Fetch Username from request URL (no direct User model binding via ID coz ID is obfuscated in stage)
-        $userName = ServerRequestHelper::getParameter($request, UserNameUrlParameter::class);
+        $userName = ServerRequestHelper::getParameter($request, UserName::class);
 
         $user = $this->userRepo->findByUsername($userName->getValue());
 

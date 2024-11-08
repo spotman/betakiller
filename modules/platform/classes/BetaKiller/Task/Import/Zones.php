@@ -50,7 +50,10 @@ class Zones extends AbstractTask
 
     public function run(ConsoleInputInterface $params): void
     {
-        foreach ((array)$this->config->load('zones', []) as $zoneName) {
+        /** @var \BetaKiller\Url\ZoneInterface $zone */
+        foreach ((array)$this->config->load('zones', []) as $zone) {
+            $zoneName = $zone->getName();
+
             $model = $this->repo->findByName($zoneName);
 
             if (!$model) {

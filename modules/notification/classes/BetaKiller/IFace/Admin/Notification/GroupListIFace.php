@@ -11,6 +11,7 @@ use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Notification\MessageRendererInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Repository\NotificationGroupRepositoryInterface;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use function http_build_query;
@@ -112,7 +113,7 @@ class GroupListIFace extends AbstractAdminIFace
 
         return [
             'name'     => $group->getCodename(),
-            'url'      => $urlHelper->getReadEntityUrl($group, ZoneInterface::ADMIN),
+            'url'      => $urlHelper->getReadEntityUrl($group, Zone::Admin),
             'messages' => $messages,
         ];
     }

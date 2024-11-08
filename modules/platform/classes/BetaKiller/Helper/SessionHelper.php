@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Helper;
@@ -9,9 +10,10 @@ use BetaKiller\Model\TokenInterface;
 use BetaKiller\Model\UserInterface;
 use DateTimeImmutable;
 use LogicException;
+use Mezzio\Session\SessionIdentifierAwareInterface;
+use Mezzio\Session\SessionInterface;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use Mezzio\Session\SessionInterface;
 
 class SessionHelper
 {
@@ -31,6 +33,15 @@ class SessionHelper
                 $to->set($key, $value);
             }
         }
+    }
+
+    public static function getId(SessionInterface $session): string
+    {
+        if (!$session instanceof SessionIdentifierAwareInterface) {
+            throw new LogicException();
+        }
+
+        return $session->getId();
     }
 
     public static function setCreatedAt(SessionInterface $session, DateTimeImmutable $createdAt): void

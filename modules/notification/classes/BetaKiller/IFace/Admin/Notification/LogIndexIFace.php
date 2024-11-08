@@ -11,7 +11,8 @@ use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Query\NotificationLogQuery;
 use BetaKiller\Repository\NotificationLogRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
-use BetaKiller\Url\Parameter\PaginationUrlParameter;
+use BetaKiller\Url\Parameter\Page;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -63,8 +64,8 @@ final class LogIndexIFace extends AbstractAdminIFace
         $status          = $urlParams->getQueryPart(self::ARG_STATUS);
         $transport       = $urlParams->getQueryPart(self::ARG_TRANSPORT);
 
-        /** @var PaginationUrlParameter $pageParam */
-        $pageParam   = ServerRequestHelper::getParameter($request, PaginationUrlParameter::class);
+        /** @var Page $pageParam */
+        $pageParam   = ServerRequestHelper::getParameter($request, Page::class);
         $currentPage = $pageParam ? $pageParam->getValue() : 1;
 
         $user = $userId ? $this->userRepo->getById($userId) : null;
@@ -122,9 +123,9 @@ final class LogIndexIFace extends AbstractAdminIFace
             'is_succeeded' => $item->isSucceeded(),
             'status'       => $item->getStatus(),
             'is_read'      => $item->isRead(),
-            'body_url'     => $urlHelper->getReadEntityUrl($item, ZoneInterface::ADMIN),
+            'body_url'     => $urlHelper->getReadEntityUrl($item, Zone::Admin),
             'retry_url'    => $item->isRetryAvailable()
-                ? $urlHelper->getEntityUrl($item, NotificationLogResource::ACTION_RETRY, ZoneInterface::ADMIN)
+                ? $urlHelper->getEntityUrl($item, NotificationLogResource::ACTION_RETRY, Zone::Admin)
                 : null,
         ];
     }

@@ -348,7 +348,9 @@ if (!function_exists('initKohanaModules')) {
 if (!function_exists('proceedModuleInit')) {
     function proceedModuleInit(string $initFilePath, ContainerInterface $container): void
     {
-        $pmi = StartupProfiler::begin('Init module '.$initFilePath);
+        $moduleName = basename(dirname($initFilePath));
+
+        $pmi = StartupProfiler::begin('Init module '.$moduleName);
 
         // Include the module initialization file once
         $className = include_once $initFilePath;

@@ -7,6 +7,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Url\BeforeRequestProcessingInterface;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -61,7 +62,7 @@ class PostItemIFace extends AbstractAppBase implements BeforeRequestProcessingIn
         $model = ContentUrlContainerHelper::getContentPost($request);
         $stack = ServerRequestHelper::getUrlElementStack($request);
 
-        $previewMode = UrlElementHelper::isCurrentZone(ZoneInterface::PREVIEW, $stack);
+        $previewMode = UrlElementHelper::isCurrentZone(Zone::Preview, $stack);
 
         if ($previewMode) {
             // See latest revision data

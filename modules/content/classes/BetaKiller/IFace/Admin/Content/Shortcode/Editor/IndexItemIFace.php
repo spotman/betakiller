@@ -2,7 +2,7 @@
 namespace BetaKiller\IFace\Admin\Content\Shortcode\Editor;
 
 use BetaKiller\Model\EntityModelInterface;
-use BetaKiller\Url\Parameter\IdUrlParameter;
+use BetaKiller\Url\Parameter\ID;
 use Psr\Http\Message\ServerRequestInterface;
 
 class IndexItemIFace extends AbstractEditor
@@ -24,8 +24,8 @@ class IndexItemIFace extends AbstractEditor
         /** @var EntityModelInterface|null $entity */
         $entity = $this->urlContainer->getEntityByClassName(EntityModelInterface::class);
 
-        /** @var \BetaKiller\Url\Parameter\IdUrlParameter|null $idParam */
-        $idParam = $this->urlContainer->getParameterByClassName(IdUrlParameter::class);
+        /** @var \BetaKiller\Url\Parameter\ID|null $idParam */
+        $idParam = $this->urlContainer->getParameterByClassName(ID::class);
         $id = $idParam ? $idParam->getValue() : null;
 
         return [

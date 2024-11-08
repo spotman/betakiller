@@ -132,7 +132,7 @@ class I18n extends AbstractTask
                 'keys'  => $this->getMissedKeysData(/* $urlHelper */),
 //                'list_url' => $urlHelper->getListEntityUrl(
 //                    TranslationKey::getUrlContainerKey(),
-//                    ZoneInterface::ADMIN
+//                    Zone::Admin
 //                ),
             ]);
         }
@@ -145,7 +145,7 @@ class I18n extends AbstractTask
         foreach ($this->newKeys as $missedKey) {
             $data[] = [
                 'name' => $missedKey->getI18nKeyName(),
-//                'url'  => $urlHelper->getReadEntityUrl($missedKey, ZoneInterface::ADMIN),
+//                'url'  => $urlHelper->getReadEntityUrl($missedKey, Zone::Admin),
             ];
         }
 

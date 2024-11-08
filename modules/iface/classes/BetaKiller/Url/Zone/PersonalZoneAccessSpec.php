@@ -24,7 +24,7 @@ class PersonalZoneAccessSpec implements ZoneAccessSpecInterface
     public function getRolesNames(): array
     {
         return [
-            // Any logged in user may access personal zone
+            // Any logged-in user may access personal zone
             RoleInterface::LOGIN,
         ];
     }

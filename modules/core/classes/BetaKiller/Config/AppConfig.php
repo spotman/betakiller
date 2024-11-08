@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Config;
@@ -8,14 +9,16 @@ use Psr\Http\Message\UriInterface;
 
 class AppConfig extends AbstractConfig implements AppConfigInterface
 {
-    public const PATH_NAMESPACE                 = ['namespace'];
-    public const PATH_BASE_URL                  = ['url', 'base'];
-    public const PATH_IS_TRAILING_SLASH_ENABLED = ['url', 'is_trailing_slash_enabled'];
-    public const PATH_CIRCULAR_LINK_HREF        = ['url', 'circular_link_href'];
-    public const PATH_SUPPORT_URL               = ['url', 'support'];
-    public const PATH_QUERY_IGNORED             = ['url', 'query', 'ignored'];
-    public const PATH_PAGE_CACHE_PATH           = ['cache', 'page', 'path'];
-    public const PATH_PAGE_CACHE_ENABLED        = ['cache', 'page', 'enabled'];
+    public const PATH_NAMESPACE                   = ['namespace'];
+    public const PATH_BASE_URL                    = ['url', 'base'];
+    public const PATH_IS_TRAILING_SLASH_ENABLED   = ['url', 'is_trailing_slash_enabled'];
+    public const PATH_IS_REDIRECT_MISSING_ENABLED = ['url', 'is_redirect_missing_enabled'];
+    public const PATH_CIRCULAR_LINK_HREF          = ['url', 'circular_link_href'];
+    public const PATH_SUPPORT_URL                 = ['url', 'support'];
+    public const PATH_QUERY_IGNORED               = ['url', 'query', 'ignored'];
+    public const PATH_RAW_PARAMETERS              = ['url', 'parameters'];
+    public const PATH_PAGE_CACHE_PATH             = ['cache', 'page', 'path'];
+    public const PATH_PAGE_CACHE_ENABLED          = ['cache', 'page', 'enabled'];
 
     /**
      * @var \Psr\Http\Message\UriFactoryInterface
@@ -48,7 +51,7 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function getNamespace(): string
     {
-        return (string)$this->get(self::PATH_NAMESPACE);
+        return $this->getString(self::PATH_NAMESPACE);
     }
 
     /**
@@ -59,7 +62,7 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function getBaseUri(): UriInterface
     {
-        $url = (string)$this->get(self::PATH_BASE_URL);
+        $url = $this->getString(self::PATH_BASE_URL);
 
         return $this->uriFactory->createUri($url);
     }
@@ -81,7 +84,17 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function isTrailingSlashEnabled(): bool
     {
-        return (bool)$this->get(self::PATH_IS_TRAILING_SLASH_ENABLED);
+        return $this->getBool(self::PATH_IS_TRAILING_SLASH_ENABLED);
+    }
+
+    public function isRedirectMissingEnabled(): bool
+    {
+        return $this->getBool(self::PATH_IS_REDIRECT_MISSING_ENABLED);
+    }
+
+    public function getRawUrlParameters(): array
+    {
+        return $this->getArray(self::PATH_RAW_PARAMETERS);
     }
 
     /**
@@ -89,7 +102,7 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function getIgnoredQueryParams(): array
     {
-        return (array)$this->get(self::PATH_QUERY_IGNORED, true);
+        return $this->getArray(self::PATH_QUERY_IGNORED, true);
     }
 
     /**
@@ -97,7 +110,7 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function getCircularLinkHref(): string
     {
-        return (string)$this->get(self::PATH_CIRCULAR_LINK_HREF);
+        return $this->getString(self::PATH_CIRCULAR_LINK_HREF);
     }
 
     /**
@@ -105,7 +118,7 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function isPageCacheEnabled(): bool
     {
-        return (bool)$this->get(self::PATH_PAGE_CACHE_ENABLED);
+        return $this->getBool(self::PATH_PAGE_CACHE_ENABLED);
     }
 
     /**
@@ -113,7 +126,7 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function getPageCachePath(): string
     {
-        return rtrim($this->get(self::PATH_PAGE_CACHE_PATH), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
+        return rtrim($this->getString(self::PATH_PAGE_CACHE_PATH), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -121,6 +134,6 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function getSupportUrl(): string
     {
-        return (string)$this->get(self::PATH_SUPPORT_URL);
+        return $this->getString(self::PATH_SUPPORT_URL);
     }
 }

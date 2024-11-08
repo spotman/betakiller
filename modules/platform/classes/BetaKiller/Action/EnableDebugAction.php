@@ -1,48 +1,26 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Action;
 
-use BetaKiller\Auth\AccessDeniedException;
-use BetaKiller\Helper\ResponseHelper;
-use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
-use BetaKiller\Model\RoleInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Spotman\Acl\AclInterface;
+use Mezzio\Session\SessionInterface;
 
-final class EnableDebugAction extends AbstractAction
+final class EnableDebugAction extends AbstractDebugAction
 {
-    /**
-     * @var \Spotman\Acl\AclInterface
-     */
-    private AclInterface $acl;
-
-    /**
-     * EnableDebugAction constructor.
-     *
-     * @param \Spotman\Acl\AclInterface $acl
-     */
-    public function __construct(AclInterface $acl)
+    protected function updateState(SessionInterface $session): void
     {
-        $this->acl = $acl;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function handle(ServerRequestInterface $request): ResponseInterface
-    {
-        $session = ServerRequestHelper::getSession($request);
-        $user    = ServerRequestHelper::getUser($request);
-
-        if (!$this->acl->hasAssignedRoleName($user, RoleInterface::DEVELOPER)) {
-            throw new AccessDeniedException('Unauthorized debug mode');
+        // Skip duplicate calls
+        if (SessionHelper::isDebugEnabled($session)) {
+            return;
         }
 
         SessionHelper::enableDebug($session);
 
-        return ResponseHelper::text('Debug enabled');
+        $this->logger->notice('Debug mode enabled for User :user_id with Session ":session_id"', [
+            ':user_id'    => SessionHelper::getUserID($session),
+            ':session_id' => SessionHelper::getId($session),
+        ]);
     }
 }

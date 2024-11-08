@@ -87,7 +87,7 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
         $ip        = ServerRequestHelper::getIpAddress($request);
         $referrer  = ServerRequestHelper::getHttpReferrer($request);
 
-        $redirectToUrl = $parentModel && $e->getRedirectToParent()
+        $redirectToUrl = ($parentModel && $e->isRedirectToParentAllowed())
             ? $urlHelper->makeUrl($parentModel, $params, false)
             : null;
 

@@ -36,6 +36,12 @@ interface AppConfigInterface
     public function isTrailingSlashEnabled(): bool;
 
     /**
+     * Returns true if redirect on missing pages is allowed
+     * @return bool
+     */
+    public function isRedirectMissingEnabled(): bool;
+
+    /**
      * @return string
      */
     public function getCircularLinkHref(): string;
@@ -54,6 +60,13 @@ interface AppConfigInterface
      * @return string[]
      */
     public function getIgnoredQueryParams(): array;
+
+    /**
+     * Returns key=>value pairs where "key" is UrlContainer` key and "value" is FQCN
+     *
+     * @return array<string, string>
+     */
+    public function getRawUrlParameters(): array;
 
     /**
      * @return string

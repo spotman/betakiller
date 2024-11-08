@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\Widget\Admin;
 
 use BetaKiller\Acl\UrlElementAccessResolverInterface;
@@ -15,6 +16,7 @@ use BetaKiller\Url\EntityLinkedUrlElementInterface;
 use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\Widget\AbstractAdminWidget;
 use Psr\Http\Message\ServerRequestInterface;
@@ -155,8 +157,7 @@ class BarWidget extends AbstractAdminWidget
         RequestLanguageHelperInterface $i18n
     ): array {
         $items       = [];
-        $urlElements = $this->tree->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE,
-            ZoneInterface::ADMIN);
+        $urlElements = $this->tree->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE, Zone::Admin);
 
         foreach ($urlElements as $urlElement) {
             if (!$this->elementAccessResolver->isAllowed($user, $urlElement, $params)) {
@@ -242,7 +243,7 @@ class BarWidget extends AbstractAdminWidget
             $stack,
             $helper,
             $entity,
-            ZoneInterface::ADMIN,
+            Zone::Admin,
             CrudlsActionsInterface::ACTION_READ
         );
     }
@@ -264,7 +265,7 @@ class BarWidget extends AbstractAdminWidget
             $stack,
             $helper,
             $entity,
-            ZoneInterface::PUBLIC,
+            Zone::Public,
             CrudlsActionsInterface::ACTION_READ
         );
     }
@@ -287,7 +288,7 @@ class BarWidget extends AbstractAdminWidget
             $stack,
             $helper,
             $entity,
-            ZoneInterface::PREVIEW,
+            Zone::Preview,
             CrudlsActionsInterface::ACTION_READ
         );
     }
@@ -296,7 +297,7 @@ class BarWidget extends AbstractAdminWidget
      * @param \BetaKiller\Url\UrlElementStack                    $stack
      * @param \BetaKiller\Helper\UrlHelperInterface              $helper
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
-     * @param string                                             $targetZone
+     * @param \BetaKiller\Url\ZoneInterface                      $targetZone
      * @param string                                             $targetAction
      *
      * @return null|string
@@ -306,7 +307,7 @@ class BarWidget extends AbstractAdminWidget
         UrlElementStack $stack,
         UrlHelperInterface $helper,
         ?DispatchableEntityInterface $entity,
-        string $targetZone,
+        ZoneInterface $targetZone,
         string $targetAction
     ): ?string {
         if (!$entity) {

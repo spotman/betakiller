@@ -16,7 +16,7 @@ class UrlElementTreeLayerIterator extends \FilterIterator
      * UrlElementTreeLayerIterator constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface                      $tree
-     * @param \BetaKiller\Url\UrlElementInterface                          $parent
+     * @param \BetaKiller\Url\UrlElementInterface|null                     $parent
      * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filter [optional]
      *
      * @throws \BetaKiller\Url\UrlElementException

@@ -1,12 +1,13 @@
 <?php
+
 declare(strict_types=1);
 
-use BetaKiller\Url\ZoneInterface;
+use BetaKiller\Url\Zone;
 
 return [
-    ZoneInterface::PUBLIC,
-    ZoneInterface::PERSONAL,
-    ZoneInterface::ADMIN,
-    ZoneInterface::DEVELOPER,
-    ZoneInterface::PREVIEW,
+    Zone::Public,
+    Zone::Personal,
+    Zone::Admin,
+    Zone::Developer,
+    Zone::Preview,
 ];

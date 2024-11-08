@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Url;
@@ -103,8 +104,8 @@ class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
                 return false;
             }
 
-            // No caching for elements with URL query params
-            if ($urlElement->getQueryParams()) {
+            // No caching for elements with URL query params (ignore frontend-only keys)
+            if (array_filter($urlElement->getQueryParams())) {
                 return false;
             }
         }
@@ -121,10 +122,14 @@ class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
             }
         }
 
-        $this->cache->set($cacheKey, serialize([
-            'stack'      => $stackData,
-            'parameters' => $paramsData,
-        ]), self::CACHE_TTL);
+        $this->cache->set(
+            $cacheKey,
+            serialize([
+                'stack'      => $stackData,
+                'parameters' => $paramsData,
+            ]),
+            self::CACHE_TTL
+        );
 
         return true;
     }
@@ -196,11 +201,15 @@ class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
 
             // Emulate fetching to prevent warnings about unused query params
             foreach ($stack->getCurrent()->getQueryParams() as $key => $binding) {
-                $proto = UrlPrototype::fromString('{'.$binding.'}');
+                // Skip frontend-only keys
+                $proto = $binding
+                    ? UrlPrototype::fromString('{'.$binding.'}')
+                    : null;
 
-                if ($urlParameters->hasParameter($proto->getDataSourceName())) {
-                    $urlParameters->getQueryPart($key, true); // Param should be defined in URL
-                }
+                // Param should be defined in URL
+                $required = $proto && $urlParameters->hasParameter($proto->getDataSourceName());
+
+                $urlParameters->getQueryPart($key, $required);
             }
 
             return true;

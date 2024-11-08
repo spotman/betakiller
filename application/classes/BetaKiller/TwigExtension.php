@@ -15,6 +15,7 @@ use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;
 use BetaKiller\Widget\WidgetFacade;
@@ -401,7 +402,7 @@ final class TwigExtension extends AbstractExtension
                 static function (array $context): bool {
                     $zoneName = $context[IFaceView::IFACE_KEY][IFaceView::IFACE_ZONE_KEY];
 
-                    return $zoneName === ZoneInterface::PUBLIC;
+                    return $zoneName === Zone::Public->getName();
                 },
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),

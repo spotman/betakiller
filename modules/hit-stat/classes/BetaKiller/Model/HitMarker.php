@@ -1,11 +1,11 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Url\Parameter\UtmCampaignUrlParameter;
-use BetaKiller\Url\Parameter\UtmContentUrlParameter;
-use BetaKiller\Url\Parameter\UtmMediumUrlParameter;
-use BetaKiller\Url\Parameter\UtmSourceUrlParameter;
-use BetaKiller\Url\Parameter\UtmTermUrlParameter;
+use BetaKiller\Url\Parameter\UtmCampaign;
+use BetaKiller\Url\Parameter\UtmContent;
+use BetaKiller\Url\Parameter\UtmMedium;
+use BetaKiller\Url\Parameter\UtmSource;
+use BetaKiller\Url\Parameter\UtmTerm;
 
 class HitMarker extends \ORM implements HitMarkerInterface
 {
@@ -133,11 +133,11 @@ class HitMarker extends \ORM implements HitMarkerInterface
     public function asQueryArray(): array
     {
         return \array_filter([
-            UtmSourceUrlParameter::QUERY_KEY   => $this->getSource(),
-            UtmMediumUrlParameter::QUERY_KEY   => $this->getMedium(),
-            UtmCampaignUrlParameter::QUERY_KEY => $this->getCampaign(),
-            UtmContentUrlParameter::QUERY_KEY  => $this->getContent(),
-            UtmTermUrlParameter::QUERY_KEY     => $this->getTerm(),
+            UtmSource::getQueryKey()   => $this->getSource(),
+            UtmMedium::getQueryKey()   => $this->getMedium(),
+            UtmCampaign::getQueryKey() => $this->getCampaign(),
+            UtmContent::getQueryKey()  => $this->getContent(),
+            UtmTerm::getQueryKey()     => $this->getTerm(),
         ]);
     }
 }

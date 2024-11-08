@@ -15,6 +15,7 @@ use BetaKiller\I18n\PluralBagFactoryInterface;
 use BetaKiller\I18n\PluralBagFormatterInterface;
 use BetaKiller\Model\I18nKeyModelInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -130,7 +131,7 @@ class AbstractUpdateItemAction extends AbstractAction implements PostRequestActi
 
         $this->entityManager->persist($key);
 
-        $url = $urlHelper->getReadEntityUrl($key, ZoneInterface::ADMIN);
+        $url = $urlHelper->getReadEntityUrl($key, Zone::Admin);
 
         return ResponseHelper::redirect($url);
     }

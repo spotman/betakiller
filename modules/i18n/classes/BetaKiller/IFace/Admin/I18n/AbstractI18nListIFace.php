@@ -12,6 +12,7 @@ use BetaKiller\Model\I18nKeyModelInterface;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Repository\I18nKeyRepositoryInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
@@ -177,7 +178,7 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
         return [
             'key'   => $model->getI18nKeyName(),
             'value' => $model->hasAnyI18nValue() ? $model->getAnyI18nValue() : null,
-            'url'   => $helper->getReadEntityUrl($model, ZoneInterface::ADMIN),
+            'url'   => $helper->getReadEntityUrl($model, Zone::Admin),
         ];
     }
 }

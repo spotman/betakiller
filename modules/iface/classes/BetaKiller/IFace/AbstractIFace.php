@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\IFace;
 
 use BetaKiller\Url\AbstractUrlElementInstance;
@@ -34,14 +35,6 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
     final public static function getSuffix(): string
     {
         return self::SUFFIX;
-    }
-
-    /**
-     * @return string
-     */
-    final public function getCodename(): string
-    {
-        return $this->getModel()->getCodename();
     }
 
     /**
@@ -142,6 +135,7 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
     {
         return $this->isHttpCacheEnabled;
     }
+
     /**
      * Use this method for enable HTTP caching
      *

@@ -6,6 +6,7 @@ use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\ContentCommentRepository;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -72,7 +73,7 @@ abstract class AbstractCommentList extends AbstractContentAdminIFace
             'id'           => $comment->getID(),
             'publicURL'    => $comment->getPublicReadUrl($helper),
             // Get public URL via related model
-            'editURL'      => $helper->getReadEntityUrl($comment, ZoneInterface::ADMIN),
+            'editURL'      => $helper->getReadEntityUrl($comment, Zone::Admin),
             // Get admin URL via related model
             'contentLabel' => $comment->getRelatedContentLabel(),
             'author'       => [

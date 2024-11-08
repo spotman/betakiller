@@ -11,11 +11,6 @@ interface IFaceInterface extends UrlElementInstanceInterface
     public const SUFFIX    = 'IFace';
 
     /**
-     * @return string
-     */
-    public function getCodename(): string;
-
-    /**
      * Returns data for View
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request

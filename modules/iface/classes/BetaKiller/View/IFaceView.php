@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\View;
 
 use BetaKiller\Assets\StaticAssetsFactory;
@@ -82,8 +83,8 @@ class IFaceView
      */
     public function render(IFaceInterface $iface, ServerRequestInterface $request): string
     {
-        $codename = $iface->getCodename();
         $model    = $iface->getModel();
+        $codename = $model->getCodename();
 
         $dataPack = RequestProfiler::begin($request, $codename.' IFace data');
 

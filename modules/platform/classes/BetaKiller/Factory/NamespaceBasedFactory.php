@@ -3,6 +3,7 @@ namespace BetaKiller\Factory;
 
 use BetaKiller\DI\ContainerInterface;
 use BetaKiller\Helper\LoggerHelper;
+use Closure;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -70,6 +71,8 @@ final class NamespaceBasedFactory implements NamespaceBasedFactoryInterface
      * @var bool
      */
     private bool $rawInstance = false;
+
+    private ?Closure $instanceFactory = null;
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -160,6 +163,13 @@ final class NamespaceBasedFactory implements NamespaceBasedFactoryInterface
     public function rawInstances(): NamespaceBasedFactoryInterface
     {
         $this->rawInstance = true;
+
+        return $this;
+    }
+
+    public function withInstanceFactory(callable $fn): NamespaceBasedFactoryInterface
+    {
+        $this->instanceFactory = Closure::fromCallable($fn);
 
         return $this;
     }
@@ -365,12 +375,16 @@ final class NamespaceBasedFactory implements NamespaceBasedFactoryInterface
      * @throws \DI\NotFoundException
      * @throws \InvalidArgumentException
      */
-    private function createInstance(string $className, array $arguments = null)
+    private function createInstance(string $className, array $arguments = null): mixed
     {
+        if ($this->instanceFactory) {
+            return $this->instanceFactory->call($this, $className, $arguments);
+        }
+
         if ($this->rawInstance) {
             return $arguments
                 ? new $className(...$arguments)
-                : new $className;
+                : new $className();
         }
 
         return $arguments

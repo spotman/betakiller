@@ -9,6 +9,7 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Notification\NotificationFacade;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -44,7 +45,7 @@ final class RetryNotificationAction extends AbstractAction
 
         $this->notification->retry($logRecord);
 
-        $url = ServerRequestHelper::getUrlHelper($request)->getReadEntityUrl($logRecord, ZoneInterface::ADMIN);
+        $url = ServerRequestHelper::getUrlHelper($request)->getReadEntityUrl($logRecord, Zone::Admin);
 
         return ResponseHelper::redirect($url);
     }

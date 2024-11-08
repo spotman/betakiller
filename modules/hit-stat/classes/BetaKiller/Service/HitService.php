@@ -19,24 +19,16 @@ use BetaKiller\Repository\HitMarkerRepository;
 use BetaKiller\Repository\HitPageRedirectRepository;
 use BetaKiller\Repository\HitPageRepositoryInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
-use BetaKiller\Url\Parameter\UtmCampaignUrlParameter;
-use BetaKiller\Url\Parameter\UtmContentUrlParameter;
-use BetaKiller\Url\Parameter\UtmMediumUrlParameter;
-use BetaKiller\Url\Parameter\UtmSourceUrlParameter;
-use BetaKiller\Url\Parameter\UtmTermUrlParameter;
+use BetaKiller\Url\Parameter\UtmCampaign;
+use BetaKiller\Url\Parameter\UtmContent;
+use BetaKiller\Url\Parameter\UtmMedium;
+use BetaKiller\Url\Parameter\UtmSource;
+use BetaKiller\Url\Parameter\UtmTerm;
 use DateTimeImmutable;
 use Psr\Http\Message\UriInterface;
 
 class HitService
 {
-    public const UTM_QUERY_KEYS = [
-        UtmSourceUrlParameter::QUERY_KEY,
-        UtmMediumUrlParameter::QUERY_KEY,
-        UtmCampaignUrlParameter::QUERY_KEY,
-        UtmContentUrlParameter::QUERY_KEY,
-        UtmTermUrlParameter::QUERY_KEY,
-    ];
-
     /**
      * @var \BetaKiller\Repository\HitDomainRepositoryInterface
      */
@@ -66,6 +58,17 @@ class HitService
      * @var \BetaKiller\Repository\HitPageRedirectRepository
      */
     private $redirectRepo;
+
+    public static function getUtmQueryKeys(): array
+    {
+        return [
+            UtmSource::getQueryKey(),
+            UtmMedium::getQueryKey(),
+            UtmCampaign::getQueryKey(),
+            UtmContent::getQueryKey(),
+            UtmTerm::getQueryKey(),
+        ];
+    }
 
     /**
      * HitService constructor.
@@ -184,11 +187,11 @@ class HitService
     public function getMarkerFromUrlContainer(UrlContainerInterface $params): ?HitMarkerInterface
     {
         // Fetch UTM tags if exists
-        $source   = $params->getQueryPart(UtmSourceUrlParameter::QUERY_KEY);
-        $medium   = $params->getQueryPart(UtmMediumUrlParameter::QUERY_KEY);
-        $campaign = $params->getQueryPart(UtmCampaignUrlParameter::QUERY_KEY);
-        $content  = $params->getQueryPart(UtmContentUrlParameter::QUERY_KEY);
-        $term     = $params->getQueryPart(UtmTermUrlParameter::QUERY_KEY);
+        $source   = $params->getQueryPart(UtmSource::getQueryKey());
+        $medium   = $params->getQueryPart(UtmMedium::getQueryKey());
+        $campaign = $params->getQueryPart(UtmCampaign::getQueryKey());
+        $content  = $params->getQueryPart(UtmContent::getQueryKey());
+        $term     = $params->getQueryPart(UtmTerm::getQueryKey());
 
         if (!$source && !$medium && !$campaign && !$content && !$term) {
             return null;

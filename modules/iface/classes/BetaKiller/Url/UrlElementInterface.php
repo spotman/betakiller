@@ -40,9 +40,10 @@ interface UrlElementInterface extends \JsonSerializable
 
     /**
      * Returns key-value pairs for "query param name" => "Url parameter binding"
-     * Example: [ "u" => "User.id", "r" => "Role.codename" ]
+     * Frontend-only keys can be ignored by setting "binding" value to "null"
+     * Example: [ "u" => "User.id", "r" => "Role.codename", "x" => null ]
      *
-     * @return array
+     * @return array<string, string|null>
      */
     public function getQueryParams(): array;
 

@@ -30,7 +30,7 @@ class TwigLayoutView extends LayoutView
             $ifaceView->set($key, $value);
         }
 
-        // Extend layout inside of IFace view via "extend" tag
+        // Extend layout inside IFace view via "extend" tag
         $content = $ifaceView->set('layout', $layoutPath)->render();
 
         return $this->wrap($content, $renderHelper);

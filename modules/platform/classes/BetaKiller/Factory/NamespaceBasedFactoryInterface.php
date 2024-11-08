@@ -44,6 +44,13 @@ interface NamespaceBasedFactoryInterface
     public function rawInstances(): NamespaceBasedFactoryInterface;
 
     /**
+     * @param callable(string $className, array $arguments): mixed $fn
+     *
+     * @return \BetaKiller\Factory\NamespaceBasedFactoryInterface
+     */
+    public function withInstanceFactory(callable $fn): NamespaceBasedFactoryInterface;
+
+    /**
      * @return NamespaceBasedFactoryInterface
      */
     public function useInterface(): NamespaceBasedFactoryInterface;

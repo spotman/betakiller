@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url;
 
+use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Factory\UrlElementInstanceFactory;
 use BetaKiller\Helper\RequestLanguageHelperInterface;
@@ -10,7 +11,7 @@ use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\UrlContainerInterface;
 
-class UrlDispatcher implements UrlDispatcherInterface
+readonly class UrlDispatcher implements UrlDispatcherInterface
 {
     /**
      * Defines default uri for index element (this used if root IFace has dynamic url behaviour)
@@ -18,41 +19,19 @@ class UrlDispatcher implements UrlDispatcherInterface
     public const DEFAULT_URI = 'index';
 
     /**
-     * @var \BetaKiller\Url\Behaviour\UrlBehaviourFactory
-     */
-    private UrlBehaviourFactory $behaviourFactory;
-
-    /**
-     * @var \BetaKiller\Url\UrlPrototypeService
-     */
-    private UrlPrototypeService $prototypeService;
-
-    /**
-     * @var \BetaKiller\Url\UrlElementTreeInterface
-     */
-    private UrlElementTreeInterface $tree;
-
-    /**
-     * @var \BetaKiller\Factory\UrlElementInstanceFactory
-     */
-    private UrlElementInstanceFactory $instanceFactory;
-
-    /**
+     * @param \BetaKiller\Config\AppConfigInterface         $appConfig
      * @param \BetaKiller\Url\UrlElementTreeInterface       $tree
      * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
      * @param \BetaKiller\Url\UrlPrototypeService           $prototypeService
      * @param \BetaKiller\Factory\UrlElementInstanceFactory $instanceFactory
      */
     public function __construct(
-        UrlElementTreeInterface $tree,
-        UrlBehaviourFactory $behaviourFactory,
-        UrlPrototypeService $prototypeService,
-        UrlElementInstanceFactory $instanceFactory
+        private AppConfigInterface $appConfig,
+        private UrlElementTreeInterface $tree,
+        private UrlBehaviourFactory $behaviourFactory,
+        private UrlPrototypeService $prototypeService,
+        private UrlElementInstanceFactory $instanceFactory
     ) {
-        $this->tree             = $tree;
-        $this->behaviourFactory = $behaviourFactory;
-        $this->prototypeService = $prototypeService;
-        $this->instanceFactory  = $instanceFactory;
     }
 
     /**
@@ -129,7 +108,7 @@ class UrlDispatcher implements UrlDispatcherInterface
 
     /**
      * @param string                                          $key
-     * @param string                                          $binding
+     * @param string|null                                     $binding
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParams
      *
      * @throws \BetaKiller\Factory\FactoryException
@@ -137,12 +116,17 @@ class UrlDispatcher implements UrlDispatcherInterface
      * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    private function processQueryPart(string $key, string $binding, UrlContainerInterface $urlParams): void
+    private function processQueryPart(string $key, ?string $binding, UrlContainerInterface $urlParams): void
     {
         $partValue = $urlParams->getQueryPart($key);
 
         // Skip missing parts
-        if (!$partValue) {
+        if ($partValue === null) {
+            return;
+        }
+
+        // Skip frontend-only keys (fetch first to prevent "unused parts" warnings)
+        if ($binding === null) {
             return;
         }
 
@@ -239,8 +223,8 @@ class UrlDispatcher implements UrlDispatcherInterface
 
         // Empty layer (bad copy-paste, mistake, etc)
         if (!$layer) {
-            // Force redirect to parent URL
-            throw new MissingUrlElementException($params, $parent, true);
+            // Redirect to parent URL if allowed
+            throw new MissingUrlElementException($params, $parent, $this->appConfig->isRedirectMissingEnabled());
         }
 
         // Search for appropriate model in current layer

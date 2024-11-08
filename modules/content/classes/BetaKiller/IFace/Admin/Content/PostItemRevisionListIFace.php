@@ -3,6 +3,7 @@ namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\Helper\UrlHelperInterface;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -41,7 +42,7 @@ class PostItemRevisionListIFace extends AbstractContentAdminIFace
         foreach ($post->getAllRevisions() as $revision) {
             $data[] = [
                 'id'         => $revision->getID(),
-                'diff_url'   => $this->urlHelper->getReadEntityUrl($revision, ZoneInterface::ADMIN),
+                'diff_url'   => $this->urlHelper->getReadEntityUrl($revision, Zone::Admin),
                 'is_actual'  => $post->isActualRevision($revision),
                 'created_at' => $revision->getCreatedAt()->format('d.m.Y H:i:s'),
                 'created_by' => $revision->getCreatedBy()->getFullName(),

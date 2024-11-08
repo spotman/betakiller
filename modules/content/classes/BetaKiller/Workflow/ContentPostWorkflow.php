@@ -6,6 +6,7 @@ use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Model\ContentPostInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Url\Zone;
 use BetaKiller\Url\ZoneInterface;
 use URL;
 
@@ -89,7 +90,7 @@ class ContentPostWorkflow
     private function notifyModeratorAboutCompletePost(ContentPostInterface $post): void
     {
         $this->notification->broadcastMessage(self::NOTIFICATION_POST_COMPLETE, [
-            'url'   => $this->urlHelper->getReadEntityUrl($post, ZoneInterface::ADMIN),
+            'url'   => $this->urlHelper->getReadEntityUrl($post, Zone::Admin),
             'label' => $post->getLabel(),
         ]);
     }
