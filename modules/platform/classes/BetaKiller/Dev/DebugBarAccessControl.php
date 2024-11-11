@@ -17,25 +17,23 @@ readonly class DebugBarAccessControl implements DebugBarAccessControlInterface
 
     public function isAllowedFor(ServerRequestInterface $request): bool
     {
-        // Read global debug setting
-        $showBar = $this->appEnv->isDebugEnabled();
-
-        // Prevent displaying DebugBar in prod mode (even if global debug is on)
-        if ($this->appEnv->inProductionMode()) {
-            $showBar = false;
-        }
-
         // Fetch actual session
         $session = ServerRequestHelper::getSession($request);
 
-        // Detect debug mode enabled for session
-        // Do not fetch User here to allow lazy loading
-        if (SessionHelper::isDebugEnabled($session)) {
-            $showBar = true;
-        }
+        // Read global debug setting
+        // Prevent displaying DebugBar in prod mode (even if global debug is on)
+        // Prevent guests
+        $showBar = $this->appEnv->isDebugEnabled()
+            && !$this->appEnv->inProductionMode()
+            && SessionHelper::hasUserID($session);
 
         // TODO Display bar only for User with "show-debug-bar" role
 
-        return $showBar;
+        // Detect debug mode enabled for session
+        // Do not fetch User here to allow lazy loading
+        $showBar = $showBar || SessionHelper::isDebugEnabled($session);
+
+        // Always show in dev mode
+        return $showBar || $this->appEnv->inDevelopmentMode();
     }
 }
