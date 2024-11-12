@@ -41,7 +41,7 @@
     "php-http/message": "^1.7",
     "php-middleware/php-debug-bar": "^4.2.0",
     "php-middleware/request-id": "^4.0",
-    "php-school/cli-menu": "^3.2",
+    "php-school/cli-menu": "^4.3",
     "psr/log": "^1.0",
     "psr/simple-cache": "^1.0",
     "punic/punic": "^3.1",
