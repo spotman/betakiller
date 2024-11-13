@@ -464,8 +464,7 @@ task('bk:deploy:dotenv:migrate', static function () {
 })->desc('Copy .env file from deploy path');
 
 task('bk:deploy:dotenv:revision', static function () {
-    $revision = gitRevision();
-    runMinionTask('storeAppRevision --revision='.$revision);
+    runMinionTask(sprintf('storeAppRevision --path=%s --revision=%s', get('dotenv_path'), gitRevision()));
 })->desc('Set APP_REVISION env variable from current git revision');
 
 /**

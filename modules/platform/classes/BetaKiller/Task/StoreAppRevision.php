@@ -6,65 +6,52 @@ namespace BetaKiller\Task;
 
 use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\DotEnvWriter;
 use BetaKiller\Env\AppEnvInterface;
 use Psr\Log\LoggerInterface;
-use Spotman\DotEnv\DotEnv;
 
 class StoreAppRevision extends AbstractTask
 {
+    private const ARG_PATH     = 'path';
     private const ARG_REVISION = 'revision';
-
-    /**
-     * @var \BetaKiller\Env\AppEnvInterface
-     */
-    private $appEnv;
-
-    /**
-     * @var \Spotman\DotEnv\DotEnv
-     */
-    private $dotEnv;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
 
     /**
      * StoreAppRevision constructor.
      *
-     * @param \BetaKiller\Env\AppEnvInterface $appEnv
-     * @param \Spotman\DotEnv\DotEnv          $dotEnv
-     * @param \Psr\Log\LoggerInterface        $logger
+     * @param \BetaKiller\DotEnvWriter $writer
+     * @param \Psr\Log\LoggerInterface $logger
      */
-    public function __construct(AppEnvInterface $appEnv, DotEnv $dotEnv, LoggerInterface $logger)
-    {
-        $this->appEnv = $appEnv;
-        $this->dotEnv = $dotEnv;
-        $this->logger = $logger;
+    public function __construct(
+        private readonly DotEnvWriter $writer,
+        private readonly LoggerInterface $logger
+    ) {
     }
 
     public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
         return [
+            $builder->string(self::ARG_PATH)->required()->label('Path to .env file'),
             $builder->string(self::ARG_REVISION)->required()->label('Revision key'),
         ];
     }
 
     public function run(ConsoleInputInterface $params): void
     {
+        $path     = $params->getString(self::ARG_PATH);
         $revision = $params->getString(self::ARG_REVISION);
 
-        $dotEnvFile = $this->appEnv->getAppRootPath().DIRECTORY_SEPARATOR.'.env';
-
-        // Create empty .env file if not exists
-        if (!file_exists($dotEnvFile)) {
-            touch($dotEnvFile);
+        if (!file_exists($path)) {
+            throw new TaskException('Missing .env file at ":path"', [
+                ':path' => $path,
+            ]);
         }
 
-        $this->dotEnv->update($dotEnvFile, [
+        $this->writer->update($path, [
             AppEnvInterface::APP_REVISION => $revision,
         ]);
 
-        $this->logger->debug('Revision set to :value', [':value' => $revision]);
+        $this->logger->info('Revision set to :value', [
+            ':value' => $revision,
+        ]);
     }
 }

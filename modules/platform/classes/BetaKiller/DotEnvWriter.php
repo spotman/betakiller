@@ -1,28 +1,27 @@
 <?php
+
 declare(strict_types=1);
 
-namespace Spotman\DotEnv;
+namespace BetaKiller;
 
-
-class DotEnv
+class DotEnvWriter
 {
-    private $records = [];
-
     /**
      * @param string $envFile
      * @param array  $data
+     *
      * @link https://stackoverflow.com/a/44448503/3640406
      */
     public function update(string $envFile, array $data): void
     {
-        $lines = file($envFile);
-        $pattern = '/([^\=]*)\=[^\n]*/';
+        $lines   = file($envFile);
+        $pattern = '/([^=]*)=[^\n]*/';
 
         $newLines = [];
         foreach ($lines as $line) {
             preg_match($pattern, $line, $matches);
 
-            if (!\count($matches)) {
+            if (!$matches) {
                 $newLines[] = $line;
                 continue;
             }
@@ -36,25 +35,11 @@ class DotEnv
 
             $value = $data[$name];
 
-            $line = "$name=$value\n";
+            $line       = "$name=$value\n";
             $newLines[] = $line;
         }
 
         $newContent = implode('', $newLines);
         file_put_contents($envFile, $newContent);
-    }
-
-    /**
-     * @param string $envFile
-     *
-     * @throws \Spotman\DotEnv\DotEnvException
-     */
-    public function load(string $envFile): void
-    {
-        $parser = new DotEnvParser();
-
-        $content = file_get_contents($envFile);
-
-        $this->records = $parser->parse($content);
     }
 }
