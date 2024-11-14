@@ -236,6 +236,11 @@ class ServerRequestHelper
 
     public static function getUser(ServerRequestInterface $request): UserInterface
     {
+        return self::getUserProvider($request)->fetch();
+    }
+
+    private static function getUserProvider(ServerRequestInterface $request): RequestUserProvider
+    {
         /** @var RequestUserProvider $provider */
         $provider = $request->getAttribute(RequestUserProvider::class);
 
@@ -243,7 +248,7 @@ class ServerRequestHelper
             throw new \LogicException('RequestUserProvider is missing');
         }
 
-        return $provider->fetch();
+        return $provider;
     }
 
     public static function isGuest(ServerRequestInterface $request): bool
@@ -257,6 +262,11 @@ class ServerRequestHelper
     {
         // Check RequestUserProvider is exists at this time
         return (bool)$request->getAttribute(RequestUserProvider::class);
+    }
+
+    public static function isUserFetched(ServerRequestInterface $request): bool
+    {
+        return self::getUserProvider($request)->isFetched();
     }
 
     public static function getSession(ServerRequestInterface $request): SessionInterface

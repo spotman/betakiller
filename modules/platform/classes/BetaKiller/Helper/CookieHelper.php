@@ -1,12 +1,16 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Helper;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Env\AppEnvInterface;
+use DateInterval;
+use DateTimeImmutable;
 use HansOtt\PSR7Cookies\SetCookie;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class CookieHelper
 {
@@ -37,8 +41,6 @@ class CookieHelper
      *
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
      * @param \BetaKiller\Env\AppEnvInterface       $appEnv
-     *
-     * @throws \HansOtt\PSR7Cookies\InvalidArgumentException
      */
     public function __construct(AppConfigInterface $appConfig, AppEnvInterface $appEnv)
     {
@@ -47,13 +49,23 @@ class CookieHelper
         }
     }
 
+    public static function has(ServerRequestInterface $request, string $name): bool
+    {
+        return isset($request->getCookieParams()[$name]);
+    }
+
+    public static function get(ServerRequestInterface $request, string $name): string
+    {
+        return $request->getCookieParams()[$name];
+    }
+
     public function set(
         ResponseInterface $response,
-        string            $name,
-        string            $value,
-        \DateInterval     $expiresIn
+        string $name,
+        string $value,
+        DateInterval $expiresIn
     ): ResponseInterface {
-        $dt        = new \DateTimeImmutable();
+        $dt        = new DateTimeImmutable();
         $expiresAt = $dt->setTimezone(DateTimeHelper::getUtcTimezone())->add($expiresIn)->getTimestamp();
 
         $cookie = new SetCookie(
@@ -72,7 +84,7 @@ class CookieHelper
 
     public function delete(ResponseInterface $response, string $name): ResponseInterface
     {
-        $interval         = new \DateInterval('P1Y');
+        $interval         = new DateInterval('P1Y');
         $interval->invert = true;
 
         return $this->set($response, $name, '', $interval);

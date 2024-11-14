@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Auth;
@@ -11,20 +12,11 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class RequestUserProvider
 {
-    /**
-     * @var \Psr\Http\Message\ServerRequestInterface
-     */
-    private ServerRequestInterface $request;
-
-    /**
-     * @var \BetaKiller\Service\AuthService
-     */
-    private AuthService $auth;
 
     /**
      * Cached User instance
      *
-     * @var \BetaKiller\Model\UserInterface
+     * @var \BetaKiller\Model\UserInterface|null
      */
     private ?UserInterface $user = null;
 
@@ -34,10 +26,8 @@ final class RequestUserProvider
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \BetaKiller\Service\AuthService          $auth
      */
-    public function __construct(ServerRequestInterface $request, AuthService $auth)
+    public function __construct(private readonly ServerRequestInterface $request, private readonly AuthService $auth)
     {
-        $this->request = $request;
-        $this->auth    = $auth;
     }
 
     public function fetch(): UserInterface
@@ -47,6 +37,11 @@ final class RequestUserProvider
         }
 
         return $this->user;
+    }
+
+    public function isFetched(): bool
+    {
+        return $this->user !== null;
     }
 
     private function detect(ServerRequestInterface $request): UserInterface

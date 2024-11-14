@@ -21,13 +21,8 @@ class ResponseHelper
     /**
      * JSON response types and signatures
      */
-    public const JSON_SUCCESS = 1;
-    public const JSON_ERROR   = 2;
-
-    private const JSON_RESPONSE_SIGNATURES = [
-        self::JSON_SUCCESS => 'ok',
-        self::JSON_ERROR   => 'error',
-    ];
+    private const JSON_SUCCESS = 'ok';
+    private const JSON_ERROR   = 'error';
 
     public static function text(string $text, int $status = null): ResponseInterface
     {
@@ -195,9 +190,14 @@ class ResponseHelper
         return self::prepareJson(self::JSON_SUCCESS, $message);
     }
 
-    public static function errorJson($message = null, int $status = null): ResponseInterface
+    public static function errorJson($message = null): ResponseInterface
     {
-        return self::prepareJson(self::JSON_ERROR, $message, $status ?? 200);
+        return self::prepareJson(self::JSON_ERROR, $message);
+    }
+
+    public static function customJson(string $result, $message = null): ResponseInterface
+    {
+        return self::prepareJson($result, $message);
     }
 
     public static function json(array $data, int $status = null): ResponseInterface
@@ -205,10 +205,10 @@ class ResponseHelper
         return new JsonResponse($data, $status ?? 200);
     }
 
-    private static function prepareJson(int $result, $message = null, int $status = null): ResponseInterface
+    private static function prepareJson(string $result, $message = null, int $status = null): ResponseInterface
     {
         $response = [
-            'response' => self::JSON_RESPONSE_SIGNATURES[$result],
+            'response' => $result,
         ];
 
         if ($message) {

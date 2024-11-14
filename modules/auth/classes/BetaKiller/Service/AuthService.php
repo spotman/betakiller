@@ -80,11 +80,6 @@ class AuthService
         $this->eventBus         = $eventBus;
     }
 
-    public function searchBy(string $loginOrEmail): ?UserInterface
-    {
-        return $this->userRepo->searchBy($loginOrEmail);
-    }
-
     /**
      * Checks if a user session is active.
      *
@@ -94,9 +89,7 @@ class AuthService
      */
     public function isUserLoggedIn(UserInterface $user): bool
     {
-        $sessions = $this->sessionStorage->getUserSessions($user);
-
-        return count($sessions) > 0;
+        return (bool)$this->getUserSession($user);
     }
 
     public function getSessionUser(SessionInterface $session): UserInterface
@@ -109,6 +102,13 @@ class AuthService
         $userID = SessionHelper::getUserID($session);
 
         return $this->userRepo->getById($userID);
+    }
+
+    public function getUserSession(UserInterface $user): ?SessionInterface
+    {
+        $sessions = $this->sessionStorage->getUserSessions($user);
+
+        return array_pop($sessions);
     }
 
     public function getSession(string $sessionID): SessionInterface
@@ -139,7 +139,7 @@ class AuthService
 
         $userResource = $this->acl->getResource(User::getModelName());
 
-        // No login role => user is not allowed to login
+        // No login role => user is not allowed to log in
         if (!$this->acl->isAllowedToUser($userResource, UserResource::ACTION_LOGIN, $user)) {
             throw new AccessDeniedException();
         }

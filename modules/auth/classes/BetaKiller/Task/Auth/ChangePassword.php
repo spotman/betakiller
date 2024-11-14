@@ -7,6 +7,7 @@ namespace BetaKiller\Task\Auth;
 use BetaKiller\Console\ConsoleHelper;
 use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Service\AuthService;
 use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
@@ -14,25 +15,17 @@ use Psr\Log\LoggerInterface;
 class ChangePassword extends AbstractTask
 {
     /**
-     * @var \BetaKiller\Service\AuthService
-     */
-    private $auth;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
      * ChangePassword constructor.
      *
-     * @param \BetaKiller\Service\AuthService $auth
-     * @param \Psr\Log\LoggerInterface        $logger
+     * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
+     * @param \BetaKiller\Service\AuthService                $auth
+     * @param \Psr\Log\LoggerInterface                       $logger
      */
-    public function __construct(AuthService $auth, LoggerInterface $logger)
+    public function __construct(
+        private UserRepositoryInterface $userRepo,
+        private AuthService $auth,
+        private LoggerInterface $logger)
     {
-        $this->auth   = $auth;
-        $this->logger = $logger;
     }
 
     public function defineOptions(ConsoleOptionBuilderInterface $builder): array
@@ -45,7 +38,7 @@ class ChangePassword extends AbstractTask
     {
         $username = ConsoleHelper::read('Enter username or e-mail');
 
-        $user = $this->auth->searchBy($username);
+        $user = $this->userRepo->searchBy($username);
 
         if (!$user) {
             $this->logger->warning('No such user');
