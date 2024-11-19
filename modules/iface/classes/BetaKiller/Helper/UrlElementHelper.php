@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\Helper;
 
 use BetaKiller\Model\LanguageInterface;
@@ -11,6 +12,7 @@ use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlElementWithLabelInterface;
 use BetaKiller\Url\UrlElementWithLayoutInterface;
 use BetaKiller\Url\ZoneInterface;
+use BetaKiller\View\TemplateContext;
 
 class UrlElementHelper
 {
@@ -121,9 +123,9 @@ class UrlElementHelper
     }
 
     /**
-     * @param \BetaKiller\Url\IFaceModelInterface             $model
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
-     * @param \BetaKiller\Model\LanguageInterface             $lang
+     * @param \BetaKiller\Url\UrlElementInterface&\BetaKiller\Helper\SeoMetaInterface $model
+     * @param \BetaKiller\Url\Container\UrlContainerInterface                         $params
+     * @param \BetaKiller\Model\LanguageInterface                                     $lang
      *
      * @return string
      * @throws \BetaKiller\I18n\I18nException
@@ -131,7 +133,7 @@ class UrlElementHelper
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function getTitle(
-        IFaceModelInterface $model,
+        UrlElementInterface&SeoMetaInterface $model,
         UrlContainerInterface $params,
         LanguageInterface $lang
     ): string {
@@ -160,7 +162,7 @@ class UrlElementHelper
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function getDescription(
-        IFaceModelInterface $model,
+        SeoMetaInterface $model,
         UrlContainerInterface $params,
         LanguageInterface $lang
     ): string {
@@ -174,6 +176,30 @@ class UrlElementHelper
         return $this->stringPatternHelper->process($description, $params, $lang, SeoMetaInterface::DESCRIPTION_LIMIT);
     }
 
+    public function expandIntoContext(UrlElementInterface $element, TemplateContext $context): void
+    {
+        $request = $context->getRequest();
+
+        // Errors may be fired early and UrlHelper may be not initialized
+        if (ServerRequestHelper::hasUrlHelper($request)) {
+            $urlHelper = ServerRequestHelper::getUrlHelper($request);
+
+            $context->setMetaCanonical($urlHelper->makeUrl($element, null, false));
+        }
+
+        if ($element instanceof IFaceModelInterface) {
+            $params = ServerRequestHelper::getUrlContainer($request);
+            $i18n   = ServerRequestHelper::getI18n($request);
+
+            // Fetch current language (can be altered in IFace::getData())
+            $lang = $i18n->getLang();
+
+            $context
+                ->setTitle($this->getTitle($element, $params, $lang))
+                ->setMetaDescription($this->getDescription($element, $params, $lang));
+        }
+    }
+
     /**
      * @param \BetaKiller\Url\IFaceModelInterface             $model
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
@@ -185,7 +211,7 @@ class UrlElementHelper
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     private function makeTitleFromLabels(
-        IFaceModelInterface $model,
+        UrlElementInterface $model,
         UrlContainerInterface $params,
         LanguageInterface $lang
     ): string {

@@ -10,6 +10,8 @@ use BetaKiller\Url\UrlElementTreeFactory;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlElementTreeValidator;
 use BetaKiller\Url\UrlElementTreeValidatorInterface;
+use BetaKiller\View\DefaultIFaceRenderer;
+use BetaKiller\View\IFaceRendererInterface;
 use BetaKiller\Widget\WidgetFacade;
 
 use function DI\autowire;
@@ -35,6 +37,8 @@ return [
         UrlElementRendererInterface::class => autowire(UrlElementRenderer::class), /* ->lazy() */
 
         WidgetFacade::class => autowire(WidgetFacade::class),
+
+        IFaceRendererInterface::class => autowire(DefaultIFaceRenderer::class),
     ],
 
 ];

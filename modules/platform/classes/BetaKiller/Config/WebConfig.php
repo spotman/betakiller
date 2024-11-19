@@ -20,21 +20,24 @@ final class WebConfig extends AbstractConfig implements WebConfigInterface
 
     public function getMiddlewares(): array
     {
-        return (array)$this->get([self::KEY_MIDDLEWARES]);
+        return $this->getArray([self::KEY_MIDDLEWARES]);
     }
 
     public function fetchGetRoutes(): array
     {
-        return (array)$this->get([self::KEY_ROUTES, self::KEY_GET]);
+        // Reverse so more specific are placed before less specific
+        return array_reverse($this->getArray([self::KEY_ROUTES, self::KEY_GET]));
     }
 
     public function fetchPostRoutes(): array
     {
-        return (array)$this->get([self::KEY_ROUTES, self::KEY_POST]);
+        // Reverse so more specific are placed before less specific
+        return array_reverse($this->getArray([self::KEY_ROUTES, self::KEY_POST]));
     }
 
     public function fetchAnyRoutes(): array
     {
-        return (array)$this->get([self::KEY_ROUTES, self::KEY_ANY]);
+        // Reverse so more specific are placed before less specific
+        return array_reverse($this->getArray([self::KEY_ROUTES, self::KEY_ANY]));
     }
 }

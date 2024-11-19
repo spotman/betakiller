@@ -5,18 +5,13 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Dev\DebugBarAccessControlInterface;
-use BetaKiller\Dev\DebugBarHttpDriver;
-use BetaKiller\Dev\DebugServerRequestHelper;
 use BetaKiller\Dev\DebugBarFactoryInterface;
+use BetaKiller\Dev\DebugServerRequestHelper;
 use BetaKiller\Dev\RequestProfiler;
-use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Helper\SessionHelper;
-use Database_Query;
 use DebugBar\JavascriptRenderer;
 use DebugBar\OpenHandler;
-use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\Response\TextResponse;
 use PhpMiddleware\PhpDebugBar\PhpDebugBarMiddleware;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -80,7 +75,7 @@ final readonly class DebugMiddleware implements MiddlewareInterface
             return $debugBar->getHttpDriver()->applyHeaders(new TextResponse($openJson));
         }
 
-        $isAjax = ServerRequestHelper::isAjax($request);
+        $isAjax   = ServerRequestHelper::isAjax($request);
         $isStatic = str_starts_with($uriPath, self::BASE_URL);
 
         $renderer = $debugBar->getJavascriptRenderer();
@@ -91,7 +86,7 @@ final readonly class DebugMiddleware implements MiddlewareInterface
         $request = DebugServerRequestHelper::withDebugBar($request, $debugBar);
 
         // Forward call
-        $response = match(true) {
+        $response = match (true) {
             $isAjax => $handler->handle($request),
             default => $middleware->process($request, $handler),
         };

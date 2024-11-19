@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller;
 
 use Aidantwoods\SecureHeaders\SecureHeaders;
@@ -7,7 +8,6 @@ use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
-use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\StringPatternHelper;
 use BetaKiller\Helper\UrlHelper;
@@ -16,8 +16,8 @@ use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\Zone;
-use BetaKiller\Url\ZoneInterface;
-use BetaKiller\View\IFaceView;
+use BetaKiller\View\DefaultIFaceRenderer;
+use BetaKiller\View\TemplateContext;
 use BetaKiller\Widget\WidgetFacade;
 use HTML;
 use Meta;
@@ -90,14 +90,14 @@ final class TwigExtension extends AbstractExtension
      * @param \Psr\Log\LoggerInterface               $logger
      */
     public function __construct(
-        AppEnvInterface            $appEnv,
-        AppConfigInterface         $appConfig,
-        WidgetFacade               $widgetFacade,
-        StringPatternHelper        $patternHelper,
-        I18nFacade                 $i18n,
-        AclInterface               $acl,
+        AppEnvInterface $appEnv,
+        AppConfigInterface $appConfig,
+        WidgetFacade $widgetFacade,
+        StringPatternHelper $patternHelper,
+        I18nFacade $i18n,
+        AclInterface $acl,
         IdentityConverterInterface $identityConverter,
-        LoggerInterface            $logger
+        LoggerInterface $logger
     ) {
         $this->appEnv            = $appEnv;
         $this->appConfig         = $appConfig;
@@ -335,7 +335,6 @@ final class TwigExtension extends AbstractExtension
                     $manifestFullPath = $assets->findFile($manifestFileName);
 
                     if (!$fileData) {
-
                         if (!$manifestFullPath) {
                             throw new Exception('Missing file ":path", check webpack build and "dist_dir" variable', [
                                 ':path' => $manifestFileName,
@@ -398,9 +397,17 @@ final class TwigExtension extends AbstractExtension
             ),
 
             new TwigFunction(
+                'iface_codename',
+                static function (array $context): string {
+                    return $context[DefaultIFaceRenderer::IFACE_KEY_ROOT][DefaultIFaceRenderer::IFACE_KEY_NAME];
+                },
+                ['is_safe' => ['html'], 'needs_context' => true]
+            ),
+
+            new TwigFunction(
                 'in_public_zone',
                 static function (array $context): bool {
-                    $zoneName = $context[IFaceView::IFACE_KEY][IFaceView::IFACE_ZONE_KEY];
+                    $zoneName = $context[DefaultIFaceRenderer::IFACE_KEY_ROOT][DefaultIFaceRenderer::IFACE_KEY_ZONE];
 
                     return $zoneName === Zone::Public->getName();
                 },
@@ -541,6 +548,14 @@ final class TwigExtension extends AbstractExtension
 
                     LoggerHelper::logRawException($this->logger, new Exception($message, $params));
                 }
+            ),
+
+            new TwigFunction(
+                'wrap_in_html5',
+                function (array $context): void {
+                    $this->getTemplateContext($context)->wrapInHtml5();
+                },
+                ['needs_context' => true]
             ),
 
             /**
@@ -720,7 +735,7 @@ final class TwigExtension extends AbstractExtension
 
     private function getRequest(array $context): ServerRequestInterface
     {
-        return $context[IFaceView::REQUEST_KEY];
+        return $context[TemplateContext::KEY_REQUEST];
     }
 
     private function getRequestUrlHelper(array $context): UrlHelper
@@ -745,24 +760,24 @@ final class TwigExtension extends AbstractExtension
         return $this->patternHelper->process($value, $params, $lang);
     }
 
-    private function getI18nHelper(array $context): RequestLanguageHelperInterface
-    {
-        return $context[IFaceView::I18N_KEY];
-    }
-
     private function getRequestLang(array $context): LanguageInterface
     {
-        return $this->getI18nHelper($context)->getLang();
+        return $context[TemplateContext::KEY_LANG];
     }
 
     private function getStaticAssets(array $context): StaticAssets
     {
-        return $context[IFaceView::ASSETS_KEY];
+        return $context[TemplateContext::KEY_ASSETS];
     }
 
     private function getMeta(array $context): Meta
     {
-        return $context[IFaceView::META_KEY];
+        return $context[TemplateContext::KEY_META];
+    }
+
+    private function getTemplateContext(array $context): TemplateContext
+    {
+        return $context[TemplateContext::KEY_CONTEXT];
     }
 
     private function processHashesForScriptTags(string $text, SecureHeaders $csp): void

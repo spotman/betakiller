@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Error;
@@ -14,71 +15,36 @@ use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
-use BetaKiller\View\IFaceView;
+use BetaKiller\View\IFaceRendererInterface;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
-class ErrorPageRenderer implements ErrorPageRendererInterface
+readonly class ErrorPageRenderer implements ErrorPageRendererInterface
 {
-    /**
-     * @var \BetaKiller\Env\AppEnvInterface
-     */
-    private $appEnv;
-
-    /**
-     * @var \BetaKiller\View\IFaceView
-     */
-    private $ifaceView;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var \BetaKiller\Url\UrlElementTreeInterface
-     */
-    private $tree;
-
-    /**
-     * @var \BetaKiller\Factory\IFaceFactory
-     */
-    private $ifaceFactory;
-
-    /**
-     * @var \BetaKiller\Error\ExceptionService
-     */
-    private $exceptionService;
-
     /**
      * ErrorPageRenderer constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface $tree
      * @param \BetaKiller\Factory\IFaceFactory        $ifaceFactory
      * @param \BetaKiller\Env\AppEnvInterface         $appEnv
-     * @param \BetaKiller\View\IFaceView              $ifaceView
+     * @param \BetaKiller\View\IFaceRendererInterface $ifaceRenderer
      * @param \BetaKiller\Error\ExceptionService      $exceptionService
      * @param \Psr\Log\LoggerInterface                $logger
      */
     public function __construct(
-        UrlElementTreeInterface $tree,
-        IFaceFactory            $ifaceFactory,
-        AppEnvInterface         $appEnv,
-        IFaceView               $ifaceView,
-        ExceptionService        $exceptionService,
-        LoggerInterface         $logger
+        private UrlElementTreeInterface $tree,
+        private IFaceFactory $ifaceFactory,
+        private AppEnvInterface $appEnv,
+        private IFaceRendererInterface $ifaceRenderer,
+        private ExceptionService $exceptionService,
+        private LoggerInterface $logger
     ) {
-        $this->appEnv           = $appEnv;
-        $this->ifaceView        = $ifaceView;
-        $this->tree             = $tree;
-        $this->ifaceFactory     = $ifaceFactory;
-        $this->exceptionService = $exceptionService;
-        $this->logger           = $logger;
     }
 
-    public function render(ServerRequestInterface $request, \Throwable $e): ResponseInterface
+    public function render(ServerRequestInterface $request, Throwable $e): ResponseInterface
     {
         if (ServerRequestHelper::isJsonPreferred($request)) {
             return $this->makeJsonResponse($e, $request);
@@ -97,7 +63,7 @@ class ErrorPageRenderer implements ErrorPageRendererInterface
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Exception
      */
-    private function makeJsonResponse(\Throwable $e, ServerRequestInterface $request): ResponseInterface
+    private function makeJsonResponse(Throwable $e, ServerRequestInterface $request): ResponseInterface
     {
         $lang = $this->getRequestLang($request);
 
@@ -115,7 +81,7 @@ class ErrorPageRenderer implements ErrorPageRendererInterface
      *
      * @return null|\Psr\Http\Message\ResponseInterface
      */
-    private function makeNiceMessage(\Throwable $exception, ServerRequestInterface $request): ?ResponseInterface
+    private function makeNiceMessage(Throwable $exception, ServerRequestInterface $request): ?ResponseInterface
     {
         $alwaysShowNiceMessage = ($exception instanceof ExceptionInterface)
             ? $exception->alwaysShowNiceMessage()
@@ -132,16 +98,18 @@ class ErrorPageRenderer implements ErrorPageRendererInterface
         try {
             $iface = $this->getErrorIFaceForCode($httpCode);
 
+            if (!$iface) {
+                return ResponseHelper::text($this->renderFallbackMessage($exception, $request), $httpCode);
+            }
+
             if ($iface instanceof AbstractHttpErrorIFace) {
                 $iface->setException($exception);
             }
 
-            $body = $iface
-                ? $this->ifaceView->render($iface, $request)
-                : $this->renderFallbackMessage($exception, $request);
+            $body = $this->ifaceRenderer->render($iface, $request);
 
             return new HtmlResponse($body, $httpCode);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             LoggerHelper::logRequestException($this->logger, $e, $request);
 
             return $isDebug
@@ -158,7 +126,7 @@ class ErrorPageRenderer implements ErrorPageRendererInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    private function makeDebugResponse(\Throwable $exception, ServerRequestInterface $request): ResponseInterface
+    private function makeDebugResponse(Throwable $exception, ServerRequestInterface $request): ResponseInterface
     {
         return \Debug::renderStackTrace($exception, $request);
     }
@@ -200,7 +168,7 @@ class ErrorPageRenderer implements ErrorPageRendererInterface
                     return $item;
                 }
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             LoggerHelper::logRawException($this->logger, $e);
         }
 
@@ -214,7 +182,7 @@ class ErrorPageRenderer implements ErrorPageRendererInterface
      * @return string
      * @throws \BetaKiller\Exception
      */
-    private function renderFallbackMessage(\Throwable $e, ServerRequestInterface $request): string
+    private function renderFallbackMessage(Throwable $e, ServerRequestInterface $request): string
     {
         $lang = $this->getRequestLang($request);
 

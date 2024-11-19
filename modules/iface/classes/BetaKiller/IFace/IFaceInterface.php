@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\IFace;
 
 use BetaKiller\Url\IFaceModelInterface;
@@ -59,4 +60,11 @@ interface IFaceInterface extends UrlElementInstanceInterface
      * @return bool
      */
     public function isHttpCachingEnabled(): bool;
+
+    /**
+     * Returns relative path name
+     *
+     * @return string
+     */
+    public function getTemplatePath(): string;
 }

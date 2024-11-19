@@ -137,6 +137,14 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getTemplatePath(): string
+    {
+        return '@ifaces'.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $this->model->getCodename());
+    }
+
+    /**
      * Use this method for enable HTTP caching
      *
      * @param \DateInterval|null $expiresIn
@@ -158,7 +166,7 @@ abstract class AbstractIFace extends AbstractUrlElementInstance implements IFace
         $interval         = new DateInterval('PT1H');
         $interval->invert = 1;
 
-        // Expires in past, no caching
+        // Expires in the past, no caching
         return $interval;
     }
 

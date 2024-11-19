@@ -17,7 +17,7 @@ interface SeoMetaInterface
     /**
      * Returns title for using in <title> tag
      *
-     * @return string
+     * @return string|null
      */
     public function getTitle(): ?string;
 
@@ -32,7 +32,7 @@ interface SeoMetaInterface
     /**
      * Returns description for using in <meta> tag
      *
-     * @return string
+     * @return string|null
      */
     public function getDescription(): ?string;
 }

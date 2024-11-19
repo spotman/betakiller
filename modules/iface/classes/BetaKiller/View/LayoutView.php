@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\View;
 
 class LayoutView implements LayoutViewInterface
@@ -18,27 +19,35 @@ class LayoutView implements LayoutViewInterface
         $this->viewFactory = $viewFactory;
     }
 
-    public function render(ViewInterface $ifaceView, HtmlRenderHelper $renderHelper): string
+    public function render(ViewInterface $ifaceView, TemplateContext $context): string
     {
-        $layoutPath = $this->getLayoutViewPath($renderHelper->getLayoutCodename());
-        $layoutView = $this->createView($layoutPath);
-
         // Inject helper objects
-        foreach ($renderHelper->getLayoutHelperObjects() as $key => $value) {
+        foreach ($context->getTemplateData() as $key => $value) {
             $ifaceView->set($key, $value);
         }
 
-        $layoutView->set('content', $ifaceView->render());
+        $content = $ifaceView->render();
 
-        return $this->wrap($layoutView->render(), $renderHelper);
+        if ($context->hasLayout()) {
+            $layoutPath = $this->getLayoutViewPath($context->getLayout());
+            $layoutView = $this->createView($layoutPath);
+
+            $content = $layoutView->set('content', $content)->render();
+        }
+
+        return $this->wrap($content, $context);
     }
 
-    protected function wrap(string $layoutContent, HtmlRenderHelper $helper): string
+    protected function wrap(string $layoutContent, TemplateContext $context): string
     {
-        $wrapperPath = $this->getWrapperViewPath($helper->getWrapperCodename());
+        if (!$context->hasWrapper()) {
+            return $layoutContent;
+        }
+
+        $wrapperPath = $this->getWrapperViewPath($context->getWrapper());
         $view        = $this->createView($wrapperPath);
 
-        foreach ($helper->getWrapperData() as $key => $value) {
+        foreach ($context->getWrapperData() as $key => $value) {
             $view->set($key, $value);
         }
 

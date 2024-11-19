@@ -1,13 +1,13 @@
 <?php
+
 namespace BetaKiller\Url\ElementProcessor;
 
-use BetaKiller\Factory\IFaceFactory;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Cache\IFaceCache;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Url\UrlElementInstanceInterface;
-use BetaKiller\View\IFaceView;
+use BetaKiller\View\IFaceRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
@@ -15,42 +15,12 @@ use Throwable;
 /**
  * IFace URL element processor
  */
-class IFaceUrlElementProcessor implements UrlElementProcessorInterface
+readonly class IFaceUrlElementProcessor implements UrlElementProcessorInterface
 {
-    /**
-     * IFace Factory
-     *
-     * @var \BetaKiller\Factory\IFaceFactory
-     */
-    private $ifaceFactory;
-
-    /**
-     * Templates controller
-     *
-     * @var \BetaKiller\View\IFaceView
-     */
-    private $ifaceView;
-
-    /**
-     * Cache manager of IFace elements
-     *
-     * @var \BetaKiller\IFace\Cache\IFaceCache
-     */
-    private $ifaceCache;
-
-    /**
-     * @param \BetaKiller\Factory\IFaceFactory   $ifaceFactory
-     * @param \BetaKiller\View\IFaceView         $ifaceView
-     * @param \BetaKiller\IFace\Cache\IFaceCache $ifaceCache
-     */
     public function __construct(
-        IFaceFactory $ifaceFactory,
-        IFaceView $ifaceView,
-        IFaceCache $ifaceCache
+        private IFaceRendererInterface $renderer,
+        private IFaceCache $ifaceCache
     ) {
-        $this->ifaceFactory = $ifaceFactory;
-        $this->ifaceView    = $ifaceView;
-        $this->ifaceCache   = $ifaceCache;
     }
 
     /**
@@ -84,7 +54,7 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
         }
 
         try {
-            $output = $this->ifaceView->render($iface, $request);
+            $output = $this->renderer->render($iface, $request);
 
             $response = ResponseHelper::html($output);
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\View;
 
 class TwigLayoutView extends LayoutView
@@ -16,23 +17,25 @@ class TwigLayoutView extends LayoutView
     }
 
     /**
-     * @param \BetaKiller\View\ViewInterface    $ifaceView
-     * @param \BetaKiller\View\HtmlRenderHelper $renderHelper
+     * @param \BetaKiller\View\ViewInterface   $ifaceView
+     * @param \BetaKiller\View\TemplateContext $context
      *
      * @return string
      */
-    public function render(ViewInterface $ifaceView, HtmlRenderHelper $renderHelper): string
+    public function render(ViewInterface $ifaceView, TemplateContext $context): string
     {
-        $layoutPath = $this->getLayoutViewPath($renderHelper->getLayoutCodename());
-
         // Inject objects for Twig helper functions
-        foreach ($renderHelper->getLayoutHelperObjects() as $key => $value) {
+        foreach ($context->getTemplateData() as $key => $value) {
             $ifaceView->set($key, $value);
         }
 
-        // Extend layout inside IFace view via "extend" tag
-        $content = $ifaceView->set('layout', $layoutPath)->render();
+        if ($context->hasLayout()) {
+            $layoutPath = $this->getLayoutViewPath($context->getLayout());
 
-        return $this->wrap($content, $renderHelper);
+            // Extend layout inside IFace view via "extend" tag
+            $ifaceView->set('layout', $layoutPath);
+        }
+
+        return $this->wrap($ifaceView->render(), $context);
     }
 }
