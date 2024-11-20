@@ -112,6 +112,8 @@ class TemplateContext
     {
         $this->meta->setTitle($title, Meta::TITLE_APPEND);
 
+        $this->useDefaultWrapper();
+
         return $this;
     }
 
@@ -126,12 +128,16 @@ class TemplateContext
     {
         $this->meta->setDescription($value);
 
+        $this->useDefaultWrapper();
+
         return $this;
     }
 
     public function setMetaCanonical(string $url): TemplateContext
     {
         $this->meta->setCanonical($url);
+
+        $this->useDefaultWrapper();
 
         return $this;
     }
@@ -144,6 +150,8 @@ class TemplateContext
     public function setContentType(string $value): self
     {
         $this->meta->setContentType($value);
+
+        $this->useDefaultWrapper();
 
         return $this;
     }
@@ -200,5 +208,12 @@ class TemplateContext
         $this->wrapper = $wrapper;
 
         return $this;
+    }
+
+    private function useDefaultWrapper(): void
+    {
+        if (!$this->hasWrapper()) {
+            $this->wrapInHtml5();
+        }
     }
 }

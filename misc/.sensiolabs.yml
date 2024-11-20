@@ -14,16 +14,15 @@ global_exclude_dirs:
     - modules/mysqli
     - modules/orm
     - modules/paginate
-    - modules/static-files
     - modules/sqlite
     - modules/ulogin
     - modules/unittests
     - modules/utils
-    - modules/admin/static-files/admin/components
+    - modules/admin/assets/static/admin/components
 
 exclude_patterns:
 - modules/*/node_modules/*
-- modules/*/static-files/*/node_modules/*
+- modules/*/assets/static/*/node_modules/*
 
 rules:
     php.use_global_variable_or_function:

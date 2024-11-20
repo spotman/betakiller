@@ -87,6 +87,9 @@ final class MezzioWebAppRunner implements WebAppRunnerInterface
 
         $config = $this->config->getMiddlewares();
 
+        // Place first middlewares without dependencies
+        uasort($config, fn(array $a, array $b) => count($a) <=> count($b));
+
         $behaviour = ResolveBehaviour::create()
             ->setThrowOnMissingReference(true)
             ->setThrowOnCircularReference(true);

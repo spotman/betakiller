@@ -24,7 +24,7 @@ class ProfilerMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         // Fresh instance for every request
-        $profiler = new RequestProfiler;
+        $profiler = new RequestProfiler();
 
         $profiler->start('RequestProfiler started')->stop();
 

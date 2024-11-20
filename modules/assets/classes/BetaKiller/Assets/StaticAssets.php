@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Assets;
@@ -11,39 +12,27 @@ use Psr\Http\Message\UriInterface;
 class StaticAssets
 {
     /**
-     * @var \BetaKiller\Env\AppEnvInterface
-     */
-    private $appEnv;
-
-    /**
-     * @var AssetsConfig
-     */
-    private $config;
-
-    /**
      * CSS files
      *
      * @var array
      */
-    private $cssData = [];
+    private array $cssData = [];
 
     /**
      * Javascript files
      *
      * @var array
      */
-    private $jsData = [];
+    private array $jsData = [];
 
     /**
-     * JS constructor.
+     * StaticAssets constructor.
      *
      * @param \BetaKiller\Env\AppEnvInterface $appEnv
      * @param \BetaKiller\Assets\AssetsConfig $config
      */
-    public function __construct(AppEnvInterface $appEnv, AssetsConfig $config)
+    public function __construct(private readonly AppEnvInterface $appEnv, private readonly AssetsConfig $config)
     {
-        $this->appEnv = $appEnv;
-        $this->config = $config;
     }
 
     public function addJs(string $location, ?array $attributes = null, ?string $condition = null): void
@@ -58,8 +47,8 @@ class StaticAssets
         }
 
         $this->jsData[$location] = [
-            'location'  => $location,
-            'condition' => $condition,
+            'location'   => $location,
+            'condition'  => $condition,
             'attributes' => $attributes ?? [],
         ];
     }
@@ -76,8 +65,8 @@ class StaticAssets
         }
 
         $this->cssData[$location] = [
-            'location'  => $location,
-            'condition' => $condition,
+            'location'   => $location,
+            'condition'  => $condition,
             'attributes' => $attributes ?? [],
         ];
     }
@@ -131,19 +120,27 @@ class StaticAssets
     }
 
     /**
-     * Поиск по проекту статичного файла
-     * (полный путь к файлу)
+     * Search for a file and return absolute path (or "null" if nothing found)
      *
      * @param string $relativePath
      *
-     * @return string
+     * @return string|null
      */
     public function findFile(string $relativePath): ?string
     {
         $info = pathinfo($relativePath);
-        $dir  = ($info['dirname'] !== '.') ? $info['dirname'].'/' : '';
 
-        $file = Kohana::find_file('static-files', $dir.$info['filename'], $info['extension']);
+        $dir  = $info['dirname'];
+        $name = $info['filename'];
+        $ext  = $info['extension'];
+
+        $dir = ($dir !== '.')
+            ? $dir.DIRECTORY_SEPARATOR
+            : '';
+
+        $path = 'static'.DIRECTORY_SEPARATOR.$dir.$name;
+
+        $file = Kohana::find_file('assets', $path, $ext);
 
         return $file ? (string)$file : null;
     }
@@ -179,9 +176,9 @@ class StaticAssets
      */
     private function getCssLink(array $data): string
     {
-        $location = $data['location'];
+        $location   = $data['location'];
         $attributes = $data['attributes'];
-        $condition = $data['condition'];
+        $condition  = $data['condition'];
 
         $code = HTML::style($location, $attributes + ['media' => 'all']);
 
@@ -201,9 +198,9 @@ class StaticAssets
      */
     private function getScriptTag(array $data): string
     {
-        $location = $data['location'];
+        $location   = $data['location'];
         $attributes = $data['attributes'];
-        $condition = $data['condition'];
+        $condition  = $data['condition'];
 
         $code = HTML::script($location, $attributes);
 

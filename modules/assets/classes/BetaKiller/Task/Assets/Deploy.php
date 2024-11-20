@@ -47,7 +47,7 @@ class Deploy extends AbstractTask
 
     public function run(ConsoleInputInterface $params): void
     {
-        $staticFilesList = Kohana::list_files('static-files');
+        $staticFilesList = Kohana::list_files('assets'.DIRECTORY_SEPARATOR.'static');
 
         $relativeDir = $params->getString(self::ARG_TARGET);
         $targetDir   = $this->appEnv->getDocRootPath().DIRECTORY_SEPARATOR.$relativeDir;
@@ -74,7 +74,7 @@ class Deploy extends AbstractTask
                 $this->processFile($item, $targetBase);
             }
         } else {
-            $fileArray = explode('static-files', $original);
+            $fileArray = explode('static', $original, 2);
 
             $target = $targetBase.$fileArray[1];
 

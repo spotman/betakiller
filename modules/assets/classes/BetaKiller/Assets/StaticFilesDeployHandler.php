@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Assets;
@@ -8,29 +9,18 @@ use BetaKiller\Helper\ResponseHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use RuntimeException;
 
-class StaticFilesDeployHandler implements RequestHandlerInterface
+readonly class StaticFilesDeployHandler implements RequestHandlerInterface
 {
-    /**
-     * @var \BetaKiller\Assets\ContentTypes
-     */
-    private ContentTypes $types;
-
-    /**
-     * @var \BetaKiller\Assets\StaticAssetsFactory
-     */
-    private StaticAssetsFactory $assetsFactory;
-
     /**
      * StaticFilesDeployHandler constructor.
      *
      * @param \BetaKiller\Assets\StaticAssetsFactory $assetsFactory
      * @param \BetaKiller\Assets\ContentTypes        $types
      */
-    public function __construct(StaticAssetsFactory $assetsFactory, ContentTypes $types)
+    public function __construct(private StaticAssetsFactory $assetsFactory, private ContentTypes $types)
     {
-        $this->assetsFactory = $assetsFactory;
-        $this->types         = $types;
     }
 
     /**
@@ -39,6 +29,8 @@ class StaticFilesDeployHandler implements RequestHandlerInterface
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \BetaKiller\Exception\NotFoundHttpException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -46,32 +38,34 @@ class StaticFilesDeployHandler implements RequestHandlerInterface
 
         $file = $request->getAttribute('file');
 
-        $orig = $assets->findFile($file);
+        // Replace URL separators with FS ones
+        $path = str_replace('/', DIRECTORY_SEPARATOR, $file);
+
+        $orig = $assets->findFile($path);
 
         if (!$orig) {
             // Return a 404 status
             throw new NotFoundHttpException('File [:file] not found', [':file' => $file]);
         }
 
-/*
-        // Производим deploy статического файла,
-        // В следующий раз его будет отдавать сразу nginx без запуска PHP
-        $deployPath = $assets->getDeployPath($file);
+        // Deploy static file via symlink
+        // On next request file will be served directly by nginx
+        $deployPath = $assets->getDeployPath($path);
 
         // Create target directory if not exists
-        $deployDir = \dirname($deployPath);
+        $deployDir = dirname($deployPath);
 
         if (!file_exists($deployDir) && !mkdir($deployDir, 0777, true) && !is_dir($deployDir)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $deployDir));
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $deployDir));
         }
 
         if (!file_exists($deployPath)) {
             symlink($orig, $deployPath);
         }
-*/
-        $ext  = pathinfo($file, \PATHINFO_EXTENSION);
+
+        $ext  = pathinfo($file, PATHINFO_EXTENSION);
         $mime = $this->types->getExtensionMimeType($ext);
 
-        return ResponseHelper::file($orig, $mime, new \DateInterval('P1D'));
+        return ResponseHelper::file($orig, $mime);
     }
 }

@@ -49,9 +49,9 @@ Encore
   //.enableVersioning(false)
 
   .addAliases({
-    'jquery': path.resolve(__dirname, '../../../../modules/admin/static-files/admin/node_modules/jquery/src/jquery.js'),
-    'jquery.jsonRPC': path.resolve(__dirname, '../../../../application/static-files/api/jquery.jsonRPC.js'),
-    'api.rpc.factory': path.resolve(__dirname, '../../../../application/static-files/api/rpc.factory.js'),
+    'jquery': path.resolve(__dirname, '../../../../modules/admin/assets/static/admin/node_modules/jquery/src/jquery.js'),
+    'jquery.jsonRPC': path.resolve(__dirname, '../../../../application/assets/static/api/jquery.jsonRPC.js'),
+    'api.rpc.factory': path.resolve(__dirname, '../../../../application/assets/static/api/rpc.factory.js'),
     'content.api.rpc': path.resolve(__dirname, '../require.js/content.api.rpc.js'),
     'ckeditor-post-message': path.resolve(__dirname, '../require.js/ckeditor-post-message.js'),
   })

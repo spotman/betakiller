@@ -445,7 +445,7 @@ task('cache:warmup', static function () {
 
 task('assets:deploy', static function () {
     runMinionTask('assets:deploy', true);
-})->desc('Collect assets from all static-files directories');
+})->desc('Collect assets from all assets/static directories');
 
 task('bk:deploy:dotenv:migrate', static function () {
     $globalDotEnv  = '{{deploy_path}}/.env';

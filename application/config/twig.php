@@ -38,7 +38,7 @@ return [
             'templates' => 'templates',
             'macros'    => 'macros',
 
-            'statics' => '../static-files',
+            'statics' => '../assets/static',
         ],
     ],
 

@@ -181,11 +181,13 @@ class UrlElementHelper
         $request = $context->getRequest();
 
         // Errors may be fired early and UrlHelper may be not initialized
-        if (ServerRequestHelper::hasUrlHelper($request)) {
-            $urlHelper = ServerRequestHelper::getUrlHelper($request);
-
-            $context->setMetaCanonical($urlHelper->makeUrl($element, null, false));
+        if (!ServerRequestHelper::hasUrlHelper($request)) {
+            return;
         }
+
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+
+        $context->setMetaCanonical($urlHelper->makeUrl($element, null, false));
 
         if ($element instanceof IFaceModelInterface) {
             $params = ServerRequestHelper::getUrlContainer($request);
