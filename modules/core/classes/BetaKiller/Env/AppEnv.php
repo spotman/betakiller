@@ -115,7 +115,7 @@ final class AppEnv implements AppEnvInterface
 
         $this->revision = $required
             ? $this->getEnvVariable(self::APP_REVISION, true)
-            : random_bytes(8);
+            : bin2hex(random_bytes(4));
     }
 
     private function detectCliEnv(): void
