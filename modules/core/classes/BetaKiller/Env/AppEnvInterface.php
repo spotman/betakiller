@@ -23,6 +23,10 @@ interface AppEnvInterface
 
     public const APP_URL      = 'APP_URL';
     public const APP_MODE     = 'APP_ENV';
+
+    /**
+     * Current git revision (set during deployment process)
+     */
     public const APP_REVISION = 'APP_REVISION';
     public const APP_DEBUG    = 'APP_DEBUG';
     public const APP_CACHE    = 'APP_CACHE';

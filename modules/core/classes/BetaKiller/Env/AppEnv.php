@@ -111,7 +111,11 @@ final class AppEnv implements AppEnvInterface
 
     private function detectAppRevision(): void
     {
-        $this->revision = $this->getEnvVariable(self::APP_REVISION);
+        $required = $this->inProductionMode() || $this->inStagingMode();
+
+        $this->revision = $required
+            ? $this->getEnvVariable(self::APP_REVISION, true)
+            : random_bytes(8);
     }
 
     private function detectCliEnv(): void
@@ -439,9 +443,6 @@ final class AppEnv implements AppEnvInterface
 
         // Absolute URL with scheme
         $dotEnv->required(self::APP_URL)->notEmpty();
-
-        // Current git revision (set upon deployment process)
-        $dotEnv->required(self::APP_REVISION)->notEmpty();
     }
 
     private function checkFileDirectoryExists(string $filePath): void
