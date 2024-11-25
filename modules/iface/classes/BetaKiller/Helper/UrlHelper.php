@@ -275,10 +275,7 @@ class UrlHelper implements UrlHelperInterface
         $params = $this->createUrlContainer();
         $params->setEntity($entity);
 
-        // Search for URL element with provided entity, action and zone
-        $urlElement = $this->tree->getByEntityActionAndZone($entity::getModelName(), $action, $zone);
-
-        return $this->makeUrl($urlElement, $params, $removeCycling);
+        return $this->getEntityNameUrl($entity::getModelName(), $action, $zone);
     }
 
     public function getEntityNameUrl(
