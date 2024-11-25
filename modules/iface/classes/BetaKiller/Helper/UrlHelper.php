@@ -275,7 +275,7 @@ class UrlHelper implements UrlHelperInterface
         $params = $this->createUrlContainer();
         $params->setEntity($entity);
 
-        return $this->getEntityNameUrl($entity::getModelName(), $action, $zone);
+        return $this->getEntityNameUrl($entity::getModelName(), $action, $zone, $params);
     }
 
     public function getEntityNameUrl(
