@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Service;
@@ -67,10 +68,10 @@ class AuthService
     public function __construct(
         PasswordHasherInterface $hasher,
         SessionStorageInterface $sessionStorage,
-        GuestUserFactory        $guestUserFactory,
+        GuestUserFactory $guestUserFactory,
         UserRepositoryInterface $userRepo,
-        AclInterface            $acl,
-        EventBusInterface       $eventBus
+        AclInterface $acl,
+        EventBusInterface $eventBus
     ) {
         $this->hasher           = $hasher;
         $this->sessionStorage   = $sessionStorage;
@@ -130,7 +131,7 @@ class AuthService
      */
     public function login(
         SessionInterface $session,
-        UserInterface    $user
+        UserInterface $user
     ): void {
         // Check account is active
         if (!$user->isActive()) {
@@ -140,8 +141,13 @@ class AuthService
         $userResource = $this->acl->getResource(User::getModelName());
 
         // No login role => user is not allowed to log in
-        if (!$this->acl->isAllowedToUser($userResource, UserResource::ACTION_LOGIN, $user)) {
-            throw new AccessDeniedException();
+        $loginAction = UserResource::ACTION_LOGIN;
+
+        if (!$this->acl->isAllowedToUser($userResource, $loginAction, $user)) {
+            throw new AccessDeniedException('Action "name" is not allowed to User ":id"', [
+                ':name' => UserResource::ACTION_LOGIN,
+                ':id'   => $user->getID(),
+            ]);
         }
 
         // Run custom user update

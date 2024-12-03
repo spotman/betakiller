@@ -30,7 +30,7 @@ return [
     ],
 
     RoleInterface::FORCE_LOGIN => [
-        RoleConfig::OPTION_DESC     => 'Grants access to force login without credentials',
+        RoleConfig::OPTION_DESC => 'Grants access to force login without credentials',
     ],
 
     RoleInterface::DEVELOPER => [

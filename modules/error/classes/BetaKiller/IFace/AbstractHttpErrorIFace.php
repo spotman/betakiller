@@ -1,12 +1,22 @@
 <?php
+
 namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
 
 abstract class AbstractHttpErrorIFace extends AbstractIFace
 {
-    protected $exception;
+    public static function injectException(ServerRequestInterface $request, Throwable $e): ServerRequestInterface
+    {
+        return $request->withAttribute(self::class, $e);
+    }
+
+    public static function fetchException(ServerRequestInterface $request): ?Throwable
+    {
+        return $request->getAttribute(self::class);
+    }
 
     /**
      * Returns data for View
@@ -22,20 +32,16 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
 //            AuthWidget::REDIRECT_KEY => ServerRequestHelper::getUrl($request),
 //        ];
 
-        $user  = !ServerRequestHelper::isGuest($request) ? ServerRequestHelper::getUser($request) : null;
-        $email = $user ? $user->getEmail() : null;
+        $user = !ServerRequestHelper::isGuest($request) ? ServerRequestHelper::getUser($request) : null;
+
+        $e = self::fetchException($request);
 
         return [
-            'email' => $email,
+            'email'   => $user?->getEmail(),
+            'message' => $e?->getMessage(),
+            'trace'   => $e?->getTraceAsString(),
 //            'login_url' => LoginIFace::URL.'?'.http_build_query($redirectData),
 //            'is_guest'  => ServerRequestHelper::isGuest($request),
         ];
-    }
-
-    public function setException(\Throwable $e): self
-    {
-        $this->exception = $e;
-
-        return $this;
     }
 }

@@ -103,7 +103,7 @@ readonly class ErrorPageRenderer implements ErrorPageRendererInterface
             }
 
             if ($iface instanceof AbstractHttpErrorIFace) {
-                $iface->setException($exception);
+                $request = AbstractHttpErrorIFace::injectException($request, $exception);
             }
 
             $body = $this->ifaceRenderer->render($iface, $request);

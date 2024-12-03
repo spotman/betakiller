@@ -33,6 +33,22 @@
           {% endif %}
         </div>
 
+        {% if not in_production() %}
+
+          {% if message %}
+            <div>
+              {{ message }}
+            </div>
+          {% endif %}
+
+          {% if trace %}
+            <div>
+              {{ trace }}
+            </div>
+          {% endif %}
+
+        {% endif %}
+
       </div>
     </div>
   </div>

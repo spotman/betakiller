@@ -1,7 +1,10 @@
 <?php
+
 namespace BetaKiller\IFace;
 
 use BetaKiller\Exception\NotAvailableHttpException;
+use DateInterval;
+use DateTimeImmutable;
 use Psr\Http\Message\ServerRequestInterface;
 
 class HttpError503IFace extends AbstractHttpErrorIFace
@@ -16,19 +19,18 @@ class HttpError503IFace extends AbstractHttpErrorIFace
      */
     public function getData(ServerRequestInterface $request): array
     {
-        $now             = new \DateTimeImmutable;
-        $defaultDuration = new \DateInterval('PT30S');
+        $now             = new DateTimeImmutable();
+        $defaultDuration = new DateInterval('PT30S');
 
-        if (!$this->exception) {
-            $endTime         = $now->add($defaultDuration);
-            $this->exception = new NotAvailableHttpException($endTime);
-        }
+        $exception = self::fetchException($request);
 
-        if (!$this->exception instanceof NotAvailableHttpException) {
+        $exception ??= new NotAvailableHttpException($now->add($defaultDuration));
+
+        if (!$exception instanceof NotAvailableHttpException) {
             throw new \LogicException('Exception must be instance of NotAvailableHttpException');
         }
 
-        $endTime = $this->exception->getEndsAt();
+        $endTime = $exception->getEndsAt();
 
         if ($endTime < $now) {
             $endTime = $now->add($defaultDuration);
