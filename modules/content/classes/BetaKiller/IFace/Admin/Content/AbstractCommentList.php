@@ -73,7 +73,7 @@ abstract class AbstractCommentList extends AbstractContentAdminIFace
             'id'           => $comment->getID(),
             'publicURL'    => $comment->getPublicReadUrl($helper),
             // Get public URL via related model
-            'editURL'      => $helper->getReadEntityUrl($comment, Zone::Admin),
+            'editURL'      => $helper->getReadEntityUrl($comment, Zone::admin()),
             // Get admin URL via related model
             'contentLabel' => $comment->getRelatedContentLabel(),
             'author'       => [

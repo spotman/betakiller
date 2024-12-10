@@ -85,7 +85,7 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
         return [
             'label'     => $article->getLabel(),
             'thumbnail' => $this->assetsHelper->getAttributesForImgTag($thumbnail, $thumbnail::SIZE_PREVIEW),
-            'url'       => $urlHelper->getReadEntityUrl($article, Zone::Public),
+            'url'       => $urlHelper->getReadEntityUrl($article, Zone::public()),
             'date'      => $createdAt?->format('d.m.Y'),
         ];
     }

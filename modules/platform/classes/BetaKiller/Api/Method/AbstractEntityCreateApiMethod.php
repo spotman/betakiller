@@ -5,7 +5,7 @@ use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Defence\ArgumentsInterface;
 
-abstract class AbstractEntityCreateApiMethod extends AbstractEntityBasedApiMethod
+abstract readonly class AbstractEntityCreateApiMethod extends AbstractEntityBasedApiMethod
 {
     /**
      * @param \Spotman\Defence\ArgumentsInterface $arguments

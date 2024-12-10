@@ -62,7 +62,7 @@ class PostItemIFace extends AbstractAppBase implements BeforeRequestProcessingIn
         $model = ContentUrlContainerHelper::getContentPost($request);
         $stack = ServerRequestHelper::getUrlElementStack($request);
 
-        $previewMode = UrlElementHelper::isCurrentZone(Zone::Preview, $stack);
+        $previewMode = UrlElementHelper::isCurrentZone(Zone::preview(), $stack);
 
         if ($previewMode) {
             // See latest revision data

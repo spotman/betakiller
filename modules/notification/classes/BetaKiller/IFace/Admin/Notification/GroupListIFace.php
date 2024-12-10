@@ -113,7 +113,7 @@ class GroupListIFace extends AbstractAdminIFace
 
         return [
             'name'     => $group->getCodename(),
-            'url'      => $urlHelper->getReadEntityUrl($group, Zone::Admin),
+            'url'      => $urlHelper->getReadEntityUrl($group, Zone::admin()),
             'messages' => $messages,
         ];
     }

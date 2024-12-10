@@ -131,7 +131,7 @@ class AbstractUpdateItemAction extends AbstractAction implements PostRequestActi
 
         $this->entityManager->persist($key);
 
-        $url = $urlHelper->getReadEntityUrl($key, Zone::Admin);
+        $url = $urlHelper->getReadEntityUrl($key, Zone::admin());
 
         return ResponseHelper::redirect($url);
     }

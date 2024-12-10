@@ -152,7 +152,7 @@ final class ArticlesListWidget extends AbstractPublicWidget
                     'original' => $this->assetsHelper->getAttributesForImgTag($thumbnail, $thumbnail::SIZE_ORIGINAL),
                     'preview'  => $this->assetsHelper->getAttributesForImgTag($thumbnail, $thumbnail::SIZE_PREVIEW),
                 ],
-                'url'        => $helper->getReadEntityUrl($article, Zone::Public),
+                'url'        => $helper->getReadEntityUrl($article, Zone::public()),
                 'label'      => $article->getLabel(),
                 'title'      => $article->getTitle(),
                 'text'       => $this->contentHelper->getPostContentPreview($article),

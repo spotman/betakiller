@@ -45,7 +45,7 @@ final class RetryNotificationAction extends AbstractAction
 
         $this->notification->retry($logRecord);
 
-        $url = ServerRequestHelper::getUrlHelper($request)->getReadEntityUrl($logRecord, Zone::Admin);
+        $url = ServerRequestHelper::getUrlHelper($request)->getReadEntityUrl($logRecord, Zone::admin());
 
         return ResponseHelper::redirect($url);
     }

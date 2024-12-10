@@ -69,7 +69,7 @@ abstract class AbstractItemIFace extends AbstractAdminIFace
             'key'       => $key->getI18nKeyName(),
             'is_plural' => $isPlural,
             'values'    => $this->getValues($key, $languages),
-//            'action'    => $urlHelper->getUpdateEntityUrl($key, Zone::Admin),
+//            'action'    => $urlHelper->getUpdateEntityUrl($key, Zone::admin()),
         ];
     }
 

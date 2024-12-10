@@ -1,22 +1,26 @@
 <?php
+
 namespace BetaKiller\Api\Method\ContentComment;
 
 use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
+use BetaKiller\Api\Method\EntityBasedApiMethodHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Workflow\ContentCommentWorkflow;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class RestoreFromTrashApiMethod extends AbstractEntityBasedApiMethod
+final readonly class RestoreFromTrashApiMethod extends AbstractEntityBasedApiMethod
 {
     /**
      * RestoreFromTrashApiMethod constructor.
      *
-     * @param \BetaKiller\Workflow\ContentCommentWorkflow $workflow
+     * @param \BetaKiller\Workflow\ContentCommentWorkflow       $workflow
+     * @param \BetaKiller\Api\Method\EntityBasedApiMethodHelper $helper
      */
-    public function __construct(private readonly ContentCommentWorkflow $workflow)
+    public function __construct(private ContentCommentWorkflow $workflow, EntityBasedApiMethodHelper $helper)
     {
+        parent::__construct($helper);
     }
 
     /**

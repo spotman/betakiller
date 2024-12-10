@@ -1,33 +1,21 @@
 <?php
+
 namespace BetaKiller\Api\Method;
 
-use BetaKiller\Factory\RepositoryFactoryInterface;
-use BetaKiller\IdentityConverterInterface;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Repository\RepositoryInterface;
-use DI\Attribute\Inject;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\Method\AbstractApiMethod;
 use Spotman\Defence\ArgumentsInterface;
 
-abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements EntityBasedApiMethodInterface
+abstract readonly class AbstractEntityBasedApiMethod extends AbstractApiMethod implements EntityBasedApiMethodInterface
 {
     /**
-     * @var \BetaKiller\Factory\RepositoryFactoryInterface
+     * @param \BetaKiller\Api\Method\EntityBasedApiMethodHelper $helper
      */
-    #[Inject]
-    private RepositoryFactoryInterface $repositoryFactory;
-
-    /**
-     * @var \BetaKiller\IdentityConverterInterface
-     */
-    #[Inject]
-    private IdentityConverterInterface $converter;
-
-    /**
-     * @var \BetaKiller\Repository\RepositoryInterface|null
-     */
-    private ?RepositoryInterface $repository = null;
+    public function __construct(private EntityBasedApiMethodHelper $helper)
+    {
+    }
 
     /**
      * @param \Spotman\Defence\ArgumentsInterface $arguments
@@ -35,15 +23,16 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
      * @return \BetaKiller\Model\AbstractEntityInterface
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \Spotman\Api\ApiMethodException
      */
-    public function getEntity(ArgumentsInterface $arguments): AbstractEntityInterface
+    protected function getEntity(ArgumentsInterface $arguments): AbstractEntityInterface
     {
         if (!$arguments->hasID()) {
             throw new ApiMethodException('Missing identity is required for entity processing');
         }
 
         // Entity name is equal to API collection name
-        $entityName = $this->getCollectionName();
+        $entityName = $this::getCollectionName();
 
         $id = $this->decodeIdentity($entityName, $arguments->getID());
 
@@ -56,11 +45,13 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
      */
     protected function getRepository(): RepositoryInterface
     {
-        if (!$this->repository) {
-            $this->repository = $this->fetchRepository();
+        static $repository;
+
+        if (!$repository) {
+            $repository = $this->fetchRepository();
         }
 
-        return $this->repository;
+        return $repository;
     }
 
     /**
@@ -69,10 +60,7 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
      */
     private function fetchRepository(): RepositoryInterface
     {
-        // Repository name is equal to API collection name
-        $repoName = $this->getCollectionName();
-
-        return $this->repositoryFactory->create($repoName);
+        return $this->helper->getRepository($this);
     }
 
     /**
@@ -97,13 +85,24 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
         $this->getRepository()->delete($entity);
     }
 
+    /**
+     * @param string $entityName
+     * @param string $value
+     *
+     * @return string
+     */
     protected function decodeIdentity(string $entityName, string $value): string
     {
-        return $this->converter->decode($entityName, $value);
+        return $this->helper->decodeIdentity($entityName, $value);
     }
 
+    /**
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
+     *
+     * @return string
+     */
     protected function encodeIdentity(AbstractEntityInterface $entity): string
     {
-        return $this->converter->encode($entity);
+        return $this->helper->encodeIdentity($entity);
     }
 }

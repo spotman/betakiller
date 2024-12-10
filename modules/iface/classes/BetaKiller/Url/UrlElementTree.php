@@ -398,7 +398,7 @@ class UrlElementTree implements UrlElementTreeInterface
      */
     private function isAdminModel(UrlElementInterface $model): bool
     {
-        return $model->getZoneName() === Zone::Admin->getName();
+        return $model->getZoneName() === Zone::admin()->getName();
     }
 
     /**
@@ -408,7 +408,7 @@ class UrlElementTree implements UrlElementTreeInterface
      */
     private function isPublicModel(UrlElementInterface $model): bool
     {
-        return $model->getZoneName() === Zone::Public->getName();
+        return $model->getZoneName() === Zone::public()->getName();
     }
 
     /**

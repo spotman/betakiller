@@ -42,7 +42,7 @@ class PostItemRevisionListIFace extends AbstractContentAdminIFace
         foreach ($post->getAllRevisions() as $revision) {
             $data[] = [
                 'id'         => $revision->getID(),
-                'diff_url'   => $this->urlHelper->getReadEntityUrl($revision, Zone::Admin),
+                'diff_url'   => $this->urlHelper->getReadEntityUrl($revision, Zone::admin()),
                 'is_actual'  => $post->isActualRevision($revision),
                 'created_at' => $revision->getCreatedAt()->format('d.m.Y H:i:s'),
                 'created_by' => $revision->getCreatedBy()->getFullName(),

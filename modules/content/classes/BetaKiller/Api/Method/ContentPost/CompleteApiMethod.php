@@ -2,21 +2,24 @@
 namespace BetaKiller\Api\Method\ContentPost;
 
 use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
+use BetaKiller\Api\Method\EntityBasedApiMethodHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Workflow\ContentPostWorkflow;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-final class CompleteApiMethod extends AbstractEntityBasedApiMethod
+final readonly class CompleteApiMethod extends AbstractEntityBasedApiMethod
 {
     /**
      * CompleteApiMethod constructor.
      *
-     * @param \BetaKiller\Workflow\ContentPostWorkflow $workflow
+     * @param \BetaKiller\Workflow\ContentPostWorkflow          $workflow
+     * @param \BetaKiller\Api\Method\EntityBasedApiMethodHelper $helper
      */
-    public function __construct(private readonly ContentPostWorkflow $workflow)
+    public function __construct(private ContentPostWorkflow $workflow, EntityBasedApiMethodHelper $helper)
     {
+        parent::__construct($helper);
     }
 
     /**

@@ -127,7 +127,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
     {
         $relatedEntity = $this->getRelatedEntityInstance();
 
-        return $helper->getReadEntityUrl($relatedEntity, Zone::Public);
+        return $helper->getReadEntityUrl($relatedEntity, Zone::public());
     }
 
     /**

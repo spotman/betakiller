@@ -157,7 +157,7 @@ class BarWidget extends AbstractAdminWidget
         RequestLanguageHelperInterface $i18n
     ): array {
         $items       = [];
-        $urlElements = $this->tree->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE, Zone::Admin);
+        $urlElements = $this->tree->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE, Zone::admin());
 
         foreach ($urlElements as $urlElement) {
             if (!$this->elementAccessResolver->isAllowed($user, $urlElement, $params)) {
@@ -243,7 +243,7 @@ class BarWidget extends AbstractAdminWidget
             $stack,
             $helper,
             $entity,
-            Zone::Admin,
+            Zone::admin(),
             CrudlsActionsInterface::ACTION_READ
         );
     }
@@ -265,7 +265,7 @@ class BarWidget extends AbstractAdminWidget
             $stack,
             $helper,
             $entity,
-            Zone::Public,
+            Zone::public(),
             CrudlsActionsInterface::ACTION_READ
         );
     }
@@ -288,7 +288,7 @@ class BarWidget extends AbstractAdminWidget
             $stack,
             $helper,
             $entity,
-            Zone::Preview,
+            Zone::preview(),
             CrudlsActionsInterface::ACTION_READ
         );
     }

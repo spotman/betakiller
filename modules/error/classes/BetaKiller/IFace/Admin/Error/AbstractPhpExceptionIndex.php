@@ -53,7 +53,7 @@ abstract class AbstractPhpExceptionIndex extends AbstractErrorAdminIFace
 
             $exceptionsData[] = [
                 'hash'       => $model->getHash(),
-                'showUrl'    => $urlHelper->getReadEntityUrl($model, Zone::Admin),
+                'showUrl'    => $urlHelper->getReadEntityUrl($model, Zone::admin()),
                 'urls'       => $model->getUrls(),
                 'paths'      => $paths,
                 'modules'    => $model->getModules(),

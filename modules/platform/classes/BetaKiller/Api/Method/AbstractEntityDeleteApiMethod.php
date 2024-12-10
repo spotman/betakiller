@@ -7,7 +7,7 @@ use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Defence\ArgumentsInterface;
 
-abstract class AbstractEntityDeleteApiMethod extends AbstractEntityBasedApiMethod
+abstract readonly class AbstractEntityDeleteApiMethod extends AbstractEntityBasedApiMethod
 {
     /**
      * @param \Spotman\Defence\ArgumentsInterface $arguments

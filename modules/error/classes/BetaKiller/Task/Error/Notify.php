@@ -106,7 +106,7 @@ class Notify extends AbstractTask
             'message'  => $model->getMessage(),
             'urls'     => $model->getUrls(),
             'paths'    => $model->getPaths(),
-            'adminUrl' => $this->urlHelper->getReadEntityUrl($model, Zone::Admin),
+            'adminUrl' => $this->urlHelper->getReadEntityUrl($model, Zone::admin()),
         ]);
 
         // Saving last notification timestamp

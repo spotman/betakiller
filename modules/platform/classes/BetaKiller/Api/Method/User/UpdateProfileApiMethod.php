@@ -8,7 +8,7 @@ use Spotman\Api\ApiMethodResponse;
 use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
 
-class UpdateProfileApiMethod extends AbstractEntityBasedApiMethod
+final readonly class UpdateProfileApiMethod extends AbstractEntityBasedApiMethod
 {
     private const ARG_DATA = 'data';
 

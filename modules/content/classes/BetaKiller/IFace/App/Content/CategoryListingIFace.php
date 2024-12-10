@@ -65,7 +65,7 @@ final class CategoryListingIFace extends AbstractAppBase
     {
         return [
             'label'    => $category->getLabel(),
-            'url'      => $urlHelper->getReadEntityUrl($category, Zone::Public),
+            'url'      => $urlHelper->getReadEntityUrl($category, Zone::public()),
             'children' => $this->getCategoriesData($urlHelper, $category),
         ];
     }

@@ -90,7 +90,7 @@ class ContentPostWorkflow
     private function notifyModeratorAboutCompletePost(ContentPostInterface $post): void
     {
         $this->notification->broadcastMessage(self::NOTIFICATION_POST_COMPLETE, [
-            'url'   => $this->urlHelper->getReadEntityUrl($post, Zone::Admin),
+            'url'   => $this->urlHelper->getReadEntityUrl($post, Zone::admin()),
             'label' => $post->getLabel(),
         ]);
     }

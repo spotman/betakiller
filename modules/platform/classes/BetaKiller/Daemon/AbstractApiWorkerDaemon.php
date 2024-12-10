@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Daemon;
@@ -22,6 +23,7 @@ use Throwable;
 use Thruway\ClientSession;
 use Thruway\Logging\Logger;
 use Thruway\Registration;
+
 use function React\Promise\resolve;
 
 abstract class AbstractApiWorkerDaemon extends AbstractDaemon
@@ -249,8 +251,8 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
         UserInterface $user
     ): ApiMethodResponse {
         return $this->apiFacade
-            ->getResource($resource, ApiResourceProxyInterface::INTERNAL)
-            ->call($method, $arguments, $user);
+            ->getProxy(ApiResourceProxyInterface::INTERNAL)
+            ->call($resource, $method, $arguments, $user);
     }
 
     private function makeApiError(Throwable $e, UserInterface $user = null): array

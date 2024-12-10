@@ -409,7 +409,7 @@ final class TwigExtension extends AbstractExtension
                 static function (array $context): bool {
                     $zoneName = $context[DefaultIFaceRenderer::IFACE_KEY_ROOT][DefaultIFaceRenderer::IFACE_KEY_ZONE];
 
-                    return $zoneName === Zone::Public->getName();
+                    return $zoneName === Zone::public()->getName();
                 },
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),

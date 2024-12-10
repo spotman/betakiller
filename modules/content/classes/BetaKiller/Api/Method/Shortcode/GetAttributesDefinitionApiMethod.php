@@ -1,27 +1,23 @@
 <?php
 namespace BetaKiller\Api\Method\Shortcode;
 
+use BetaKiller\Api\Method\EntityBasedApiMethodHelper;
 use BetaKiller\Content\Shortcode\ShortcodeFacade;
 use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
 
-class GetAttributesDefinitionApiMethod extends AbstractShortcodeApiMethod
+readonly class GetAttributesDefinitionApiMethod extends AbstractShortcodeApiMethod
 {
-    /**
-     * @var \BetaKiller\Content\Shortcode\ShortcodeFacade
-     */
-    private $facade;
-
     /**
      * ApproveApiMethod constructor.
      *
      * @param \BetaKiller\Content\Shortcode\ShortcodeFacade $facade
      */
-    public function __construct(ShortcodeFacade $facade)
+    public function __construct(private ShortcodeFacade $facade, EntityBasedApiMethodHelper $helper)
     {
-        $this->facade = $facade;
+        parent::__construct($helper);
     }
 
     /**

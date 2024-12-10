@@ -382,7 +382,7 @@ class UrlHelper implements UrlHelperInterface
      */
     public function getPreviewEntityUrl(DispatchableEntityInterface $entity): ?string
     {
-        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, Zone::Preview);
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, Zone::preview());
     }
 
     public function detectDummyRedirectTarget(DummyModelInterface $dummy): ?UrlElementInterface

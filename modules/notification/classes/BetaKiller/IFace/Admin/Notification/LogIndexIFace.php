@@ -123,9 +123,9 @@ final class LogIndexIFace extends AbstractAdminIFace
             'is_succeeded' => $item->isSucceeded(),
             'status'       => $item->getStatus(),
             'is_read'      => $item->isRead(),
-            'body_url'     => $urlHelper->getReadEntityUrl($item, Zone::Admin),
+            'body_url'     => $urlHelper->getReadEntityUrl($item, Zone::admin()),
             'retry_url'    => $item->isRetryAvailable()
-                ? $urlHelper->getEntityUrl($item, NotificationLogResource::ACTION_RETRY, Zone::Admin)
+                ? $urlHelper->getEntityUrl($item, NotificationLogResource::ACTION_RETRY, Zone::admin())
                 : null,
         ];
     }

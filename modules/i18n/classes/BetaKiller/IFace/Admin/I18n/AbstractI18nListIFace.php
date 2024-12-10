@@ -178,7 +178,7 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
         return [
             'key'   => $model->getI18nKeyName(),
             'value' => $model->hasAnyI18nValue() ? $model->getAnyI18nValue() : null,
-            'url'   => $helper->getReadEntityUrl($model, Zone::Admin),
+            'url'   => $helper->getReadEntityUrl($model, Zone::admin()),
         ];
     }
 }

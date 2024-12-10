@@ -5,6 +5,6 @@ namespace BetaKiller\Api\Method\Shortcode;
 
 use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
 
-abstract class AbstractShortcodeApiMethod extends AbstractEntityBasedApiMethod
+abstract readonly class AbstractShortcodeApiMethod extends AbstractEntityBasedApiMethod
 {
 }

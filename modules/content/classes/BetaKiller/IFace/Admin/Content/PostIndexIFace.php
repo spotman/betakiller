@@ -46,7 +46,7 @@ class PostIndexIFace extends AbstractContentAdminIFace
         foreach ($articles as $article) {
             $data[] = [
                 'id'    => $article->getID(),
-                'url'   => $urlHelper->getReadEntityUrl($article, Zone::Admin),
+                'url'   => $urlHelper->getReadEntityUrl($article, Zone::admin()),
                 'label' => $article->getLabel(),
             ];
         }

@@ -94,7 +94,7 @@ class ClaimRegistrationAction extends AbstractAction
             $this->facade->broadcastMessage(self::NOTIFICATION, [
                 'email'             => $log->getTargetString(),
                 'ip'                => ServerRequestHelper::getIpAddress($request),
-                'notification_url'  => $urlHelper->getReadEntityUrl($log, Zone::Admin),
+                'notification_url'  => $urlHelper->getReadEntityUrl($log, Zone::admin()),
                 'notification_hash' => $log->getHash(),
             ]);
 

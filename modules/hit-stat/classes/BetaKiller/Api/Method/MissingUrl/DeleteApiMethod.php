@@ -6,7 +6,7 @@ use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\UserInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-final class DeleteApiMethod extends AbstractEntityDeleteApiMethod
+final readonly class DeleteApiMethod extends AbstractEntityDeleteApiMethod
 {
     /**
      * @param \Spotman\Defence\DefinitionBuilderInterface $builder
