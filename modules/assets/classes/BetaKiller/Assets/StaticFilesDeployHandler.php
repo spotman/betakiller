@@ -66,6 +66,6 @@ readonly class StaticFilesDeployHandler implements RequestHandlerInterface
         $ext  = pathinfo($file, PATHINFO_EXTENSION);
         $mime = $this->types->getExtensionMimeType($ext);
 
-        return ResponseHelper::file($orig, $mime);
+        return ResponseHelper::file($orig, $mime)->withHeader('x-provided-by', 'backend');
     }
 }
