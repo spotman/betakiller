@@ -6,7 +6,7 @@ use BetaKiller\Repository\PhpExceptionRepository;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\Method\AbstractApiMethod;
 
-abstract class AbstractPhpExceptionApiMethod extends AbstractApiMethod
+abstract readonly class AbstractPhpExceptionApiMethod extends AbstractApiMethod
 {
     protected function findByHash(PhpExceptionRepository $repository, string $hash): PhpExceptionModelInterface
     {

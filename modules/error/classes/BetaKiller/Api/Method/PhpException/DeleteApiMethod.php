@@ -1,29 +1,24 @@
 <?php
+
 namespace BetaKiller\Api\Method\PhpException;
 
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 
-class DeleteApiMethod extends AbstractPhpExceptionApiMethod
+readonly class DeleteApiMethod extends AbstractPhpExceptionApiMethod
 {
     private const ARG_HASH = 'hash';
-
-    /**
-     * @var \BetaKiller\Repository\PhpExceptionRepository
-     */
-    private $repository;
 
     /**
      * DeleteApiMethod constructor.
      *
      * @param PhpExceptionRepository $repository
      */
-    public function __construct(PhpExceptionRepository $repository)
+    public function __construct(private PhpExceptionRepository $repository)
     {
-        $this->repository = $repository;
     }
 
     /**

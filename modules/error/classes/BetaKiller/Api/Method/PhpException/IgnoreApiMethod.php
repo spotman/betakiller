@@ -1,29 +1,24 @@
 <?php
+
 namespace BetaKiller\Api\Method\PhpException;
 
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 
-class IgnoreApiMethod extends AbstractPhpExceptionApiMethod
+readonly class IgnoreApiMethod extends AbstractPhpExceptionApiMethod
 {
     private const ARG_HASH = 'hash';
-
-    /**
-     * @var PhpExceptionRepository
-     */
-    private $repository;
 
     /**
      * IgnoreApiMethod constructor.
      *
      * @param \BetaKiller\Repository\PhpExceptionRepository $repository
      */
-    public function __construct(PhpExceptionRepository $repository)
+    public function __construct(private PhpExceptionRepository $repository)
     {
-        $this->repository = $repository;
     }
 
     /**

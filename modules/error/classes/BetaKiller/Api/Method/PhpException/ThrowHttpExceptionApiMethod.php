@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\Api\Method\PhpException;
 
 use BetaKiller\Exception\HttpException;
@@ -7,7 +8,7 @@ use Spotman\Api\ApiMethodResponse;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class ThrowHttpExceptionApiMethod extends AbstractPhpExceptionApiMethod
+readonly class ThrowHttpExceptionApiMethod extends AbstractPhpExceptionApiMethod
 {
     private const ARG_CODE = 'code';
 
