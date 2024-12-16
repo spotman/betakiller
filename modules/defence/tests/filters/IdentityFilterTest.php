@@ -23,8 +23,7 @@ class IdentityFilterTest extends AbstractFilterTest
     public function sanitizeData(): array
     {
         return [
-            // Remove tags
-            '<script>alert("Hello")</script> world' => 'alert(&#34;Hello&#34;) world',
+            '<script>alert("Hello")</script> world' => '&lt;script&gt;alert(&quot;Hello&quot;)&lt;/script&gt; world',
         ];
     }
 
@@ -43,6 +42,6 @@ class IdentityFilterTest extends AbstractFilterTest
 
     protected function makeInstance(): FilterInterface
     {
-        return new IdentityFilter;
+        return new IdentityFilter();
     }
 }
