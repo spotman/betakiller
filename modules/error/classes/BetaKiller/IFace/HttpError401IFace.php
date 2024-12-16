@@ -1,8 +1,9 @@
 <?php
+
 namespace BetaKiller\IFace;
 
 use BetaKiller\IFace\Auth\LoginIFace;
 
-class HttpError401IFace extends LoginIFace
+readonly class HttpError401IFace extends LoginIFace
 {
 }

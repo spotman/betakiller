@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\IFace\App\Content;
 
 use BetaKiller\Helper\AssetsHelper;
@@ -8,24 +9,17 @@ use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Url\BeforeRequestProcessingInterface;
 use BetaKiller\Url\Zone;
-use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PostItemIFace extends AbstractAppBase implements BeforeRequestProcessingInterface
+readonly class PostItemIFace extends AbstractAppBase implements BeforeRequestProcessingInterface
 {
-    /**
-     * @var \BetaKiller\Helper\AssetsHelper
-     */
-    private $assetsHelper;
-
     /**
      * PostItem constructor.
      *
      * @param \BetaKiller\Helper\AssetsHelper $assetsHelper
      */
-    public function __construct(AssetsHelper $assetsHelper)
+    public function __construct(private AssetsHelper $assetsHelper)
     {
-        $this->assetsHelper = $assetsHelper;
     }
 
     /**
@@ -77,8 +71,7 @@ class PostItemIFace extends AbstractAppBase implements BeforeRequestProcessingIn
 
     protected function getPostData(ContentPost $model): array
     {
-        $this->setLastModified($model->getApiLastModified());
-        $this->setExpiresInterval(new \DateInterval('P1D')); // One day
+//        $this->setLastModified($model->getApiLastModified());
 
         $thumbnails = [];
 
@@ -86,7 +79,7 @@ class PostItemIFace extends AbstractAppBase implements BeforeRequestProcessingIn
             $thumbnails[] = $this->assetsHelper->getAttributesForImgTag($thumb, $thumb::SIZE_ORIGINAL);
 
             // Get image last modified and set it to iface
-            $this->setLastModified($thumb->getLastModifiedAt());
+//            $this->setLastModified($thumb->getLastModifiedAt());
         }
 
         return [

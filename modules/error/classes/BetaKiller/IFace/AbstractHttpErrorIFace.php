@@ -6,7 +6,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
-abstract class AbstractHttpErrorIFace extends AbstractIFace
+abstract readonly class AbstractHttpErrorIFace extends AbstractIFace
 {
     public static function injectException(ServerRequestInterface $request, Throwable $e): ServerRequestInterface
     {

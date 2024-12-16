@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Action\Auth\Admin;
@@ -11,23 +12,16 @@ use BetaKiller\IFace\Auth\Admin\AuthRootIFace;
 use BetaKiller\Service\AuthService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Spotman\Defence\DefinitionBuilderInterface;
 
-class SessionRestartAction extends AbstractAction
+readonly class SessionRestartAction extends AbstractAction
 {
-    /**
-     * @var \BetaKiller\Service\AuthService
-     */
-    private $auth;
-
     /**
      * SessionRestartAction constructor.
      *
      * @param \BetaKiller\Service\AuthService $auth
      */
-    public function __construct(AuthService $auth)
+    public function __construct(private AuthService $auth)
     {
-        $this->auth = $auth;
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\Notification;
@@ -12,32 +13,12 @@ use BetaKiller\Notification\MessageRendererInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Repository\NotificationGroupRepositoryInterface;
 use BetaKiller\Url\Zone;
-use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
+
 use function http_build_query;
 
-class GroupListIFace extends AbstractAdminIFace
+readonly class GroupListIFace extends AbstractAdminIFace
 {
-    /**
-     * @var \BetaKiller\Repository\NotificationGroupRepository
-     */
-    private $groupRepo;
-
-    /**
-     * @var \BetaKiller\Config\NotificationConfigInterface
-     */
-    private $config;
-
-    /**
-     * @var \BetaKiller\Notification\MessageRendererInterface
-     */
-    private $messageRenderer;
-
-    /**
-     * @var \BetaKiller\Repository\LanguageRepositoryInterface
-     */
-    private $langRepo;
-
     /**
      * GroupListIFace constructor.
      *
@@ -47,15 +28,11 @@ class GroupListIFace extends AbstractAdminIFace
      * @param \BetaKiller\Notification\MessageRendererInterface           $messageRenderer
      */
     public function __construct(
-        NotificationGroupRepositoryInterface $groupRepo,
-        NotificationConfigInterface $config,
-        LanguageRepositoryInterface $langRepo,
-        MessageRendererInterface $messageRenderer
+        private NotificationGroupRepositoryInterface $groupRepo,
+        private NotificationConfigInterface $config,
+        private LanguageRepositoryInterface $langRepo,
+        private MessageRendererInterface $messageRenderer
     ) {
-        $this->groupRepo       = $groupRepo;
-        $this->config          = $config;
-        $this->messageRenderer = $messageRenderer;
-        $this->langRepo        = $langRepo;
     }
 
     /**
@@ -130,8 +107,10 @@ class GroupListIFace extends AbstractAdminIFace
             $langName = $language->getIsoCode();
 
             // Make matrix
-            $data[$langName] = $hasGeneralTemplate || $this->messageRenderer->hasLocalizedTemplate($messageCodename,
-                    $langName);
+            $data[$langName] = $hasGeneralTemplate || $this->messageRenderer->hasLocalizedTemplate(
+                    $messageCodename,
+                    $langName
+                );
         }
 
         return $data;

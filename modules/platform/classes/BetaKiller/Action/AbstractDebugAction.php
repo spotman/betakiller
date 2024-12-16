@@ -14,7 +14,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
-abstract class AbstractDebugAction extends AbstractAction
+abstract readonly class AbstractDebugAction extends AbstractAction
 {
     /**
      * AbstractDebugAction constructor.

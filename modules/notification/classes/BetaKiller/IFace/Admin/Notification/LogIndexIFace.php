@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\Notification;
@@ -13,10 +14,9 @@ use BetaKiller\Repository\NotificationLogRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Url\Parameter\Page;
 use BetaKiller\Url\Zone;
-use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class LogIndexIFace extends AbstractAdminIFace
+final readonly class LogIndexIFace extends AbstractAdminIFace
 {
     public const ARG_MESSAGE   = 'message';
     public const ARG_USER      = 'user';
@@ -24,25 +24,13 @@ final class LogIndexIFace extends AbstractAdminIFace
     public const ARG_TRANSPORT = 'transport';
 
     /**
-     * @var \BetaKiller\Repository\NotificationLogRepositoryInterface
-     */
-    private NotificationLogRepositoryInterface $logRepo;
-
-    /**
-     * @var \BetaKiller\Repository\UserRepositoryInterface
-     */
-    private UserRepositoryInterface $userRepo;
-
-    /**
      * LogIndexIFace constructor.
      *
      * @param \BetaKiller\Repository\NotificationLogRepositoryInterface $logRepo
      * @param \BetaKiller\Repository\UserRepositoryInterface            $userRepo
      */
-    public function __construct(NotificationLogRepositoryInterface $logRepo, UserRepositoryInterface $userRepo)
+    public function __construct(private NotificationLogRepositoryInterface $logRepo, private UserRepositoryInterface $userRepo)
     {
-        $this->logRepo  = $logRepo;
-        $this->userRepo = $userRepo;
     }
 
     /**

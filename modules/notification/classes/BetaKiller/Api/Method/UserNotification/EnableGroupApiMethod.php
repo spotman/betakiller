@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Api\Method\UserNotification;
@@ -6,7 +7,7 @@ namespace BetaKiller\Api\Method\UserNotification;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\UserInterface;
 
-class EnableGroupApiMethod extends AbstractUpdateGroupApiMethod
+readonly class EnableGroupApiMethod extends AbstractUpdateGroupApiMethod
 {
     protected function processGroup(NotificationGroupInterface $group, UserInterface $user): void
     {

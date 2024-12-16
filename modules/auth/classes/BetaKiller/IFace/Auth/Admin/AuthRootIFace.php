@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\IFace\Auth\Admin;
@@ -8,7 +9,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use Psr\Http\Message\ServerRequestInterface;
 
-class AuthRootIFace extends AbstractAdminIFace
+readonly class AuthRootIFace extends AbstractAdminIFace
 {
     /**
      * Returns data for View

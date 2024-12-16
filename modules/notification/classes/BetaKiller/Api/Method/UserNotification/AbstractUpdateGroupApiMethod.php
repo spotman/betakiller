@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Api\Method\UserNotification;
@@ -13,19 +14,9 @@ use Spotman\Api\Method\AbstractApiMethod;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-abstract class AbstractUpdateGroupApiMethod extends AbstractApiMethod
+abstract readonly class AbstractUpdateGroupApiMethod extends AbstractApiMethod
 {
     private const ARG_CODENAME = 'codename';
-
-    /**
-     * @var \BetaKiller\Repository\NotificationGroupRepository
-     */
-    private NotificationGroupRepository $repo;
-
-    /**
-     * @var \BetaKiller\Notification\NotificationFacade
-     */
-    private NotificationFacade $notification;
 
     /**
      * AbstractUpdateGroupApiMethod constructor.
@@ -33,10 +24,10 @@ abstract class AbstractUpdateGroupApiMethod extends AbstractApiMethod
      * @param \BetaKiller\Repository\NotificationGroupRepository $repo
      * @param \BetaKiller\Notification\NotificationFacade        $notification
      */
-    public function __construct(NotificationGroupRepository $repo, NotificationFacade $notification)
-    {
-        $this->repo = $repo;
-        $this->notification = $notification;
+    public function __construct(
+        private NotificationGroupRepository $repo,
+        private NotificationFacade $notification
+    ) {
     }
 
     /**

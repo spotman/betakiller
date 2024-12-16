@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\WebHooks;
@@ -9,18 +10,8 @@ use BetaKiller\Repository\WebHookRepositoryInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ListItemsIFace extends AbstractAdminIFace
+readonly class ListItemsIFace extends AbstractAdminIFace
 {
-    /**
-     * @var \BetaKiller\Repository\WebHookRepositoryInterface
-     */
-    private $webHookRepository;
-
-    /**
-     * @var \BetaKiller\Url\UrlElementTreeInterface
-     */
-    private $tree;
-
     /**
      * Index constructor.
      *
@@ -28,11 +19,9 @@ class ListItemsIFace extends AbstractAdminIFace
      * @param \BetaKiller\Url\UrlElementTreeInterface           $tree
      */
     public function __construct(
-        WebHookRepositoryInterface $webHookRepository,
-        UrlElementTreeInterface $tree
+        private WebHookRepositoryInterface $webHookRepository,
+        private UrlElementTreeInterface $tree
     ) {
-        $this->webHookRepository = $webHookRepository;
-        $this->tree              = $tree;
     }
 
     /**

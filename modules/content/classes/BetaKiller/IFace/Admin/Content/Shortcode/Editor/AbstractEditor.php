@@ -1,43 +1,18 @@
 <?php
+
 namespace BetaKiller\IFace\Admin\Content\Shortcode\Editor;
 
 use BetaKiller\Content\Shortcode\Editor\ShortcodeEditorFactory;
 use BetaKiller\Content\Shortcode\Editor\ShortcodeEditorInterface;
 use BetaKiller\Content\Shortcode\ShortcodeEntityInterface;
-use BetaKiller\Content\Shortcode\ShortcodeFacade;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Admin\Content\AbstractContentAdminIFace;
-use BetaKiller\Url\Container\UrlContainerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractEditor extends AbstractContentAdminIFace
+abstract readonly class AbstractEditor extends AbstractContentAdminIFace
 {
-    /**
-     * @var \BetaKiller\Content\Shortcode\ShortcodeEntityInterface
-     */
-    protected $shortcodeEntity;
-
-    /**
-     * @var \BetaKiller\Url\Container\UrlContainerInterface
-     */
-    protected $urlContainer;
-
-    /**
-     * @var \BetaKiller\Content\Shortcode\ShortcodeFacade
-     */
-    protected $shortcodeFacade;
-
-    /**
-     * @var \BetaKiller\Content\Shortcode\Editor\ShortcodeEditorFactory
-     */
-    private $editorFactory;
-
-    public function __construct(
-        ShortcodeEditorFactory $factory,
-        UrlContainerInterface $urlContainer,
-        ShortcodeFacade $facade
-    ) {
-        $this->editorFactory = $factory;
-        $this->urlContainer = $urlContainer;
-        $this->shortcodeFacade = $facade;
+    public function __construct(private ShortcodeEditorFactory $editorFactory)
+    {
     }
 
     /**
@@ -45,10 +20,13 @@ abstract class AbstractEditor extends AbstractContentAdminIFace
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
      */
-    protected function getShortcodeEditor(): ShortcodeEditorInterface
+    protected function getShortcodeEditor(ServerRequestInterface $request): ShortcodeEditorInterface
     {
-        $this->shortcodeEntity = $this->urlContainer->getEntity(ShortcodeEntityInterface::MODEL_NAME);
+        return $this->editorFactory->createFromEntity($this->getShortcodeEntity($request));
+    }
 
-        return $this->editorFactory->createFromEntity($this->shortcodeEntity);
+    private function getShortcodeEntity(ServerRequestInterface $request): ShortcodeEntityInterface
+    {
+        return ServerRequestHelper::getEntity($request, ShortcodeEntityInterface::MODEL_NAME);
     }
 }

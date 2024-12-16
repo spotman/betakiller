@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Action\Auth;
@@ -16,24 +17,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class SendRecoveryEmailAction extends AbstractAction implements PostRequestActionInterface
+readonly class SendRecoveryEmailAction extends AbstractAction implements PostRequestActionInterface
 {
     private const ARG_EMAIL = 'email';
-
-    /**
-     * @var \BetaKiller\Repository\UserRepositoryInterface
-     */
-    private $userRepo;
-
-    /**
-     * @var \BetaKiller\Service\AccessRecoveryService
-     */
-    private $recovery;
-
-    /**
-     * @var \BetaKiller\Security\CsrfService
-     */
-    private $csrf;
 
     /**
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
@@ -41,13 +27,10 @@ class SendRecoveryEmailAction extends AbstractAction implements PostRequestActio
      * @param \BetaKiller\Security\CsrfService               $csrf
      */
     public function __construct(
-        UserRepositoryInterface $userRepo,
-        AccessRecoveryService $recovery,
-        CsrfService $csrf
+        private UserRepositoryInterface $userRepo,
+        private AccessRecoveryService $recovery,
+        private CsrfService $csrf
     ) {
-        $this->userRepo = $userRepo;
-        $this->recovery = $recovery;
-        $this->csrf     = $csrf;
     }
 
     public function definePostArguments(DefinitionBuilderInterface $builder): void

@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\IFace\Auth;
 
 use BetaKiller\Auth\UserUrlDetectorInterface;
@@ -8,23 +9,17 @@ use BetaKiller\IFace\AbstractIFace;
 use BetaKiller\Url\BeforeRequestProcessingInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class LoginIFace extends AbstractIFace implements BeforeRequestProcessingInterface
+readonly class LoginIFace extends AbstractIFace implements BeforeRequestProcessingInterface
 {
     public const URL = '/login/';
-
-    /**
-     * @var \BetaKiller\Auth\UserUrlDetectorInterface
-     */
-    private $urlDetector;
 
     /**
      * LoginIFace constructor.
      *
      * @param \BetaKiller\Auth\UserUrlDetectorInterface $urlDetector
      */
-    public function __construct(UserUrlDetectorInterface $urlDetector)
+    public function __construct(private UserUrlDetectorInterface $urlDetector)
     {
-        $this->urlDetector = $urlDetector;
     }
 
     /**

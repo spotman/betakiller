@@ -7,7 +7,7 @@ use DateInterval;
 use DateTimeImmutable;
 use Psr\Http\Message\ServerRequestInterface;
 
-class HttpError503IFace extends AbstractHttpErrorIFace
+readonly class HttpError503IFace extends AbstractHttpErrorIFace
 {
     /**
      * Returns data for View

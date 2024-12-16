@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\IFace\Admin\Test;
 
 use BetaKiller\Exception\ServerErrorHttpException;
@@ -7,21 +8,15 @@ use BetaKiller\IFace\Admin\Error\AbstractErrorAdminIFace;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
-class PhpExceptionLoggerIFace extends AbstractErrorAdminIFace
+readonly class PhpExceptionLoggerIFace extends AbstractErrorAdminIFace
 {
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    protected $logger;
-
     /**
      * PhpExceptionLogger constructor.
      *
      * @param \Psr\Log\LoggerInterface $logger
      */
-    public function __construct(LoggerInterface $logger)
+    public function __construct(private LoggerInterface $logger)
     {
-        $this->logger = $logger;
     }
 
     /**

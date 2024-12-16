@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\IFace\Admin\Error;
 
 use BetaKiller\Helper\ServerRequestHelper;
@@ -8,21 +9,15 @@ use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PhpExceptionItemIFace extends AbstractErrorAdminIFace
+readonly class PhpExceptionItemIFace extends AbstractErrorAdminIFace
 {
-    /**
-     * @var \BetaKiller\Repository\UserRepositoryInterface
-     */
-    private $userRepo;
-
     /**
      * PhpExceptionItem constructor.
      *
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
      */
-    public function __construct(UserRepositoryInterface $userRepo)
+    public function __construct(private UserRepositoryInterface $userRepo)
     {
-        $this->userRepo = $userRepo;
     }
 
     /**

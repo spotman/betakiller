@@ -3,6 +3,7 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Url\IFaceModelInterface;
+use DateInterval;
 
 /**
  * Class IFace
@@ -155,6 +156,20 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      * @return string|null
      */
     public function getMenuCounterCodename(): ?string
+    {
+        // realization temporarily is absent.
+        // at this moment there is no need to store IFace data in database.
+        return null;
+    }
+
+    public function isCacheEnabled(): bool
+    {
+        // realization temporarily is absent.
+        // at this moment there is no need to store IFace data in database.
+        return false;
+    }
+
+    public function getExpiresInterval(): ?DateInterval
     {
         // realization temporarily is absent.
         // at this moment there is no need to store IFace data in database.

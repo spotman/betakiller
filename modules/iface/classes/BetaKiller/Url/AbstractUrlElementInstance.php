@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Url;
 
-abstract class AbstractUrlElementInstance implements UrlElementInstanceInterface
+abstract readonly class AbstractUrlElementInstance implements UrlElementInstanceInterface
 {
     /**
      * @return string

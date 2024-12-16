@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\WebHooks;
@@ -13,36 +14,18 @@ use BetaKiller\Model\WebHookModelInterface;
 use BetaKiller\Repository\WebHookLogRepository;
 use Psr\Http\Message\ServerRequestInterface;
 
-class InfoItemIFace extends AbstractAdminIFace
+readonly class InfoItemIFace extends AbstractAdminIFace
 {
-    /**
-     * @var \BetaKiller\Factory\WebHookFactory
-     */
-    private $factory;
-
-    /**
-     * @var \BetaKiller\Repository\WebHookLogRepository
-     */
-    private $logRepo;
-
-    /**
-     * @var \BetaKiller\IdentityConverterInterface
-     */
-    private $converter;
-
     /**
      * @param \BetaKiller\Factory\WebHookFactory          $factory
      * @param \BetaKiller\Repository\WebHookLogRepository $logRepo
      * @param \BetaKiller\IdentityConverterInterface      $converter
      */
     public function __construct(
-        WebHookFactory $factory,
-        WebHookLogRepository $logRepo,
-        IdentityConverterInterface $converter
+        private WebHookFactory $factory,
+        private WebHookLogRepository $logRepo,
+        private IdentityConverterInterface $converter
     ) {
-        $this->factory   = $factory;
-        $this->logRepo   = $logRepo;
-        $this->converter = $converter;
     }
 
     /**

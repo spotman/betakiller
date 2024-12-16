@@ -17,6 +17,7 @@ use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Session\SessionStorageInterface;
+use Laminas\Diactoros\Response\EmptyResponse;
 use Mezzio\Session\SessionInterface;
 use Spotman\Acl\AclInterface;
 
@@ -115,6 +116,12 @@ class AuthService
     public function getSession(string $sessionID): SessionInterface
     {
         return $this->sessionStorage->getByToken($sessionID);
+    }
+
+    public function persistSession(SessionInterface $session): void
+    {
+        // Yep, it`s ugly, thanks to vendor lib
+        $this->sessionStorage->persistSession($session, new EmptyResponse());
     }
 
     /**

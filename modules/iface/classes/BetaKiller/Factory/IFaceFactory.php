@@ -46,9 +46,6 @@ class IFaceFactory
 
         $codename = $model->getCodename();
 
-        /** @var \BetaKiller\IFace\IFaceInterface $instance */
-        $instance = $this->factory->create($codename);
-
-        return $instance->setModel($model);
+        return $this->factory->create($codename);
     }
 }

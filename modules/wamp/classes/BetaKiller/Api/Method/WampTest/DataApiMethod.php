@@ -10,7 +10,7 @@ use Spotman\Api\Method\AbstractApiMethod;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class DataApiMethod extends AbstractApiMethod
+readonly class DataApiMethod extends AbstractApiMethod
 {
     public const ARG_CASE = 'case';
 

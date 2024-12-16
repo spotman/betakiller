@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Action;
@@ -8,26 +9,19 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\TextHelper;
 use BetaKiller\Model\NotificationLogInterface;
-use BetaKiller\Model\RoleInterface;
 use BetaKiller\Repository\NotificationLogRepositoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class MarkNotificationAsReadAction extends AbstractAction
+readonly final class MarkNotificationAsReadAction extends AbstractAction
 {
-    /**
-     * @var \BetaKiller\Repository\NotificationLogRepositoryInterface
-     */
-    private NotificationLogRepositoryInterface $logRepo;
-
     /**
      * MarkNotificationAsReadAction constructor.
      *
      * @param \BetaKiller\Repository\NotificationLogRepositoryInterface $logRepo
      */
-    public function __construct(NotificationLogRepositoryInterface $logRepo)
+    public function __construct(private NotificationLogRepositoryInterface $logRepo)
     {
-        $this->logRepo = $logRepo;
     }
 
     /**
@@ -73,7 +67,9 @@ final class MarkNotificationAsReadAction extends AbstractAction
      */
     private function makePixel(): ResponseInterface
     {
-        $pixel = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII=');
+        $pixel = base64_decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII='
+        );
 
         return ResponseHelper::fileContent($pixel, 'image/png');
     }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Action\Admin\I18n;
@@ -16,41 +17,15 @@ use BetaKiller\I18n\PluralBagFormatterInterface;
 use BetaKiller\Model\I18nKeyModelInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Url\Zone;
-use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class AbstractUpdateItemAction extends AbstractAction implements PostRequestActionInterface
+readonly class AbstractUpdateItemAction extends AbstractAction implements PostRequestActionInterface
 {
     private const ARG_I18N_VALUES      = 'values';
     private const ARG_LANG_NAME        = 'name';
     private const ARG_TRANSLATED_VALUE = 'value';
-
-    /**
-     * @var \BetaKiller\I18n\I18nFacade
-     */
-    private $i18nFacade;
-
-    /**
-     * @var \BetaKiller\Repository\LanguageRepositoryInterface
-     */
-    private $langRepo;
-
-    /**
-     * @var \BetaKiller\I18n\PluralBagFormatterInterface
-     */
-    private $formatter;
-
-    /**
-     * @var \BetaKiller\I18n\PluralBagFactoryInterface
-     */
-    private $pluralFactory;
-
-    /**
-     * @var \BetaKiller\EntityManager
-     */
-    private $entityManager;
 
     /**
      * AbstractUpdateItemAction constructor.
@@ -62,17 +37,12 @@ class AbstractUpdateItemAction extends AbstractAction implements PostRequestActi
      * @param \BetaKiller\I18n\PluralBagFactoryInterface         $pluralFactory
      */
     public function __construct(
-        EntityManager $entityManager,
-        I18nFacade $i18nFacade,
-        LanguageRepositoryInterface $langRepo,
-        PluralBagFormatterInterface $formatter,
-        PluralBagFactoryInterface $pluralFactory
+        private EntityManager $entityManager,
+        private I18nFacade $i18nFacade,
+        private LanguageRepositoryInterface $langRepo,
+        private PluralBagFormatterInterface $formatter,
+        private PluralBagFactoryInterface $pluralFactory
     ) {
-        $this->entityManager = $entityManager;
-        $this->i18nFacade    = $i18nFacade;
-        $this->langRepo      = $langRepo;
-        $this->formatter     = $formatter;
-        $this->pluralFactory = $pluralFactory;
     }
 
     public function definePostArguments(DefinitionBuilderInterface $builder): void

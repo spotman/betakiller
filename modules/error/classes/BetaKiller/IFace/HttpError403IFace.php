@@ -1,6 +1,6 @@
 <?php
 namespace BetaKiller\IFace;
 
-final class HttpError403IFace extends AbstractHttpErrorIFace
+final readonly class HttpError403IFace extends AbstractHttpErrorIFace
 {
 }

@@ -1,9 +1,10 @@
 <?php
+
 namespace BetaKiller\IFace\Admin;
 
 use Psr\Http\Message\ServerRequestInterface;
 
-final class IndexIFace extends AbstractAdminIFace
+final readonly class IndexIFace extends AbstractAdminIFace
 {
     /**
      * Returns data for View

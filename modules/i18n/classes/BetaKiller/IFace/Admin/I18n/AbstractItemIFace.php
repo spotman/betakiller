@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\I18n;
@@ -11,26 +12,10 @@ use BetaKiller\Model\I18nKeyInterface;
 use BetaKiller\Model\I18nKeyModelInterface;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
-use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractItemIFace extends AbstractAdminIFace
+abstract readonly class AbstractItemIFace extends AbstractAdminIFace
 {
-    /**
-     * @var \BetaKiller\Repository\LanguageRepositoryInterface
-     */
-    private $langRepo;
-
-    /**
-     * @var \BetaKiller\I18n\I18nFacade
-     */
-    private $facade;
-
-    /**
-     * @var \BetaKiller\I18n\PluralBagFormatterInterface
-     */
-    private $plural;
-
     /**
      * CommonItemIFace constructor.
      *
@@ -39,13 +24,10 @@ abstract class AbstractItemIFace extends AbstractAdminIFace
      * @param \BetaKiller\I18n\PluralBagFormatterInterface       $plural
      */
     public function __construct(
-        I18nFacade $facade,
-        LanguageRepositoryInterface $langRepo,
-        PluralBagFormatterInterface $plural
+        private I18nFacade $facade,
+        private LanguageRepositoryInterface $langRepo,
+        private PluralBagFormatterInterface $plural
     ) {
-        $this->langRepo = $langRepo;
-        $this->facade   = $facade;
-        $this->plural   = $plural;
     }
 
     /**

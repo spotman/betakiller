@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\I18n;
@@ -13,42 +14,23 @@ use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Repository\I18nKeyRepositoryInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Url\Zone;
-use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
-abstract class AbstractI18nListIFace extends AbstractAdminIFace
+abstract readonly class AbstractI18nListIFace extends AbstractAdminIFace
 {
     /**
-     * @var \BetaKiller\Repository\I18nKeyRepositoryInterface
-     */
-    private I18nKeyRepositoryInterface $keyRepo;
-
-    /**
-     * @var \BetaKiller\Repository\LanguageRepositoryInterface
-     */
-    private LanguageRepositoryInterface $langRepo;
-
-    /**
-     * @var \BetaKiller\I18n\I18nConfigInterface
-     */
-    private I18nConfigInterface $i18nConfig;
-
-    /**
-     * CommonListIFace constructor.
+     * AbstractI18nListIFace constructor.
      *
      * @param \BetaKiller\Repository\I18nKeyRepositoryInterface  $keyRepo
      * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
      * @param \BetaKiller\I18n\I18nConfigInterface               $i18nConfig
      */
     public function __construct(
-        I18nKeyRepositoryInterface $keyRepo,
-        LanguageRepositoryInterface $langRepo,
-        I18nConfigInterface $i18nConfig
+        private I18nKeyRepositoryInterface $keyRepo,
+        private LanguageRepositoryInterface $langRepo,
+        private I18nConfigInterface $i18nConfig
     ) {
-        $this->keyRepo    = $keyRepo;
-        $this->langRepo   = $langRepo;
-        $this->i18nConfig = $i18nConfig;
     }
 
     /**
@@ -74,7 +56,7 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
         return [
             'display' => [
                 'current' => $displayType,
-                'list' => $this->getDisplayList($currentUri, $filterLang),
+                'list'    => $this->getDisplayList($currentUri, $filterLang),
             ],
             'filter'  => [
                 'self'    => (string)$currentUri->withQuery(''),
@@ -113,15 +95,15 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
             : '?';
 
         return [
-            'rich' => [
-                'name' => 'rich',
+            'rich'  => [
+                'name'  => 'rich',
                 'label' => 'Rich',
-                'url' => (string)$currentUri->withQuery($baseQuery . 'display=rich'),
+                'url'   => (string)$currentUri->withQuery($baseQuery.'display=rich'),
             ],
             'plain' => [
-                'name' => 'plain',
+                'name'  => 'plain',
                 'label' => 'Plain',
-                'url' => (string)$currentUri->withQuery($baseQuery . 'display=plain'),
+                'url'   => (string)$currentUri->withQuery($baseQuery.'display=plain'),
             ],
         ];
     }

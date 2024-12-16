@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Acl\EntityPermissionResolverInterface;
@@ -11,28 +12,8 @@ use BetaKiller\Repository\EntityRepository;
 use BetaKiller\Repository\ShortcodeRepository;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class PostItemIFace extends AbstractContentAdminIFace
+final readonly class PostItemIFace extends AbstractContentAdminIFace
 {
-    /**
-     * @var \BetaKiller\Helper\AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
-     * @var \BetaKiller\Repository\ShortcodeRepository
-     */
-    private $shortcodeRepo;
-
-    /**
-     * @var \BetaKiller\Repository\EntityRepository
-     */
-    private $entityRepo;
-
-    /**
-     * @var \BetaKiller\Acl\EntityPermissionResolverInterface
-     */
-    private $entityPermissionResolver;
-
     /**
      * PostItem constructor.
      *
@@ -42,15 +23,11 @@ final class PostItemIFace extends AbstractContentAdminIFace
      * @param \BetaKiller\Repository\EntityRepository           $entityRepo
      */
     public function __construct(
-        EntityPermissionResolverInterface $entityPermissionResolver,
-        AssetsHelper $assetsHelper,
-        ShortcodeRepository $shortcodeRepo,
-        EntityRepository $entityRepo
+        private EntityPermissionResolverInterface $entityPermissionResolver,
+        private AssetsHelper $assetsHelper,
+        private ShortcodeRepository $shortcodeRepo,
+        private EntityRepository $entityRepo
     ) {
-        $this->assetsHelper             = $assetsHelper;
-        $this->shortcodeRepo            = $shortcodeRepo;
-        $this->entityRepo               = $entityRepo;
-        $this->entityPermissionResolver = $entityPermissionResolver;
     }
 
     /**
@@ -100,7 +77,7 @@ final class PostItemIFace extends AbstractContentAdminIFace
                 'title'       => $post->getTitle(),
                 'description' => $post->getDescription(),
 
-                'needsCategory'   => $post->needsCategory(),
+                'needsCategory'     => $post->needsCategory(),
                 'is_update_allowed' => $updateAllowed,
 
                 'status' => [

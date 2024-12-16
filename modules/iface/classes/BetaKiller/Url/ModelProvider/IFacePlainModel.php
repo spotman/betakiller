@@ -1,10 +1,13 @@
 <?php
+
 namespace BetaKiller\Url\ModelProvider;
 
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementForMenuPlainModelTrait;
+use Carbon\CarbonInterval;
+use DateInterval;
 
 final class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFaceModelInterface
 {
@@ -12,23 +15,18 @@ final class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implemen
 
     public const OPTION_TITLE = 'title';
 
-    /**
-     * @var string
-     */
-    private $label;
+    private ?string $label = null;
+
+    private ?string $title = null;
+
+    private ?string $layoutCodename = null;
+
+    private bool $cache = false;
+
+    private ?DateInterval $expiresIn = null;
 
     /**
-     * @var string
-     */
-    private $title;
-
-    /**
-     * @var string|null
-     */
-    private $layoutCodename;
-
-    /**
-     * @return string
+     * @inheritDoc
      */
     public static function getXmlTagName(): string
     {
@@ -36,19 +34,15 @@ final class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implemen
     }
 
     /**
-     * Returns label for using in breadcrumbs and etc
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getLabel(): string
     {
-        return $this->label ?: '';
+        return $this->label ?? '';
     }
 
     /**
-     * @param string $value
-     *
-     * @throws \BetaKiller\Exception\NotImplementedHttpException
+     * @inheritDoc
      */
     public function setLabel(string $value): void
     {
@@ -56,12 +50,7 @@ final class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implemen
     }
 
     /**
-     * Sets title for using in <title> tag
-     *
-     * @param string $value
-     *
-     * @return SeoMetaInterface
-     * @throws \BetaKiller\Exception\NotImplementedHttpException
+     * @inheritDoc
      */
     public function setTitle(string $value): SeoMetaInterface
     {
@@ -69,12 +58,7 @@ final class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implemen
     }
 
     /**
-     * Sets description for using in <meta> tag
-     *
-     * @param string $value
-     *
-     * @return SeoMetaInterface
-     * @throws \BetaKiller\Exception\NotImplementedHttpException
+     * @inheritDoc
      */
     public function setDescription(string $value): SeoMetaInterface
     {
@@ -82,9 +66,7 @@ final class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implemen
     }
 
     /**
-     * Returns title for using in page <title> tag
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getTitle(): ?string
     {
@@ -92,14 +74,28 @@ final class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implemen
     }
 
     /**
-     * Returns description for using in <meta> tag
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getDescription(): ?string
     {
         // Admin IFace does not need description
         return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isCacheEnabled(): bool
+    {
+        return $this->cache;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getExpiresInterval(): ?DateInterval
+    {
+        return $this->expiresIn;
     }
 
     /**
@@ -113,13 +109,15 @@ final class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implemen
             self::OPTION_LABEL  => $this->getLabel(),
             self::OPTION_TITLE  => $this->getTitle(),
             self::OPTION_LAYOUT => $this->getLayoutCodename(),
+
+            self::OPTION_CACHE => $this->cache
+                ? CarbonInterval::instance($this->expiresIn)->spec()
+                : null,
         ]);
     }
 
     /**
-     * Returns layout codename
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getLayoutCodename(): ?string
     {
@@ -131,8 +129,20 @@ final class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implemen
         $this->label = $data[self::OPTION_LABEL] ?? null;
         $this->title = $data[self::OPTION_TITLE] ?? null;
 
-        if (isset($data[self::OPTION_LAYOUT])) {
-            $this->layoutCodename = (string)$data[self::OPTION_LAYOUT];
+        $layout = $data[self::OPTION_LAYOUT] ?? null;
+
+        if ($layout) {
+            $this->layoutCodename = (string)$layout;
+        }
+
+        $cache = $data[self::OPTION_CACHE] ?? null;
+
+        if ($cache && $cache !== 'false') {
+            $this->cache = true;
+
+            $this->expiresIn = $cache !== 'true'
+                ? new DateInterval($cache)
+                : null;
         }
 
         $this->menuFromArray($data);

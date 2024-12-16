@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\Notification;
@@ -8,7 +9,7 @@ use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Model\NotificationLogInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class LogItemIFace extends AbstractAdminIFace
+readonly class LogItemIFace extends AbstractAdminIFace
 {
     /**
      * Returns data for View

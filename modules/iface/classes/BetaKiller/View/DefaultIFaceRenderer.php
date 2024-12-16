@@ -9,6 +9,7 @@ use BetaKiller\Repository\IFaceLayoutRepository;
 use BetaKiller\Repository\RepositoryException;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementException;
+use LogicException;
 use Psr\Http\Message\ServerRequestInterface;
 
 readonly class DefaultIFaceRenderer implements IFaceRendererInterface
@@ -41,13 +42,15 @@ readonly class DefaultIFaceRenderer implements IFaceRendererInterface
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return string
-     * @throws \BetaKiller\I18n\I18nException
-     * @throws \BetaKiller\Url\UrlElementException
-     * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function render(IFaceInterface $iface, ServerRequestInterface $request): string
     {
-        $model    = $iface->getModel();
+        $model = $this->elementHelper->getInstanceModel($iface);
+
+        if (!$model instanceof IFaceModelInterface) {
+            throw new LogicException();
+        }
+
         $codename = $model->getCodename();
 
         $dataPack = RequestProfiler::begin($request, $codename.' IFace data');

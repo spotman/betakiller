@@ -4,7 +4,7 @@ namespace BetaKiller\IFace\Admin\Content;
 use BetaKiller\Helper\ContentUrlContainerHelper;
 use Psr\Http\Message\ServerRequestInterface;
 
-class CommentItemIFace extends AbstractContentAdminIFace
+readonly class CommentItemIFace extends AbstractContentAdminIFace
 {
     /**
      * Returns data for View

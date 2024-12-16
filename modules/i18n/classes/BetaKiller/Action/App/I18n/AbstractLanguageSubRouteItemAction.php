@@ -16,7 +16,7 @@ use BetaKiller\Url\UrlElementStack;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractLanguageSubRouteItemAction extends AbstractAction implements AfterUrlDispatchingInterface
+abstract readonly class AbstractLanguageSubRouteItemAction extends AbstractAction implements AfterUrlDispatchingInterface
 {
     /**
      * @inheritDoc

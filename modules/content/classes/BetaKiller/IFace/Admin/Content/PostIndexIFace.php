@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\ServerRequestHelper;
@@ -6,21 +7,15 @@ use BetaKiller\Repository\ContentPostRepository;
 use BetaKiller\Url\Zone;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PostIndexIFace extends AbstractContentAdminIFace
+readonly class PostIndexIFace extends AbstractContentAdminIFace
 {
-    /**
-     * @var \BetaKiller\Repository\ContentPostRepository
-     */
-    private $postRepo;
-
     /**
      * PostIndex constructor.
      *
      * @param \BetaKiller\Repository\ContentPostRepository $postRepo
      */
-    public function __construct(ContentPostRepository $postRepo)
+    public function __construct(private ContentPostRepository $postRepo)
     {
-        $this->postRepo = $postRepo;
     }
 
     /**

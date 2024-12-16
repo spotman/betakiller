@@ -25,30 +25,10 @@ use Spotman\Defence\DefinitionBuilderInterface;
  *
  * @package BetaKiller\Auth
  */
-class RegularLoginAction extends AbstractAction implements PostRequestActionInterface
+readonly class RegularLoginAction extends AbstractAction implements PostRequestActionInterface
 {
     private const ARG_LOGIN    = 'user-login';
     private const ARG_PASSWORD = 'user-password';
-
-    /**
-     * @var \BetaKiller\Service\AuthService
-     */
-    private $auth;
-
-    /**
-     * @var \BetaKiller\Repository\UserRepositoryInterface
-     */
-    private $userRepo;
-
-    /**
-     * @var \BetaKiller\MessageBus\EventBusInterface
-     */
-    private $eventBus;
-
-    /**
-     * @var \BetaKiller\Security\CsrfService
-     */
-    private $csrf;
 
     /**
      * RegularLoginAction constructor.
@@ -59,15 +39,11 @@ class RegularLoginAction extends AbstractAction implements PostRequestActionInte
      * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
     public function __construct(
-        AuthService $auth,
-        UserRepositoryInterface $userRepo,
-        CsrfService $csrf,
-        EventBusInterface $eventBus
+        private AuthService $auth,
+        private UserRepositoryInterface $userRepo,
+        private CsrfService $csrf,
+        private EventBusInterface $eventBus
     ) {
-        $this->auth     = $auth;
-        $this->userRepo = $userRepo;
-        $this->eventBus = $eventBus;
-        $this->csrf     = $csrf;
     }
 
     /**

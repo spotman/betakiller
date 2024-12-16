@@ -36,6 +36,7 @@
     "middlewares/negotiation": "^2.1",
     "mmamedov/page-cache": "^2.0",
     "monolog/monolog": "^2.2",
+    "nesbot/carbon": "^3.8",
     "php-di/php-di": "^7.0",
     "php-http/guzzle7-adapter": "^1.0",
     "php-http/message": "^1.7",
@@ -64,13 +65,13 @@
     "voryx/thruway": "^0.5.3"
   },
   "require-dev": {
-    "codedungeon/phpunit-result-printer": "^0.32.0",
     "deployer/deployer": "^v6.9.0",
+    "diablomedia/phpunit-pretty-printer": "^5.0",
     "jolicode/jolinotif": "^2.0",
     "kint-php/kint": "^4.2.3",
     "kint-php/kint-twig": "^3.0",
     "phpspec/prophecy-phpunit": "^2.0",
-    "phpstan/phpstan": "^0.12",
+    "phpstan/phpstan": "^2.0",
     "phpunit/php-code-coverage": "^9.2",
     "phpunit/phpunit": "^9.4",
     "roave/security-advisories": "dev-master",

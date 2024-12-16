@@ -183,7 +183,9 @@ class DatabaseSessionStorage implements SessionStorageInterface
      */
     public function getUserSessions(UserInterface $user): array
     {
-        return $this->sessionRepo->getUserSessions($user);
+        $sessionModels = $this->sessionRepo->getUserSessions($user);
+
+        return array_map(fn(UserSessionInterface $model) => $this->restoreSession($model), $sessionModels);
     }
 
     /**

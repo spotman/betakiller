@@ -7,7 +7,7 @@ namespace BetaKiller\Action;
 use BetaKiller\Helper\SessionHelper;
 use Mezzio\Session\SessionInterface;
 
-final class DisableDebugAction extends AbstractDebugAction
+final readonly class DisableDebugAction extends AbstractDebugAction
 {
     protected function updateState(SessionInterface $session): void
     {

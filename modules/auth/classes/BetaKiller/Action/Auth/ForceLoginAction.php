@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Action\Auth;
@@ -26,38 +27,8 @@ use Spotman\Acl\AclInterface;
  *
  * @package BetaKiller\Auth
  */
-final class ForceLoginAction extends AbstractAction
+final readonly class ForceLoginAction extends AbstractAction
 {
-    /**
-     * @var \BetaKiller\Service\AuthService
-     */
-    private AuthService $auth;
-
-    /**
-     * @var \BetaKiller\MessageBus\EventBusInterface
-     */
-    private EventBusInterface $eventBus;
-
-    /**
-     * @var \BetaKiller\Auth\UserUrlDetectorInterface
-     */
-    private UserUrlDetectorInterface $urlDetector;
-
-    /**
-     * @var \BetaKiller\Repository\UserRepositoryInterface
-     */
-    private UserRepositoryInterface $userRepo;
-
-    /**
-     * @var \BetaKiller\Env\AppEnvInterface
-     */
-    private AppEnvInterface $appEnv;
-
-    /**
-     * @var \Spotman\Acl\AclInterface
-     */
-    private AclInterface $acl;
-
     /**
      * ForceLoginAction constructor.
      *
@@ -69,19 +40,13 @@ final class ForceLoginAction extends AbstractAction
      * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
     public function __construct(
-        AppEnvInterface $appEnv,
-        AuthService $auth,
-        UserRepositoryInterface $userRepo,
-        UserUrlDetectorInterface $urlDetector,
-        AclInterface $acl,
-        EventBusInterface $eventBus
+        private AppEnvInterface $appEnv,
+        private AuthService $auth,
+        private UserRepositoryInterface $userRepo,
+        private UserUrlDetectorInterface $urlDetector,
+        private AclInterface $acl,
+        private EventBusInterface $eventBus
     ) {
-        $this->appEnv      = $appEnv;
-        $this->auth        = $auth;
-        $this->userRepo    = $userRepo;
-        $this->eventBus    = $eventBus;
-        $this->urlDetector = $urlDetector;
-        $this->acl         = $acl;
     }
 
     /**
@@ -89,10 +54,13 @@ final class ForceLoginAction extends AbstractAction
      *
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Auth\AccessDeniedException
-     * @throws \BetaKiller\Auth\UserBlockedException
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
      * @throws \BetaKiller\Auth\IncorrectCredentialsException
+     * @throws \BetaKiller\Auth\UserBlockedException
      * @throws \BetaKiller\Exception\ValidationException
+     * @throws \BetaKiller\MessageBus\MessageBusException
      * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Url\Container\UrlContainerException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -117,7 +85,7 @@ final class ForceLoginAction extends AbstractAction
         $user = $this->userRepo->findByUsername($userName->getValue());
 
         if (!$user) {
-            throw new IncorrectCredentialsException;
+            throw new IncorrectCredentialsException();
         }
 
         $this->auth->login($session, $user);

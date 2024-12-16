@@ -5,6 +5,6 @@ namespace BetaKiller\Api\Resource;
 
 use Spotman\Api\AbstractApiResource;
 
-class WampTestApiResource extends AbstractApiResource
+readonly class WampTestApiResource extends AbstractApiResource
 {
 }

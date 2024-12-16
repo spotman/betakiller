@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\ServerRequestHelper;
@@ -7,24 +8,17 @@ use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\ContentCommentRepository;
 use BetaKiller\Url\Zone;
-use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractCommentList extends AbstractContentAdminIFace
+abstract readonly class AbstractCommentList extends AbstractContentAdminIFace
 {
-    /**
-     * @var \BetaKiller\Repository\ContentCommentRepository
-     */
-    private $commentRepo;
-
     /**
      * AbstractCommentList constructor.
      *
-     * @param \BetaKiller\Repository\ContentCommentRepository $commentRepository
+     * @param \BetaKiller\Repository\ContentCommentRepository $commentRepo
      */
-    public function __construct(ContentCommentRepository $commentRepository)
+    public function __construct(private ContentCommentRepository $commentRepo)
     {
-        $this->commentRepo = $commentRepository;
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Action\Auth;
@@ -11,18 +12,8 @@ use BetaKiller\Workflow\UserWorkflow;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class SuspendAction extends AbstractAction
+readonly class SuspendAction extends AbstractAction
 {
-    /**
-     * @var \BetaKiller\Auth\UserUrlDetectorInterface
-     */
-    private $urlDetector;
-
-    /**
-     * @var \BetaKiller\Workflow\UserWorkflow
-     */
-    private $userWorkflow;
-
     /**
      * SuspendApiMethod constructor.
      *
@@ -30,11 +21,9 @@ class SuspendAction extends AbstractAction
      * @param \BetaKiller\Auth\UserUrlDetectorInterface $urlDetector
      */
     public function __construct(
-        UserWorkflow $userWorkflow,
-        UserUrlDetectorInterface $urlDetector
+        private UserWorkflow $userWorkflow,
+        private UserUrlDetectorInterface $urlDetector
     ) {
-        $this->userWorkflow = $userWorkflow;
-        $this->urlDetector  = $urlDetector;
     }
 
     /**

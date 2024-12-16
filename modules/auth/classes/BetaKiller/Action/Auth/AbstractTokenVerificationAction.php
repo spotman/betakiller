@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Action\Auth;
@@ -18,36 +19,18 @@ use BetaKiller\Service\TokenService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractTokenVerificationAction extends AbstractAction
+abstract readonly class AbstractTokenVerificationAction extends AbstractAction
 {
-    /**
-     * @var \BetaKiller\Service\TokenService
-     */
-    private $tokenService;
-
-    /**
-     * @var \BetaKiller\Service\AuthService
-     */
-    private $auth;
-
-    /**
-     * @var \BetaKiller\Auth\UserUrlDetectorInterface
-     */
-    private $urlDetector;
-
     /**
      * @param \BetaKiller\Service\TokenService          $tokenService
      * @param \BetaKiller\Service\AuthService           $auth
      * @param \BetaKiller\Auth\UserUrlDetectorInterface $urlDetector
      */
     public function __construct(
-        TokenService $tokenService,
-        AuthService $auth,
-        UserUrlDetectorInterface $urlDetector
+        private TokenService $tokenService,
+        private AuthService $auth,
+        private UserUrlDetectorInterface $urlDetector
     ) {
-        $this->tokenService = $tokenService;
-        $this->auth         = $auth;
-        $this->urlDetector  = $urlDetector;
     }
 
     /**

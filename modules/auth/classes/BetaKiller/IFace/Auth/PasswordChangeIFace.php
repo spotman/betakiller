@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\IFace\Auth;
 
 use BetaKiller\Action\Auth\ChangePasswordAction;
@@ -9,19 +10,9 @@ use BetaKiller\IFace\AbstractIFace;
 use BetaKiller\Security\CsrfService;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PasswordChangeIFace extends AbstractIFace
+readonly class PasswordChangeIFace extends AbstractIFace
 {
     public const FLASH_STATUS = 'password_changed';
-
-    /**
-     * @var \BetaKiller\Auth\UserUrlDetectorInterface
-     */
-    private $urlDetector;
-
-    /**
-     * @var \BetaKiller\Security\CsrfService
-     */
-    private $csrf;
 
     /**
      * PasswordChangeIFace constructor.
@@ -29,10 +20,8 @@ class PasswordChangeIFace extends AbstractIFace
      * @param \BetaKiller\Auth\UserUrlDetectorInterface $urlDetector
      * @param \BetaKiller\Security\CsrfService          $csrf
      */
-    public function __construct(UserUrlDetectorInterface $urlDetector, CsrfService $csrf)
+    public function __construct(private UserUrlDetectorInterface $urlDetector, private CsrfService $csrf)
     {
-        $this->urlDetector = $urlDetector;
-        $this->csrf        = $csrf;
     }
 
     /**

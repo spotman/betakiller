@@ -9,7 +9,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractLanguageSubRouteRootAction extends AbstractAction
+abstract readonly class AbstractLanguageSubRouteRootAction extends AbstractAction
 {
     /**
      * @inheritDoc

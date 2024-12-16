@@ -144,7 +144,7 @@ final class DateTimeHelper
 
     public static function dateIntervalToSeconds(DateInterval $interval): int
     {
-        $now = new DateTimeImmutable;
+        $now = new DateTimeImmutable();
         $ref = $now->add($interval);
 
         return abs($ref->getTimestamp() - $now->getTimestamp());

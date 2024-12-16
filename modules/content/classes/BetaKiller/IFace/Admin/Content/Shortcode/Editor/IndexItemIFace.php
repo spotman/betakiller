@@ -1,11 +1,13 @@
 <?php
+
 namespace BetaKiller\IFace\Admin\Content\Shortcode\Editor;
 
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\EntityModelInterface;
 use BetaKiller\Url\Parameter\ID;
 use Psr\Http\Message\ServerRequestInterface;
 
-class IndexItemIFace extends AbstractEditor
+readonly class IndexItemIFace extends AbstractEditor
 {
     /**
      * Returns data for View
@@ -19,18 +21,18 @@ class IndexItemIFace extends AbstractEditor
      */
     public function getData(ServerRequestInterface $request): array
     {
-        $editor = $this->getShortcodeEditor();
+        $editor = $this->getShortcodeEditor($request);
 
         /** @var EntityModelInterface|null $entity */
-        $entity = $this->urlContainer->getEntityByClassName(EntityModelInterface::class);
+        $entity = ServerRequestHelper::getEntity($request, EntityModelInterface::class);
 
         /** @var \BetaKiller\Url\Parameter\ID|null $idParam */
-        $idParam = $this->urlContainer->getParameterByClassName(ID::class);
-        $id = $idParam ? $idParam->getValue() : null;
+        $idParam = ServerRequestHelper::getParameter($request, ID::class);
+        $id      = $idParam?->getValue();
 
         return [
-            'action'   => 'index',
-            'template' => $editor->getTemplateName(),
-        ] + $editor->getIndexIFaceData($entity, $id);
+                'action'   => 'index',
+                'template' => $editor->getTemplateName(),
+            ] + $editor->getIndexIFaceData($entity, $id);
     }
 }

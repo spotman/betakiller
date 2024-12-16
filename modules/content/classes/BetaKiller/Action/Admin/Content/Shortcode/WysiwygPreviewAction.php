@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\Action\Admin\Content\Shortcode;
 
 use BetaKiller\Action\AbstractAction;
@@ -9,21 +10,15 @@ use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class WysiwygPreviewAction extends AbstractAction
+readonly class WysiwygPreviewAction extends AbstractAction
 {
-    /**
-     * @var \BetaKiller\Content\Shortcode\ShortcodeFacade
-     */
-    private $shortcodeFacade;
-
     /**
      * WysiwygPreviewAction constructor.
      *
      * @param \BetaKiller\Content\Shortcode\ShortcodeFacade $shortcodeFacade
      */
-    public function __construct(ShortcodeFacade $shortcodeFacade)
+    public function __construct(private ShortcodeFacade $shortcodeFacade)
     {
-        $this->shortcodeFacade = $shortcodeFacade;
     }
 
     /**

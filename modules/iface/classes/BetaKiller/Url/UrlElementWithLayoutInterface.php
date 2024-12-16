@@ -10,7 +10,7 @@ interface UrlElementWithLayoutInterface extends UrlElementInterface
     /**
      * Returns layout codename or null if using parent layout
      *
-     * @return string
+     * @return string|null
      */
     public function getLayoutCodename(): ?string;
 }

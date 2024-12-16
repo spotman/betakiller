@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Action\Auth;
@@ -17,30 +18,18 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class ChangePasswordAction extends AbstractAction implements PostRequestActionInterface
+readonly class ChangePasswordAction extends AbstractAction implements PostRequestActionInterface
 {
-    private const ARG_PASS = 'password';
+    private const ARG_PASS         = 'password';
     private const ARG_PASS_CONFIRM = 'password_confirm';
-
-    /**
-     * @var \BetaKiller\Service\AuthService
-     */
-    private $auth;
-
-    /**
-     * @var \BetaKiller\Security\CsrfService
-     */
-    private $csrf;
 
     /**
      * ChangePasswordAction constructor.
      *
      * @param \BetaKiller\Service\AuthService $auth
      */
-    public function __construct(AuthService $auth, CsrfService $csrf)
+    public function __construct(private AuthService $auth, private CsrfService $csrf)
     {
-        $this->auth = $auth;
-        $this->csrf = $csrf;
     }
 
     /**
@@ -84,7 +73,7 @@ class ChangePasswordAction extends AbstractAction implements PostRequestActionIn
 
         // Update password
         $password = $post->getString(self::ARG_PASS);
-        $confirm = $post->getString(self::ARG_PASS_CONFIRM);
+        $confirm  = $post->getString(self::ARG_PASS_CONFIRM);
 
         if ($password !== $confirm) {
             throw new PublicException('Passwords are not equal');

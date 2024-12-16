@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Action\Admin;
@@ -10,25 +11,18 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Url\Zone;
-use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class RetryNotificationAction extends AbstractAction
+final readonly class RetryNotificationAction extends AbstractAction
 {
-    /**
-     * @var \BetaKiller\Notification\NotificationFacade
-     */
-    private NotificationFacade $notification;
-
     /**
      * MarkNotificationAsReadAction constructor.
      *
      * @param \BetaKiller\Notification\NotificationFacade $notification
      */
-    public function __construct(NotificationFacade $notification)
+    public function __construct(private NotificationFacade $notification)
     {
-        $this->notification = $notification;
     }
 
     /**

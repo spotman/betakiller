@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\IFace\Auth;
 
 use BetaKiller\Action\Auth\SendRecoveryEmailAction;
@@ -8,7 +9,7 @@ use BetaKiller\IFace\AbstractIFace;
 use BetaKiller\Security\CsrfService;
 use Psr\Http\Message\ServerRequestInterface;
 
-class AccessRecoveryRequestIFace extends AbstractIFace
+readonly class AccessRecoveryRequestIFace extends AbstractIFace
 {
     public const FLASH_STATUS         = 'access_recovery_status';
     public const FLASH_STATUS_OK      = 'ok';
@@ -16,24 +17,13 @@ class AccessRecoveryRequestIFace extends AbstractIFace
     public const FLASH_STATUS_MISSING = 'missing';
 
     /**
-     * @var \BetaKiller\Security\CsrfService
-     */
-    private $csrf;
-
-    /**
-     * @var \BetaKiller\Auth\UserUrlDetectorInterface
-     */
-    private $urlDetector;
-
-    /**
      * AccessRecoveryRequestIFace constructor.
      *
-     * @param \BetaKiller\Security\CsrfService $csrf
+     * @param \BetaKiller\Security\CsrfService          $csrf
+     * @param \BetaKiller\Auth\UserUrlDetectorInterface $urlDetector
      */
-    public function __construct(CsrfService $csrf, UserUrlDetectorInterface $urlDetector)
+    public function __construct(private CsrfService $csrf, private UserUrlDetectorInterface $urlDetector)
     {
-        $this->csrf        = $csrf;
-        $this->urlDetector = $urlDetector;
     }
 
     /**

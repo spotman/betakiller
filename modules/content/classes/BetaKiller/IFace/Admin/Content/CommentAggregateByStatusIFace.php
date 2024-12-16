@@ -1,9 +1,10 @@
 <?php
+
 namespace BetaKiller\IFace\Admin\Content;
 
 use Psr\Http\Message\ServerRequestInterface;
 
-class CommentAggregateByStatusIFace extends AbstractContentAdminIFace
+readonly class CommentAggregateByStatusIFace extends AbstractContentAdminIFace
 {
     /**
      * Returns data for View

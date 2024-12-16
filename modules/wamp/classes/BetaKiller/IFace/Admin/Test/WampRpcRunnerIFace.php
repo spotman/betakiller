@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\Test;
@@ -8,7 +9,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\AbstractIFace;
 use Psr\Http\Message\ServerRequestInterface;
 
-class WampRpcRunnerIFace extends AbstractIFace
+readonly class WampRpcRunnerIFace extends AbstractIFace
 {
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
@@ -20,9 +21,11 @@ class WampRpcRunnerIFace extends AbstractIFace
         $case = ServerRequestHelper::getQueryPart($request, 'case', true);
 
         return [
-            'connection_type' => strtolower(trim(
-                ServerRequestHelper::getQueryPart($request, 'connectionType', true)
-            )),
+            'connection_type' => strtolower(
+                trim(
+                    ServerRequestHelper::getQueryPart($request, 'connectionType', true)
+                )
+            ),
             'case'            => $case,
             'case_value'      => json_encode(DataApiMethod::makeTestResponse($case)),
             'tests_qty'       => (int)ServerRequestHelper::getQueryPart($request, 'testsQty', true),

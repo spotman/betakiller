@@ -3,6 +3,6 @@ namespace BetaKiller\Api\Resource;
 
 use Spotman\Api\AbstractApiResource;
 
-class ContentPostApiResource extends AbstractApiResource
+readonly class ContentPostApiResource extends AbstractApiResource
 {
 }

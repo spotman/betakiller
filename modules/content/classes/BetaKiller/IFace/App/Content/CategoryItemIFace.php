@@ -1,11 +1,12 @@
 <?php
+
 namespace BetaKiller\IFace\App\Content;
 
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Helper\ContentUrlContainerHelper;
 use Psr\Http\Message\ServerRequestInterface;
 
-class CategoryItemIFace extends AbstractAppBase
+readonly class CategoryItemIFace extends AbstractAppBase
 {
     /**
      * Returns data for View

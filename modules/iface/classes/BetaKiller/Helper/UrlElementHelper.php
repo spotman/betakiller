@@ -6,6 +6,7 @@ use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementException;
+use BetaKiller\Url\UrlElementInstanceInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
@@ -73,6 +74,11 @@ class UrlElementHelper
         $currentZone  = $currentIFace?->getZoneName();
 
         return $currentZone === $zone->getName();
+    }
+
+    public function getInstanceModel(UrlElementInstanceInterface $instance): UrlElementInterface
+    {
+        return $this->tree->getByCodename($instance::codename());
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\IFace\Auth;
@@ -6,7 +7,7 @@ namespace BetaKiller\IFace\Auth;
 use BetaKiller\IFace\AbstractIFace;
 use Psr\Http\Message\ServerRequestInterface;
 
-class RegistrationClaimThanksIFace extends AbstractIFace
+readonly class RegistrationClaimThanksIFace extends AbstractIFace
 {
     /**
      * Returns data for View

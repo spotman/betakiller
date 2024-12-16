@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Api\Method\NotificationFrequency;
@@ -11,28 +12,18 @@ use Spotman\Api\Method\AbstractApiMethod;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class ListApiMethod extends AbstractApiMethod
+readonly class ListApiMethod extends AbstractApiMethod
 {
-    /**
-     * @var \BetaKiller\I18n\I18nFacade
-     */
-    private $i18n;
-
-    /**
-     * @var \BetaKiller\Repository\NotificationFrequencyRepositoryInterface
-     */
-    private $repo;
-
     /**
      * ListApiMethod constructor.
      *
      * @param \BetaKiller\Repository\NotificationFrequencyRepositoryInterface $repo
      * @param \BetaKiller\I18n\I18nFacade                                     $i18n
      */
-    public function __construct(NotificationFrequencyRepositoryInterface $repo, I18nFacade $i18n)
-    {
-        $this->repo = $repo;
-        $this->i18n = $i18n;
+    public function __construct(
+        private NotificationFrequencyRepositoryInterface $repo,
+        private I18nFacade $i18n
+    ) {
     }
 
     /**

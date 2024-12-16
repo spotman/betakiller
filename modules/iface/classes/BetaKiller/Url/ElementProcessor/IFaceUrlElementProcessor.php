@@ -4,10 +4,14 @@ namespace BetaKiller\Url\ElementProcessor;
 
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\IFace\Cache\IFaceCache;
 use BetaKiller\IFace\IFaceInterface;
+use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInstanceInterface;
 use BetaKiller\View\IFaceRendererInterface;
+use DateTimeImmutable;
+use LogicException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
@@ -19,6 +23,7 @@ readonly class IFaceUrlElementProcessor implements UrlElementProcessorInterface
 {
     public function __construct(
         private IFaceRendererInterface $renderer,
+        private UrlElementHelper $elementHelper,
         private IFaceCache $ifaceCache
     ) {
     }
@@ -45,6 +50,12 @@ readonly class IFaceUrlElementProcessor implements UrlElementProcessorInterface
             ]);
         }
 
+        $model = $this->elementHelper->getInstanceModel($iface);
+
+        if (!$model instanceof IFaceModelInterface) {
+            throw new LogicException();
+        }
+
         $urlContainer = ServerRequestHelper::getUrlContainer($request);
         $user         = ServerRequestHelper::getUser($request);
 
@@ -58,8 +69,8 @@ readonly class IFaceUrlElementProcessor implements UrlElementProcessorInterface
 
             $response = ResponseHelper::html($output);
 
-            return $iface->isHttpCachingEnabled()
-                ? ResponseHelper::enableCaching($response, $iface->getLastModified(), $iface->getExpiresInterval())
+            return $model->isCacheEnabled()
+                ? ResponseHelper::enableCaching($response, new DateTimeImmutable('now'), $model->getExpiresInterval())
                 : ResponseHelper::disableCaching($response);
         } catch (Throwable $e) {
             // Prevent response caching

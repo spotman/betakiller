@@ -3,25 +3,21 @@
 namespace BetaKiller\IFace\Admin\Content\Shortcode;
 
 use BetaKiller\Content\Shortcode\ShortcodeEntityInterface;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Repository\ShortcodeRepository;
+use BetaKiller\Url\Zone;
 use Psr\Http\Message\ServerRequestInterface;
 
-class IndexIFace extends AbstractAdminIFace
+readonly class IndexIFace extends AbstractAdminIFace
 {
-    /**
-     * @var \BetaKiller\Repository\ShortcodeRepository
-     */
-    private $repo;
-
     /**
      * Index constructor.
      *
      * @param \BetaKiller\Repository\ShortcodeRepository $repo
      */
-    public function __construct(ShortcodeRepository $repo)
+    public function __construct(private ShortcodeRepository $repo)
     {
-        $this->repo = $repo;
     }
 
     /**
@@ -36,12 +32,11 @@ class IndexIFace extends AbstractAdminIFace
     {
         $otherData = [];
 
-        /** @var ShortcodeEntityInterface[] $otherShortcodes */
         $otherShortcodes = array_merge($this->repo->getStaticShortcodes(), $this->repo->getDynamicShortcodes());
 
         foreach ($otherShortcodes as $entity) {
             $tagName             = $entity->getTagName();
-            $otherData[$tagName] = $this->makeShortcodeData($entity);
+            $otherData[$tagName] = $this->makeShortcodeData($entity, $request);
         }
 
         // Sort by tag name alphabetically
@@ -58,12 +53,14 @@ class IndexIFace extends AbstractAdminIFace
      * @return array
      * @throws \BetaKiller\Url\UrlElementException
      */
-    private function makeShortcodeData(ShortcodeEntityInterface $shortcode): array
+    private function makeShortcodeData(ShortcodeEntityInterface $shortcode, ServerRequestInterface $request): array
     {
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+
         return [
             'codename' => $shortcode->getCodename(),
             'tag_name' => $shortcode->getTagName(),
-            'url'      => $this->ifaceHelper->getReadEntityUrl($shortcode),
+            'url'      => $urlHelper->getReadEntityUrl($shortcode, Zone::admin()),
         ];
     }
 }

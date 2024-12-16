@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Action\App\I18n;
@@ -15,31 +16,21 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class ChangeUserLanguageAction extends AbstractAction implements PostRequestActionInterface
+readonly class ChangeUserLanguageAction extends AbstractAction implements PostRequestActionInterface
 {
     public const ARG_LANG = 'lang';
     public const ARG_URL  = 'url';
 
     /**
-     * @var \BetaKiller\Repository\UserRepositoryInterface
-     */
-    private $userRepo;
-
-    /**
-     * @var \BetaKiller\Repository\LanguageRepositoryInterface
-     */
-    private $langRepo;
-
-    /**
-     * ApplicantOneIFace constructor.
+     * ChangeUserLanguageAction constructor.
      *
      * @param \BetaKiller\Repository\UserRepositoryInterface     $userRepo
      * @param \BetaKiller\Repository\LanguageRepositoryInterface $languageRepo
      */
-    public function __construct(UserRepositoryInterface $userRepo, LanguageRepositoryInterface $languageRepo)
-    {
-        $this->userRepo = $userRepo;
-        $this->langRepo = $languageRepo;
+    public function __construct(
+        private UserRepositoryInterface $userRepo,
+        private LanguageRepositoryInterface $langRepo
+    ) {
     }
 
     /**

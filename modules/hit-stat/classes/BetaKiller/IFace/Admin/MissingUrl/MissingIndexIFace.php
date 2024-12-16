@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\MissingUrl;
@@ -7,21 +8,15 @@ use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Repository\MissingUrlRepository;
 use Psr\Http\Message\ServerRequestInterface;
 
-class MissingIndexIFace extends AbstractAdminIFace
+readonly class MissingIndexIFace extends AbstractAdminIFace
 {
-    /**
-     * @var \BetaKiller\Repository\MissingUrlRepository
-     */
-    private $missingUrlRepository;
-
     /**
      * MissingIndex constructor.
      *
      * @param \BetaKiller\Repository\MissingUrlRepository $missingUrlRepository
      */
-    public function __construct(MissingUrlRepository $missingUrlRepository)
+    public function __construct(private MissingUrlRepository $missingUrlRepository)
     {
-        $this->missingUrlRepository = $missingUrlRepository;
     }
 
     /**

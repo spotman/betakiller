@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Exception\NotImplementedHttpException;
@@ -7,18 +8,8 @@ use BetaKiller\Repository\ContentPostRevisionRepository;
 use BetaKiller\Url\UrlDispatcherException;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PostItemRevisionIFace extends AbstractContentAdminIFace
+readonly class PostItemRevisionIFace extends AbstractContentAdminIFace
 {
-    /**
-     * @var \BetaKiller\Helper\ContentUrlContainerHelper
-     */
-    private $urlParametersHelper;
-
-    /**
-     * @var \BetaKiller\Repository\ContentPostRevisionRepository
-     */
-    private $revisionRepository;
-
     /**
      * PostItemRevision constructor.
      *
@@ -26,11 +17,9 @@ class PostItemRevisionIFace extends AbstractContentAdminIFace
      * @param \BetaKiller\Repository\ContentPostRevisionRepository $revisionRepository
      */
     public function __construct(
-        ContentUrlContainerHelper     $urlParametersHelper,
-        ContentPostRevisionRepository $revisionRepository
+        private ContentUrlContainerHelper $urlParametersHelper,
+        private ContentPostRevisionRepository $revisionRepository
     ) {
-        $this->urlParametersHelper = $urlParametersHelper;
-        $this->revisionRepository  = $revisionRepository;
     }
 
     /**

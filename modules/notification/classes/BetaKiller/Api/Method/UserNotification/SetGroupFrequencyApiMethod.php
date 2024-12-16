@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Api\Method\UserNotification;
@@ -11,24 +12,18 @@ use Spotman\Api\Method\AbstractApiMethod;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class SetGroupFrequencyApiMethod extends AbstractApiMethod
+readonly class SetGroupFrequencyApiMethod extends AbstractApiMethod
 {
     private const ARG_GROUP = 'group';
     private const ARG_FREQ  = 'frequency';
-
-    /**
-     * @var \BetaKiller\Notification\NotificationFacade
-     */
-    private $notification;
 
     /**
      * SetGroupFrequencyApiMethod constructor.
      *
      * @param \BetaKiller\Notification\NotificationFacade $notification
      */
-    public function __construct(NotificationFacade $notification)
+    public function __construct(private NotificationFacade $notification)
     {
-        $this->notification = $notification;
     }
 
     /**

@@ -9,21 +9,15 @@ use BetaKiller\Repository\ContentCategoryRepository;
 use BetaKiller\Url\Zone;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class CategoryListingIFace extends AbstractAppBase
+final readonly class CategoryListingIFace extends AbstractAppBase
 {
-    /**
-     * @var \BetaKiller\Repository\ContentCategoryRepository
-     */
-    private $categoryRepository;
-
     /**
      * CategoryListing constructor.
      *
      * @param \BetaKiller\Repository\ContentCategoryRepository $categoryRepository
      */
-    public function __construct(ContentCategoryRepository $categoryRepository)
+    public function __construct(private ContentCategoryRepository $categoryRepository)
     {
-        $this->categoryRepository = $categoryRepository;
     }
 
     /**

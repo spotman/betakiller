@@ -1,9 +1,10 @@
 <?php
+
 namespace BetaKiller\IFace\Admin\Error;
 
 use BetaKiller\Repository\PhpExceptionRepository;
 
-class IgnoredPhpExceptionIndexIFace extends AbstractPhpExceptionIndex
+readonly class IgnoredPhpExceptionIndexIFace extends AbstractPhpExceptionIndex
 {
     /**
      * @param \BetaKiller\Repository\PhpExceptionRepository $repo

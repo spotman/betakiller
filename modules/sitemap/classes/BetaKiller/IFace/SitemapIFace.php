@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\IFace;
@@ -6,16 +7,10 @@ namespace BetaKiller\IFace;
 use BetaKiller\Url\AvailableUrlsCollector;
 use Psr\Http\Message\ServerRequestInterface;
 
-class SitemapIFace extends AbstractIFace
+readonly class SitemapIFace extends AbstractIFace
 {
-    /**
-     * @var \BetaKiller\Url\AvailableUrlsCollector
-     */
-    private $collector;
-
-    public function __construct(AvailableUrlsCollector $collector)
+    public function __construct(private AvailableUrlsCollector $collector)
     {
-        $this->collector = $collector;
     }
 
     /**

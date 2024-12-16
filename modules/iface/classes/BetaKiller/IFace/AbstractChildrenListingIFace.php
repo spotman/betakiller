@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\ServerRequestHelper;
@@ -7,28 +8,16 @@ use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractChildrenListingIFace extends AbstractIFace
+abstract readonly class AbstractChildrenListingIFace extends AbstractIFace
 {
-    /**
-     * @var \BetaKiller\Url\UrlElementTreeInterface
-     */
-    private $tree;
-
-    /**
-     * @var \BetaKiller\Helper\UrlElementHelper
-     */
-    private $elementHelper;
-
     /**
      * AbstractChildrenListingIFace constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface $tree
      * @param \BetaKiller\Helper\UrlElementHelper     $elementHelper
      */
-    public function __construct(UrlElementTreeInterface $tree, UrlElementHelper $elementHelper)
+    public function __construct(private UrlElementTreeInterface $tree, private UrlElementHelper $elementHelper)
     {
-        $this->tree          = $tree;
-        $this->elementHelper = $elementHelper;
     }
 
     /**
@@ -48,7 +37,9 @@ abstract class AbstractChildrenListingIFace extends AbstractIFace
 
         $data = [];
 
-        foreach ($this->tree->getChildren($this->getModel()) as $urlElement) {
+        $current = $this->elementHelper->getInstanceModel($this);
+
+        foreach ($this->tree->getChildren($current) as $urlElement) {
             // Show only ifaces
             if (!$urlElement instanceof IFaceModelInterface) {
                 continue;

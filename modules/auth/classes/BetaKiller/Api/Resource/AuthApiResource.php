@@ -5,6 +5,6 @@ namespace BetaKiller\Api\Resource;
 
 use Spotman\Api\AbstractApiResource;
 
-class AuthApiResource extends AbstractApiResource
+readonly class AuthApiResource extends AbstractApiResource
 {
 }

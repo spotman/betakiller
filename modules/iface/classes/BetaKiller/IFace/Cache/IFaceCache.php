@@ -1,10 +1,15 @@
 <?php
+
 namespace BetaKiller\IFace\Cache;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Exception\NotImplementedHttpException;
+use BetaKiller\Helper\DateTimeHelper;
+use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\IFace\IFaceInterface;
+use BetaKiller\Url\IFaceModelInterface;
+use DateInterval;
 use PageCache\PageCache;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -12,42 +17,32 @@ use Psr\Log\LoggerInterface;
 final class IFaceCache
 {
     /**
-     * @var \BetaKiller\Config\ConfigProviderInterface
-     */
-    private $appConfig;
-
-    /**
      * @var PageCache
      */
-    private $pageCache;
+    private PageCache $pageCache;
 
     /**
      * @var bool
      */
-    private $enabled;
-
-    /**
-     * @var \BetaKiller\Env\AppEnvInterface
-     */
-    private $appEnv;
+    private bool $enabled;
 
     /**
      * IFaceCache constructor.
      *
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
      * @param \BetaKiller\Env\AppEnvInterface       $appEnv
+     * @param \BetaKiller\Helper\UrlElementHelper   $elementHelper
      * @param \Psr\Log\LoggerInterface              $logger
      */
     public function __construct(
-        AppConfigInterface $appConfig,
-        AppEnvInterface $appEnv,
+        private AppConfigInterface $appConfig,
+        private AppEnvInterface $appEnv,
+        private UrlElementHelper $elementHelper,
         LoggerInterface $logger
     ) {
-        $this->enabled   = !$appEnv->isCli() && $appConfig->isPageCacheEnabled();
-        $this->appEnv    = $appEnv;
-        $this->appConfig = $appConfig;
+        $this->enabled = !$appEnv->isCli() && $appConfig->isPageCacheEnabled();
 
-        $this->pageCache = new PageCache;
+        $this->pageCache = new PageCache();
         $this->pageCache->setLogger($logger);
     }
 
@@ -85,8 +80,14 @@ final class IFaceCache
             return;
         }
 
+        $model = $this->elementHelper->getInstanceModel($iface);
+
+        if (!$model instanceof IFaceModelInterface) {
+            throw new \LogicException();
+        }
+
         // Skip caching (admin interfaces and non-cachable pages)
-        if (!$iface->isHttpCachingEnabled()) {
+        if (!$model->isCacheEnabled()) {
             return;
         }
 
@@ -96,8 +97,10 @@ final class IFaceCache
 
         $cachePath = $this->appEnv->getCachePath($this->appConfig->getPageCachePath());
 
+        $expiresIn = $model->getExpiresInterval() ?? new DateInterval('PT1H'); // 1 hour caching by default
+
         $this->pageCache->config()
-            ->setCacheExpirationInSeconds($iface->getExpiresSeconds())
+            ->setCacheExpirationInSeconds(DateTimeHelper::dateIntervalToSeconds($expiresIn))
             ->setCachePath($cachePath)
             ->setEnableLog(true)
             ->setSendHeaders(true)

@@ -13,34 +13,13 @@ use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Url\Zone;
-use BetaKiller\Url\ZoneInterface;
 use BetaKiller\Workflow\UserWorkflow;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ClaimRegistrationAction extends AbstractAction
+readonly class ClaimRegistrationAction extends AbstractAction
 {
     public const NOTIFICATION = 'email/support/claim-registration';
-
-    /**
-     * @var \BetaKiller\Helper\NotificationHelper
-     */
-    private NotificationHelper $facade;
-
-    /**
-     * @var \BetaKiller\Repository\LanguageRepositoryInterface
-     */
-    private LanguageRepositoryInterface $langRepo;
-
-    /**
-     * @var \BetaKiller\Repository\UserRepositoryInterface
-     */
-    private UserRepositoryInterface $userRepo;
-
-    /**
-     * @var \BetaKiller\Workflow\UserWorkflow
-     */
-    private UserWorkflow $userWorkflow;
 
     /**
      * ClaimRegistrationAction constructor.
@@ -51,15 +30,11 @@ class ClaimRegistrationAction extends AbstractAction
      * @param \BetaKiller\Workflow\UserWorkflow                  $userWorkflow
      */
     public function __construct(
-        NotificationHelper $notification,
-        LanguageRepositoryInterface $langRepo,
-        UserRepositoryInterface $userRepo,
-        UserWorkflow $userWorkflow
+        private NotificationHelper $notification,
+        private LanguageRepositoryInterface $langRepo,
+        private UserRepositoryInterface $userRepo,
+        private UserWorkflow $userWorkflow
     ) {
-        $this->facade       = $notification;
-        $this->langRepo     = $langRepo;
-        $this->userRepo     = $userRepo;
-        $this->userWorkflow = $userWorkflow;
     }
 
     /**
@@ -91,7 +66,7 @@ class ClaimRegistrationAction extends AbstractAction
         if (!$user->isRegistrationClaimed()) {
             $this->userWorkflow->notRegisteredClaim($user);
 
-            $this->facade->broadcastMessage(self::NOTIFICATION, [
+            $this->notification->broadcastMessage(self::NOTIFICATION, [
                 'email'             => $log->getTargetString(),
                 'ip'                => ServerRequestHelper::getIpAddress($request),
                 'notification_url'  => $urlHelper->getReadEntityUrl($log, Zone::admin()),

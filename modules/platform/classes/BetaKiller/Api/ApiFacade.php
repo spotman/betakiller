@@ -1,6 +1,6 @@
 <?php
 namespace BetaKiller\Api;
 
-class ApiFacade extends \Spotman\Api\ApiFacade
+readonly class ApiFacade extends \Spotman\Api\ApiFacade
 {
 }

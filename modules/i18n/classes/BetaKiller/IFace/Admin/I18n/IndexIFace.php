@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\I18n;
@@ -6,7 +7,7 @@ namespace BetaKiller\IFace\Admin\I18n;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use Psr\Http\Message\ServerRequestInterface;
 
-class IndexIFace extends AbstractAdminIFace
+readonly class IndexIFace extends AbstractAdminIFace
 {
     /**
      * Returns data for View

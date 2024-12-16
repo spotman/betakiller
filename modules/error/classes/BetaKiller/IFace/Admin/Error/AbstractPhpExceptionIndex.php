@@ -1,27 +1,21 @@
 <?php
+
 namespace BetaKiller\IFace\Admin\Error;
 
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Repository\PhpExceptionRepository;
 use BetaKiller\Url\Zone;
-use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractPhpExceptionIndex extends AbstractErrorAdminIFace
+abstract readonly class AbstractPhpExceptionIndex extends AbstractErrorAdminIFace
 {
-    /**
-     * @var \BetaKiller\Repository\PhpExceptionRepository
-     */
-    private $repo;
-
     /**
      * AbstractPhpExceptionIndex constructor.
      *
      * @param \BetaKiller\Repository\PhpExceptionRepository $repo
      */
-    public function __construct(PhpExceptionRepository $repo)
+    public function __construct(private PhpExceptionRepository $repo)
     {
-        $this->repo = $repo;
     }
 
     /**

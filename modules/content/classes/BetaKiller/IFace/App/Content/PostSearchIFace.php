@@ -1,10 +1,11 @@
 <?php
+
 namespace BetaKiller\IFace\App\Content;
 
 use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PostSearchIFace extends AbstractAppBase
+readonly class PostSearchIFace extends AbstractAppBase
 {
     /**
      * Returns data for View

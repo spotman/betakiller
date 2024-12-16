@@ -5,7 +5,7 @@
         <iface uri="create" name="Admin\Content\PostCreate" label="Create post" entity="ContentPost"
                entityAction="create"/>
         <iface uri="{ContentPost.id}" name="Admin\Content\PostItem" label="{ContentPost.label}" entity="ContentPost"
-               entityAction="read">
+               entityAction="read" cache="P1D">
             <iface uri="revisions" name="Admin\Content\PostItemRevisionList" label="Revisions" entity="ContentPost"
                    entityAction="read">
                 <iface uri="{ContentPostRevision.id}" name="Admin\Content\PostItemRevision"

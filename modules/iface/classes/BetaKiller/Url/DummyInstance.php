@@ -1,25 +1,20 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Url;
 
 use LogicException;
 
-class DummyInstance extends AbstractUrlElementInstance
+readonly class DummyInstance extends AbstractUrlElementInstance
 {
-    /**
-     * @var \BetaKiller\Url\DummyModelInterface
-     */
-    private $model;
-
     /**
      * DummyInstance constructor.
      *
      * @param \BetaKiller\Url\DummyModelInterface $model
      */
-    public function __construct(DummyModelInterface $model)
+    public function __construct(private DummyModelInterface $model)
     {
-        $this->model = $model;
     }
 
     /**

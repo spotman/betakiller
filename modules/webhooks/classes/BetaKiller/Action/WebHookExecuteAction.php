@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Action;
@@ -14,28 +15,16 @@ use BetaKiller\Repository\WebHookLogRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class WebHookExecuteAction extends AbstractAction
+readonly class WebHookExecuteAction extends AbstractAction
 {
-    /**
-     * WebHook Factory
-     *
-     * @var \BetaKiller\Factory\WebHookFactory
-     */
-    private $webHookFactory;
-
-    /**
-     * @var \BetaKiller\Repository\WebHookLogRepository
-     */
-    private $webHookLogRepository;
-
     /**
      * @param \BetaKiller\Factory\WebHookFactory          $webHookFactory
      * @param \BetaKiller\Repository\WebHookLogRepository $webHookLogRepository
      */
-    public function __construct(WebHookFactory $webHookFactory, WebHookLogRepository $webHookLogRepository)
-    {
-        $this->webHookFactory       = $webHookFactory;
-        $this->webHookLogRepository = $webHookLogRepository;
+    public function __construct(
+        private WebHookFactory $webHookFactory,
+        private WebHookLogRepository $webHookLogRepository
+    ) {
     }
 
     /**
@@ -54,7 +43,7 @@ class WebHookExecuteAction extends AbstractAction
         $model = ServerRequestHelper::getEntity($request, WebHookModelInterface::class);
 
         if (!$model) {
-            throw new NotFoundHttpException;
+            throw new NotFoundHttpException();
         }
 
         $requestMethod = $request->getMethod();
