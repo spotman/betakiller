@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Security;
@@ -7,11 +8,11 @@ use BetaKiller\Exception\SecurityException;
 use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use LogicException;
+use Mezzio\Session\SessionIdentifierAwareInterface;
+use Mezzio\Session\SessionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Spotman\Defence\ArgumentsDefinitionProviderInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
-use Mezzio\Session\SessionIdentifierAwareInterface;
-use Mezzio\Session\SessionInterface;
 
 class CsrfService implements ArgumentsDefinitionProviderInterface
 {
@@ -51,7 +52,7 @@ class CsrfService implements ArgumentsDefinitionProviderInterface
         $key = $this->makeSessionTokenName($token);
 
         if ($session->has($key)) {
-            throw new LogicException('Duplicate CSRF token ":value" in session ":id"', [
+            throw new SecurityException('Duplicate CSRF token ":value" in session ":id"', [
                 ':id'    => $session->getId(),
                 ':value' => $token,
             ]);

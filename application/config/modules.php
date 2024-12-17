@@ -17,7 +17,6 @@ return [
     'message-bus'  => MODPATH.'message-bus',           // Event and command buses
     'meta-tags'    => MODPATH.'meta-tags',             // HTML meta tags helper
     'console'      => MODPATH.'console',               // CLI Tasks
-//    'security-headers'      => MODPATH.'security-headers',      // Send CSP and other security headers
 
     // Database layer with Kohana dependencies
     'database'     => MODPATH.'database',              // Database access
@@ -37,7 +36,7 @@ return [
     // Platform defaults (DI config, presets, etc)
     'platform'     => MODPATH.'platform',              // Platform implementation
 
-    // These modules DEPENDS on PLATFORM and have NO legacy ROUTES
+    // These modules DEPEND on PLATFORM and have NO legacy ROUTES
     'acl'          => MODPATH.'acl',                   // Role based access control
     'api'          => MODPATH.'api',                   // API subsystem
 //    'api-test'     => MODPATH.'api-test',              // CLI and UI helpers for testing API subsystem
@@ -56,6 +55,7 @@ return [
     'robots-txt'   => MODPATH.'robots-txt',            // Serve different robots.txt for different environments
     'search'       => MODPATH.'search',                // Search and filtering capabilities
     'security'     => MODPATH.'security',              // Various security helpers
+    //'csp'          => MODPATH.'csp',                   // Send CSP and other security headers
     'sitemap'      => MODPATH.'sitemap',               // Generating sitemap.xml
     'twig'         => MODPATH.'twig',                  // Twig template engine
 //    'wamp'         => MODPATH.'wamp',                  // WAMP protocol support (router + client)
