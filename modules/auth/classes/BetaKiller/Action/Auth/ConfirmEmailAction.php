@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Action\Auth;
@@ -9,13 +10,8 @@ use BetaKiller\Service\AuthService;
 use BetaKiller\Service\TokenService;
 use BetaKiller\Workflow\UserWorkflow;
 
-class ConfirmEmailAction extends AbstractTokenVerificationAction
+readonly class ConfirmEmailAction extends AbstractTokenVerificationAction
 {
-    /**
-     * @var \BetaKiller\Workflow\UserWorkflow
-     */
-    private $userWorkflow;
-
     /**
      * @param \BetaKiller\Service\TokenService          $tokenService
      * @param \BetaKiller\Service\AuthService           $auth
@@ -26,11 +22,9 @@ class ConfirmEmailAction extends AbstractTokenVerificationAction
         TokenService $tokenService,
         AuthService $auth,
         UserUrlDetectorInterface $urlDetector,
-        UserWorkflow $userWorkflow
+        private UserWorkflow $userWorkflow
     ) {
         parent::__construct($tokenService, $auth, $urlDetector);
-
-        $this->userWorkflow = $userWorkflow;
     }
 
     /**

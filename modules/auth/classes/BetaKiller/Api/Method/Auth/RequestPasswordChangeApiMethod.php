@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Api\Method\Auth;
@@ -10,21 +11,15 @@ use Spotman\Api\Method\AbstractApiMethod;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class RequestPasswordChangeApiMethod extends AbstractApiMethod
+readonly class RequestPasswordChangeApiMethod extends AbstractApiMethod
 {
-    /**
-     * @var \BetaKiller\Service\AuthService
-     */
-    private $auth;
-
     /**
      * RequestPasswordChangeApiMethod constructor.
      *
      * @param \BetaKiller\Service\AuthService $auth
      */
-    public function __construct(AuthService $auth)
+    public function __construct(private AuthService $auth)
     {
-        $this->auth = $auth;
     }
 
     /**

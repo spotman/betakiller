@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Api\Method\Language;
@@ -10,23 +11,17 @@ use Spotman\Api\Method\AbstractApiMethod;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class SearchApiMethod extends AbstractApiMethod
+readonly class SearchApiMethod extends AbstractApiMethod
 {
     private const ARG_TERM = 'term';
-
-    /**
-     * @var \BetaKiller\Repository\LanguageRepositoryInterface
-     */
-    private $repo;
 
     /**
      * SearchApiMethod constructor.
      *
      * @param \BetaKiller\Repository\LanguageRepositoryInterface $repo
      */
-    public function __construct(LanguageRepositoryInterface $repo)
+    public function __construct(private LanguageRepositoryInterface $repo)
     {
-        $this->repo = $repo;
     }
 
     /**

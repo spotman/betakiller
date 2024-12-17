@@ -7,7 +7,7 @@ use BetaKiller\I18n\I18nConfigInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Repository\TranslationKeyRepositoryInterface;
 
-class CommonListIFace extends AbstractI18nListIFace
+readonly class CommonListIFace extends AbstractI18nListIFace
 {
     /**
      * CommonListIFace constructor.

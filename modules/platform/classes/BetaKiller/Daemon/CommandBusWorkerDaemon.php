@@ -134,9 +134,9 @@ final class CommandBusWorkerDaemon extends AbstractDaemon
 
     private function processQueueMessage(Message $queueMessage): bool
     {
-        try {
-            $body = $queueMessage->getBody();
+        $body = $queueMessage->getBody();
 
+        try {
             // Unserialize message
             $message = unserialize($body, [
                 CommandMessageInterface::class,

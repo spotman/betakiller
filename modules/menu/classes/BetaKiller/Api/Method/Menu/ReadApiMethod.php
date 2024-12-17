@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Api\Method\Menu;
@@ -16,7 +17,7 @@ use Spotman\Api\Method\AbstractApiMethod;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class ReadApiMethod extends AbstractApiMethod
+readonly class ReadApiMethod extends AbstractApiMethod
 {
     /**
      * Menu name
@@ -39,21 +40,6 @@ class ReadApiMethod extends AbstractApiMethod
     private const ARG_DEPTH = 'depth';
 
     /**
-     * @var \BetaKiller\Service\MenuService
-     */
-    private MenuService $service;
-
-    /**
-     * @var \BetaKiller\Url\UrlDispatcherInterface
-     */
-    private UrlDispatcherInterface $urlDispatcher;
-
-    /**
-     * @var \BetaKiller\Acl\UrlElementAccessResolverInterface
-     */
-    private UrlElementAccessResolverInterface $elementAccessResolver;
-
-    /**
      * ReadApiMethod constructor.
      *
      * @param \BetaKiller\Service\MenuService                   $service
@@ -61,13 +47,10 @@ class ReadApiMethod extends AbstractApiMethod
      * @param \BetaKiller\Acl\UrlElementAccessResolverInterface $elementAccessResolver
      */
     public function __construct(
-        MenuService $service,
-        UrlDispatcherInterface $urlDispatcher,
-        UrlElementAccessResolverInterface $elementAccessResolver
+        private MenuService $service,
+        private UrlDispatcherInterface $urlDispatcher,
+        private UrlElementAccessResolverInterface $elementAccessResolver
     ) {
-        $this->service               = $service;
-        $this->urlDispatcher         = $urlDispatcher;
-        $this->elementAccessResolver = $elementAccessResolver;
     }
 
     /**

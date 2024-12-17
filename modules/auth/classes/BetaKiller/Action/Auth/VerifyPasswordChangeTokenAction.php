@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Action\Auth;
@@ -7,7 +8,7 @@ use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\IFace\Auth\PasswordChangeIFace;
 use BetaKiller\Model\UserInterface;
 
-class VerifyPasswordChangeTokenAction extends AbstractTokenVerificationAction
+readonly class VerifyPasswordChangeTokenAction extends AbstractTokenVerificationAction
 {
     /**
      * @param \BetaKiller\Helper\UrlHelperInterface $urlHelper

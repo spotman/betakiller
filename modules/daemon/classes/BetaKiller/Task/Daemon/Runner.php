@@ -507,7 +507,7 @@ final class Runner extends AbstractTask
             $this->loop->addSignal(SIGTERM, $shutdownHandler);
         } else {
             // Install no-op handler instead
-            $this->loop->addSignal(SIGTERM, static function () {
+            $this->loop->addSignal(SIGTERM, function () {
                 $this->logger->notice('SIGTERM sent to ":name" Daemon, but that signal is not supported', [
                     ':name' => $this->codename,
                 ]);

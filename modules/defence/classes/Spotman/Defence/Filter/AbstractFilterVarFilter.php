@@ -12,7 +12,7 @@ abstract class AbstractFilterVarFilter implements FilterInterface
         $options['default'] = null;
 
         return \filter_var($value, $type, [
-            'options' => $options ?? [],
+            'options' => $options,
             'flags'   => $flags ?? 0,
         ]);
     }

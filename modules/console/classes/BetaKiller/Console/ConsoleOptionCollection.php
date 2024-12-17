@@ -25,7 +25,7 @@ readonly class ConsoleOptionCollection implements ConsoleOptionCollectionInterfa
         foreach ($items as $item) {
             $name = $item->getName();
 
-            if (isset($this->items[$name])) {
+            if (isset($namedItems[$name])) {
                 throw new LogicException(sprintf('Duplicate option "%s"', $name));
             }
 

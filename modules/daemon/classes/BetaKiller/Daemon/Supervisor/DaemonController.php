@@ -520,12 +520,12 @@ final class DaemonController
         });
 
         // On successful startup
-        $promise->done(function () use ($unit, $name) {
+        $promise->done(function () use ($unit) {
             $this->emitUnitEvent($unit, DaemonUnit::EVENT_STARTED);
         });
 
         // On startup error
-        $promise->otherwise(function () use ($unit, $name) {
+        $promise->otherwise(function () use ($unit) {
             $this->emitUnitEvent($unit, DaemonUnit::EVENT_FAILED);
         });
 

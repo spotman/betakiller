@@ -4,22 +4,31 @@ parameters:
 
   level: 1
   paths:
-    - modules/ddd/classes
-    - modules/core/classes
-    - modules/platform/classes
     - modules/acl/classes
     - modules/admin/classes
     - modules/api/classes
+    - modules/auth/classes
     - modules/assets/classes
+    - modules/console/classes
+    - modules/core/classes
+    - modules/cron/classes
+    - modules/daemon/classes
     - modules/defence/classes
     - modules/error/classes
+    - modules/ddd/classes
     - modules/helper/classes
+    - modules/i18n/classes
     - modules/iface/classes
     - modules/log/classes
     - modules/maintenance/classes
+    - modules/menu/classes
     - modules/message-bus/classes
     - modules/notification/classes
+    - modules/platform/classes
+    - modules/security/classes
     - modules/sitemap/classes
+    - modules/twig/classes
     - modules/wamp/classes
     - modules/webhooks/classes
     - modules/widget/classes
+    - modules/workflow/classes
