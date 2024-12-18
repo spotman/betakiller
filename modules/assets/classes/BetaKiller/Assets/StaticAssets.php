@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Assets;
 
+use BetaKiller\Config\AssetsConfig;
 use BetaKiller\Env\AppEnvInterface;
 use HTML;
 use Kohana;
@@ -29,7 +30,7 @@ class StaticAssets
      * StaticAssets constructor.
      *
      * @param \BetaKiller\Env\AppEnvInterface $appEnv
-     * @param \BetaKiller\Assets\AssetsConfig $config
+     * @param \BetaKiller\Config\AssetsConfig $config
      */
     public function __construct(private readonly AppEnvInterface $appEnv, private readonly AssetsConfig $config)
     {

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\Assets;
+namespace BetaKiller\Config;
 
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Config\AbstractConfig;
@@ -203,6 +203,18 @@ class AssetsConfig extends AbstractConfig
     public function getProviderConfigValue(AssetsProviderInterface $provider, array $path, bool $optional = null)
     {
         return $this->getModelConfigValue($provider->getCodename(), $path, $optional);
+    }
+
+    /**
+     * @param \BetaKiller\Assets\Provider\AssetsProviderInterface $provider
+     *
+     * @return string[]
+     */
+    public function getProviderPostUploadHandlers(AssetsProviderInterface $provider): array
+    {
+        return $this->getProviderConfigValue($provider, [
+            AssetsConfig::CONFIG_MODEL_POST_UPLOAD_KEY,
+        ]) ?? [];
     }
 
     /**

@@ -1,11 +1,11 @@
 <?php
+
 namespace BetaKiller\Assets\Provider;
 
 use BetaKiller\Assets\Handler\AssetsHandlerInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RepositoryInterface;
-use Psr\Http\Message\UploadedFileInterface;
 
 interface AssetsProviderInterface
 {
@@ -64,11 +64,6 @@ interface AssetsProviderInterface
      * @return bool
      */
     public function hasAction(string $action): bool;
-
-    /**
-     * @param \BetaKiller\Assets\Handler\AssetsHandlerInterface $handler
-     */
-    public function addPostUploadHandler(AssetsHandlerInterface $handler): void;
 
     /**
      * Returns provider`s URL key or codename if no key was defined
@@ -130,17 +125,6 @@ interface AssetsProviderInterface
      * @return string
      */
     public function getModelExtension(AssetsModelInterface $model): string;
-
-    /**
-     * Process uploaded file
-     *
-     * @param \Psr\Http\Message\UploadedFileInterface $file
-     * @param array                                   $postData Array with items from $_POST
-     * @param \BetaKiller\Model\UserInterface         $user
-     *
-     * @return AssetsModelInterface
-     */
-    public function upload(UploadedFileInterface $file, array $postData, UserInterface $user): AssetsModelInterface;
 
     /**
      * Store regular file

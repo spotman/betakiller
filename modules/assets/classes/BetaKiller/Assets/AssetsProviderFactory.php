@@ -1,8 +1,10 @@
 <?php
+
 namespace BetaKiller\Assets;
 
 use BetaKiller\Assets\Exception\AssetsProviderException;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
+use BetaKiller\Config\AssetsConfig;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
 use BetaKiller\Factory\NamespaceBasedFactoryInterface;
@@ -41,11 +43,6 @@ class AssetsProviderFactory
     private $pathStrategyFactory;
 
     /**
-     * @var \BetaKiller\Assets\AssetsHandlerFactory
-     */
-    private $handlerFactory;
-
-    /**
      * @var AssetsProviderInterface[]
      */
     private $instances;
@@ -58,17 +55,15 @@ class AssetsProviderFactory
      * @param \BetaKiller\Factory\RepositoryFactoryInterface            $repositoryFactory
      * @param \BetaKiller\Assets\AssetsStorageFactory                   $storageFactory
      * @param \BetaKiller\Assets\AssetsPathStrategyFactory              $pathStrategyFactory
-     * @param \BetaKiller\Assets\AssetsHandlerFactory                   $handlerFactory
      *
      * @throws \BetaKiller\Factory\FactoryException
      */
     public function __construct(
         NamespaceBasedFactoryBuilderInterface $factoryBuilder,
-        ConfigProviderInterface               $config,
-        RepositoryFactoryInterface            $repositoryFactory,
-        AssetsStorageFactory                  $storageFactory,
-        AssetsPathStrategyFactory             $pathStrategyFactory,
-        AssetsHandlerFactory                  $handlerFactory
+        ConfigProviderInterface $config,
+        RepositoryFactoryInterface $repositoryFactory,
+        AssetsStorageFactory $storageFactory,
+        AssetsPathStrategyFactory $pathStrategyFactory
     ) {
         $this->factory = $factoryBuilder
             ->createFactory()
@@ -80,7 +75,6 @@ class AssetsProviderFactory
         $this->repositoryFactory   = $repositoryFactory;
         $this->storageFactory      = $storageFactory;
         $this->pathStrategyFactory = $pathStrategyFactory;
-        $this->handlerFactory      = $handlerFactory;
     }
 
     /**
@@ -151,11 +145,10 @@ class AssetsProviderFactory
             return $cached;
         }
 
-        $modelConfig             = $this->getModelConfig($modelName);
-        $providerName            = $modelConfig[AssetsConfig::CONFIG_MODEL_PROVIDER_KEY];
-        $storageConfig           = $modelConfig[AssetsConfig::CONFIG_MODEL_STORAGE_KEY];
-        $pathStrategyName        = $modelConfig[AssetsConfig::CONFIG_MODEL_PATH_STRATEGY_KEY] ?? 'MultiLevelHash';
-        $postUploadHandlersNames = $modelConfig[AssetsConfig::CONFIG_MODEL_POST_UPLOAD_KEY] ?? [];
+        $modelConfig      = $this->getModelConfig($modelName);
+        $providerName     = $modelConfig[AssetsConfig::CONFIG_MODEL_PROVIDER_KEY];
+        $storageConfig    = $modelConfig[AssetsConfig::CONFIG_MODEL_STORAGE_KEY];
+        $pathStrategyName = $modelConfig[AssetsConfig::CONFIG_MODEL_PATH_STRATEGY_KEY] ?? 'MultiLevelHash';
 
         // Repository codename is equal model name
         $repository = $this->repositoryFactory->create($modelName);
@@ -191,12 +184,6 @@ class AssetsProviderFactory
                     ':name' => $modelName,
                 ]);
             }
-        }
-
-        // Inject custom post upload handlers
-        foreach ($postUploadHandlersNames as $handlerName) {
-            $handler = $this->handlerFactory->create($handlerName);
-            $providerInstance->addPostUploadHandler($handler);
         }
 
         $this->instances[$modelName] = $providerInstance;

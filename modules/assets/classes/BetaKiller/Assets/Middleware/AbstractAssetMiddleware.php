@@ -30,24 +30,9 @@ use Psr\Log\LoggerInterface;
 abstract class AbstractAssetMiddleware implements RequestHandlerInterface
 {
     /**
-     * @var \BetaKiller\Assets\AssetsProviderFactory
-     */
-    private $providerFactory;
-
-    /**
-     * @var \BetaKiller\Assets\AssetsDeploymentService
-     */
-    private $deploymentService;
-
-    /**
      * @var \BetaKiller\Assets\Provider\AssetsProviderInterface
      */
     protected $provider;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
 
     /**
      * AbstractAssetMiddleware constructor.
@@ -57,13 +42,10 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
      * @param \Psr\Log\LoggerInterface                   $logger
      */
     public function __construct(
-        AssetsProviderFactory $providerFactory,
-        AssetsDeploymentService $deploymentService,
-        LoggerInterface $logger
+        private AssetsProviderFactory $providerFactory,
+        private AssetsDeploymentService $deploymentService,
+        private LoggerInterface $logger
     ) {
-        $this->providerFactory   = $providerFactory;
-        $this->deploymentService = $deploymentService;
-        $this->logger            = $logger;
     }
 
     /**

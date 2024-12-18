@@ -2,26 +2,18 @@
 namespace BetaKiller\Assets\Provider;
 
 use BetaKiller\Acl\Resource\AssetsAclResourceInterface;
-use BetaKiller\Assets\AssetsConfig;
 use BetaKiller\Assets\AssetsDeploymentService;
 use BetaKiller\Assets\ContentTypes;
 use BetaKiller\Assets\Exception\AssetsException;
 use BetaKiller\Assets\Exception\AssetsModelException;
 use BetaKiller\Assets\Exception\AssetsProviderException;
 use BetaKiller\Assets\Exception\AssetsUploadException;
-use BetaKiller\Assets\Exception\CantWriteUploadException;
 use BetaKiller\Assets\Exception\DuplicateFileUploadException;
-use BetaKiller\Assets\Exception\ExtensionHaltedUploadException;
-use BetaKiller\Assets\Exception\FormSizeUploadException;
-use BetaKiller\Assets\Exception\IniSizeUploadException;
-use BetaKiller\Assets\Exception\NoFileUploadException;
-use BetaKiller\Assets\Exception\NoTmpDirUploadException;
-use BetaKiller\Assets\Exception\PartialUploadException;
-use BetaKiller\Assets\Handler\AssetsHandlerInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\Model\HashBasedAssetsModelInterface;
 use BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface;
 use BetaKiller\Assets\Storage\AssetsStorageInterface;
+use BetaKiller\Config\AssetsConfig;
 use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\IdentityConverterInterface;
@@ -29,25 +21,15 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\HashStrategyAssetsRepositoryInterface;
 use BetaKiller\Repository\RepositoryInterface;
 use DateTimeImmutable;
-use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
 use Spotman\Acl\AclInterface;
+
 use function basename;
 use function dirname;
 use function in_array;
 use function is_array;
 use function mb_strlen;
-use function sys_get_temp_dir;
-use function tempnam;
-use const UPLOAD_ERR_CANT_WRITE;
-use const UPLOAD_ERR_EXTENSION;
-use const UPLOAD_ERR_FORM_SIZE;
-use const UPLOAD_ERR_INI_SIZE;
-use const UPLOAD_ERR_NO_FILE;
-use const UPLOAD_ERR_NO_TMP_DIR;
-use const UPLOAD_ERR_OK;
-use const UPLOAD_ERR_PARTIAL;
 
 abstract class AbstractAssetsProvider implements AssetsProviderInterface
 {
@@ -82,7 +64,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     private $entityFactory;
 
     /**
-     * @var \BetaKiller\Assets\AssetsConfig
+     * @var \BetaKiller\Config\AssetsConfig
      */
     protected $config;
 
@@ -95,11 +77,6 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @var AclInterface
      */
     private $acl;
-
-    /**
-     * @var \BetaKiller\Assets\Handler\AssetsHandlerInterface[]
-     */
-    private $postUploadHandlers = [];
 
     /**
      * @var \BetaKiller\Assets\AssetsDeploymentService
@@ -124,7 +101,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param \BetaKiller\Repository\RepositoryInterface                  $repository
      * @param \BetaKiller\Assets\Storage\AssetsStorageInterface           $storage
      * @param \BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface $pathStrategy
-     * @param \BetaKiller\Assets\AssetsConfig                             $config
+     * @param \BetaKiller\Config\AssetsConfig                             $config
      * @param \BetaKiller\Assets\AssetsDeploymentService                  $deploymentService
      * @param \BetaKiller\Assets\ContentTypes                             $contentTypes
      * @param \BetaKiller\IdentityConverterInterface                      $converter
@@ -327,80 +304,6 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     }
 
     /**
-     * @param \Psr\Http\Message\UploadedFileInterface $file     Item from $_FILES
-     * @param array                                   $postData Array with items from $_POST
-     * @param \BetaKiller\Model\UserInterface         $user
-     *
-     * @return AssetsModelInterface
-     * @throws \BetaKiller\Assets\Exception\AssetsException
-     * @throws \BetaKiller\Assets\Exception\AssetsUploadException
-     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
-     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
-     */
-    public function upload(UploadedFileInterface $file, array $postData, UserInterface $user): AssetsModelInterface
-    {
-        // Check permissions
-        if (!$this->isUploadAllowed($user)) {
-            throw new AssetsProviderException('Upload is not allowed');
-        }
-
-        // Security checks
-        $this->checkUploadedFile($file);
-
-        // Move uploaded file to temp location (and proceed underlying checks)
-        $fullPath = tempnam(sys_get_temp_dir(), 'assets-upload');
-        $file->moveTo($fullPath);
-
-        // Store temp file
-        $name  = strip_tags($file->getClientFilename());
-        $model = $this->store($fullPath, $name, $user);
-
-        $this->postUploadProcessing($model, $postData, $user);
-
-        // Cleanup
-        unlink($fullPath);
-
-        return $model;
-    }
-
-    private function checkUploadedFile(UploadedFileInterface $file): void
-    {
-        if (!$file->getSize()) {
-            throw new NoFileUploadException;
-        }
-
-        // TODO i18n for exceptions
-        switch ($file->getError()) {
-            case UPLOAD_ERR_OK:
-                return;
-
-            case UPLOAD_ERR_CANT_WRITE:
-                throw new CantWriteUploadException;
-
-            case UPLOAD_ERR_NO_TMP_DIR:
-                throw new NoTmpDirUploadException;
-
-            case UPLOAD_ERR_EXTENSION:
-                throw new ExtensionHaltedUploadException;
-
-            case UPLOAD_ERR_FORM_SIZE:
-                throw new FormSizeUploadException;
-
-            case UPLOAD_ERR_INI_SIZE:
-                throw new IniSizeUploadException;
-
-            case UPLOAD_ERR_NO_FILE:
-                throw new NoFileUploadException;
-
-            case UPLOAD_ERR_PARTIAL:
-                throw new PartialUploadException;
-
-            default:
-                throw new AssetsUploadException;
-        }
-    }
-
-    /**
      * Returns asset model with predefined fields.
      * Model needs to be saved in repository after calling this method.
      *
@@ -509,30 +412,6 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     {
         // No changes by default
         return $content;
-    }
-
-    /**
-     * After upload processing
-     *
-     * @param AssetsModelInterface            $model
-     * @param array                           $postData
-     * @param \BetaKiller\Model\UserInterface $user
-     */
-    protected function postUploadProcessing(AssetsModelInterface $model, array $postData, UserInterface $user): void
-    {
-        if ($this->postUploadHandlers) {
-            foreach ($this->postUploadHandlers as $handler) {
-                $handler->update($this, $model, $postData, $user);
-            }
-        }
-    }
-
-    /**
-     * @param \BetaKiller\Assets\Handler\AssetsHandlerInterface $handler
-     */
-    public function addPostUploadHandler(AssetsHandlerInterface $handler): void
-    {
-        $this->postUploadHandlers[] = $handler;
     }
 
     /**

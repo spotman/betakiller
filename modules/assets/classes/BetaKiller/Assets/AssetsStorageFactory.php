@@ -2,6 +2,7 @@
 namespace BetaKiller\Assets;
 
 use BetaKiller\Assets\Storage\AssetsStorageInterface;
+use BetaKiller\Config\AssetsConfig;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
 use BetaKiller\Factory\NamespaceBasedFactoryInterface;

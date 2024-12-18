@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Assets;
 
+use BetaKiller\Config\AssetsConfig;
 use BetaKiller\Env\AppEnvInterface;
 use Psr\Container\ContainerInterface;
 
