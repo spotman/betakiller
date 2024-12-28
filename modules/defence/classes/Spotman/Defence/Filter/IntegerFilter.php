@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace Spotman\Defence\Filter;
 
+use InvalidArgumentException;
 use Spotman\Defence\ArgumentDefinitionInterface;
+
+use function is_int;
 
 class IntegerFilter extends AbstractFilterVarFilter
 {
@@ -34,8 +37,21 @@ class IntegerFilter extends AbstractFilterVarFilter
      */
     public function apply($value): int
     {
-        if (!\is_int($value)) {
-            throw new \InvalidArgumentException;
+        // Allow numeric strings
+        if (is_string($value)) {
+            $strValue = $value;
+            $intValue = (int)$value;
+
+            // Check if string representation is equal to integer one
+            if ((string)$intValue !== $strValue) {
+                throw new InvalidArgumentException();
+            }
+
+            $value = $intValue;
+        }
+
+        if (!is_int($value)) {
+            throw new InvalidArgumentException();
         }
 
         $value = $this->filterVar(
@@ -45,7 +61,7 @@ class IntegerFilter extends AbstractFilterVarFilter
         );
 
         if ($value === null) {
-            throw new \InvalidArgumentException;
+            throw new InvalidArgumentException();
         }
 
         return (int)$value;

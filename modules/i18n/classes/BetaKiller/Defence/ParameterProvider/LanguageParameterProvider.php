@@ -27,7 +27,7 @@ final class LanguageParameterProvider implements ParameterProviderInterface
     /**
      * @inheritDoc
      */
-    public function convertValue(string $value): ArgumentParameterInterface
+    public function convertValue(string|int $value): ArgumentParameterInterface
     {
         return $this->repo->getByIsoCode($value);
     }

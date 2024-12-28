@@ -13,7 +13,7 @@ final class FakeStringParameterProvider implements ParameterProviderInterface
         return 'fake-'.$value.'-fake';
     }
 
-    public function convertValue(string $value): ArgumentParameterInterface
+    public function convertValue(string|int $value): ArgumentParameterInterface
     {
         if (!\is_string($value)) {
             throw new \LogicException('Test value must be "string"');

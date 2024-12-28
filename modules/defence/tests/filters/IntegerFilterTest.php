@@ -28,8 +28,8 @@ class IntegerFilterTest extends AbstractFilterTest
     public function sanitizeData(): array
     {
         return [
-            // Fake for sanity
-            0xFFFF => 0xFFFF,
+            // Numeric string to int conversion
+            '12345' => 12345,
         ];
     }
 
@@ -39,6 +39,9 @@ class IntegerFilterTest extends AbstractFilterTest
             false,
             3.14159,
             'string',
+            '01234',
+            '1.234',
+            '1,234',
             [],
             new \stdClass(),
         ];
