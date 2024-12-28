@@ -1,9 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Spotman\Defence;
 
-use Spotman\Defence\Filter\StringFilter;
+use Spotman\Defence\Filter\ParameterFilter;
 
 class ParameterArgumentDefinition extends SingleArgumentDefinition implements ParameterArgumentDefinitionInterface
 {
@@ -21,7 +22,7 @@ class ParameterArgumentDefinition extends SingleArgumentDefinition implements Pa
     {
         parent::__construct($name, self::TYPE_PARAMETER);
 
-        $this->addFilter(new StringFilter());
+        $this->addFilter(new ParameterFilter());
 
         $this->codename = $codename;
     }

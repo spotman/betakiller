@@ -22,7 +22,6 @@ class StringFilter extends AbstractFilterVarFilter
     {
         return [
             ArgumentDefinitionInterface::TYPE_STRING,
-            ArgumentDefinitionInterface::TYPE_PARAMETER,
         ];
     }
 
@@ -37,15 +36,9 @@ class StringFilter extends AbstractFilterVarFilter
     public function apply($value): string
     {
         if (!\is_string($value)) {
-            throw new \InvalidArgumentException;
+            throw new \InvalidArgumentException();
         }
 
-        $value = strip_tags(str_replace(["\0", "\t", "\r", "\n"], '', $value));
-
-        if ($value === null) {
-            throw new \InvalidArgumentException;
-        }
-
-        return trim((string)$value);
+        return trim(strip_tags(str_replace(["\0", "\t", "\r", "\n"], '', $value)));
     }
 }

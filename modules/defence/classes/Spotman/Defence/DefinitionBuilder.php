@@ -201,8 +201,10 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      */
     public function paramArray(string $name, string $codename): DefinitionBuilderInterface
     {
-        return $this->addArgument(new SingleArrayArgumentDefinition($name,
-            new ParameterArgumentDefinition($name, $codename)));
+        return $this->addArgument(new SingleArrayArgumentDefinition(
+            $name,
+            new ParameterArgumentDefinition($name, $codename))
+        );
     }
 
     /**
