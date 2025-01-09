@@ -1,9 +1,11 @@
 <?php
+
 namespace BetaKiller\Log;
 
 use BetaKiller\Exception;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\HandlerInterface;
+use Monolog\LogRecord;
 
 class LazyLoadProxyHandler extends AbstractProcessingHandler
 {
@@ -37,14 +39,7 @@ class LazyLoadProxyHandler extends AbstractProcessingHandler
         $this->factory = $factory;
     }
 
-    /**
-     * Writes the record down to the log of the implementing handler
-     *
-     * @param  array $record
-     *
-     * @return void
-     */
-    protected function write(array $record): void
+    protected function write(LogRecord $record): void
     {
         $this->getHandlerInstance()->handle($record);
     }

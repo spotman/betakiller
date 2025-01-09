@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\Error;
 
 use BetaKiller\Helper\LoggerHelper;
@@ -8,10 +9,10 @@ use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\PhpExceptionRepositoryInterface;
 use Debug;
-use Email;
 use ErrorException;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionClass;
 use Throwable;
@@ -64,11 +65,11 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     /**
      * Writes the record down to the log of the implementing handler
      *
-     * @param array $record
+     * @param \Monolog\LogRecord $record
      *
      * @return void
      */
-    protected function write(array $record): void
+    protected function write(LogRecord $record): void
     {
         if (!$this->enabled) {
             return;
@@ -94,7 +95,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         }
     }
 
-    private function detectException(array $record): Throwable
+    private function detectException(LogRecord $record): Throwable
     {
         /** @var \Throwable|null $exception */
         $exception = $record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION] ?? null;
@@ -126,8 +127,8 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      * @throws \ReflectionException
      */
     private function storeException(
-        Throwable               $exception,
-        ?UserInterface          $user,
+        Throwable $exception,
+        ?UserInterface $user,
         ?ServerRequestInterface $request
     ): void {
         $class = (new ReflectionClass($exception))->getShortName();
@@ -193,13 +194,11 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         // Adding error source file and line number
         $model->addPath($file.':'.$line);
 
-        if ($exception) {
-            // Getting HTML stacktrace
-            $stacktrace = Debug::htmlStackTrace($exception, $request);
+        // Getting HTML stacktrace
+        $stacktrace = Debug::htmlStackTrace($exception, $request);
 
-            // Adding trace
-            $model->setTrace($stacktrace);
-        }
+        // Adding trace
+        $model->setTrace($stacktrace);
 
         $isNotificationNeeded = $this->isNotificationNeededFor($model);
 
@@ -248,8 +247,14 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
     private function getExceptionText(Throwable $e): string
     {
-        return sprintf('%s [ %s ]: %s ~ %s [ %d ]',
-            get_class($e), $e->getCode(), strip_tags($e->getMessage()), Debug::path($e->getFile()), $e->getLine());
+        return sprintf(
+            '%s [ %s ]: %s ~ %s [ %d ]',
+            get_class($e),
+            $e->getCode(),
+            strip_tags($e->getMessage()),
+            Debug::path($e->getFile()),
+            $e->getLine()
+        );
     }
 
     private function sendPlainEmail(Throwable $subsystemX, ?Throwable $originalX): void

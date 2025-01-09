@@ -6,13 +6,14 @@ namespace BetaKiller\Log;
 use BetaKiller\ExceptionInterface;
 use BetaKiller\Helper\LoggerHelper;
 use Monolog\Handler\HandlerWrapper;
+use Monolog\LogRecord;
 
 final class SkipExpectedExceptionsHandler extends HandlerWrapper
 {
     /**
      * {@inheritdoc}
      */
-    public function handle(array $record): bool
+    public function handle(LogRecord $record): bool
     {
         /** @var \Throwable|null $e */
         $e = $record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION] ?? null;

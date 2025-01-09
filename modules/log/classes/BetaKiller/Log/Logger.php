@@ -11,11 +11,11 @@ use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\SlackWebhookHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\TelegramBotHandler;
+use Monolog\Level;
 use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\WebProcessor;
 use Psr\Log\LoggerTrait;
-
 use Throwable;
 
 use function chmod;
@@ -138,7 +138,7 @@ class Logger implements LoggerInterface
         $this->monolog
             ->pushProcessor(new KohanaPlaceholderProcessor())
             ->pushProcessor(new MemoryPeakUsageProcessor())
-            ->pushProcessor(new IntrospectionProcessor($this->monolog::WARNING, $ignoreClasses));
+            ->pushProcessor(new IntrospectionProcessor(Level::Warning, $ignoreClasses));
 
         // CLI mode logging
         if ($this->appEnv->isCli()) {
@@ -148,15 +148,15 @@ class Logger implements LoggerInterface
         }
     }
 
-    private function getLogLevel(): int
+    private function getLogLevel(): Level
     {
         $isDebug = $this->appEnv->isDebugEnabled();
         $isHuman = $this->appEnv->isHuman();
 
         $level = match (true) {
-            $isDebug => \Monolog\Logger::DEBUG,
-            $isHuman => \Monolog\Logger::INFO,
-            default => \Monolog\Logger::NOTICE,
+            $isDebug => Level::Debug,
+            $isHuman => Level::Info,
+            default => Level::Notice,
         };
 
         // CLI override
@@ -216,8 +216,9 @@ class Logger implements LoggerInterface
         $slackWebHookUrl = $this->appEnv->getEnvVariable('SLACK_ERROR_WEBHOOK');
         $tgApiKey        = $this->appEnv->getEnvVariable('TELEGRAM_ERROR_API_KEY');
         $tgChannel       = $this->appEnv->getEnvVariable('TELEGRAM_ERROR_CHANNEL');
+        $tgTopic         = (int)$this->appEnv->getEnvVariable('TELEGRAM_ERROR_TOPIC', false);
 
-        $logLevel = \Monolog\Logger::NOTICE;
+        $logLevel = Level::Notice;
 
         switch (true) {
             case $slackWebHookUrl:
@@ -234,6 +235,10 @@ class Logger implements LoggerInterface
                 break;
 
             case $tgApiKey && $tgChannel:
+                if ($tgTopic) {
+                    $tgChannel = '-100'.$tgChannel.'_'.$tgTopic;
+                }
+
                 $errorHandler = new TelegramBotHandler(
                     $tgApiKey,
                     $tgChannel,
@@ -243,7 +248,8 @@ class Logger implements LoggerInterface
                     true,
                     false,
                     false,
-                    true
+                    true,
+                    $tgTopic ?? null
                 );
 
                 $tgFormatter = new LineFormatter(

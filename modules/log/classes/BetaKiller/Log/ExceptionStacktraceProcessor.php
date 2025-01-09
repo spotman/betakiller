@@ -1,17 +1,15 @@
 <?php
+
 namespace BetaKiller\Log;
 
 use BetaKiller\ExceptionInterface;
 use BetaKiller\Helper\LoggerHelper;
+use Monolog\LogRecord;
+use Monolog\Processor\ProcessorInterface;
 
-class ExceptionStacktraceProcessor
+class ExceptionStacktraceProcessor implements ProcessorInterface
 {
-    /**
-     * @param string[][] $record
-     *
-     * @return array
-     */
-    public function __invoke(array $record)
+    public function __invoke(LogRecord $record)
     {
         /** @var \Throwable|null $exception */
         $exception = $record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION] ?? null;

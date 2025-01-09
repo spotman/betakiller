@@ -1,14 +1,13 @@
 <?php
+
 namespace BetaKiller\Log;
 
-class CliProcessor
+use Monolog\LogRecord;
+use Monolog\Processor\ProcessorInterface;
+
+class CliProcessor implements ProcessorInterface
 {
-    /**
-     * @param  string[][] $record
-     *
-     * @return array
-     */
-    public function __invoke(array $record)
+    public function __invoke(LogRecord $record)
     {
         global $argv;
 

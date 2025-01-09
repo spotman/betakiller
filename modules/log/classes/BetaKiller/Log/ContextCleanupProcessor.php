@@ -1,19 +1,17 @@
 <?php
+
 namespace BetaKiller\Log;
 
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\UserInterface;
+use Monolog\LogRecord;
+use Monolog\Processor\ProcessorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ContextCleanupProcessor
+class ContextCleanupProcessor implements ProcessorInterface
 {
-    /**
-     * @param string[][] $record
-     *
-     * @return array
-     */
-    public function __invoke(array $record)
+    public function __invoke(LogRecord $record)
     {
         if (isset($record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION])) {
             unset($record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION]);
