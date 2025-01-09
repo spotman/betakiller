@@ -5,7 +5,7 @@ namespace BetaKiller\Url\ElementProcessor;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
-use BetaKiller\IFace\Cache\IFaceCache;
+use BetaKiller\IFace\Cache\IFaceCacheInterface;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInstanceInterface;
@@ -24,7 +24,7 @@ readonly class IFaceUrlElementProcessor implements UrlElementProcessorInterface
     public function __construct(
         private IFaceRendererInterface $renderer,
         private UrlElementHelper $elementHelper,
-        private IFaceCache $ifaceCache
+        private IFaceCacheInterface $ifaceCache
     ) {
     }
 
@@ -36,7 +36,6 @@ readonly class IFaceUrlElementProcessor implements UrlElementProcessorInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Url\ElementProcessor\UrlElementProcessorException
-     * @throws \PageCache\PageCacheException
      * @throws \Throwable
      */
     public function process(

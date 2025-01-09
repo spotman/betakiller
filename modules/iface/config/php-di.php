@@ -1,6 +1,8 @@
 <?php
 
 use BetaKiller\DI\ContainerInterface;
+use BetaKiller\IFace\Cache\DummyIFaceCache;
+use BetaKiller\IFace\Cache\IFaceCacheInterface;
 use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Url\UrlDispatcherCacheWrapper;
 use BetaKiller\Url\UrlDispatcherInterface;
@@ -39,6 +41,7 @@ return [
         WidgetFacade::class => autowire(WidgetFacade::class),
 
         IFaceRendererInterface::class => autowire(DefaultIFaceRenderer::class),
+        IFaceCacheInterface::class    => autowire(DummyIFaceCache::class),
     ],
 
 ];

@@ -14,7 +14,7 @@ use PageCache\PageCache;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
-final class IFaceCache
+final class IFaceCache implements IFaceCacheInterface
 {
     /**
      * @var PageCache
@@ -91,7 +91,7 @@ final class IFaceCache
             return;
         }
 
-        $strategy = new IFacePageCacheStrategy($request);
+        $strategy = new \BetaKiller\IFace\Cache\IFacePageCacheStrategy($request);
 
         $this->pageCache->setStrategy($strategy);
 
