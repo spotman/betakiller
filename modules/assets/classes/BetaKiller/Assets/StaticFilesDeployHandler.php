@@ -55,7 +55,7 @@ readonly class StaticFilesDeployHandler implements RequestHandlerInterface
         // Create target directory if not exists
         $deployDir = dirname($deployPath);
 
-        if (!file_exists($deployDir) && !mkdir($deployDir, 0777, true) && !is_dir($deployDir)) {
+        if (!file_exists($deployDir) && !@mkdir($deployDir, 0777, true) && !is_dir($deployDir)) {
             throw new RuntimeException(sprintf('Directory "%s" was not created', $deployDir));
         }
 
