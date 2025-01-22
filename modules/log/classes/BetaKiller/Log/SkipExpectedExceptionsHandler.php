@@ -16,7 +16,7 @@ final class SkipExpectedExceptionsHandler extends HandlerWrapper
     public function handle(LogRecord $record): bool
     {
         /** @var \Throwable|null $e */
-        $e = $record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION] ?? null;
+        $e = $record->context[LoggerHelper::CONTEXT_KEY_EXCEPTION] ?? null;
 
         // Skip expected exceptions
         if ($e && $e instanceof ExceptionInterface && !$e->isNotificationEnabled()) {

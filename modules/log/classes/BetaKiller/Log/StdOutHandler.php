@@ -32,7 +32,7 @@ class StdOutHandler extends StreamHandler
     public function isHandling(LogRecord $record): bool
     {
         // Do not show exceptions, they will be processed in exception handler
-        if (isset($record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION])) {
+        if (isset($record->context[LoggerHelper::CONTEXT_KEY_EXCEPTION])) {
             return false;
         }
 

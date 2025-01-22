@@ -76,10 +76,10 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         }
 
         /** @var ServerRequestInterface|null $request */
-        $request = $record['context'][LoggerHelper::CONTEXT_KEY_REQUEST] ?? null;
+        $request = $record->context[LoggerHelper::CONTEXT_KEY_REQUEST] ?? null;
 
         /** @var UserInterface|null $user */
-        $user = $record['context'][LoggerHelper::CONTEXT_KEY_USER] ?? null;
+        $user = $record->context[LoggerHelper::CONTEXT_KEY_USER] ?? null;
 
         $exception = null;
 
@@ -98,10 +98,10 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     private function detectException(LogRecord $record): Throwable
     {
         /** @var \Throwable|null $exception */
-        $exception = $record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION] ?? null;
+        $exception = $record->context[LoggerHelper::CONTEXT_KEY_EXCEPTION] ?? null;
 
         if (!$exception) {
-            $extra = $record['extra'] ?? [];
+            $extra = $record->extra;
 
             // Create dummy exception if this is a plain "alert" or "emergency" message
             $exception = new ErrorException(

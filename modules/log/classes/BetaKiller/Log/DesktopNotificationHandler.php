@@ -31,7 +31,7 @@ final class DesktopNotificationHandler extends AbstractHandler
     public function handle(LogRecord $record): bool
     {
         /** @var \Throwable|null $exception */
-        $exception = $record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION] ?? null;
+        $exception = $record->context[LoggerHelper::CONTEXT_KEY_EXCEPTION] ?? null;
 
         if ($exception) {
             // Find root exception

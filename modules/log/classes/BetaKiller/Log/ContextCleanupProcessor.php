@@ -13,32 +13,34 @@ class ContextCleanupProcessor implements ProcessorInterface
 {
     public function __invoke(LogRecord $record)
     {
-        if (isset($record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION])) {
-            unset($record['context'][LoggerHelper::CONTEXT_KEY_EXCEPTION]);
+        $context = $record->context;
+
+        if (isset($context[LoggerHelper::CONTEXT_KEY_EXCEPTION])) {
+            unset($context[LoggerHelper::CONTEXT_KEY_EXCEPTION]);
         }
 
-        if (isset($record['context'][LoggerHelper::CONTEXT_KEY_REQUEST])) {
-            $request = $record['context'][LoggerHelper::CONTEXT_KEY_REQUEST];
+        if (isset($context[LoggerHelper::CONTEXT_KEY_REQUEST])) {
+            $request = $context[LoggerHelper::CONTEXT_KEY_REQUEST];
 
             assert($request instanceof ServerRequestInterface);
 
             $id = ServerRequestHelper::getRequestUuid($request);
 
             if ($id) {
-                $record['context'][LoggerHelper::CONTEXT_KEY_REQUEST] = $id;
+                $context[LoggerHelper::CONTEXT_KEY_REQUEST] = $id;
             } else {
-                unset($record['context'][LoggerHelper::CONTEXT_KEY_REQUEST]);
+                unset($context[LoggerHelper::CONTEXT_KEY_REQUEST]);
             }
         }
 
-        if (isset($record['context'][LoggerHelper::CONTEXT_KEY_USER])) {
-            $user = $record['context'][LoggerHelper::CONTEXT_KEY_USER];
+        if (isset($context[LoggerHelper::CONTEXT_KEY_USER])) {
+            $user = $context[LoggerHelper::CONTEXT_KEY_USER];
 
             assert($user instanceof UserInterface);
 
-            $record['context'][LoggerHelper::CONTEXT_KEY_USER] = $user->getID();
+            $context[LoggerHelper::CONTEXT_KEY_USER] = $user->getID();
         }
 
-        return $record;
+        return $record->with(context: $context);
     }
 }

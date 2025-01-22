@@ -11,10 +11,12 @@ class CliProcessor implements ProcessorInterface
     {
         global $argv;
 
-        $record['context']['pid'] = \getmypid();
-        $record['context']['uid'] = \getmyuid();
-        $record['context']['cwd'] = implode(' ', $argv ?: []);
-
-        return $record;
+        return $record->with(
+            context: array_merge($record->context, [
+                'pid' => \getmypid(),
+                'uid' => \getmyuid(),
+                'cwd' => implode(' ', $argv ?: []),
+            ])
+        );
     }
 }
