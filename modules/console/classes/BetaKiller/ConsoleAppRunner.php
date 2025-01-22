@@ -8,6 +8,7 @@ use Beberlei\Metrics\Collector\Collector;
 use BetaKiller\Console\ConsoleHelper;
 use BetaKiller\Console\ConsoleInput;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\Console\ConsoleOptionCollection;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskFactory;
@@ -46,7 +47,10 @@ final readonly class ConsoleAppRunner implements CliAppRunnerInterface
         $className = ConsoleHelper::convert_task_to_class_name($taskName);
         $instance  = $this->taskFactory->create($className);
 
-        $taskOptions = $instance->getDefinedOptions($this->optionBuilder);
+        $instanceOptions = $instance->defineOptions($this->optionBuilder);
+        $commonOptions   = $this->defineCommonOptions($this->optionBuilder);
+
+        $taskOptions = new ConsoleOptionCollection(array_merge($commonOptions, $instanceOptions));
 
         // Show the help page for this task if requested
         if ($this->appEnv->hasCliOption('help')) {
@@ -63,5 +67,30 @@ final readonly class ConsoleAppRunner implements CliAppRunnerInterface
 
         $this->metrics->measure(sprintf('task.%s', $metricsName), $duration);
         $this->metrics->flush();
+    }
+
+    private function defineCommonOptions(ConsoleOptionBuilderInterface $builder): array
+    {
+        return [
+            $builder
+                ->string(AppEnvInterface::CLI_OPTION_STAGE)
+                ->optional(AppEnvInterface::MODE_DEVELOPMENT)
+                ->label('Env stage'),
+
+            $builder
+                ->string(AppEnvInterface::CLI_OPTION_LOG_LEVEL)
+                ->optional()
+                ->label('Log level'),
+
+            $builder
+                ->bool(AppEnvInterface::CLI_OPTION_DEBUG)
+                ->optional()
+                ->label('Force debug'),
+
+            $builder
+                ->string(AppEnvInterface::CLI_OPTION_USER)
+                ->optional()
+                ->label('Run as User'),
+        ];
     }
 }

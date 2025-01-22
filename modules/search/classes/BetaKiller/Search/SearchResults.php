@@ -92,6 +92,11 @@ class SearchResults implements SearchResultsInterface
         $this->items[] = $item;
     }
 
+    public function getItemsCount(): int
+    {
+        return count($this->items);
+    }
+
     /**
      * @inheritDoc
      */

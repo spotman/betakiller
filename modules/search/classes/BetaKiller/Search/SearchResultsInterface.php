@@ -24,6 +24,11 @@ interface SearchResultsInterface extends \IteratorAggregate, \JsonSerializable
     /**
      * @return int
      */
+    public function getItemsCount(): int;
+
+    /**
+     * @return int
+     */
     public function getTotalCount(): int;
 
     /**

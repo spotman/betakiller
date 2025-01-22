@@ -50,10 +50,10 @@ class TaskFactory
     /**
      * @param string $className
      *
-     * @return \BetaKiller\Task\AbstractTask
+     * @return \BetaKiller\Console\ConsoleTaskInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function create(string $className): AbstractTask
+    public function create(string $className): ConsoleTaskInterface
     {
         return $this->factory->create($className, [
             'user' => $this->detectCliUser() ?? $this->createCliUser(),
