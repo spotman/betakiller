@@ -1,18 +1,36 @@
 {% extends layout %}
 
 {% block content %}
-  <div class="error-404">
-    {% block error_title %}
-      <h1 class="center-align">{{ "error.http.404.label"|i18n }}</h1>
-    {% endblock %}
+  {{ css("ifaces/HttpError404.css") }}
 
-    <p class="center-align">
-      {{ "error.http.404.p1"|i18n }}
-      {{ "error.http.404.p2"|i18n }}
-      {{ "error.http.404.search.message"|i18n }}
-    </p>
+  <div class="container error-404">
+    <div class="row align-items-center h-100">
+      <div class="col">
 
-    {% block search_form "" %}
+        <div class="card">
+          {% block card_header %}
+            <div class="card-header">
+              <h4 class="center-align">{{ "error.http.404.label"|i18n }}</h4>
+            </div>
+          {% endblock %}
 
+          <div class="card-body">
+            <p>
+              {{ "error.http.404.p1"|i18n }}<br/>
+              {{ "error.http.404.p2"|i18n }}
+            </p>
+
+            {% block search_form "" %}
+
+            <p>
+              <button class="btn btn-primary back-button">
+                {{ "error.http.back-button"|i18n }}
+              </button>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 {% endblock %}
