@@ -1,6 +1,8 @@
 error.http.400.label: "Incorrect request"
 error.http.400.message: "Maybe you`ve missed something?"
+
 error.http.401.label: "Authorization required"
+
 error.http.403.label: "Access denied"
 error.http.403.message: "You have no enough privileges for viewing current page."
 error.http.403.login-button: "Sign in"
@@ -15,6 +17,7 @@ error.http.404.search.message: "You may use the search form."
 error.http.500.label: "System error"
 error.http.500.p1: "We are on our way to fix it."
 error.http.500.p2: "The page will be refreshed in 45 seconds."
+error.http.500.p3: "Error ID: :hash"
 error.http.500.button.cancel: "Cancel refresh"
 
 error.http.503.label: "Maintenance mode"

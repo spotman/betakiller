@@ -20,5 +20,8 @@ error.http.500.p2: "Для вашего удобства страница буд
 error.http.500.p3: "Error ID: :hash"
 error.http.500.button.cancel: "Отмена"
 
+error.http.503.label: "Идут работы"
+error.http.503.p1: "Мы обновляем сервер, через :sec секунд он будет готов."
+
 notification.developer.error.subsystem-failure.subj: "BetaKiller logging subsystem failure"
 notification.developer.error.php-exception.subj: "BetaKiller exception"
