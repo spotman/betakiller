@@ -664,6 +664,16 @@ final class TwigExtension extends AbstractExtension
                 },
                 ['needs_context' => true,]
             ),
+
+            new TwigFunction(
+                'body_attr',
+                function (array $context, string $key, string $value): void {
+                    $tc = $this->getTemplateContext($context);
+
+                    $tc->setBodyAttribute($key, $value);
+                },
+                ['needs_context' => true,]
+            ),
         ];
     }
 

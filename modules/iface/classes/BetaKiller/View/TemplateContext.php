@@ -28,6 +28,8 @@ class TemplateContext
      */
     private ?string $layout = null;
 
+    private array $bodyAttributes = [];
+
     /**
      * HtmlRenderHelper constructor.
      *
@@ -156,6 +158,13 @@ class TemplateContext
         return $this;
     }
 
+    public function setBodyAttribute(string $key, string $value): self
+    {
+        $this->bodyAttributes[$key] = $value;
+
+        return $this;
+    }
+
     public function getTemplateData(): array
     {
         return [
@@ -179,9 +188,12 @@ class TemplateContext
     public function getWrapperData(): array
     {
         return [
-            'lang'   => $this->lang->getIsoCode(),
-            'header' => $this->renderHeader(),
-            'footer' => $this->renderFooter(),
+            'lang'            => $this->lang->getIsoCode(),
+            'header'          => $this->renderHeader(),
+            'footer'          => $this->renderFooter(),
+
+            // Attributes for the <body> tag
+            'body_attributes' => $this->renderBodyAttributes(),
         ];
     }
 
@@ -196,6 +208,18 @@ class TemplateContext
     private function renderFooter(): string
     {
         return $this->assets->renderJs();
+    }
+
+    private function renderBodyAttributes(): string
+    {
+        return implode(
+            ' ',
+            array_map(
+                fn(string $key, string $value) => sprintf('%s="%s"', $key, $value),
+                array_keys($this->bodyAttributes),
+                array_values($this->bodyAttributes),
+            )
+        );
     }
 
     /**
