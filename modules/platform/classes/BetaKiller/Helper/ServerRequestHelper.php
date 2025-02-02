@@ -118,11 +118,14 @@ class ServerRequestHelper
         return $request->getAttribute(RouteResult::class);
     }
 
+    public static function getRequestedWith(ServerRequestInterface $request): ?string
+    {
+        return $request->getServerParams()['HTTP_X_REQUESTED_WITH'] ?? null;
+    }
+
     public static function isAjax(ServerRequestInterface $request): bool
     {
-        $server = $request->getServerParams();
-
-        $requestedWith = $server['HTTP_X_REQUESTED_WITH'] ?? '';
+        $requestedWith = self::getRequestedWith($request) ?? '';
 
         return mb_strtolower($requestedWith) === 'xmlhttprequest';
     }
