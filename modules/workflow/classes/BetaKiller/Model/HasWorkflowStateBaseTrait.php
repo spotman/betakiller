@@ -41,13 +41,16 @@ trait HasWorkflowStateBaseTrait
     }
 
     /**
-     * @param string $state
+     * @param \BetaKiller\Workflow\WorkflowStateInterface|string $state
      *
      * @return bool
+     * @throws \Kohana_Exception
      */
-    protected function isInWorkflowState(string $state): bool
+    protected function isInWorkflowState(WorkflowStateInterface|string $state): bool
     {
-        return $this->getWorkflowState()->getCodename() === $state;
+        $codename = $state instanceof WorkflowStateInterface ? $state->getCodename() : $state;
+
+        return $this->getWorkflowState()->getCodename() === $codename;
     }
 
     /**
