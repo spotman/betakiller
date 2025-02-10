@@ -19,7 +19,7 @@ use function mb_strtolower;
  * @method UserInterface[] getAll()
  * @method void save(UserInterface $entity)
  */
-class UserRepository extends AbstractHasWorkflowStateRepository implements UserRepositoryInterface
+class UserRepository extends AbstractOrmBasedHasWorkflowStateRepository implements UserRepositoryInterface
 {
     /**
      * @inheritDoc

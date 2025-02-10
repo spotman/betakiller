@@ -24,7 +24,7 @@ trait HasWorkflowStateEnumEntityTrait
      */
     public function hasWorkflowState(): bool
     {
-        return !empty($this->get(static::getWorkflowStateForeignKey()));
+        return $this->get(static::getWorkflowStateForeignKey()) !== null;
     }
 
     /**

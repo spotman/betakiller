@@ -17,55 +17,38 @@ abstract class AbstractHasWorkflowStateRepository extends AbstractOrmBasedDispat
     {
         $orm = $this->getOrmInstance();
 
-        $rel = $this->getStateRelationKey();
-        $col = $this->getStateCodenameColumnName();
+        $col = $this->getStateColumnName();
 
-        $orm->where($rel.'.'.$col, 'IS', null);
+        $orm->where($col, 'IS', null);
 
         return $this->findAll($orm);
     }
 
     protected function filterState(OrmInterface $orm, WorkflowStateInterface $state): self
     {
-        return $this->filterStateCodename($orm, $state->getCodename());
-    }
+        $orm->where($this->getStateColumnName(), '=', $this->getStateColumnValue($state));
+
+        return $this;    }
 
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      * @param WorkflowStateInterface[]                  $states
+     * @param bool|null                                 $not
      *
      * @return $this
      */
-    protected function filterStates(OrmInterface $orm, array $states): self
+    protected function filterStates(OrmInterface $orm, array $states, bool $not = null): self
     {
-        $codenames = array_map(static function (WorkflowStateInterface $state) {
-            return $state->getCodename();
-        }, $states);
+        $values = array_map(fn (WorkflowStateInterface $state) => $this->getStateColumnValue($state), $states);
 
-        return $this->filterStatesCodenames($orm, $codenames);
-    }
+        $col = $this->getStateColumnName();
 
-    protected function filterStateCodename(OrmInterface $orm, string $codename): self
-    {
-        $rel = $this->getStateRelationKey();
-        $col = $this->getStateCodenameColumnName();
-
-        $orm->where($rel.'.'.$col, '=', $codename);
+        $orm->where($col, $not ? 'NOT IN' : 'IN', $values);
 
         return $this;
     }
 
-    protected function filterStatesCodenames(OrmInterface $orm, array $codenames, bool $not = null): self
-    {
-        $rel = $this->getStateRelationKey();
-        $col = $this->getStateCodenameColumnName();
+    abstract protected function getStateColumnName(): string;
 
-        $orm->where($rel.'.'.$col, $not ? 'NOT IN' : 'IN', $codenames);
-
-        return $this;
-    }
-
-    abstract protected function getStateRelationKey(): string;
-
-    abstract protected function getStateCodenameColumnName(): string;
+    abstract protected function getStateColumnValue(WorkflowStateInterface $state): int|string;
 }

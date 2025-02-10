@@ -18,7 +18,7 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
  * @method ContentPost|null findByWpID(int $id)
  * @method ContentPost[] getAll()
  */
-class ContentPostRepository extends AbstractHasWorkflowStateRepository implements ContentPostRepositoryInterface
+class ContentPostRepository extends AbstractOrmBasedHasWorkflowStateRepository implements ContentPostRepositoryInterface
 {
     use OrmBasedRepositoryHasWordpressIdTrait;
 

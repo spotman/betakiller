@@ -21,7 +21,7 @@ use DateInterval;
  * @method ContentCommentInterface[] getAll()
  * @method ContentCommentInterface|null getParent(ContentCommentInterface $parent)
  */
-class ContentCommentRepository extends AbstractHasWorkflowStateRepository
+class ContentCommentRepository extends AbstractOrmBasedHasWorkflowStateRepository
     implements ContentCommentRepositoryInterface
 {
     use OrmBasedRepositoryHasWordpressIdTrait;
