@@ -3,7 +3,7 @@
 namespace BetaKiller\Env;
 
 use Dotenv\Dotenv;
-use BetaKiller\Exception\LogicException;
+use LogicException;
 
 use function stream_isatty;
 
@@ -166,7 +166,7 @@ final class AppEnv implements AppEnvInterface
         $value = getenv($name);
 
         if (!$value && $required) {
-            throw new LogicException('Missing :name env variable', [':name' => $name]);
+            throw new LogicException(sprintf('Missing "%s" env variable', $name));
         }
 
         return (string)$value;
