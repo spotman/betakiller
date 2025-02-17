@@ -3,7 +3,7 @@
 namespace BetaKiller\Env;
 
 use Dotenv\Dotenv;
-use LogicException;
+use BetaKiller\Exception\LogicException;
 
 use function stream_isatty;
 
