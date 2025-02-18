@@ -38,7 +38,7 @@ return [
     'messages' => [
         Notify::NOTIFICATION_PHP_EXCEPTION => [
             'group'     => ERROR_MANAGEMENT_GROUP,
-            'transport' => EmailTransport::CODENAME,
+            'transport' => EmailTransport::getName(),
             'critical'  => true,
         ],
     ],

@@ -11,46 +11,27 @@ use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\NotificationException;
 use BetaKiller\Notification\NotificationFacade;
 
-class NotificationHelper
+final readonly class NotificationHelper implements NotificationGatewayInterface
 {
-    /**
-     * @var \BetaKiller\Notification\NotificationFacade
-     */
-    private $notification;
-
-    /**
-     * @var \BetaKiller\I18n\I18nFacade
-     */
-    private $i18n;
-
     /**
      * NotificationHelper constructor.
      *
-     * @param \BetaKiller\Notification\NotificationFacade $facade
+     * @param \BetaKiller\Notification\NotificationFacade $notification
      * @param \BetaKiller\I18n\I18nFacade                 $i18n
      */
     public function __construct(
-        NotificationFacade $facade,
-        I18nFacade $i18n
+        private NotificationFacade $notification,
+        private I18nFacade $i18n
     ) {
-        $this->notification = $facade;
-        $this->i18n         = $i18n;
     }
 
-    public function getMessageGroup(string $messageCodename): NotificationGroupInterface
+    private function getMessageGroup(string $messageCodename): NotificationGroupInterface
     {
         return $this->notification->getGroupByMessageCodename($messageCodename);
     }
 
     /**
-     * Send message to a linked group
-     *
-     * @param string        $name
-     * @param array         $templateData
-     *
-     * @param string[]|null $attachments
-     *
-     * @throws \BetaKiller\Notification\NotificationException
+     * @inheritDoc
      */
     public function broadcastMessage(string $name, array $templateData, array $attachments = null): void
     {
@@ -78,14 +59,7 @@ class NotificationHelper
     }
 
     /**
-     * Send direct message to a single user
-     *
-     * @param string                                          $name
-     * @param \BetaKiller\Notification\MessageTargetInterface $target
-     * @param array                                           $templateData
-     * @param string[]                                        $attachments Array of files to attach
-     *
-     * @throws \BetaKiller\Notification\NotificationException
+     * @inheritDoc
      */
     public function directMessage(
         string $name,
@@ -105,24 +79,24 @@ class NotificationHelper
         $this->notification->enqueueImmediate($message);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function dismissBroadcast(string $name): void
     {
         $this->notification->dismissBroadcast($name);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function dismissDirect(string $name, MessageTargetInterface $target): void
     {
         $this->notification->dismissDirect($name, $target);
     }
 
     /**
-     * Generate target from email
-     *
-     * @param string      $email
-     * @param string      $name Full name of recipient
-     * @param null|string $lang Target language alpha-2 ISO code
-     *
-     * @return \BetaKiller\Notification\MessageTargetInterface
+     * @inheritDoc
      */
     public function emailTarget(string $email, string $name, ?string $lang = null): MessageTargetInterface
     {
@@ -132,9 +106,7 @@ class NotificationHelper
     }
 
     /**
-     * @param string|null $name
-     *
-     * @return \BetaKiller\Notification\MessageTargetInterface
+     * @inheritDoc
      */
     public function debugEmailTarget(string $name = null): MessageTargetInterface
     {
@@ -150,6 +122,9 @@ class NotificationHelper
         );
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getGroupUserConfig(
         NotificationGroupInterface $group,
         UserInterface $user

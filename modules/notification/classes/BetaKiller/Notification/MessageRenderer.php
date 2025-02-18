@@ -1,31 +1,20 @@
 <?php
+
 namespace BetaKiller\Notification;
 
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\View\ViewFactoryInterface;
 
-class MessageRenderer implements MessageRendererInterface
+readonly class MessageRenderer implements MessageRendererInterface
 {
-    /**
-     * @var \BetaKiller\View\ViewFactoryInterface
-     */
-    private $viewFactory;
-
-    /**
-     * @var \BetaKiller\I18n\I18nFacade
-     */
-    private $i18n;
-
     /**
      * MessageRenderer constructor.
      *
      * @param \BetaKiller\View\ViewFactoryInterface $viewFactory
      * @param \BetaKiller\I18n\I18nFacade           $i18n
      */
-    public function __construct(ViewFactoryInterface $viewFactory, I18nFacade $i18n)
+    public function __construct(private ViewFactoryInterface $viewFactory, private I18nFacade $i18n)
     {
-        $this->viewFactory = $viewFactory;
-        $this->i18n        = $i18n;
     }
 
     /**
@@ -86,7 +75,8 @@ class MessageRenderer implements MessageRendererInterface
         return $this->viewFactory->exists($file);
     }
 
-    private function makeTemplateFileName(string $messageCodename,string $langName = null): string {
+    private function makeTemplateFileName(string $messageCodename, string $langName = null): string
+    {
         $templateName = $messageCodename;
 
         if ($langName) {
@@ -148,7 +138,7 @@ class MessageRenderer implements MessageRendererInterface
 
         throw new NotificationException('Missing ":name" message template for ":transport" in lang ":lang"', [
             ':name'      => $message->getCodename(),
-            ':transport' => $transport->getName(),
+            ':transport' => $transport::getName(),
             ':lang'      => $langName,
         ]);
     }

@@ -6,36 +6,24 @@ namespace BetaKiller\Task\Test\Notification;
 
 use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
-use BetaKiller\Helper\NotificationHelper;
-use BetaKiller\Task\AbstractTask;
+use BetaKiller\Console\ConsoleTaskInterface;
+use BetaKiller\Helper\NotificationGatewayInterface;
 use Psr\Log\LoggerInterface;
 
-final class SendBroadcast extends AbstractTask
+final readonly class SendBroadcast implements ConsoleTaskInterface
 {
     public const NOTIFICATION_TEST_BROADCAST = 'developer/test/broadcast';
 
     /**
-     * @var \BetaKiller\Helper\NotificationHelper
-     */
-    private $notification;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * Send constructor.
+     * SendBroadcast constructor.
      *
-     * @param \BetaKiller\Helper\NotificationHelper $notification
-     * @param \Psr\Log\LoggerInterface              $logger
+     * @param \BetaKiller\Helper\NotificationGatewayInterface $notification
+     * @param \Psr\Log\LoggerInterface                        $logger
      */
     public function __construct(
-        NotificationHelper $notification,
-        LoggerInterface $logger
+        private NotificationGatewayInterface $notification,
+        private LoggerInterface $logger
     ) {
-        $this->notification = $notification;
-        $this->logger       = $logger;
     }
 
     /**

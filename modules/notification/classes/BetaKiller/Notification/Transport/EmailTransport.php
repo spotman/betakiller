@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\Notification\Transport;
 
 use BetaKiller\Config\EmailConfigInterface;
@@ -9,25 +10,8 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
-final class EmailTransport extends AbstractTransport
+final readonly class EmailTransport extends AbstractTransport
 {
-    public const CODENAME = 'email';
-
-    /**
-     * @var \BetaKiller\Env\AppEnvInterface
-     */
-    private $appEnv;
-
-    /**
-     * @var \Symfony\Component\Mailer\MailerInterface
-     */
-    private MailerInterface $mailer;
-
-    /**
-     * @var \BetaKiller\Config\EmailConfigInterface
-     */
-    private EmailConfigInterface $config;
-
     /**
      * EmailTransport constructor.
      *
@@ -35,16 +19,13 @@ final class EmailTransport extends AbstractTransport
      * @param \Symfony\Component\Mailer\MailerInterface $mailer
      * @param \BetaKiller\Config\EmailConfigInterface   $config
      */
-    public function __construct(AppEnvInterface $appEnv, MailerInterface $mailer, EmailConfigInterface $config)
+    public function __construct(private AppEnvInterface $appEnv, private MailerInterface $mailer, private EmailConfigInterface $config)
     {
-        $this->appEnv = $appEnv;
-        $this->mailer = $mailer;
-        $this->config = $config;
     }
 
-    public function getName(): string
+    public static function getName(): string
     {
-        return self::CODENAME;
+        return 'email';
     }
 
     public function isEnabledFor(MessageTargetInterface $user): bool
@@ -84,9 +65,9 @@ final class EmailTransport extends AbstractTransport
      * @throws \BetaKiller\Exception
      */
     public function send(
-        MessageInterface       $message,
+        MessageInterface $message,
         MessageTargetInterface $target,
-        string                 $body
+        string $body
     ): bool {
         $fromUser = $message->getFrom();
 

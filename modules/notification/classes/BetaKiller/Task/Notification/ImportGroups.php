@@ -7,6 +7,7 @@ namespace BetaKiller\Task\Notification;
 use BetaKiller\Config\NotificationConfigInterface;
 use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\Console\ConsoleTaskInterface;
 use BetaKiller\Model\NotificationGroup;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Notification\DismissBroadcastOnEventMessageInterface;
@@ -17,38 +18,12 @@ use BetaKiller\Notification\TransportException;
 use BetaKiller\Notification\TransportFactory;
 use BetaKiller\Repository\NotificationGroupRepository;
 use BetaKiller\Repository\RoleRepositoryInterface;
-use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
 
-class ImportGroups extends AbstractTask
+final readonly class ImportGroups implements ConsoleTaskInterface
 {
     /**
-     * @var \BetaKiller\Config\NotificationConfigInterface
-     */
-    private $config;
-
-    /**
-     * @var \BetaKiller\Repository\RoleRepositoryInterface
-     */
-    private $roleRepo;
-
-    /**
-     * @var \BetaKiller\Repository\NotificationGroupRepository
-     */
-    private $groupRepo;
-
-    /**
-     * @var \BetaKiller\Notification\TransportFactory
-     */
-    private $transportFactory;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * ChangePassword constructor.
+     * ImportGroups constructor.
      *
      * @param \BetaKiller\Repository\NotificationGroupRepository $groupRepo
      * @param \BetaKiller\Config\NotificationConfigInterface     $config
@@ -57,17 +32,12 @@ class ImportGroups extends AbstractTask
      * @param \Psr\Log\LoggerInterface                           $logger
      */
     public function __construct(
-        NotificationGroupRepository $groupRepo,
-        NotificationConfigInterface $config,
-        RoleRepositoryInterface $roleRepo,
-        TransportFactory $transportFactory,
-        LoggerInterface $logger
+        private NotificationGroupRepository $groupRepo,
+        private NotificationConfigInterface $config,
+        private RoleRepositoryInterface $roleRepo,
+        private TransportFactory $transportFactory,
+        private LoggerInterface $logger
     ) {
-        $this->groupRepo        = $groupRepo;
-        $this->config           = $config;
-        $this->roleRepo         = $roleRepo;
-        $this->transportFactory = $transportFactory;
-        $this->logger           = $logger;
     }
 
     /**
@@ -211,9 +181,9 @@ class ImportGroups extends AbstractTask
             if ($dismissOnEvents && !$transport instanceof DismissibleTransportInterface) {
                 throw new TransportException(
                     'Message ":message" has dismiss_on events but transport ":transport" is not dismissible', [
-                    ':message'   => $messageCodename,
-                    ':transport' => $transportCodename,
-                ]
+                        ':message'   => $messageCodename,
+                        ':transport' => $transportCodename,
+                    ]
                 );
             }
 
@@ -225,10 +195,10 @@ class ImportGroups extends AbstractTask
                 if (!is_a($dismissOn, $targetEventType, true)) {
                     throw new TransportException(
                         'Message ":message" dismiss_on event ":event" must implement :must', [
-                        ':message' => $messageCodename,
-                        ':event'   => $dismissOn,
-                        ':must'    => $targetEventType,
-                    ]
+                            ':message' => $messageCodename,
+                            ':event'   => $dismissOn,
+                            ':must'    => $targetEventType,
+                        ]
                     );
                 }
             }

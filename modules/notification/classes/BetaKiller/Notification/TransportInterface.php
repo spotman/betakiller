@@ -6,7 +6,7 @@ interface TransportInterface
     /**
      * @return string
      */
-    public function getName(): string;
+    public static function getName(): string;
 
     /**
      * @param \BetaKiller\Notification\MessageTargetInterface $target

@@ -6,39 +6,19 @@ namespace BetaKiller\Task\Notification;
 
 use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\Console\ConsoleTaskInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\ScheduleProcessor\ScheduleProcessorInterface;
 use BetaKiller\Notification\ScheduleProcessorFactory;
 use BetaKiller\Notification\ScheduleTargetSpecInterface;
-use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Psr\Log\LoggerInterface;
 
-final class SendScheduled extends AbstractTask
+final readonly class SendScheduled implements ConsoleTaskInterface
 {
     private const ARG_FREQ = 'freq';
-
-    /**
-     * @var \BetaKiller\Notification\NotificationFacade
-     */
-    private $notification;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var \BetaKiller\Notification\ScheduleProcessorFactory
-     */
-    private $processorFactory;
-
-    /**
-     * @var \BetaKiller\Notification\ScheduleTargetSpecInterface
-     */
-    private ScheduleTargetSpecInterface $targetSpec;
 
     /**
      * SendScheduled constructor.
@@ -49,15 +29,11 @@ final class SendScheduled extends AbstractTask
      * @param \Psr\Log\LoggerInterface                             $logger
      */
     public function __construct(
-        NotificationFacade $notification,
-        ScheduleProcessorFactory $processorFactory,
-        ScheduleTargetSpecInterface $targetSpec,
-        LoggerInterface $logger
+        private NotificationFacade $notification,
+        private ScheduleProcessorFactory $processorFactory,
+        private ScheduleTargetSpecInterface $targetSpec,
+        private LoggerInterface $logger
     ) {
-        $this->notification     = $notification;
-        $this->processorFactory = $processorFactory;
-        $this->logger           = $logger;
-        $this->targetSpec       = $targetSpec;
     }
 
     /**
@@ -95,8 +71,8 @@ final class SendScheduled extends AbstractTask
                     $this->logger,
                     new TaskException(
                         'Multiple messages in scheduled group ":name" are not allowed', [
-                        ':name' => $group->getCodename(),
-                    ]
+                            ':name' => $group->getCodename(),
+                        ]
                     )
                 );
                 continue;

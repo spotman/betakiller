@@ -46,19 +46,19 @@ return [
         AccessRecoveryService::NOTIFICATION_NAME => [
             'group'     => AUTH_USER_GROUP,
             'action'    => VerifyAccessRecoveryTokenAction::codename(),
-            'transport' => EmailTransport::CODENAME,
+            'transport' => EmailTransport::getName(),
         ],
 
         UserConfirmationEmailHandler::EMAIL_VERIFICATION => [
             'group'     => AUTH_USER_GROUP,
             'action'    => ConfirmEmailAction::codename(),
-            'transport' => EmailTransport::CODENAME,
+            'transport' => EmailTransport::getName(),
         ],
 
         UserPasswordChangeRequestedEmailHandler::REQUEST_PASSWORD_CHANGE => [
             'group'     => AUTH_USER_GROUP,
             'action'    => VerifyPasswordChangeTokenAction::codename(),
-            'transport' => EmailTransport::CODENAME,
+            'transport' => EmailTransport::getName(),
         ],
     ],
 ];

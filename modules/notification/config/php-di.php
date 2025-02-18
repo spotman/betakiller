@@ -4,6 +4,8 @@ use BetaKiller\Config\EmailConfig;
 use BetaKiller\Config\EmailConfigInterface;
 use BetaKiller\Config\NotificationConfig;
 use BetaKiller\Config\NotificationConfigInterface;
+use BetaKiller\Helper\NotificationGatewayInterface;
+use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Repository\NotificationFrequencyRepository;
 use BetaKiller\Repository\NotificationFrequencyRepositoryInterface;
 use BetaKiller\Repository\NotificationGroupRepository;
@@ -17,6 +19,7 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+
 use function DI\autowire;
 use function DI\factory;
 
@@ -31,6 +34,8 @@ return [
         NotificationLogRepositoryInterface::class             => autowire(NotificationLogRepository::class),
         NotificationGroupRepositoryInterface::class           => autowire(NotificationGroupRepository::class),
         NotificationGroupUserConfigRepositoryInterface::class => autowire(NotificationGroupUserConfigRepository::class),
+
+        NotificationGatewayInterface::class => autowire(NotificationHelper::class),
 
         MailerInterface::class => autowire(Mailer::class),
 

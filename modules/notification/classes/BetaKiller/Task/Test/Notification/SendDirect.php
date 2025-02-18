@@ -6,47 +6,29 @@ namespace BetaKiller\Task\Test\Notification;
 
 use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
-use BetaKiller\Helper\NotificationHelper;
+use BetaKiller\Console\ConsoleTaskInterface;
+use BetaKiller\Helper\NotificationGatewayInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
-use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
 
-class SendDirect extends AbstractTask
+final readonly class SendDirect implements ConsoleTaskInterface
 {
     private const ARG_TARGET = 'target';
 
     public const NOTIFICATION_TEST_DIRECT = 'developer/test/direct';
 
     /**
-     * @var \BetaKiller\Helper\NotificationHelper
-     */
-    private $notification;
-
-    /**
-     * @var \BetaKiller\Repository\UserRepositoryInterface
-     */
-    private $userRepo;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
      * SendDirect constructor.
      *
-     * @param \BetaKiller\Helper\NotificationHelper          $notification
-     * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
-     * @param \Psr\Log\LoggerInterface                       $logger
+     * @param \BetaKiller\Helper\NotificationGatewayInterface $notification
+     * @param \BetaKiller\Repository\UserRepositoryInterface  $userRepo
+     * @param \Psr\Log\LoggerInterface                        $logger
      */
     public function __construct(
-        NotificationHelper $notification,
-        UserRepositoryInterface $userRepo,
-        LoggerInterface $logger
+        private NotificationGatewayInterface $notification,
+        private UserRepositoryInterface $userRepo,
+        private LoggerInterface $logger
     ) {
-        $this->notification = $notification;
-        $this->userRepo     = $userRepo;
-        $this->logger       = $logger;
     }
 
     /**

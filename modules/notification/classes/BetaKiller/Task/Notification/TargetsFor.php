@@ -6,6 +6,7 @@ namespace BetaKiller\Task\Notification;
 
 use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\Console\ConsoleTaskInterface;
 use BetaKiller\Model\NotificationFrequencyInterface;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\RoleInterface;
@@ -13,23 +14,12 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\NotificationException;
 use BetaKiller\Notification\NotificationFacade;
-use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
 
-final class TargetsFor extends AbstractTask
+final readonly class TargetsFor implements ConsoleTaskInterface
 {
     private const OPTION_MESSAGE = 'message';
     private const OPTION_FREQ    = 'freq';
-
-    /**
-     * @var \BetaKiller\Notification\NotificationFacade
-     */
-    private $facade;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
 
     /**
      * TargetsFor constructor.
@@ -37,10 +27,8 @@ final class TargetsFor extends AbstractTask
      * @param \BetaKiller\Notification\NotificationFacade $facade
      * @param \Psr\Log\LoggerInterface                    $logger
      */
-    public function __construct(NotificationFacade $facade, LoggerInterface $logger)
+    public function __construct(private NotificationFacade $facade, private LoggerInterface $logger)
     {
-        $this->facade = $facade;
-        $this->logger = $logger;
     }
 
     /**

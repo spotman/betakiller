@@ -5,9 +5,9 @@ use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Notification\MessageInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 
-class OnlineTransport extends AbstractTransport
+final readonly class OnlineTransport extends AbstractTransport
 {
-    public function getName(): string
+    public static function getName(): string
     {
         return 'online';
     }

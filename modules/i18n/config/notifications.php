@@ -38,7 +38,7 @@ return [
     'messages' => [
         I18n::NOTIFICATION_NEW_KEYS => [
             'group'     => TRANSLATION_MANAGEMENT_GROUP,
-            'transport' => EmailTransport::CODENAME,
+            'transport' => EmailTransport::getName(),
             'broadcast' => true,
         ],
     ],

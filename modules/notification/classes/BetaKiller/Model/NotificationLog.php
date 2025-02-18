@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Model;
@@ -57,7 +58,9 @@ class NotificationLog extends \ORM implements NotificationLogInterface
 
     protected function createTableIfNotExists(): void
     {
-        DB::query(Database::SELECT, 'CREATE TABLE IF NOT EXISTS `notification_log` (
+        DB::query(
+            Database::SELECT,
+            'CREATE TABLE IF NOT EXISTS `notification_log` (
     id INTEGER PRIMARY KEY NOT NULL,
     hash VARCHAR(128) NOT NULL,
     name VARCHAR(64) NOT NULL,
@@ -71,7 +74,8 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     body TEXT NULL DEFAULT NULL,
     result TEXT NULL DEFAULT NULL,
     read_at DATETIME DEFAULT NULL
-)')->execute($this->_db_group);
+)'
+        )->execute($this->_db_group);
     }
 
     private function enableAutoVacuum(): void
@@ -120,12 +124,17 @@ class NotificationLog extends \ORM implements NotificationLogInterface
      */
     public function getTargetUserId(): ?string
     {
-        return $this->get(self::COL_USER_ID);
+        $raw = $this->get(self::COL_USER_ID);
+
+        // PK is numeric, so DB driver returns int here
+        return $raw
+            ? (string)$raw
+            : null;
     }
 
     public function setTransport(TransportInterface $transport): NotificationLogInterface
     {
-        $this->set(self::COL_TRANSPORT, $transport->getName());
+        $this->set(self::COL_TRANSPORT, $transport::getName());
 
         return $this;
     }

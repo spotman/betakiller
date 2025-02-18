@@ -304,7 +304,7 @@ final class NotificationFacade
     {
         if (!$transport->canHandle($message)) {
             throw new TransportException('Transport ":transport" can not handle message ":message"', [
-                ':transport' => $transport->getName(),
+                ':transport' => $transport::getName(),
                 ':message'   => $message->getCodename(),
             ]);
         }

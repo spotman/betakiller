@@ -48,18 +48,18 @@ return [
     'messages' => [
         ContentPostWorkflow::NOTIFICATION_POST_COMPLETE => [
             'group'     => POST_MODERATION,
-            'transport' => EmailTransport::CODENAME,
+            'transport' => EmailTransport::getName(),
             'broadcast' => true,
         ],
 
         ContentCommentWorkflow::NOTIFICATION_AUTHOR_APPROVE => [
             'group'     => COMMENT_USER_EVENT,
-            'transport' => EmailTransport::CODENAME,
+            'transport' => EmailTransport::getName(),
         ],
 
         ContentCommentWorkflow::NOTIFICATION_PARENT_REPLY => [
             'group'     => COMMENT_USER_EVENT,
-            'transport' => EmailTransport::CODENAME,
+            'transport' => EmailTransport::getName(),
         ],
     ],
 ];

@@ -3,6 +3,6 @@ namespace BetaKiller\Notification\Transport;
 
 use BetaKiller\Notification\TransportInterface;
 
-abstract class AbstractTransport implements TransportInterface
+abstract readonly class AbstractTransport implements TransportInterface
 {
 }

@@ -10,7 +10,7 @@ define('TEST_NOTIFICATIONS_GROUP', 'test-notifications');
 
 return [
     'transports' => [
-        EmailTransport::CODENAME,
+        EmailTransport::getName(),
     ],
 
     /**
@@ -44,13 +44,13 @@ return [
     'messages'   => [
         SendDirect::NOTIFICATION_TEST_DIRECT => [
             'group'     => TEST_NOTIFICATIONS_GROUP,
-            'transport' => EmailTransport::CODENAME,
+            'transport' => EmailTransport::getName(),
             'critical'  => true,
         ],
 
         SendBroadcast::NOTIFICATION_TEST_BROADCAST => [
             'group'     => TEST_NOTIFICATIONS_GROUP,
-            'transport' => EmailTransport::CODENAME,
+            'transport' => EmailTransport::getName(),
             'broadcast' => true,
         ],
     ],

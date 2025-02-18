@@ -39,13 +39,13 @@ return [
     'messages' => [
         ProcessHits::MISSING_TARGETS => [
             'group'     => HIT_STAT_GROUP,
-            'transport' => EmailTransport::CODENAME,
+            'transport' => EmailTransport::getName(),
             'broadcast' => true,
         ],
 
         ProcessHits::NEW_SOURCES => [
             'group'     => HIT_STAT_GROUP,
-            'transport' => EmailTransport::CODENAME,
+            'transport' => EmailTransport::getName(),
             'broadcast' => true,
         ],
     ],
