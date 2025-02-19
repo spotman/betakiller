@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url;
 
+use BetaKiller\Dev\StartupProfiler;
 use BetaKiller\Helper\LoggerHelper;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -27,6 +28,8 @@ final readonly class UrlElementTreeFactory
     {
         $tree = new UrlElementTree();
 
+        $p = StartupProfiler::begin('UrlElementTree loading');
+
         if (!$this->loadFromCache($tree)) {
             // Fetch from loader
             $this->loader->loadInto($tree);
@@ -36,6 +39,8 @@ final readonly class UrlElementTreeFactory
 
             $this->storeInCache($tree);
         }
+
+        StartupProfiler::end($p);
 
         return $tree;
     }
