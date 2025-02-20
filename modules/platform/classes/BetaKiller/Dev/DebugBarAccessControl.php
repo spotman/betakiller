@@ -20,6 +20,11 @@ readonly class DebugBarAccessControl implements DebugBarAccessControlInterface
         // Fetch actual session
         $session = ServerRequestHelper::getSession($request);
 
+        // Allow debug mode to be disabled for Session (even in dev mode)
+        if (SessionHelper::hasDebugDefined($session) && !SessionHelper::isDebugEnabled($session)) {
+            return false;
+        }
+
         // Read global debug setting
         // Prevent displaying DebugBar in prod mode (even if global debug is on)
         // Prevent guests

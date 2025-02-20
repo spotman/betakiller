@@ -7,8 +7,6 @@ namespace BetaKiller\Action;
 use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Model\User;
-use BetaKiller\Session\SessionStorageInterface;
 use Mezzio\Session\SessionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -19,11 +17,9 @@ abstract readonly class AbstractDebugAction extends AbstractAction
     /**
      * AbstractDebugAction constructor.
      *
-     * @param \BetaKiller\Session\SessionStorageInterface $sessionStorage
-     * @param \Psr\Log\LoggerInterface                    $logger
+     * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(
-        private SessionStorageInterface $sessionStorage,
         protected LoggerInterface $logger
     ) {
     }
@@ -39,17 +35,11 @@ abstract readonly class AbstractDebugAction extends AbstractAction
             throw new AccessDeniedException('Unauthorized debug mode');
         }
 
-        $forUser = ServerRequestHelper::getEntity($request, User::class);
+        $session = ServerRequestHelper::getSession($request);
 
-        $forSessions = $this->sessionStorage->getUserSessions($forUser ?? $user);
+        $this->updateState($session);
 
-        foreach ($forSessions as $forSession) {
-            $this->updateState($forSession);
-        }
-
-        return $forUser
-            ? ResponseHelper::text(sprintf('Debug mode changed for User %s', $forUser->getID()))
-            : ResponseHelper::redirect('/');
+        return ResponseHelper::text(sprintf('Debug mode changed for User %s', $user->getID()));
     }
 
     abstract protected function updateState(SessionInterface $session): void;

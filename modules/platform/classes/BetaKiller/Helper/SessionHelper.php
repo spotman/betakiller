@@ -162,7 +162,12 @@ class SessionHelper
         $session->set(self::DEBUG, false);
     }
 
-    public static function isDebugEnabled(SessionInterface $session): bool
+    public static function hasDebugDefined(SessionInterface $session): bool
+    {
+        return $session->has(self::DEBUG);
+    }
+
+    public static function isDebugEnabled(SessionInterface $session): ?bool
     {
         return (bool)$session->get(self::DEBUG);
     }

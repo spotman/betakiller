@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <dummy uri="debug" name="DebugDummy" label="Session debug hooks" zone="developer" hideInSiteMap="true">
-        <action uri="enable" name="EnableDebug">
-            <dummy uri="{User.id}" name="EnableDebugUser" label="Enable debug user dummy"/>
-        </action>
-
-        <action uri="disable" name="DisableDebug">
-            <dummy uri="{User.id}" name="DisableDebugUser" label="Disable debug user dummy"/>
-        </action>
+        <action uri="enable" name="EnableDebug"/>
+        <action uri="disable" name="DisableDebug"/>
     </dummy>
 </root>
