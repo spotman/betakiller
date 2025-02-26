@@ -38,12 +38,12 @@ readonly class DebugBarFactory implements DebugBarFactoryInterface
         if ($user->isDeveloper()) {
             $debugBar
                 ->addCollector(new DebugBarTimeDataCollector($request))
-                ->addCollector(new DebugBarCookiesDataCollector($request))
-                ->addCollector(new DebugBarSessionDataCollector($request));
+                ->addCollector(new DebugBarCookiesDataCollector($request));
         }
 
         // Common collectors
         $debugBar
+            ->addCollector(new DebugBarSessionDataCollector($request))
             ->addCollector(new DebugBarUserDataCollector($request));
 
         // Developer collectors
