@@ -388,7 +388,7 @@ final class I18nFacade
 
         foreach ($data as $key => $value) {
             // Add prefix if it does not exist
-            if (strpos($key, self::PLACEHOLDER_PREFIX) !== 0) {
+            if (!str_starts_with($key, self::PLACEHOLDER_PREFIX)) {
                 $key = self::PLACEHOLDER_PREFIX.$key;
             }
 

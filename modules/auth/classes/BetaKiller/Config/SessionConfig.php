@@ -30,14 +30,9 @@ class SessionConfig extends AbstractConfig implements SessionConfigInterface
         return new DateInterval('PT'.$seconds.'S');
     }
 
-    public function getAllowedClassNames(): array
-    {
-        return (array)$this->get(['allowed_class_names'], true);
-    }
-
     public function getEncryptionKey(): ?string
     {
-        return $this->get(['encrypt_key']);
+        return $this->get(['encrypt_key']) ?: null;
     }
 
     protected function getConfigRootGroup(): string

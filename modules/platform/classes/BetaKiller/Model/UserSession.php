@@ -9,7 +9,7 @@ use DateTimeImmutable;
 
 class UserSession extends \ORM implements UserSessionInterface
 {
-    public const TOKEN_LENGTH = 32;
+    public const TOKEN_LENGTH = 40;
 
     public const COL_IS_REGENERATED = 'is_regenerated';
 
@@ -110,18 +110,6 @@ class UserSession extends \ORM implements UserSessionInterface
         $this->set('contents', $value);
 
         return $this;
-    }
-
-    public function setOrigin(string $url): UserSessionInterface
-    {
-        $this->set('origin', $url);
-
-        return $this;
-    }
-
-    public function getOrigin(): string
-    {
-        return (string)$this->get('origin');
     }
 
     public function markAsRegenerated(): void

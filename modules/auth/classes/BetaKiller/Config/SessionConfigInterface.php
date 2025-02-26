@@ -23,11 +23,6 @@ interface SessionConfigInterface
     public function getLifetime(): DateInterval;
 
     /**
-     * @return array
-     */
-    public function getAllowedClassNames(): array;
-
-    /**
      * @return string|null
      */
     public function getEncryptionKey(): ?string;

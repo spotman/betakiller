@@ -6,15 +6,17 @@ namespace BetaKiller\Session;
 use BetaKiller\Model\UserInterface;
 use Mezzio\Session\SessionInterface;
 use Mezzio\Session\SessionPersistenceInterface;
+use Ramsey\Uuid\UuidInterface;
 
 interface SessionStorageInterface extends SessionPersistenceInterface
 {
     /**
-     * @param string|null $originUrl
+     * @param string|null $id
+     * @param array|null  $data
      *
      * @return \Mezzio\Session\SessionInterface
      */
-    public function createSession(string $originUrl = null): SessionInterface;
+    public function createSession(?string $id = null, array $data = null): SessionInterface;
 
     /**
      * @param string $token

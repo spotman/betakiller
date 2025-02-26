@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Config;
@@ -7,21 +8,38 @@ use BetaKiller\Exception;
 
 class NotificationConfig extends AbstractConfig implements NotificationConfigInterface
 {
-    public const CONFIG_GROUP_NAME       = 'notifications';
-    public const PATH_TRANSPORTS         = ['transports'];
-    public const PATH_GROUPS             = ['groups'];
-    public const PATH_GROUP_IS_SYSTEM    = ['groups', 'groupCodename' => '', 'is_system'];
-    public const PATH_GROUP_FREQ_CTRL    = ['groups', 'groupCodename' => '', 'freq_control'];
-    public const PATH_GROUP_ROLES        = ['groups', 'groupCodename' => '', 'roles'];
-    public const PATH_MESSAGES           = ['messages'];
-    public const PATH_MESSAGE_GROUP      = ['messages', 'messageCodename' => '', 'group'];
-    public const PATH_MESSAGE_ACTION     = ['messages', 'messageCodename' => '', 'action'];
-    public const PATH_MESSAGE_TRANSPORT  = ['messages', 'messageCodename' => '', 'transport'];
-    public const PATH_MESSAGE_BROADCAST  = ['messages', 'messageCodename' => '', 'broadcast'];
-    public const PATH_MESSAGE_CRITICAL   = ['messages', 'messageCodename' => '', 'critical'];
-    public const PATH_MESSAGE_DISMISS_ON = ['messages', 'messageCodename' => '', 'dismiss_on'];
+    /**
+     * Group keys below
+     */
+    public const ROLES        = 'roles';
+    public const IS_SYSTEM    = 'is_system';
+    public const FREQ_CONTROL = 'freq_control';
 
-    public const PATH_TRANSPORT_UTM = ['utm', 'transportCodename' => ''];
+    /**
+     * Message keys below
+     */
+    public const GROUP      = 'group';
+    public const ACTION     = 'action';
+    public const TRANSPORT  = 'transport';
+    public const BROADCAST  = 'broadcast';
+    public const CRITICAL   = 'critical';
+    public const DISMISS_ON = 'dismiss_on';
+
+    private const CONFIG_GROUP_NAME       = 'notifications';
+    private const PATH_TRANSPORTS         = ['transports'];
+    private const PATH_GROUPS             = ['groups'];
+    private const PATH_GROUP_IS_SYSTEM    = ['groups', 'groupCodename' => '', self::IS_SYSTEM];
+    private const PATH_GROUP_FREQ_CTRL    = ['groups', 'groupCodename' => '', self::FREQ_CONTROL];
+    private const PATH_GROUP_ROLES        = ['groups', 'groupCodename' => '', self::ROLES];
+    private const PATH_MESSAGES           = ['messages'];
+    private const PATH_MESSAGE_GROUP      = ['messages', 'messageCodename' => '', self::GROUP];
+    private const PATH_MESSAGE_ACTION     = ['messages', 'messageCodename' => '', self::ACTION];
+    private const PATH_MESSAGE_TRANSPORT  = ['messages', 'messageCodename' => '', self::TRANSPORT];
+    private const PATH_MESSAGE_BROADCAST  = ['messages', 'messageCodename' => '', self::BROADCAST];
+    private const PATH_MESSAGE_CRITICAL   = ['messages', 'messageCodename' => '', self::CRITICAL];
+    private const PATH_MESSAGE_DISMISS_ON = ['messages', 'messageCodename' => '', self::DISMISS_ON];
+
+    private const PATH_TRANSPORT_UTM = ['utm', 'transportCodename' => ''];
 
     /**
      * @return string

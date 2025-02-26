@@ -73,7 +73,7 @@ abstract readonly class AbstractTokenVerificationAction extends AbstractAction
         $this->auth->login($session, $user);
 
         // Store token hash for further security checks
-        SessionHelper::setTokenHash($session, $token);
+        SessionHelper::setVerificationToken($session, $token);
 
         return $response;
     }

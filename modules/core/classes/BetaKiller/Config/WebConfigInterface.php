@@ -32,4 +32,11 @@ interface WebConfigInterface
      * @return string[]
      */
     public function fetchAnyRoutes(): array;
+
+    /**
+     * Returns array of middlewares` classes which should be executed if no matched route is found
+     *
+     * @return string[]
+     */
+    public function getNotFoundPipeline(): array;
 }

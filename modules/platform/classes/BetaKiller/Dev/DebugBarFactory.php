@@ -58,6 +58,8 @@ readonly class DebugBarFactory implements DebugBarFactoryInterface
 //            $debugBar->addCollector(new DebugBarTwigDataCollector($this->twigEnv));
 //        }
 
+        $debugBar->setStackDataSessionNamespace(SessionHelper::makeServiceKey('stack_data'));
+
         // Storage for processing data for AJAX calls and redirects
         $debugBar->setStorage(new FileStorage($this->appEnv->getTempPath('debugbar-storage')));
 

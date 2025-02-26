@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use BetaKiller\Config\WebConfig;
@@ -58,29 +59,25 @@ return [
 //        ],
     ],
 
-    WebConfig::KEY_ROUTES => [
-        WebConfig::KEY_ANY => [
-            // UrlElement processing
-            '/{path:.*}' => [
-                // Heavy operation
-                UrlHelperMiddleware::class,
+    // UrlElement processing
+    WebConfig::KEY_NOT_FOUND_PIPE => [
+        // Heavy operation
+        UrlHelperMiddleware::class,
 
-                // Save stat (referrer, target, utm markers, etc) (depends on UrlContainer)
-                class_exists(HitStatMiddleware::class) ? HitStatMiddleware::class : DummyMiddleware::class,
+        // Save stat (referrer, target, utm markers, etc) (depends on UrlContainer)
+        class_exists(HitStatMiddleware::class) ? HitStatMiddleware::class : DummyMiddleware::class,
 
-                // Display custom 404 page for dispatched UrlElement
-                CustomNotFoundPageMiddleware::class,
+        // Display custom 404 page for dispatched UrlElement
+        CustomNotFoundPageMiddleware::class,
 
-                // Depends on UrlHelper
-                UrlElementDispatchMiddleware::class,
+        // Depends on UrlHelper
+        UrlElementDispatchMiddleware::class,
 
-                // Prevent access for locked users
-                UserStatusMiddleware::class,
+        // Prevent access for locked users
+        UserStatusMiddleware::class,
 
-                // Render UrlElement
-                UrlElementRenderMiddleware::class,
-            ],
-        ],
+        // Render UrlElement
+        UrlElementRenderMiddleware::class,
     ],
 
 ];

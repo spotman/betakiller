@@ -37,7 +37,7 @@ readonly class PasswordChangeIFace extends AbstractIFace
         $session = ServerRequestHelper::getSession($request);
 
         // Ensure user had been authorized via one-time token
-        SessionHelper::checkToken($session);
+        SessionHelper::checkVerificationTokenExists($session);
 
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
         $user      = ServerRequestHelper::getUser($request);

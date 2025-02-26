@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Session;
@@ -21,32 +22,12 @@ use Mezzio\Session\SessionIdentifierAwareInterface;
 use Mezzio\Session\SessionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Ramsey\Uuid\UuidInterface;
-use Text;
+use Random\Engine\Secure;
+use Random\Randomizer;
 
-class DatabaseSessionStorage implements SessionStorageInterface
+final readonly class DatabaseSessionStorage implements SessionStorageInterface
 {
     public const COOKIE_NAME = 'sid';
-
-    /**
-     * @var \BetaKiller\Config\SessionConfigInterface
-     */
-    private SessionConfigInterface $config;
-
-    /**
-     * @var \BetaKiller\Repository\UserSessionRepositoryInterface
-     */
-    private UserSessionRepositoryInterface $sessionRepo;
-
-    /**
-     * @var \BetaKiller\Security\EncryptionInterface
-     */
-    private EncryptionInterface $encryption;
-
-    /**
-     * @var \BetaKiller\Helper\CookieHelper
-     */
-    private CookieHelper $cookieHelper;
 
     /**
      * DatabaseSessionStorage constructor.
@@ -57,23 +38,15 @@ class DatabaseSessionStorage implements SessionStorageInterface
      * @param \BetaKiller\Helper\CookieHelper                       $cookieHelper
      */
     public function __construct(
-        UserSessionRepositoryInterface $sessionRepo,
-        SessionConfigInterface         $config,
-        EncryptionInterface            $encryption,
-        CookieHelper                   $cookieHelper
+        private UserSessionRepositoryInterface $sessionRepo,
+        private SessionConfigInterface $config,
+        private EncryptionInterface $encryption,
+        private CookieHelper $cookieHelper
     ) {
-        $this->sessionRepo  = $sessionRepo;
-        $this->config       = $config;
-        $this->encryption   = $encryption;
-        $this->cookieHelper = $cookieHelper;
     }
 
     /**
-     * Generate a session data instance based on the request.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @return \Mezzio\Session\SessionInterface
+     * @inheritDoc
      */
     public function initializeSessionFromRequest(ServerRequestInterface $request): SessionInterface
     {
@@ -88,21 +61,15 @@ class DatabaseSessionStorage implements SessionStorageInterface
 
     private function fetchSessionFromRequest(ServerRequestInterface $request): SessionInterface
     {
-        $userAgent  = ServerRequestHelper::getUserAgent($request);
-        $originUrl  = ServerRequestHelper::getUrl($request);
-        $originUuid = ServerRequestHelper::getRequestUuid($request);
-
-        if (!$userAgent) {
-            // Bots, fake requests, etc => regenerate empty session
-            return $this->createSession($originUrl, $originUuid);
-        }
+        $userAgent = ServerRequestHelper::getUserAgent($request);
 
         $cookies = $request->getCookieParams();
         $token   = $cookies[self::COOKIE_NAME] ?? null;
 
-        if (!$token) {
-            // No session (cleared by browser or new visitor) => regenerate empty session
-            return $this->createSession($originUrl, $originUuid);
+        // Bots, fake requests, etc => reuse empty session
+        // No session (cleared by browser or new visitor) => regenerate empty session
+        if (!$token || !$userAgent) {
+            return $this->createSession($token);
         }
 
         return $this->getByToken($token);
@@ -130,10 +97,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         $data = $this->decodeData($content);
 
         // Create session DTO
-        $session = $this->sessionFactory($model->getToken(), $data);
-
-        SessionHelper::setCreatedAt($session, $model->getCreatedAt());
-        SessionHelper::markAsPersistent($session);
+        $session = $this->createSession($model->getToken(), $data);
 
         // Restore user in session if exists
         if ($model->hasUser()) {
@@ -145,10 +109,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * @param string $token
-     *
-     * @return \Mezzio\Session\Session
-     * @throws \BetaKiller\Repository\RepositoryException
+     * @inheritDoc
      */
     public function getByToken(string $token): SessionInterface
     {
@@ -156,7 +117,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
 
         if (!$model) {
             // Missing session (cleared by gc or stale) => regenerate empty session
-            return $this->createSession();
+            return $this->createSession($token);
         }
 
         if ($model->isRegenerated()) {
@@ -175,11 +136,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @return \Mezzio\Session\SessionInterface[]
-     * @throws \BetaKiller\Exception\DomainException
-     * @throws \BetaKiller\Repository\RepositoryException
+     * @inheritDoc
      */
     public function getUserSessions(UserInterface $user): array
     {
@@ -189,39 +146,16 @@ class DatabaseSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * @param string|null                     $originUrl
-     * @param \Ramsey\Uuid\UuidInterface|null $originUuid
-     *
-     * @return \Mezzio\Session\SessionInterface
+     * @inheritDoc
      */
-    public function createSession(string $originUrl = null, UuidInterface $originUuid = null): SessionInterface
+    public function createSession(?string $id = null, array $data = null): SessionInterface
     {
         // Generate new token and fresh session object without data
-        $session = $this->sessionFactory($this->generateToken(), []);
-
-        if ($originUrl) {
-            SessionHelper::setOriginUrl($session, $originUrl);
-        }
-
-        if ($originUuid) {
-            SessionHelper::setOriginUuid($session, $originUuid);
-        }
-
-        SessionHelper::setCreatedAt($session, new DateTimeImmutable);
-
-        return $session;
+        return new Session($data ?? [], $id ?? $this->generateToken());
     }
 
     /**
-     * Persist the session data instance.
-     *
-     * Persists the session data, returning a response instance with any
-     * artifacts required to return to the client.
-     *
-     * @param \Mezzio\Session\SessionInterface    $session
-     * @param \Psr\Http\Message\ResponseInterface $response
-     *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @inheritDoc
      */
     public function persistSession(SessionInterface $session, ResponseInterface $response): ResponseInterface
     {
@@ -252,7 +186,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * @param \Mezzio\Session\SessionInterface $session
+     * @inheritDoc
      */
     public function destroySession(SessionInterface $session): void
     {
@@ -264,22 +198,16 @@ class DatabaseSessionStorage implements SessionStorageInterface
         }
     }
 
-    private function sessionFactory(string $token, array $data): SessionInterface
-    {
-        return new Session($data, $token);
-    }
-
     private function storeSession(SessionInterface $session): void
     {
-        // Fetch session model if exists
-        $model = $this->getSessionModel($session);
-
-        if (!$model) {
-            // Create new model for provided token
-            $model = $this->createSessionModel($session);
+        // Do not store empty sessions
+        if (SessionHelper::isEmpty($session)) {
+            return;
         }
 
-        $origin = SessionHelper::getOriginUrl($session);
+        // Fetch session model if exists
+        // Create new model for provided token
+        $model = $this->getSessionModel($session) ?? $this->createSessionModel($session);
 
         // Import user ID from Session only once
         if (SessionHelper::hasUserID($session) && !$model->hasUser()) {
@@ -287,16 +215,9 @@ class DatabaseSessionStorage implements SessionStorageInterface
             $model->setUserID($userID);
         }
 
-        // Import origin URL if exists
-        if ($origin) {
-            $model->setOrigin($origin);
-        }
-
         if ($session->isRegenerated()) {
             $model->markAsRegenerated();
         }
-
-        SessionHelper::markAsPersistent($session);
 
         // Encode and encrypt session data
         $content = $this->encodeData($session->toArray());
@@ -304,7 +225,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         // Update model data from session
         $model
             ->setContents($content)
-            ->setLastActiveAt(new DateTimeImmutable);
+            ->setLastActiveAt(new DateTimeImmutable());
 
         $this->sessionRepo->save($model);
     }
@@ -312,10 +233,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
     private function regenerateSession(SessionInterface $oldSession): SessionInterface
     {
         // Generate new token and create fresh session with empty data
-        $newSession = $this->createSession(
-            SessionHelper::getOriginUrl($oldSession),
-            SessionHelper::getOriginUuid($oldSession)
-        );
+        $newSession = $this->createSession();
 
         $userID = SessionHelper::getUserID($oldSession);
 
@@ -330,11 +248,9 @@ class DatabaseSessionStorage implements SessionStorageInterface
 
     private function generateToken(): string
     {
-        do {
-            $token = sha1(uniqid(Text::random('alnum', UserSession::TOKEN_LENGTH), true));
-        } while ($this->sessionRepo->findByToken($token));
+        $rand = new Randomizer(new Secure());
 
-        return $token;
+        return bin2hex($rand->getBytes(UserSession::TOKEN_LENGTH / 2));
     }
 
     private function getSessionModel(SessionInterface $session): ?UserSessionInterface
@@ -358,19 +274,16 @@ class DatabaseSessionStorage implements SessionStorageInterface
 
         $model = new UserSession();
 
-        // Fetch original creation time
-        $createdAt = SessionHelper::getCreatedAt($session);
-
         $model
             ->setToken($session->getId())
-            ->setCreatedAt($createdAt);
+            ->setCreatedAt(new DateTimeImmutable());
 
         return $model;
     }
 
     private function encodeData(array $data): string
     {
-        $content = serialize($data);
+        $content = json_encode($data, JSON_OBJECT_AS_ARRAY);
 
         $key = $this->getEncryptionKey();
 
@@ -391,7 +304,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
             $content = $this->encryption->decrypt($content, $key);
         }
 
-        $data = unserialize($content, $this->config->getAllowedClassNames());
+        $data = json_decode($content, true);
 
         if (!is_array($data)) {
             throw new Exception('Invalid session data: :value', [':value' => json_encode($data)]);

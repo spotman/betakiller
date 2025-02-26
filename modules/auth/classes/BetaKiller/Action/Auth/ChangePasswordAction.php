@@ -65,7 +65,7 @@ readonly class ChangePasswordAction extends AbstractAction implements PostReques
         $user      = ServerRequestHelper::getUser($request);
 
         // Ensure user had been authorized via one-time token
-        SessionHelper::checkToken($session);
+        SessionHelper::checkVerificationTokenExists($session);
 
         $this->csrf->checkActionToken($request);
 

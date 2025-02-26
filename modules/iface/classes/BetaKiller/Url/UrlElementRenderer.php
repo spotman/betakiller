@@ -7,6 +7,7 @@ use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Factory\UrlElementInstanceFactory;
 use BetaKiller\Factory\UrlElementProcessorFactory;
+use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -53,6 +54,16 @@ class UrlElementRenderer implements UrlElementRendererInterface
         if ($urlElement instanceof DummyModelInterface) {
             $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
+            // Check redirect
+            $redirectTarget = $urlHelper->detectDummyRedirectTarget($urlElement);
+
+            if ($redirectTarget) {
+                $redirectTo = $urlHelper->makeUrl($redirectTarget);
+
+                return ResponseHelper::redirect($redirectTo);
+            }
+
+            // Check forwarding
             $forwardTarget = $urlHelper->detectDummyForwardTarget($urlElement);
 
             if ($forwardTarget) {

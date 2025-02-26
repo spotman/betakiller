@@ -122,6 +122,10 @@ final class MezzioWebAppRunner implements WebAppRunnerInterface
         // NotFoundHandler kicks in; alternately, you can provide other fallback
         // middleware to execute.
 
+        foreach ($this->config->getNotFoundPipeline() as $className) {
+            $this->app->pipe($className);
+        }
+
         StartupProfiler::getInstance()->stop($p);
     }
 

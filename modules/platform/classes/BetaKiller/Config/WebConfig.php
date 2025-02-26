@@ -1,11 +1,13 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Config;
 
 final class WebConfig extends AbstractConfig implements WebConfigInterface
 {
-    public const KEY_MIDDLEWARES = 'middlewares';
+    public const KEY_MIDDLEWARES    = 'middlewares';
+    public const KEY_NOT_FOUND_PIPE = 'not_found';
 
     public const KEY_ROUTES = 'routes';
 
@@ -39,5 +41,13 @@ final class WebConfig extends AbstractConfig implements WebConfigInterface
     {
         // Reverse so more specific are placed before less specific
         return array_reverse($this->getArray([self::KEY_ROUTES, self::KEY_ANY]));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getNotFoundPipeline(): array
+    {
+        return $this->getArray([self::KEY_NOT_FOUND_PIPE]);
     }
 }

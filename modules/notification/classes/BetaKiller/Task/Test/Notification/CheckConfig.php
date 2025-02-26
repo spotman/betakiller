@@ -10,7 +10,6 @@ use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\MessageBus\EventBusConfigInterface;
 use BetaKiller\Task\AbstractTask;
-use Psr\Log\LoggerInterface;
 
 class CheckConfig extends AbstractTask
 {
@@ -18,11 +17,6 @@ class CheckConfig extends AbstractTask
      * @var \BetaKiller\Config\EmailConfigInterface
      */
     private EmailConfigInterface $emailConfig;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
 
     /**
      * @var \BetaKiller\MessageBus\EventBusConfigInterface
@@ -34,16 +28,13 @@ class CheckConfig extends AbstractTask
      *
      * @param \BetaKiller\Config\EmailConfigInterface        $emailConfig
      * @param \BetaKiller\MessageBus\EventBusConfigInterface $eventBusConfig
-     * @param \Psr\Log\LoggerInterface                       $logger
      */
     public function __construct(
         EmailConfigInterface $emailConfig,
         EventBusConfigInterface $eventBusConfig,
-        LoggerInterface $logger
     ) {
         $this->emailConfig    = $emailConfig;
         $this->eventBusConfig = $eventBusConfig;
-        $this->logger         = $logger;
     }
 
     /**
@@ -80,14 +71,14 @@ class CheckConfig extends AbstractTask
             'Timeout'    => $this->emailConfig->getTimeout(),
             'Username'   => $this->emailConfig->getUsername(),
             'Password'   => $this->emailConfig->getPassword(),
-            'Encryption' => $this->emailConfig->useEncryption(),
+            'Encryption' => $this->emailConfig->useEncryption() ? 'enabled' : 'disabled',
             'Domain'     => $this->emailConfig->getDomain(),
             'From.email' => $this->emailConfig->getFromEmail(),
             'From.name'  => $this->emailConfig->getFromName(),
         ];
 
         foreach ($data as $label => $value) {
-            echo sprintf('%s: %s'.PHP_EOL, $label, ConsoleHelper::color($value, 'green'));
+            echo sprintf('%s: %s'.PHP_EOL, $label, ConsoleHelper::color((string)$value, 'green'));
         }
     }
 

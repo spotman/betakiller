@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Model;
@@ -33,10 +34,6 @@ interface UserSessionInterface extends AbstractEntityInterface
     public function getContents(): string;
 
     public function setContents(string $value): UserSessionInterface;
-
-    public function setOrigin(string $url): UserSessionInterface;
-
-    public function getOrigin(): string;
 
     public function markAsRegenerated(): void;
 

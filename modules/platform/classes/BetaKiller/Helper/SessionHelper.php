@@ -17,13 +17,16 @@ use Ramsey\Uuid\UuidInterface;
 
 class SessionHelper
 {
-    public const CREATED_AT   = 'created_at';
-    public const PERSISTENT   = 'persistent';
-    public const AUTH_USER_ID = 'auth_user_id';
-    public const ORIGIN_URL   = 'origin_url';
-    public const ORIGIN_UUID  = 'origin_uuid';
-    public const TOKEN_HASH   = 'token';
-    public const DEBUG        = 'debug';
+    public const AUTH_USER_ID       = 'auth_user_id';
+    public const DEBUG              = 'debug';
+    public const VERIFICATION_TOKEN = 'token';
+
+    private const SERVICE_KEY_PREFIX = '_';
+
+    public static function makeServiceKey(string $name): string
+    {
+        return self::SERVICE_KEY_PREFIX.$name;
+    }
 
     public static function transferData(SessionInterface $from, SessionInterface $to): void
     {
@@ -44,38 +47,10 @@ class SessionHelper
         return $session->getId();
     }
 
-    public static function setCreatedAt(SessionInterface $session, DateTimeImmutable $createdAt): void
+    public static function isEmpty(SessionInterface $session): bool
     {
-        $session->set(self::CREATED_AT, $createdAt->getTimestamp());
-    }
-
-    public static function getCreatedAt(SessionInterface $session): DateTimeImmutable
-    {
-        $ts = $session->get(self::CREATED_AT);
-
-        return DateTimeHelper::createDateTimeFromTimestamp($ts);
-    }
-
-    /**
-     * Mark session as saved in persistent storage
-     *
-     * @param \Mezzio\Session\SessionInterface $session
-     */
-    public static function markAsPersistent(SessionInterface $session): void
-    {
-        $session->set(self::PERSISTENT, true);
-    }
-
-    /**
-     * Check session was saved in persistent storage
-     *
-     * @param \Mezzio\Session\SessionInterface $session
-     *
-     * @return bool
-     */
-    public static function isPersistent(SessionInterface $session): bool
-    {
-        return (bool)$session->get(self::PERSISTENT);
+        // Filter service keys
+        return empty(array_filter(array_keys($session->toArray()), fn(string $key) => !str_starts_with($key, self::SERVICE_KEY_PREFIX)));
     }
 
     public static function setUserID(SessionInterface $session, UserInterface $user): void
@@ -111,41 +86,19 @@ class SessionHelper
         }
     }
 
-    public static function getOriginUrl(SessionInterface $session): ?string
+    public static function getVerificationToken(SessionInterface $session): ?string
     {
-        return $session->get(self::ORIGIN_URL);
+        return $session->get(self::VERIFICATION_TOKEN);
     }
 
-    public static function setOriginUrl(SessionInterface $session, string $url): void
+    public static function setVerificationToken(SessionInterface $session, TokenInterface $token): void
     {
-        $session->set(self::ORIGIN_URL, $url);
+        $session->set(self::VERIFICATION_TOKEN, $token->getValue());
     }
 
-    public static function getOriginUuid(SessionInterface $session): ?UuidInterface
+    public static function checkVerificationTokenExists(SessionInterface $session): void
     {
-        $value = $session->get(self::ORIGIN_UUID);
-
-        return $value ? Uuid::fromString($value) : null;
-    }
-
-    public static function setOriginUuid(SessionInterface $session, UuidInterface $uuid): void
-    {
-        $session->set(self::ORIGIN_UUID, $uuid->toString());
-    }
-
-    public static function getTokenHash(SessionInterface $session): ?string
-    {
-        return $session->get(self::TOKEN_HASH);
-    }
-
-    public static function setTokenHash(SessionInterface $session, TokenInterface $token): void
-    {
-        $session->set(self::TOKEN_HASH, $token->getValue());
-    }
-
-    public static function checkToken(SessionInterface $session): void
-    {
-        $tokenHash = static::getTokenHash($session);
+        $tokenHash = static::getVerificationToken($session);
 
         if (!$tokenHash) {
             throw new AccessDeniedException('Session token is required for further processing');

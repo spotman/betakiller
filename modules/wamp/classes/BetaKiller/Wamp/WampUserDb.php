@@ -53,7 +53,7 @@ class WampUserDb implements WampCraUserDbInterface
         try {
             $session = $this->auth->getSession($authid);
 
-            if (!SessionHelper::isPersistent($session)) {
+            if (!SessionHelper::isEmpty($session)) {
                 // Make random key string so auth will never be succeeded
                 return $this->makeFakeData($authid);
             }

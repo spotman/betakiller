@@ -4,6 +4,7 @@ use BetaKiller\Config\EmailConfig;
 use BetaKiller\Config\EmailConfigInterface;
 use BetaKiller\Config\NotificationConfig;
 use BetaKiller\Config\NotificationConfigInterface;
+use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\NotificationGatewayInterface;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Repository\NotificationFrequencyRepository;
@@ -18,6 +19,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 use function DI\autowire;
@@ -39,7 +41,7 @@ return [
 
         MailerInterface::class => autowire(Mailer::class),
 
-        TransportInterface::class => factory(function (EmailConfigInterface $config, LoggerInterface $logger) {
+        TransportInterface::class => factory(function (EmailConfigInterface $config, LoggerInterface $logger, AppEnvInterface $appEnv) {
             $transport = new EsmtpTransport(
                 $config->getHost(),
                 $config->getPort(),
@@ -52,6 +54,19 @@ return [
                 ->setUsername($config->getUsername())
                 ->setPassword($config->getPassword())
                 ->setLocalDomain($config->getDomain());
+
+            // Disable SSL cert checks in dev mode
+            // @see EsmtpTransportFactory
+            if ($appEnv->inDevelopmentMode()) {
+                /** @var SocketStream $stream */
+                $stream = $transport->getStream();
+                $streamOptions = $stream->getStreamOptions();
+
+                $streamOptions['ssl']['verify_peer'] = false;
+                $streamOptions['ssl']['verify_peer_name'] = false;
+
+                $stream->setStreamOptions($streamOptions);
+            }
 
             return $transport;
         }),

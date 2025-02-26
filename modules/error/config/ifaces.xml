@@ -9,7 +9,6 @@
         <iface name="HttpError503" uri="503" label="error.http.503.label" zone="public"/>
     </iface>
 
-    <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в UrlElementTree::admin() -->
     <dummy uri="errors" name="Admin\Error\IndexDummy" parent="Admin\Index" label="Errors" menu="admin"
            entity="PhpException" entityAction="search" redirect="Admin\Error\UnresolvedPhpExceptionIndex">
         <iface uri="{PhpException.hash}" name="Admin\Error\PhpExceptionItem"
