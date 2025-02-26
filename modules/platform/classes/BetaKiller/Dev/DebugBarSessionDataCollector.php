@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Dev;
@@ -69,6 +70,8 @@ class DebugBarSessionDataCollector extends DataCollector implements Renderable
         foreach ($session->toArray() as $key => $value) {
             $data[$key] = $this->getDataFormatter()->formatVar($value);
         }
+
+        ksort($data);
 
         return $data;
     }
