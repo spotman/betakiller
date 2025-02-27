@@ -4,7 +4,6 @@ namespace BetaKiller\Widget\Admin;
 
 use BetaKiller\Acl\UrlElementAccessResolverInterface;
 use BetaKiller\CrudlsActionsInterface;
-use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
@@ -12,7 +11,6 @@ use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
-use BetaKiller\Url\EntityLinkedUrlElementInterface;
 use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
@@ -105,11 +103,7 @@ class BarWidget extends AbstractAdminWidget
         UrlContainerInterface $params,
         UrlHelperInterface $helper
     ): array {
-        $currentUrlElement = UrlElementHelper::getCurrentIFaceModel($stack);
-
-        $primaryEntity = $currentUrlElement
-            ? $this->detectPrimaryEntity($currentUrlElement, $params)
-            : null;
+        $primaryEntity = $this->detectPrimaryEntity($stack, $params);
 
         return [
             'previewUrl' => $this->getPreviewButtonUrl($primaryEntity, $stack, $helper),
@@ -126,10 +120,10 @@ class BarWidget extends AbstractAdminWidget
      * @throws \BetaKiller\Url\UrlElementException
      */
     protected function detectPrimaryEntity(
-        EntityLinkedUrlElementInterface $urlElement,
+        UrlElementStack $stack,
         UrlContainerInterface $params
     ): ?DispatchableEntityInterface {
-        $current = $urlElement;
+        $current = $stack->getCurrent();
 
         do {
             $name   = $current->getEntityModelName();

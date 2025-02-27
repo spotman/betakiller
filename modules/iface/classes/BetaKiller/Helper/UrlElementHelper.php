@@ -42,36 +42,15 @@ class UrlElementHelper
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementStack $stack
-     *
-     * @return \BetaKiller\Url\IFaceModelInterface|null
-     * @throws \BetaKiller\Url\UrlElementException
-     */
-    public static function getCurrentIFaceModel(UrlElementStack $stack): ?IFaceModelInterface
-    {
-        $element = $stack->hasCurrent() ? $stack->getCurrent() : null;
-
-        if ($element && !$element instanceof IFaceModelInterface) {
-            throw new UrlElementException('Current URL element :codename is not an IFace, :class given', [
-                ':codename' => $element->getCodename(),
-                ':class'    => get_class($element),
-            ]);
-        }
-
-        return $element;
-    }
-
-    /**
      * @param \BetaKiller\Url\ZoneInterface   $zone
      * @param \BetaKiller\Url\UrlElementStack $stack
      *
      * @return bool
-     * @throws \BetaKiller\Url\UrlElementException
      */
     public static function isCurrentZone(ZoneInterface $zone, UrlElementStack $stack): bool
     {
-        $currentIFace = self::getCurrentIFaceModel($stack);
-        $currentZone  = $currentIFace?->getZoneName();
+        $currentElement = $stack->hasCurrent() ? $stack->getCurrent() : null;
+        $currentZone    = $currentElement?->getZoneName();
 
         return $currentZone === $zone->getName();
     }
