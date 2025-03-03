@@ -6,6 +6,7 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Helper\TextHelper;
+use BetaKiller\Notification\MessageInterface;
 use BetaKiller\Notification\MessageTargetEmail;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\TransportInterface;
@@ -29,6 +30,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     public const COL_RESULT       = 'result';
     public const COL_READ_AT      = 'read_at';
 
+    public const STATUS_PENDING   = 'pending';
     public const STATUS_SUCCEEDED = 'succeeded';
     public const STATUS_FAILED    = 'failed';
 
@@ -81,6 +83,20 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     private function enableAutoVacuum(): void
     {
         DB::query(Database::SELECT, 'PRAGMA auto_vacuum = FULL')->execute($this->_db_group);
+    }
+
+    public static function createFrom(MessageInterface $message, TransportInterface $transport): NotificationLogInterface
+    {
+        $target = $message->getTarget();
+
+        return (new self())
+            ->setHash($message->getHash())
+            ->setProcessedAt(new DateTimeImmutable())
+            ->setMessageName($message->getCodename())
+            ->setTarget($target)
+            ->setTransport($transport)
+            ->setLanguageIsoCode($target->getLanguageIsoCode())
+            ->markAsPending();
     }
 
     /**
@@ -159,6 +175,11 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         $this->set(self::COL_BODY, $body);
 
         return $this;
+    }
+
+    private function markAsPending(): NotificationLogInterface
+    {
+        return $this->setStatus(self::STATUS_PENDING);
     }
 
     public function markAsSucceeded(): NotificationLogInterface

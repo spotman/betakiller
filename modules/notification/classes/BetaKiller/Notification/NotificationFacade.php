@@ -266,7 +266,7 @@ final class NotificationFacade
             return false;
         }
 
-        $log = $this->createLogRecord($message, $transport);
+        $log = NotificationLog::createFrom($message, $transport);
 
         $target = $message->getTarget();
 
@@ -312,19 +312,6 @@ final class NotificationFacade
         $target = $message->getTarget();
 
         return $transport->isEnabledFor($target);
-    }
-
-    private function createLogRecord(MessageInterface $message, TransportInterface $transport): NotificationLogInterface
-    {
-        $target = $message->getTarget();
-
-        return (new NotificationLog)
-            ->setHash($message->getHash())
-            ->setProcessedAt(new DateTimeImmutable)
-            ->setMessageName($message->getCodename())
-            ->setTarget($target)
-            ->setTransport($transport)
-            ->setLanguageIsoCode($target->getLanguageIsoCode());
     }
 
     public function retry(NotificationLogInterface $logRecord): bool
