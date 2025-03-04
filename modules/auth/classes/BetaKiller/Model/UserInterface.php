@@ -59,6 +59,8 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
 
     public function isMinion(): bool;
 
+    public function isAdmin(): bool;
+
     /**
      * @return \DateTimeImmutable|null
      */

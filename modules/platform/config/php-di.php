@@ -57,7 +57,9 @@ use BetaKiller\Middleware\CspReportBodyParamsStrategy;
 use BetaKiller\Notification\MessageActionUrlGeneratorInterface;
 use BetaKiller\Notification\MessageRenderer;
 use BetaKiller\Notification\MessageRendererInterface;
+use BetaKiller\Notification\MessageTargetResolverInterface;
 use BetaKiller\Notification\ScheduleTargetSpecInterface;
+use BetaKiller\Notification\UserMessageTargetResolver;
 use BetaKiller\Notification\UserScheduleTargetSpec;
 use BetaKiller\NotificationMessageActionUrlGenerator;
 use BetaKiller\Repository\RoleRepository;
@@ -283,6 +285,7 @@ return [
 
         ApiLanguageDetectorInterface::class => autowire(ApiLanguageDetector::class),
 
+        MessageTargetResolverInterface::class     => autowire(UserMessageTargetResolver::class),
         MessageActionUrlGeneratorInterface::class => autowire(NotificationMessageActionUrlGenerator::class),
 
         UuidFactoryInterface::class              => autowire(UuidFactory::class),

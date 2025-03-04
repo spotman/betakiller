@@ -9,9 +9,9 @@ use DateTimeImmutable;
 
 trait GuestUserTrait
 {
-    public function isGuest(): bool
+    public function isAdmin(): bool
     {
-        return true;
+        return false;
     }
 
     /**

@@ -6,6 +6,8 @@ use BetaKiller\Config\EmailConfigInterface;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Notification\MessageInterface;
 use BetaKiller\Notification\MessageTargetInterface;
+use BetaKiller\Notification\MessageTargetResolverInterface;
+use BetaKiller\Notification\TransportException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -15,12 +17,17 @@ final readonly class EmailTransport extends AbstractTransport
     /**
      * EmailTransport constructor.
      *
-     * @param \BetaKiller\Env\AppEnvInterface           $appEnv
-     * @param \Symfony\Component\Mailer\MailerInterface $mailer
-     * @param \BetaKiller\Config\EmailConfigInterface   $config
+     * @param \BetaKiller\Env\AppEnvInterface                         $appEnv
+     * @param \Symfony\Component\Mailer\MailerInterface               $mailer
+     * @param \BetaKiller\Config\EmailConfigInterface                 $config
+     * @param \BetaKiller\Notification\MessageTargetResolverInterface $resolver
      */
-    public function __construct(private AppEnvInterface $appEnv, private MailerInterface $mailer, private EmailConfigInterface $config)
-    {
+    public function __construct(
+        private AppEnvInterface $appEnv,
+        private MailerInterface $mailer,
+        private EmailConfigInterface $config,
+        private MessageTargetResolverInterface $resolver
+    ) {
     }
 
     public static function getName(): string
@@ -62,7 +69,8 @@ final readonly class EmailTransport extends AbstractTransport
      * @param string                                          $body
      *
      * @return bool Number of messages sent
-     * @throws \BetaKiller\Exception
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     * @throws \BetaKiller\Notification\TransportException
      */
     public function send(
         MessageInterface $message,
@@ -82,21 +90,18 @@ final readonly class EmailTransport extends AbstractTransport
         $attachments = $message->getAttachments();
 
         if (!$to) {
-            throw new \InvalidArgumentException('Missing email target');
+            throw new TransportException('Missing email target');
         }
 
         if (!$subj) {
-            throw new \InvalidArgumentException('Missing email subject');
+            throw new TransportException('Missing email subject');
         }
 
-        // Redirect all emails while in debug mode
-        if ($this->appEnv->isDebugEnabled()) {
+        // Redirect all emails if required
+        if (!$this->resolver->isDirectSendingAllowed($target)) {
             $subj .= ' [DEBUG] '.$to;
             $to   = $this->appEnv->getDebugEmail();
         }
-
-        // Fake delay to prevent blackout of SMTP relay
-        sleep(2);
 
         $email = (new Email())
             ->sender($sender)
@@ -111,6 +116,9 @@ final readonly class EmailTransport extends AbstractTransport
         }
 
         $this->mailer->send($email);
+
+        // Fake delay to prevent blackout of SMTP relay
+        usleep(500000);
 
         return true;
     }

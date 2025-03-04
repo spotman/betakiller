@@ -162,6 +162,11 @@ class User extends AbstractCreatedAt implements UserInterface
         return $this->hasUsername() && $this->getUsername() === self::CLI_USERNAME;
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->hasRoleName(RoleInterface::ADMIN_PANEL);
+    }
+
     /**
      * @return bool
      */
