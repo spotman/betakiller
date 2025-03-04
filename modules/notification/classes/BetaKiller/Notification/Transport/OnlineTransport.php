@@ -1,9 +1,11 @@
 <?php
 namespace BetaKiller\Notification\Transport;
 
+use BetaKiller\Exception\LogicException;
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Notification\MessageInterface;
 use BetaKiller\Notification\MessageTargetInterface;
+use BetaKiller\Notification\OnlineMessageTargetInterface;
 
 final readonly class OnlineTransport extends AbstractTransport
 {
@@ -22,9 +24,15 @@ final readonly class OnlineTransport extends AbstractTransport
         return false;
     }
 
-    public function isEnabledFor(MessageTargetInterface $user): bool
+    public function isEnabledFor(MessageTargetInterface $target): bool
     {
-        return $user->isOnlineNotificationAllowed() && $this->isOnline($user);
+        if (!$target instanceof OnlineMessageTargetInterface) {
+            throw new LogicException('Message target must implement :class', [
+                ':class' => OnlineMessageTargetInterface::class,
+            ]);
+        }
+
+        return $this->isOnline($target) && $target->isOnlineNotificationAllowed();
     }
 
     /**

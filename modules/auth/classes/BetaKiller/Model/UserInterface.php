@@ -1,10 +1,13 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
 use BetaKiller\MessageBus\RestrictionTargetInterface;
-use BetaKiller\Notification\MessageTargetInterface;
+use BetaKiller\Notification\EmailMessageTargetInterface;
+use BetaKiller\Notification\OnlineMessageTargetInterface;
+use BetaKiller\Notification\PhoneMessageTargetInterface;
 use BetaKiller\Url\RequestUserInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use DateTimeImmutable;
@@ -16,8 +19,8 @@ use Spotman\Acl\AclUserInterface;
  * @package BetaKiller\Model
  */
 interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWorkflowStateInterface,
-    MessageTargetInterface, AclUserInterface, EntityWithAclSpecInterface, RequestUserInterface, CreatedAtInterface,
-    RestrictionTargetInterface
+    EmailMessageTargetInterface, PhoneMessageTargetInterface, OnlineMessageTargetInterface, AclUserInterface,
+    EntityWithAclSpecInterface, RequestUserInterface, CreatedAtInterface, RestrictionTargetInterface
 {
     public static function isIpAddressEnabled(): bool;
 

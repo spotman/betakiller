@@ -186,7 +186,7 @@ final class NotificationFacade
      *
      * @param string                                          $messageCodename
      * @param \BetaKiller\Notification\MessageTargetInterface $target
-     * @param array                                           $data
+     * @param array|null                                      $data
      * @param array|null                                      $attachments Array of files to attach
      *
      * @return \BetaKiller\Notification\MessageInterface
@@ -195,14 +195,17 @@ final class NotificationFacade
     public function createMessage(
         string                 $messageCodename,
         MessageTargetInterface $target,
-        array                  $data,
+        array                  $data = null,
         array                  $attachments = null
     ): MessageInterface {
         $transportName = $this->config->getMessageTransport($messageCodename);
         $isCritical    = $this->config->isMessageCritical($messageCodename);
 
-        $message = $this->messageFactory->create($messageCodename, $target, $transportName, $isCritical)
-            ->setTemplateData($data);
+        $message = $this->messageFactory->create($messageCodename, $target, $transportName, $isCritical);
+
+        if ($data) {
+            $message->setTemplateData($data);
+        }
 
         if ($attachments) {
             foreach ($attachments as $attach) {
@@ -721,14 +724,18 @@ final class NotificationFacade
             return $this->userRepo->getById($userId);
         }
 
-        $targetString = $log->getTargetString();
+        $targetString = $log->getTargetIdentity();
 
-        if (!TextHelper::contains($targetString, '<')) {
-            return null;
+        if (str_ends_with($targetString, '>')) {
+            [$name, $email] = explode('<', trim($targetString, '>'));
+
+            return new EmailMessageTarget($email, $name, $log->getLanguageIsoCode());
         }
 
-        [$name, $email] = explode('<', trim($targetString, '>'));
+        if (str_starts_with($targetString, '+')) {
+            return new PhoneMessageTarget($targetString, $log->getLanguageIsoCode());
+        }
 
-        return new MessageTargetEmail($email, $name, $log->getLanguageIsoCode());
+        return null;
     }
 }

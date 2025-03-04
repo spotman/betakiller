@@ -1,15 +1,16 @@
 <?php
+
 declare(strict_types=1);
 
+use BetaKiller\Config\NotificationConfig;
+use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Notification\Transport\EmailTransport;
 use BetaKiller\Task\Test\Notification\SendBroadcast;
 use BetaKiller\Task\Test\Notification\SendDirect;
 
-define('TEST_NOTIFICATIONS_GROUP', 'test-notifications');
-
 return [
-    'transports' => [
+    NotificationConfig::ROOT_TRANSPORTS => [
         EmailTransport::getName(),
     ],
 
@@ -22,9 +23,9 @@ return [
      *   ...
      * ]
      */
-    'groups'     => [
-        TEST_NOTIFICATIONS_GROUP => [
-            'roles' => [
+    NotificationConfig::ROOT_GROUPS     => [
+        NotificationHelper::TEST_NOTIFICATIONS_GROUP => [
+            NotificationConfig::ROLES => [
                 RoleInterface::DEVELOPER,
             ],
         ],
@@ -41,17 +42,17 @@ return [
      *   ...
      * ]
      */
-    'messages'   => [
+    NotificationConfig::ROOT_MESSAGES   => [
         SendDirect::NOTIFICATION_TEST_DIRECT => [
-            'group'     => TEST_NOTIFICATIONS_GROUP,
-            'transport' => EmailTransport::getName(),
-            'critical'  => true,
+            NotificationConfig::GROUP     => NotificationHelper::TEST_NOTIFICATIONS_GROUP,
+            NotificationConfig::TRANSPORT => EmailTransport::getName(),
+            NotificationConfig::CRITICAL  => true,
         ],
 
         SendBroadcast::NOTIFICATION_TEST_BROADCAST => [
-            'group'     => TEST_NOTIFICATIONS_GROUP,
-            'transport' => EmailTransport::getName(),
-            'broadcast' => true,
+            NotificationConfig::GROUP     => NotificationHelper::TEST_NOTIFICATIONS_GROUP,
+            NotificationConfig::TRANSPORT => EmailTransport::getName(),
+            NotificationConfig::BROADCAST => true,
         ],
     ],
 ];

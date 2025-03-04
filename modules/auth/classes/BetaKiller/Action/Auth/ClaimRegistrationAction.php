@@ -67,7 +67,7 @@ readonly class ClaimRegistrationAction extends AbstractAction
             $this->userWorkflow->notRegisteredClaim($user);
 
             $this->notification->broadcastMessage(self::NOTIFICATION, [
-                'email'             => $log->getTargetString(),
+                'email'             => $log->getTargetIdentity(),
                 'ip'                => ServerRequestHelper::getIpAddress($request),
                 'notification_url'  => $urlHelper->getReadEntityUrl($log, Zone::admin()),
                 'notification_hash' => $log->getHash(),

@@ -4,6 +4,8 @@ namespace BetaKiller\Notification\Transport;
 
 use BetaKiller\Config\EmailConfigInterface;
 use BetaKiller\Env\AppEnvInterface;
+use BetaKiller\Exception\LogicException;
+use BetaKiller\Notification\EmailMessageTargetInterface;
 use BetaKiller\Notification\MessageInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\MessageTargetResolverInterface;
@@ -35,9 +37,9 @@ final readonly class EmailTransport extends AbstractTransport
         return 'email';
     }
 
-    public function isEnabledFor(MessageTargetInterface $user): bool
+    public function isEnabledFor(MessageTargetInterface $target): bool
     {
-        return $user->isEmailNotificationAllowed();
+        return $target instanceof EmailMessageTargetInterface && $target->isEmailNotificationAllowed();
     }
 
     /**
@@ -71,21 +73,34 @@ final readonly class EmailTransport extends AbstractTransport
      * @return bool Number of messages sent
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      * @throws \BetaKiller\Notification\TransportException
+     * @throws \BetaKiller\Exception\LogicException
      */
     public function send(
         MessageInterface $message,
         MessageTargetInterface $target,
         string $body
     ): bool {
+        if (!$target instanceof EmailMessageTargetInterface) {
+            throw new LogicException('Message target must implement :class', [
+                ':class' => EmailMessageTargetInterface::class,
+            ]);
+        }
+
         $fromUser = $message->getFrom();
+
+        if ($fromUser && !$fromUser instanceof EmailMessageTargetInterface) {
+            throw new LogicException('Email message "from" field must implement :class', [
+                ':class' => EmailMessageTargetInterface::class,
+            ]);
+        }
 
         $sender = new Address($this->config->getFromEmail(), $this->config->getFromName());
 
         $from = $fromUser
-            ? new Address($fromUser->getEmail(), $fromUser->getFullName())
+            ? new Address($fromUser->getMessageEmail(), $fromUser->getFullName())
             : $sender;
 
-        $to          = $target->getEmail();
+        $to          = $target->getMessageEmail();
         $subj        = $message->getSubject();
         $attachments = $message->getAttachments();
 

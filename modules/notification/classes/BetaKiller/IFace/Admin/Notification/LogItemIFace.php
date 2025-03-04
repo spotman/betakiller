@@ -31,7 +31,7 @@ readonly class LogItemIFace extends AbstractAdminIFace
                 'date'         => $item->getProcessedAt()->format('d.m.Y H:i:s'),
                 'status'       => $item->getStatus(),
                 'is_succeeded' => $item->isSucceeded(),
-                'target'       => $item->getTargetString(),
+                'target'       => $item->getTargetIdentity(),
                 'subject'      => $item->getSubject(),
                 'result'       => $item->getFailureReason(),
                 'body_url'     => $urlHelper->makeCodenameUrl(NotificationLogItemBodyAction::codename()),

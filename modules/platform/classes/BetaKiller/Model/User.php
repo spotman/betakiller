@@ -526,6 +526,26 @@ class User extends AbstractCreatedAt implements UserInterface
         $this->set(self::COL_NOTIFY_BY_EMAIL, false);
     }
 
+    public function getMessageIdentity(): string
+    {
+        return sprintf('#%s %s', $this->getID(), $this->getFullName());
+    }
+
+    public function getMessageEmail(): string
+    {
+        return $this->getEmail();
+    }
+
+    public function getMessagePhone(): string
+    {
+        return $this->getPhone();
+    }
+
+    public function isPhoneNotificationAllowed(): bool
+    {
+        return true;
+    }
+
     /**
      * @return array
      */

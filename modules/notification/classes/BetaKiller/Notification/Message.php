@@ -275,7 +275,7 @@ class Message implements MessageInterface
         $this->hash = sha1(implode('-', [
             microtime(),
             $this->getCodename(),
-            $this->getTarget()->getEmail(),
+            $this->getTarget()->getMessageIdentity(),
             $this->getTransportName(),
         ]));
     }

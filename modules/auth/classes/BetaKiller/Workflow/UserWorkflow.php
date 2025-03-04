@@ -15,13 +15,11 @@ use BetaKiller\Event\UserResumedEvent;
 use BetaKiller\Event\UserSuspendedEvent;
 use BetaKiller\Event\UserUnlockedEvent;
 use BetaKiller\Exception\DomainException;
-use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Factory\UserFactoryInterface;
 use BetaKiller\Factory\UserInfo;
 use BetaKiller\MessageBus\EventBusInterface;
-use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Notification\MessageTargetInterface;
+use BetaKiller\Notification\EmailMessageTargetInterface;
 use BetaKiller\Repository\RoleRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 
@@ -100,7 +98,7 @@ final class UserWorkflow
         }
 
         // Enable email notifications by default
-        if ($user instanceof MessageTargetInterface) {
+        if ($user instanceof EmailMessageTargetInterface) {
             $user->enableEmailNotification();
         }
 

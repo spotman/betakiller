@@ -74,7 +74,7 @@ final class DismissDirect extends AbstractTask
         $this->notification->dismissDirect($messageName, $target);
 
         $this->logger->debug('Direct message dismissed for :name', [
-            ':name' => $target->getEmail(),
+            ':name' => $target->getMessageEmail(),
         ]);
     }
 }

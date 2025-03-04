@@ -58,7 +58,7 @@ final readonly class LogIndexIFace extends AbstractAdminIFace
 
         $user = $userId ? $this->userRepo->getById($userId) : null;
 
-        $query = new NotificationLogQuery;
+        $query = new NotificationLogQuery();
 
         if ($messageCodename) {
             $query->withMessageCodename($messageCodename);
@@ -89,9 +89,9 @@ final readonly class LogIndexIFace extends AbstractAdminIFace
 
             'filters' => [
                 'user'      => [
-                    'id'    => $user ? $user->getID() : null,
-                    'name'  => $user ? $user->getFullName() : null,
-                    'email' => $user ? $user->getEmail() : null,
+                    'id'    => $user?->getID(),
+                    'name'  => $user?->getFullName(),
+                    'email' => $user?->getEmail(),
                 ],
                 'message'   => $messageCodename,
                 'status'    => $status,
@@ -106,7 +106,7 @@ final readonly class LogIndexIFace extends AbstractAdminIFace
             'processed_at' => $item->getProcessedAt(),
             'name'         => $item->getMessageName(),
             'transport'    => $item->getTransportName(),
-            'target'       => $item->getTargetString(),
+            'target'       => $item->getTargetIdentity(),
             'user_id'      => $item->getTargetUserId(),
             'is_succeeded' => $item->isSucceeded(),
             'status'       => $item->getStatus(),

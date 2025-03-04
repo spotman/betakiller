@@ -1,18 +1,23 @@
 <?php
+
 namespace BetaKiller\Helper;
 
 use BetaKiller\I18n\I18nFacade;
-use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\NotificationGroupUserConfigInterface;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Notification\MessageTargetEmail;
+use BetaKiller\Notification\EmailMessageTarget;
+use BetaKiller\Notification\EmailMessageTargetInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\NotificationException;
 use BetaKiller\Notification\NotificationFacade;
+use BetaKiller\Notification\PhoneMessageTarget;
+use BetaKiller\Notification\PhoneMessageTargetInterface;
 
 final readonly class NotificationHelper implements NotificationGatewayInterface
 {
+    public const TEST_NOTIFICATIONS_GROUP = 'test-notifications';
+
     /**
      * NotificationHelper constructor.
      *
@@ -33,7 +38,7 @@ final readonly class NotificationHelper implements NotificationGatewayInterface
     /**
      * @inheritDoc
      */
-    public function broadcastMessage(string $name, array $templateData, array $attachments = null): void
+    public function broadcastMessage(string $name, array $templateData = null, array $attachments = null): void
     {
         if (!$this->notification->isBroadcastMessage($name)) {
             throw new NotificationException('Direct message ":name" must not be send via broadcast', [
@@ -64,7 +69,7 @@ final readonly class NotificationHelper implements NotificationGatewayInterface
     public function directMessage(
         string $name,
         MessageTargetInterface $target,
-        array $templateData,
+        array $templateData = null,
         array $attachments = null
     ): void {
         if ($this->notification->isBroadcastMessage($name)) {
@@ -98,11 +103,21 @@ final readonly class NotificationHelper implements NotificationGatewayInterface
     /**
      * @inheritDoc
      */
-    public function emailTarget(string $email, string $name, ?string $lang = null): MessageTargetInterface
+    public function emailTarget(string $email, string $name, ?string $lang = null): EmailMessageTargetInterface
     {
         $lang = $lang ?? $this->i18n->getPrimaryLanguage()->getIsoCode();
 
-        return new MessageTargetEmail($email, $name, $lang);
+        return new EmailMessageTarget($email, $name, $lang);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function phoneTarget(string $phone, ?string $lang = null): PhoneMessageTargetInterface
+    {
+        $lang = $lang ?? $this->i18n->getPrimaryLanguage()->getIsoCode();
+
+        return new PhoneMessageTarget($phone, $lang);
     }
 
     /**

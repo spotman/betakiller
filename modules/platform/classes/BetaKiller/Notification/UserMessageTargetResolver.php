@@ -20,17 +20,12 @@ final readonly class UserMessageTargetResolver implements MessageTargetResolverI
             return true;
         }
 
-        // Redirect all messages while in debug mode (exclude production)
-        if ($this->appEnv->isDebugEnabled()) {
-            return false;
-        }
-
         // Always message directly Admin Users
-        if ($target instanceof UserInterface && $target->isAdmin()) {
+        if (($target instanceof UserInterface) && $target->isAdmin()) {
             return true;
         }
 
-        // Just put everything in the logs in non-prod modes
-        return false;
+        // Redirect all messages while in debug mode (exclude production)
+        return !$this->appEnv->isDebugEnabled();
     }
 }

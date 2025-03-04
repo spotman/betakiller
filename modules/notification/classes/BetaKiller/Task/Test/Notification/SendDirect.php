@@ -56,10 +56,10 @@ final readonly class SendDirect implements ConsoleTaskInterface
             ? $this->userRepo->findByEmail($userEmail)
             : $this->notification->debugEmailTarget();
 
-        $this->notification->directMessage(self::NOTIFICATION_TEST_DIRECT, $target, []);
+        $this->notification->directMessage(self::NOTIFICATION_TEST_DIRECT, $target);
 
         $this->logger->info('Message sent to ":email"', [
-            ':email' => $target->getEmail(),
+            ':email' => $target->getMessageEmail(),
         ]);
     }
 }

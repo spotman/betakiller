@@ -118,7 +118,7 @@ final readonly class SendScheduled implements ConsoleTaskInterface
 
         $this->logger->info('Sending notification message ":name" to target ":who"', [
             ':name' => $messageCodename,
-            ':who'  => $target->getEmail(),
+            ':who'  => $target->getMessageIdentity(),
         ]);
 
         $this->notification->enqueueScheduled($message);

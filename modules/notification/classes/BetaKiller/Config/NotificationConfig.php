@@ -9,6 +9,14 @@ use BetaKiller\Exception;
 class NotificationConfig extends AbstractConfig implements NotificationConfigInterface
 {
     /**
+     * Root keys below
+     */
+    public const ROOT_TRANSPORTS = 'transports';
+    public const ROOT_GROUPS     = 'groups';
+    public const ROOT_MESSAGES   = 'messages';
+    public const ROOT_UTM        = 'utm';
+
+    /**
      * Group keys below
      */
     public const ROLES        = 'roles';
@@ -26,20 +34,20 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     public const DISMISS_ON = 'dismiss_on';
 
     private const CONFIG_GROUP_NAME       = 'notifications';
-    private const PATH_TRANSPORTS         = ['transports'];
-    private const PATH_GROUPS             = ['groups'];
-    private const PATH_GROUP_IS_SYSTEM    = ['groups', 'groupCodename' => '', self::IS_SYSTEM];
-    private const PATH_GROUP_FREQ_CTRL    = ['groups', 'groupCodename' => '', self::FREQ_CONTROL];
-    private const PATH_GROUP_ROLES        = ['groups', 'groupCodename' => '', self::ROLES];
-    private const PATH_MESSAGES           = ['messages'];
-    private const PATH_MESSAGE_GROUP      = ['messages', 'messageCodename' => '', self::GROUP];
-    private const PATH_MESSAGE_ACTION     = ['messages', 'messageCodename' => '', self::ACTION];
-    private const PATH_MESSAGE_TRANSPORT  = ['messages', 'messageCodename' => '', self::TRANSPORT];
-    private const PATH_MESSAGE_BROADCAST  = ['messages', 'messageCodename' => '', self::BROADCAST];
-    private const PATH_MESSAGE_CRITICAL   = ['messages', 'messageCodename' => '', self::CRITICAL];
-    private const PATH_MESSAGE_DISMISS_ON = ['messages', 'messageCodename' => '', self::DISMISS_ON];
+    private const PATH_TRANSPORTS         = [self::ROOT_TRANSPORTS];
+    private const PATH_GROUPS             = [self::ROOT_GROUPS];
+    private const PATH_GROUP_IS_SYSTEM    = [self::ROOT_GROUPS, 'groupCodename' => '', self::IS_SYSTEM];
+    private const PATH_GROUP_FREQ_CTRL    = [self::ROOT_GROUPS, 'groupCodename' => '', self::FREQ_CONTROL];
+    private const PATH_GROUP_ROLES        = [self::ROOT_GROUPS, 'groupCodename' => '', self::ROLES];
+    private const PATH_MESSAGES           = [self::ROOT_MESSAGES];
+    private const PATH_MESSAGE_GROUP      = [self::ROOT_MESSAGES, 'messageCodename' => '', self::GROUP];
+    private const PATH_MESSAGE_ACTION     = [self::ROOT_MESSAGES, 'messageCodename' => '', self::ACTION];
+    private const PATH_MESSAGE_TRANSPORT  = [self::ROOT_MESSAGES, 'messageCodename' => '', self::TRANSPORT];
+    private const PATH_MESSAGE_BROADCAST  = [self::ROOT_MESSAGES, 'messageCodename' => '', self::BROADCAST];
+    private const PATH_MESSAGE_CRITICAL   = [self::ROOT_MESSAGES, 'messageCodename' => '', self::CRITICAL];
+    private const PATH_MESSAGE_DISMISS_ON = [self::ROOT_MESSAGES, 'messageCodename' => '', self::DISMISS_ON];
 
-    private const PATH_TRANSPORT_UTM = ['utm', 'transportCodename' => ''];
+    private const PATH_TRANSPORT_UTM = [self::ROOT_UTM, 'transportCodename' => ''];
 
     /**
      * @return string

@@ -164,7 +164,7 @@ readonly class MessageRenderer implements MessageRendererInterface
     {
         return array_merge($message->getTemplateData(), [
             'target_name'  => $targetUser->getFullName(),
-            'target_email' => $targetUser->getEmail(),
+            'target_email' => $targetUser instanceof EmailMessageTargetInterface ? $targetUser->getMessageEmail() : null,
         ]);
     }
 }

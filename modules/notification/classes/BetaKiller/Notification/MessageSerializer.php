@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Notification;
@@ -25,8 +26,12 @@ class MessageSerializer
     private const KEY_EMAIL_NAME    = 'name';
     private const KEY_EMAIL_LANG    = 'lang';
 
+    private const KEY_PHONE_NUMBER = 'phone';
+    private const KEY_PHONE_LANG   = 'lang';
+
     private const TARGET_TYPE_USER  = 'user';
     private const TARGET_TYPE_EMAIL = 'email';
+    private const TARGET_TYPE_PHONE = 'phone';
 
     /**
      * @var \BetaKiller\Repository\UserRepository
@@ -98,12 +103,19 @@ class MessageSerializer
                     self::KEY_USER_ID     => $target->getID(),
                 ];
 
-            case $target instanceof MessageTargetEmail:
+            case $target instanceof EmailMessageTargetInterface:
                 return [
                     self::KEY_TARGET_TYPE   => self::TARGET_TYPE_EMAIL,
-                    self::KEY_EMAIL_ADDRESS => $target->getEmail(),
+                    self::KEY_EMAIL_ADDRESS => $target->getMessageEmail(),
                     self::KEY_EMAIL_NAME    => $target->getFullName(),
                     self::KEY_EMAIL_LANG    => $target->getLanguageIsoCode(),
+                ];
+
+            case $target instanceof PhoneMessageTargetInterface:
+                return [
+                    self::KEY_TARGET_TYPE  => self::TARGET_TYPE_PHONE,
+                    self::KEY_PHONE_NUMBER => $target->getMessagePhone(),
+                    self::KEY_PHONE_LANG   => $target->getLanguageIsoCode(),
                 ];
 
             default:
@@ -122,10 +134,16 @@ class MessageSerializer
                 return $this->userRepo->getById($data[self::KEY_USER_ID]);
 
             case self::TARGET_TYPE_EMAIL:
-                return new MessageTargetEmail(
+                return new EmailMessageTarget(
                     $data[self::KEY_EMAIL_ADDRESS],
                     $data[self::KEY_EMAIL_NAME],
                     $data[self::KEY_EMAIL_LANG]
+                );
+
+            case self::TARGET_TYPE_PHONE:
+                return new PhoneMessageTarget(
+                    $data[self::KEY_PHONE_NUMBER],
+                    $data[self::KEY_PHONE_LANG]
                 );
 
             default:

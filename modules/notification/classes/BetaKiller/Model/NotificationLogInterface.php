@@ -93,7 +93,7 @@ interface NotificationLogInterface extends DispatchableEntityInterface
     /**
      * @return string
      */
-    public function getTargetString(): string;
+    public function getTargetIdentity(): string;
 
     /**
      * @return string

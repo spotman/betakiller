@@ -179,7 +179,7 @@ class UserRepository extends AbstractOrmBasedHasWorkflowStateRepository implemen
 
     protected function filterPhone(OrmInterface $orm, string $value): self
     {
-        $orm->where($orm->object_column(User::COL_PHONE), '=', $value);
+        $orm->where($orm->object_column(User::COL_PHONE), '=', trim($value, '+'));
 
         return $this;
     }

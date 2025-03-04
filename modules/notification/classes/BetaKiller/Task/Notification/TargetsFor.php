@@ -87,17 +87,17 @@ final readonly class TargetsFor implements ConsoleTaskInterface
         foreach ($targets as $item) {
             $targetFreq = $this->getTargetGroupFrequencyName($group, $item);
 
-            if ($item instanceof UserInterface) {
-                $this->logger->info('[:lang] :email [:freq]', [
-                    ':email' => $item->getEmail(),
-                    ':lang'  => $item->getLanguageIsoCode(),
-                    ':freq'  => $targetFreq ? $targetFreq->getCodename() : 'immediate',
-                ]);
-            } else {
+            if (!$item instanceof UserInterface) {
                 throw new NotificationException('Unknown target type ":type"', [
                     ':type' => \gettype($item),
                 ]);
             }
+
+            $this->logger->info('[:lang] :email [:freq]', [
+                ':email' => $item->getMessageEmail(),
+                ':lang'  => $item->getLanguageIsoCode(),
+                ':freq'  => $targetFreq ? $targetFreq->getCodename() : 'immediate',
+            ]);
         }
     }
 

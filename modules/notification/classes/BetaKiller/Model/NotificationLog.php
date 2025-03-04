@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-use BetaKiller\Exception\DomainException;
 use BetaKiller\Helper\TextHelper;
 use BetaKiller\Notification\MessageInterface;
-use BetaKiller\Notification\MessageTargetEmail;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\TransportInterface;
 use Database;
@@ -224,7 +222,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
      * @return string
      * @throws \Kohana_Exception
      */
-    public function getTargetString(): string
+    public function getTargetIdentity(): string
     {
         return (string)$this->get(self::COL_TARGET);
     }
@@ -260,17 +258,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
 
     private function makeTargetString(MessageTargetInterface $target): string
     {
-        if ($target instanceof MessageTargetEmail) {
-            return sprintf('%s <%s>', $target->getFullName(), $target->getEmail());
-        }
-
-        if ($target instanceof UserInterface) {
-            return sprintf('%s <%s>', $target->getFullName(), $target->getEmail());
-        }
-
-        throw new DomainException('Unknown target type ":type"', [
-            ':type' => \gettype($target),
-        ]);
+        return $target->getMessageIdentity();
     }
 
     private function setStatus(string $value): NotificationLogInterface
@@ -349,6 +337,6 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     {
         return !$this->isSucceeded()
             && $this->getBody()
-            && ($this->getTargetUserId() || TextHelper::contains($this->getTargetString(), '<'));
+            && ($this->getTargetUserId() || TextHelper::contains($this->getTargetIdentity(), '<'));
     }
 }
