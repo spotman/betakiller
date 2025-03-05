@@ -8,6 +8,7 @@ use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Search\SearchResultsInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmQueryBuilderInterface;
+use DB;
 use ORM\PaginateHelper;
 
 abstract class AbstractOrmBasedRepository extends AbstractRepository
@@ -178,6 +179,15 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         return $model;
     }
 
+    protected function countSelf(OrmInterface $orm): int
+    {
+        $orm->custom_select([
+            [DB::expr('COUNT(*)'), 'total'],
+        ]);
+
+        return (int)$orm->execute_query()->get('total');
+    }
+
     protected function countAll(OrmInterface $orm): int
     {
         return $orm->count_all();
@@ -338,9 +348,9 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     protected function filterWithSoundex(OrmQueryBuilderInterface $orm, string $col, string $term): self
     {
         $orm->where(
-            \DB::expr(sprintf('MATCH (%s)', $col)),
+            DB::expr(sprintf('MATCH (%s)', $col)),
             '',
-            \DB::expr(sprintf('AGAINST (\'%s\')', $term)), //  WITH QUERY EXPANSION
+            DB::expr(sprintf('AGAINST (\'%s\')', $term)), //  WITH QUERY EXPANSION
         );
 
         return $this;
