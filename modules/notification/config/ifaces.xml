@@ -16,7 +16,7 @@
                entity="NotificationLog" entityAction="list">
             <iface uri="{Page}" name="Admin\Notification\LogPage" label="Page {Page}"/>
             <dummy uri="item" name="Admin\Notification\ItemDummy" label="Item">
-                <iface uri="{NotificationLog.id}" name="Admin\Notification\LogItem" label="Message"
+                <iface uri="{NotificationLog.id}" name="Admin\Notification\LogItem" label="{NotificationLog.id}"
                        entity="NotificationLog" entityAction="read">
                     <action uri="body" name="Admin\NotificationLogItemBody"/>
                     <action uri="retry" name="Admin\RetryNotification"

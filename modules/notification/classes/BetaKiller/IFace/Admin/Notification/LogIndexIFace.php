@@ -11,7 +11,6 @@ use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Query\NotificationLogQuery;
 use BetaKiller\Repository\NotificationLogRepositoryInterface;
-use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Url\Parameter\Page;
 use BetaKiller\Url\Zone;
 use Psr\Http\Message\ServerRequestInterface;
@@ -19,7 +18,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final readonly class LogIndexIFace extends AbstractAdminIFace
 {
     public const ARG_MESSAGE   = 'message';
-    public const ARG_USER      = 'user';
+    public const ARG_TARGET    = 'target';
     public const ARG_STATUS    = 'status';
     public const ARG_TRANSPORT = 'transport';
 
@@ -27,19 +26,11 @@ final readonly class LogIndexIFace extends AbstractAdminIFace
      * LogIndexIFace constructor.
      *
      * @param \BetaKiller\Repository\NotificationLogRepositoryInterface $logRepo
-     * @param \BetaKiller\Repository\UserRepositoryInterface            $userRepo
      */
-    public function __construct(private NotificationLogRepositoryInterface $logRepo, private UserRepositoryInterface $userRepo)
+    public function __construct(private NotificationLogRepositoryInterface $logRepo)
     {
     }
 
-    /**
-     * Returns data for View
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @return array
-     */
     public function getData(ServerRequestInterface $request): array
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
@@ -47,33 +38,30 @@ final readonly class LogIndexIFace extends AbstractAdminIFace
 
         $itemsPerPage = 100;
 
-        $messageCodename = $urlParams->getQueryPart(self::ARG_MESSAGE);
-        $userId          = $urlParams->getQueryPart(self::ARG_USER);
-        $status          = $urlParams->getQueryPart(self::ARG_STATUS);
-        $transport       = $urlParams->getQueryPart(self::ARG_TRANSPORT);
+        $filterMessageName   = $urlParams->getQueryPart(self::ARG_MESSAGE);
+        $filterTargetId      = $urlParams->getQueryPart(self::ARG_TARGET);
+        $filterStatusName    = $urlParams->getQueryPart(self::ARG_STATUS);
+        $filterTransportName = $urlParams->getQueryPart(self::ARG_TRANSPORT);
 
-        /** @var Page $pageParam */
-        $pageParam   = ServerRequestHelper::getParameter($request, Page::class);
-        $currentPage = $pageParam ? $pageParam->getValue() : 1;
-
-        $user = $userId ? $this->userRepo->getById($userId) : null;
+        $pageParam   = Page::fromRequest($request, 1);
+        $currentPage = $pageParam->getValue();
 
         $query = new NotificationLogQuery();
 
-        if ($messageCodename) {
-            $query->withMessageCodename($messageCodename);
+        if ($filterMessageName) {
+            $query->withMessageCodename($filterMessageName);
         }
 
-        if ($user) {
-            $query->forUser($user);
+        if ($filterTargetId) {
+            $query->forTargetIdentity($filterTargetId);
         }
 
-        if ($status) {
-            $query->withStatus($status);
+        if ($filterStatusName) {
+            $query->withStatus($filterStatusName);
         }
 
-        if ($transport) {
-            $query->throughTransport($transport);
+        if ($filterTransportName) {
+            $query->throughTransport($filterTransportName);
         }
 
         $items = $this->logRepo->getList($query, $currentPage, $itemsPerPage);
@@ -81,40 +69,78 @@ final readonly class LogIndexIFace extends AbstractAdminIFace
         $data = [];
 
         foreach ($items as $item) {
-            $data[] = $this->getItemData($item, $urlHelper);
+            $data[] = $this->getItemData($item, $urlHelper, $filterTargetId, $filterMessageName, $filterStatusName, $filterTransportName);
         }
 
         return [
             'items' => $data,
 
             'filters' => [
-                'user'      => [
-                    'id'    => $user?->getID(),
-                    'name'  => $user?->getFullName(),
-                    'email' => $user?->getEmail(),
+                'defined' => $filterTargetId || $filterMessageName || $filterStatusName || $filterTransportName,
+                'target'  => [
+                    'identity'  => $filterTargetId,
+                    'clear_url' => $this->makeFilterUrl(null, $filterMessageName, $filterStatusName, $filterTransportName),
                 ],
-                'message'   => $messageCodename,
-                'status'    => $status,
-                'transport' => $transport,
+                'message' => [
+                    'name'      => $filterMessageName,
+                    'clear_url' => $this->makeFilterUrl($filterTargetId, null, $filterStatusName, $filterTransportName),
+                ],
+
+                'status'    => [
+                    'name'      => $filterStatusName,
+                    'clear_url' => $this->makeFilterUrl($filterTargetId, $filterMessageName, null, $filterTransportName),
+
+                ],
+                'transport' => [
+                    'name'      => $filterTransportName,
+                    'clear_url' => $this->makeFilterUrl($filterTargetId, $filterMessageName, $filterStatusName, null),
+                ],
             ],
         ];
     }
 
-    private function getItemData(NotificationLogInterface $item, UrlHelperInterface $urlHelper): array
+    private function makeFilterUrl(?string $targetId, ?string $messageName, ?string $statusName, ?string $transportName): string
     {
+        return '?'.http_build_query(
+                array_filter([
+                    self::ARG_TARGET    => $targetId,
+                    self::ARG_MESSAGE   => $messageName,
+                    self::ARG_STATUS    => $statusName,
+                    self::ARG_TRANSPORT => $transportName,
+                ])
+            );
+    }
+
+    private function getItemData(
+        NotificationLogInterface $item,
+        UrlHelperInterface $urlHelper,
+        ?string $filterTargetId,
+        ?string $filterMessageName,
+        ?string $filterStatusName,
+        ?string $filterTransportName
+    ): array {
+        $itemTargetId      = $item->getTargetIdentity();
+        $itemStatusName    = $item->getStatus();
+        $itemMessageName   = $item->getMessageName();
+        $itemTransportName = $item->getTransportName();
+
         return [
             'processed_at' => $item->getProcessedAt(),
-            'name'         => $item->getMessageName(),
-            'transport'    => $item->getTransportName(),
+            'name'         => $itemMessageName,
+            'transport'    => $itemTransportName,
             'target'       => $item->getTargetIdentity(),
-            'user_id'      => $item->getTargetUserId(),
             'is_succeeded' => $item->isSucceeded(),
-            'status'       => $item->getStatus(),
+            'status'       => $itemStatusName,
             'is_read'      => $item->isRead(),
             'body_url'     => $urlHelper->getReadEntityUrl($item, Zone::admin()),
             'retry_url'    => $item->isRetryAvailable()
                 ? $urlHelper->getEntityUrl($item, NotificationLogResource::ACTION_RETRY, Zone::admin())
                 : null,
+
+            'user_url'      => $this->makeFilterUrl($itemTargetId, $filterMessageName, $filterStatusName, $filterTransportName),
+            'message_url'   => $this->makeFilterUrl($filterTargetId, $itemMessageName, $filterStatusName, $filterTransportName),
+            'status_url'    => $this->makeFilterUrl($filterTargetId, $filterMessageName, $itemStatusName, $filterTransportName),
+            'transport_url' => $this->makeFilterUrl($filterTargetId, $filterMessageName, $filterStatusName, $itemTransportName),
         ];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Query;
@@ -11,6 +12,8 @@ class NotificationLogQuery
      * @var \BetaKiller\Model\UserInterface|null
      */
     private ?UserInterface $user = null;
+
+    private ?string $targetIdentity = null;
 
     /**
      * @var string|null
@@ -26,6 +29,13 @@ class NotificationLogQuery
      * @var string|null
      */
     private ?string $transport = null;
+
+    public function forTargetIdentity(string $identity): self
+    {
+        $this->targetIdentity = $identity;
+
+        return $this;
+    }
 
     /**
      * @param \BetaKiller\Model\UserInterface $user
@@ -49,6 +59,19 @@ class NotificationLogQuery
         $this->messageCodename = $codename;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasTargetDefined(): bool
+    {
+        return $this->targetIdentity !== null;
+    }
+
+    public function getTargetIdentity(): string
+    {
+        return $this->targetIdentity;
     }
 
     /**

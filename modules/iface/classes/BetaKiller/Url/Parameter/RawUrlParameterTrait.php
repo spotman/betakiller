@@ -4,8 +4,22 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Parameter;
 
+use BetaKiller\Helper\ServerRequestHelper;
+use Psr\Http\Message\ServerRequestInterface;
+
 trait RawUrlParameterTrait
 {
+    public static function fromRequest(ServerRequestInterface $request, mixed $default = null): ?static
+    {
+        $value = ServerRequestHelper::getParameter($request, static::class);
+
+        if (!$value && $default) {
+            return new static($default);
+        }
+
+        return $value;
+    }
+
     /**
      * Returns key which will be used for storing model in UrlContainer registry.
      *

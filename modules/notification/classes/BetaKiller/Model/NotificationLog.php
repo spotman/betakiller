@@ -122,7 +122,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
 
     public function setTarget(MessageTargetInterface $target): NotificationLogInterface
     {
-        $this->set(self::COL_TARGET, $this->makeTargetString($target));
+        $this->set(self::COL_TARGET, $target->getMessageIdentity());
 
         if ($target instanceof UserInterface) {
             $this->set(self::COL_USER_ID, $target->getID());
@@ -194,9 +194,6 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         return $this->setStatus(self::STATUS_FAILED);
     }
 
-    /**
-     * @return string|null
-     */
     public function getFailureReason(): ?string
     {
         return $this->get(self::COL_RESULT);
@@ -254,11 +251,6 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     public function isSucceeded(): bool
     {
         return $this->getStatus() === self::STATUS_SUCCEEDED;
-    }
-
-    private function makeTargetString(MessageTargetInterface $target): string
-    {
-        return $target->getMessageIdentity();
     }
 
     private function setStatus(string $value): NotificationLogInterface
@@ -335,8 +327,6 @@ class NotificationLog extends \ORM implements NotificationLogInterface
      */
     public function isRetryAvailable(): bool
     {
-        return !$this->isSucceeded()
-            && $this->getBody()
-            && ($this->getTargetUserId() || TextHelper::contains($this->getTargetIdentity(), '<'));
+        return !$this->isSucceeded() && $this->getBody();
     }
 }

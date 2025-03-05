@@ -274,18 +274,18 @@ final class NotificationFacade
         $target = $message->getTarget();
 
         try {
-            // Fill subject line if transport need it
+            // Render message template
+            $body = $this->renderer->makeBody($message, $target, $transport);
+
+            // Save body first to allow retry
+            $log->setBody($body);
+
+            // Fill subject line if the transport needs it
             if ($transport->isSubjectRequired()) {
                 $subj = $this->renderer->makeSubject($message, $target);
                 $message->setSubject($subj);
                 $log->setSubject($subj);
             }
-
-            // Render message template
-            $body = $this->renderer->makeBody($message, $target, $transport);
-
-            // Save data to log file (transport name, target string (email, phone, etc), body)
-            $log->setBody($body);
 
             // Send message via transport
             if ($transport->send($message, $target, $body)) {
@@ -328,7 +328,7 @@ final class NotificationFacade
         $target = $this->detectLogRecordTarget($logRecord);
 
         if (!$target) {
-            throw new NotificationException('Can not retry message without target User ID; hash ":hash"', [
+            throw new NotificationException('Can not retry message without target; hash ":hash"', [
                 ':hash' => $logRecord->getHash(),
             ]);
         }

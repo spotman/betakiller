@@ -74,6 +74,13 @@ class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository i
         return $this;
     }
 
+    private function filterTargetIdentity(ExtendedOrmInterface $orm, string $identity): self
+    {
+        $orm->where($orm->object_column(NotificationLog::COL_TARGET), '=', $identity);
+
+        return $this;
+    }
+
     private function filterUser(ExtendedOrmInterface $orm, UserInterface $user): self
     {
         $orm->where($orm->object_column(NotificationLog::COL_USER_ID), '=', $user->getID());
@@ -97,6 +104,10 @@ class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository i
 
     private function applyQuery(ExtendedOrmInterface $orm, NotificationLogQuery $query): self
     {
+        if ($query->hasTargetDefined()) {
+            $this->filterTargetIdentity($orm, $query->getTargetIdentity());
+        }
+
         if ($query->hasUserDefined()) {
             $this->filterUser($orm, $query->getUser());
         }

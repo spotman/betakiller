@@ -7,6 +7,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementWithLabelInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class BreadcrumbsWidget extends AbstractWidget
@@ -75,8 +76,9 @@ class BreadcrumbsWidget extends AbstractWidget
     public function getAclRoles(): array
     {
         return [
-            // Allow to guests and any logged in users
+            // Allow to guests and any logged-in users
             RoleInterface::GUEST,
+            RoleInterface::LOGIN,
         ];
     }
 
