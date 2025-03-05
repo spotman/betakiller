@@ -26,10 +26,10 @@ abstract readonly class AbstractStringUrlParameter implements StringUrlParameter
 
         static::check($value);
 
-        return static::createInstance($value);
+        return static::create($value);
     }
 
-    protected static function createInstance(string $value): static
+    public static function create(string $value): static
     {
         return new static($value);
     }

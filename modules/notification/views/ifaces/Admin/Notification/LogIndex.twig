@@ -109,6 +109,23 @@
           </tbody>
 
         </table>
+
+        <div>
+          <br />
+          {% if prev_page_url %}
+            <a href="{{ prev_page_url }}" class="btn teal left">
+              Prev
+              <i class="material-icons left">chevron_left</i>
+            </a>
+          {% endif %}
+
+          {% if next_page_url %}
+            <a href="{{ next_page_url }}" class="btn teal right">
+              Next
+              <i class="material-icons right">chevron_right</i>
+            </a>
+          {% endif %}
+        </div>
       {% else %}
         <p class="center-align">
           No logs yet.

@@ -1,10 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
 use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Query\NotificationLogQuery;
+use BetaKiller\Search\SearchResultsInterface;
 
 /**
  * Class NotificationLogRepositoryInterface
@@ -27,9 +29,9 @@ interface NotificationLogRepositoryInterface extends DispatchableRepositoryInter
      * @param int                                    $page
      * @param int                                    $itemsPerPage
      *
-     * @return \BetaKiller\Model\NotificationLogInterface[]
+     * @return \BetaKiller\Search\SearchResultsInterface
      *
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getList(NotificationLogQuery $query, int $page, int $itemsPerPage): array;
+    public function search(NotificationLogQuery $query, int $page, int $itemsPerPage): SearchResultsInterface;
 }

@@ -21,6 +21,7 @@ final readonly class LogIndexIFace extends AbstractAdminIFace
     public const ARG_TARGET    = 'target';
     public const ARG_STATUS    = 'status';
     public const ARG_TRANSPORT = 'transport';
+    public const ARG_PAGE      = 'page';
 
     /**
      * LogIndexIFace constructor.
@@ -35,8 +36,6 @@ final readonly class LogIndexIFace extends AbstractAdminIFace
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
         $urlParams = ServerRequestHelper::getUrlContainer($request);
-
-        $itemsPerPage = 100;
 
         $filterMessageName   = $urlParams->getQueryPart(self::ARG_MESSAGE);
         $filterTargetId      = $urlParams->getQueryPart(self::ARG_TARGET);
@@ -64,16 +63,26 @@ final readonly class LogIndexIFace extends AbstractAdminIFace
             $query->throughTransport($filterTransportName);
         }
 
-        $items = $this->logRepo->getList($query, $currentPage, $itemsPerPage);
+        $searchResult = $this->logRepo->search($query, $currentPage, 30);
 
         $data = [];
 
-        foreach ($items as $item) {
+        foreach ($searchResult as $item) {
             $data[] = $this->getItemData($item, $urlHelper, $filterTargetId, $filterMessageName, $filterStatusName, $filterTransportName);
         }
 
+        $nextPageUrl = $searchResult->hasNextPage()
+            ? $this->makeFilterUrl($filterTargetId, $filterMessageName, $filterStatusName, $filterTransportName, $currentPage + 1)
+            : null;
+
+        $prevPageUrl = $currentPage > 1
+            ? $this->makeFilterUrl($filterTargetId, $filterMessageName, $filterStatusName, $filterTransportName, $currentPage - 1)
+            : null;
+
         return [
-            'items' => $data,
+            'items'         => $data,
+            'next_page_url' => $nextPageUrl,
+            'prev_page_url' => $prevPageUrl,
 
             'filters' => [
                 'defined' => $filterTargetId || $filterMessageName || $filterStatusName || $filterTransportName,
@@ -99,14 +108,20 @@ final readonly class LogIndexIFace extends AbstractAdminIFace
         ];
     }
 
-    private function makeFilterUrl(?string $targetId, ?string $messageName, ?string $statusName, ?string $transportName): string
-    {
+    private function makeFilterUrl(
+        ?string $targetId,
+        ?string $messageName,
+        ?string $statusName,
+        ?string $transportName,
+        ?int $page = null
+    ): string {
         return '?'.http_build_query(
                 array_filter([
                     self::ARG_TARGET    => $targetId,
                     self::ARG_MESSAGE   => $messageName,
                     self::ARG_STATUS    => $statusName,
                     self::ARG_TRANSPORT => $transportName,
+                    self::ARG_PAGE      => $page,
                 ])
             );
     }

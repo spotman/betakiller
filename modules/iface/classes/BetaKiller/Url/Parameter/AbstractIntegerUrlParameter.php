@@ -26,10 +26,10 @@ abstract readonly class AbstractIntegerUrlParameter implements IntegerUrlParamet
 
         static::check($value);
 
-        return static::createInstance($value);
+        return static::create($value);
     }
 
-    protected static function createInstance(int $value): static
+    public static function create(int $value): static
     {
         return new static($value);
     }

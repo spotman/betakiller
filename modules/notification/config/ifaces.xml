@@ -13,16 +13,12 @@
         </iface>
 
         <iface uri="logs" name="Admin\Notification\LogIndex" label="Logs" menu="admin"
-               entity="NotificationLog" entityAction="list">
-            <iface uri="{Page}" name="Admin\Notification\LogPage" label="Page {Page}"/>
-            <dummy uri="item" name="Admin\Notification\ItemDummy" label="Item">
-                <iface uri="{NotificationLog.id}" name="Admin\Notification\LogItem" label="{NotificationLog.id}"
-                       entity="NotificationLog" entityAction="read">
-                    <action uri="body" name="Admin\NotificationLogItemBody"/>
-                    <action uri="retry" name="Admin\RetryNotification"
-                            entity="NotificationLog" entityAction="retry"/>
-                </iface>
-            </dummy>
+               entity="NotificationLog" entityAction="list" query="page=Page,target,message,status,transport">
+            <iface uri="{NotificationLog.id}" name="Admin\Notification\LogItem" label="{NotificationLog.id}"
+                   entity="NotificationLog" entityAction="read">
+                <action uri="body" name="Admin\NotificationLogItemBody"/>
+                <action uri="retry" name="Admin\RetryNotification" entity="NotificationLog" entityAction="retry"/>
+            </iface>
         </iface>
 
     </iface>

@@ -278,10 +278,8 @@ class UrlPrototypeService
      */
     private function calculateParameterKeyValue(UrlPrototype $prototype, UrlParameterInterface $param): string
     {
-        $key = $prototype->getModelKey();
-
         if ($prototype->isMethodCall()) {
-            $method = $key;
+            $method = $prototype->getModelKey();
 
             if (!method_exists($param, $method)) {
                 throw new UrlPrototypeException('Method ":method" does not exists in model :model', [
@@ -310,7 +308,7 @@ class UrlPrototypeService
         if ($prototype->hasModelKey()) {
             // Model key needs entity
             if ($param instanceof DispatchableEntityInterface) {
-                return $param->getUrlKeyValue($key);
+                return $param->getUrlKeyValue($prototype->getModelKey());
             }
 
             throw new UrlPrototypeException('UrlParameter :model must implement :must for using keys in url', [

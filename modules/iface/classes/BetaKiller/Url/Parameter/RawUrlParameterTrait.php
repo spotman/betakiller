@@ -94,7 +94,7 @@ trait RawUrlParameterTrait
             $rawValue = $rawValue.$delim.$suffix;
         }
 
-        return $rawValue;
+        return (string)$rawValue;
     }
 
     protected static function removePrefixAndSuffix(string $uriValue): string

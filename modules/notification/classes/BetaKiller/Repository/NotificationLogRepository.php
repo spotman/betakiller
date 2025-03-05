@@ -8,6 +8,7 @@ use BetaKiller\Model\NotificationLog;
 use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Query\NotificationLogQuery;
+use BetaKiller\Search\SearchResultsInterface;
 
 /**
  * Class NotificationLogRepository
@@ -43,14 +44,14 @@ class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository i
     /**
      * @inheritDoc
      */
-    public function getList(NotificationLogQuery $query, int $page, int $itemsPerPage): array
+    public function search(NotificationLogQuery $query, int $page, int $itemsPerPage): SearchResultsInterface
     {
         $orm = $this->getOrmInstance();
 
         return $this
             ->applyQuery($orm, $query)
             ->orderByProcessedAtDesc($orm)
-            ->findAll($orm, $page, $itemsPerPage);
+            ->findAllResults($orm, $page, $itemsPerPage);
     }
 
     private function orderByProcessedAtDesc(ExtendedOrmInterface $orm): self

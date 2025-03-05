@@ -5,9 +5,10 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\TransportInterface;
+use BetaKiller\Search\SearchResultsItemInterface;
 use DateTimeImmutable;
 
-interface NotificationLogInterface extends DispatchableEntityInterface
+interface NotificationLogInterface extends DispatchableEntityInterface, SearchResultsItemInterface
 {
     /**
      * @param \DateTimeImmutable $value
