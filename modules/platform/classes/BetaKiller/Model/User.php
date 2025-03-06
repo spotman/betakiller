@@ -528,7 +528,7 @@ class User extends AbstractCreatedAt implements UserInterface
 
     public function getMessageIdentity(): string
     {
-        return sprintf('#%s %s', $this->getID(), $this->getFullName());
+        return sprintf('#%s', $this->getID());
     }
 
     public function getMessageEmail(): string
