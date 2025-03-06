@@ -1,5 +1,8 @@
 <?php
 
+use BetaKiller\DI\Container;
+use BetaKiller\Log\LoggerInterface;
+
 /**
  * Database connection wrapper/helper.
  *
@@ -92,6 +95,14 @@ abstract class Kohana_Database
                 // Reconnect if ping failed
                 $instance->disconnect();
                 $instance->connect();
+
+                // TODO Remove after debug of "MySQL has gone away"
+                /** @var \BetaKiller\Log\LoggerInterface $logger */
+                $logger = Container::getInstance()->get(LoggerInterface::class);
+
+                $logger->notice('Database ping failed for :config', [
+                    ':config' => json_encode($instance->_config),
+                ]);
             }
         }
     }
@@ -510,7 +521,7 @@ abstract class Kohana_Database
         $escaped_identifier = $this->_identifier.$this->_identifier;
 
         if (is_array($column)) {
-            list($column, $alias) = $column;
+            [$column, $alias] = $column;
             $alias = str_replace($this->_identifier, $escaped_identifier, $alias);
         }
 
@@ -581,7 +592,7 @@ abstract class Kohana_Database
         $escaped_identifier = $this->_identifier.$this->_identifier;
 
         if (is_array($table)) {
-            list($table, $alias) = $table;
+            [$table, $alias] = $table;
             $alias = str_replace($this->_identifier, $escaped_identifier, $alias);
         }
 
@@ -646,7 +657,7 @@ abstract class Kohana_Database
         $escaped_identifier = $this->_identifier.$this->_identifier;
 
         if (is_array($value)) {
-            list($value, $alias) = $value;
+            [$value, $alias] = $value;
             $alias = str_replace($this->_identifier, $escaped_identifier, $alias);
         }
 
