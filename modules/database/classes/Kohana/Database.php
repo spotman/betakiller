@@ -100,7 +100,7 @@ abstract class Kohana_Database
                 /** @var \BetaKiller\Log\LoggerInterface $logger */
                 $logger = Container::getInstance()->get(LoggerInterface::class);
 
-                $logger->notice('Database ping failed for :config', [
+                $logger->warning('Database ping failed for :config', [
                     ':config' => json_encode($instance->_config),
                 ]);
             }
