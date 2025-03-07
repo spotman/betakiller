@@ -1,8 +1,5 @@
 <?php
 
-use BetaKiller\DI\Container;
-use BetaKiller\Log\LoggerInterface;
-
 /**
  * Database connection wrapper/helper.
  *
@@ -71,8 +68,9 @@ abstract class Kohana_Database
             }
 
             if (!isset($config['type'])) {
-                throw new Kohana_Exception('Database type not defined in :name configuration',
-                    [':name' => $name]);
+                throw new Kohana_Exception('Database type not defined in :name configuration', [
+                    ':name' => $name,
+                ]);
             }
 
             // Set the driver class name
@@ -88,23 +86,32 @@ abstract class Kohana_Database
         return Database::$instances[$name];
     }
 
-    public static function pingAll(): void
+    /**
+     * @return \Throwable[]
+     */
+    public static function pingAll(): array
     {
+        $errors = [];
+
         foreach (Database::$instances as $instance) {
-            if (!$instance->ping()) {
+            try {
+                if ($instance->ping()) {
+                    continue;
+                }
+
+                $errors[] = new Database_Exception('Database ping failed for :config', [
+                    ':config' => json_encode($instance->_config),
+                ]);
+
                 // Reconnect if ping failed
                 $instance->disconnect();
                 $instance->connect();
-
-                // TODO Remove after debug of "MySQL has gone away"
-                /** @var \BetaKiller\Log\LoggerInterface $logger */
-                $logger = Container::getInstance()->get(LoggerInterface::class);
-
-                $logger->warning('Database ping failed for :config', [
-                    ':config' => json_encode($instance->_config),
-                ]);
+            } catch (Throwable $e) {
+                $errors[] = $e;
             }
         }
+
+        return $errors;
     }
 
     /**

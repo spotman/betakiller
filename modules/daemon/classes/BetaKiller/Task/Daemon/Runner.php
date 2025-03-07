@@ -526,7 +526,9 @@ final class Runner extends AbstractTask
     private function addPingDatabaseHandler(): void
     {
         $this->pingDbTimer = $this->loop->addPeriodicTimer(5, static function () {
-            Database::pingAll();
+            foreach (Database::pingAll() as $error) {
+                LoggerHelper::logRawException($this->logger, $error);
+            }
         });
     }
 
