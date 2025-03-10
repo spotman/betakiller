@@ -47,7 +47,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     private const PATH_MESSAGE_CRITICAL   = [self::ROOT_MESSAGES, 'messageCodename' => '', self::CRITICAL];
     private const PATH_MESSAGE_DISMISS_ON = [self::ROOT_MESSAGES, 'messageCodename' => '', self::DISMISS_ON];
 
-    private const PATH_TRANSPORT_UTM = [self::ROOT_UTM, 'transportCodename' => ''];
+    private const PATH_UTM_TRANSPORT = [self::ROOT_UTM, 'transportCodename' => ''];
 
     /**
      * @return string
@@ -58,7 +58,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     }
 
     /**
-     * @return string[] ['transportOneCodename','transportTwoCodename',..]
+     * @inheritDoc
      */
     public function getTransports(): array
     {
@@ -66,7 +66,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     }
 
     /**
-     * @return string[] ['groupCodename1','groupCodename1',..]
+     * @inheritDoc
      */
     public function getGroups(): array
     {
@@ -76,10 +76,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     }
 
     /**
-     * @param string $groupCodename
-     *
-     * @return string[] ['roleCodename1','roleCodename2',..]
-     * @throws \BetaKiller\Exception
+     * @inheritDoc
      */
     public function getGroupRoles(string $groupCodename): array
     {
@@ -90,9 +87,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     }
 
     /**
-     * @param string $groupCodename
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function isSystemGroup(string $groupCodename): bool
     {
@@ -103,10 +98,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     }
 
     /**
-     * @param string $messageCodename
-     *
-     * @return string
-     * @throws \BetaKiller\Exception
+     * @inheritDoc
      */
     public function getMessageGroup(string $messageCodename): string
     {
@@ -117,9 +109,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     }
 
     /**
-     * @param string $groupCodename
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function isGroupFreqControlled(string $groupCodename): bool
     {
@@ -130,10 +120,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     }
 
     /**
-     * @param string $groupCodename
-     *
-     * @return string[]
-     * @throws \BetaKiller\Exception
+     * @inheritDoc
      */
     public function getGroupMessages(string $groupCodename): array
     {
@@ -168,11 +155,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     }
 
     /**
-     * Returns transport codename
-     *
-     * @param string $messageCodename
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getMessageTransport(string $messageCodename): string
     {
@@ -183,9 +166,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     }
 
     /**
-     * @param string $messageCodename
-     *
-     * @return array
+     * @inheritDoc
      */
     public function getMessageDismissOnEvents(string $messageCodename): array
     {
@@ -196,9 +177,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     }
 
     /**
-     * @param string $messageCodename
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function isMessageBroadcast(string $messageCodename): bool
     {
@@ -224,7 +203,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
      */
     public function getUtmMarkers(string $transportCodename): array
     {
-        $path                      = self::PATH_TRANSPORT_UTM;
+        $path                      = self::PATH_UTM_TRANSPORT;
         $path['transportCodename'] = $transportCodename;
 
         return (array)$this->get($path, true);
