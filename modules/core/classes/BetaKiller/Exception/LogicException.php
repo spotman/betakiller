@@ -8,8 +8,8 @@ use BetaKiller\Exception;
 
 class LogicException extends Exception
 {
-    public function __construct(string $message, array $variables = null)
+    public function __construct(string $message = null, array $variables = null)
     {
-        parent::__construct($message, $variables, 500);
+        parent::__construct($message ?? '', $variables, 500);
     }
 }
