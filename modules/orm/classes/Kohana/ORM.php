@@ -865,11 +865,12 @@ class Kohana_ORM extends Model implements Serializable
      * Binds another one-to-one object to this model.  One-to-one objects
      * can be nested using 'object1:object2' syntax
      *
-     * @param string $target_path Target model to bind to
+     * @param string    $target_path Target model to bind to
+     * @param bool|null $select
      *
      * @return $this
      */
-    public function with($target_path)
+    public function with(string $target_path, bool $select = null)
     {
         if (isset($this->_with_applied[$target_path])) {
             // Don't join anything already joined
@@ -903,7 +904,7 @@ class Kohana_ORM extends Model implements Serializable
         } else {
             if (!isset($this->_with_applied[$parent_path])) {
                 // If the parent path hasn't been joined yet, do it first (otherwise LEFT JOINs fail)
-                $this->with($parent_path);
+                $this->with($parent_path, $select);
             }
         }
 
@@ -915,13 +916,17 @@ class Kohana_ORM extends Model implements Serializable
             return $this;
         }
 
+        $select ??= true;
+
         // Use the keys of the empty object to determine the columns
         foreach (array_keys($target->_object) as $column) {
             $name  = $target_path.'.'.$column;
             $alias = $target_path.':'.$column;
 
-            // Add the prefix so that load_result can determine the relationship
-            $this->select([$name, $alias]);
+            if ($select) {
+                // Add the prefix so that load_result can determine the relationship
+                $this->select([$name, $alias]);
+            }
         }
 
         if (isset($parent->_belongs_to[$target_alias])) {

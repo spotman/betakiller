@@ -183,7 +183,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     {
         $orm->custom_select([
             [DB::expr('COUNT(*)'), 'total'],
-        ]);
+        ], true, false);
 
         return (int)$orm->execute_query()->get('total');
     }
