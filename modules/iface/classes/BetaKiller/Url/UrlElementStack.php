@@ -97,6 +97,16 @@ class UrlElementStack implements \IteratorAggregate
     }
 
     /**
+     * Get all UrlElements
+     *
+     * @return \BetaKiller\Url\UrlElementInterface[]
+     */
+    public function getItems(): array
+    {
+        return array_values($this->items);
+    }
+
+    /**
      * @return \BetaKiller\Url\UrlElementInterface
      */
     public function getCurrent(): UrlElementInterface
