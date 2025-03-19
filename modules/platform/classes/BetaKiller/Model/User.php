@@ -28,6 +28,7 @@ class User extends AbstractCreatedAt implements UserInterface
     public const COL_LAST_NAME         = 'last_name';
     public const COL_MIDDLE_NAME       = 'middle_name';
     public const COL_EMAIL             = 'email';
+    public const COL_IS_EMAIL_VERIFIED = 'is_email_verified';
     public const COL_PHONE             = 'phone';
     public const COL_IS_PHONE_VERIFIED = 'is_phone_verified';
     public const COL_NOTIFY_BY_EMAIL   = 'notify_by_email';
@@ -165,14 +166,6 @@ class User extends AbstractCreatedAt implements UserInterface
     public function isAdmin(): bool
     {
         return $this->hasRoleName(RoleInterface::ADMIN_PANEL);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEmailConfirmed(): bool
-    {
-        return $this->isInWorkflowState(UserState::EMAIL_CONFIRMED);
     }
 
     /**
@@ -361,8 +354,6 @@ class User extends AbstractCreatedAt implements UserInterface
 
         return $this->isInWorkflowStates([
             UserState::CREATED,
-            UserState::EMAIL_CONFIRMED,
-            UserState::EMAIL_CHANGED,
             UserState::RESUMED,
         ]);
     }
@@ -451,6 +442,30 @@ class User extends AbstractCreatedAt implements UserInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function markEmailAsVerified(): void
+    {
+        $this->set(self::COL_IS_EMAIL_VERIFIED, true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function markEmailAsUnverified(): void
+    {
+        $this->set(self::COL_IS_EMAIL_VERIFIED, false);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isEmailVerified(): bool
+    {
+        return (bool)$this->get(self::COL_IS_EMAIL_VERIFIED);
+    }
+
+    /**
      * @param string $number
      *
      * @return \BetaKiller\Model\UserInterface
@@ -489,6 +504,14 @@ class User extends AbstractCreatedAt implements UserInterface
     public function markPhoneAsVerified(): void
     {
         $this->set(self::COL_IS_PHONE_VERIFIED, true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function markPhoneAsUnverified(): void
+    {
+        $this->set(self::COL_IS_PHONE_VERIFIED, false);
     }
 
     /**

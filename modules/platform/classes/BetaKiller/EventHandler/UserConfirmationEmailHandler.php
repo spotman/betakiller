@@ -34,7 +34,7 @@ final class UserConfirmationEmailHandler
         $user = $event->getUser();
 
         // Skip confirmation messages for
-        if ($user->isEmailConfirmed()) {
+        if ($user->isEmailVerified()) {
             return;
         }
 

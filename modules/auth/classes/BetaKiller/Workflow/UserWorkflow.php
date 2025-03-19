@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Workflow;
@@ -11,6 +12,7 @@ use BetaKiller\Event\UserEmailChangedEvent;
 use BetaKiller\Event\UserEmailConfirmedEvent;
 use BetaKiller\Event\UserPhoneConfirmedEvent;
 use BetaKiller\Event\UserRegistrationClaimedEvent;
+use BetaKiller\Event\UserRemovedEvent;
 use BetaKiller\Event\UserResumedEvent;
 use BetaKiller\Event\UserSuspendedEvent;
 use BetaKiller\Event\UserUnlockedEvent;
@@ -23,35 +25,31 @@ use BetaKiller\Notification\EmailMessageTargetInterface;
 use BetaKiller\Repository\RoleRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 
-final class UserWorkflow
+final readonly class UserWorkflow
 {
-    public const TRANSITION_EMAIL_CONFIRMED = 'confirm';
-    public const TRANSITION_CHANGE_EMAIL    = 'change-email';
-
-    public const TRANSITION_BLOCK     = 'block';
-    public const TRANSITION_UNLOCK    = 'unlock';
-    public const TRANSITION_REG_CLAIM = 'reg-claim';
-
-    public const TRANSITION_SUSPEND          = 'suspend';
-    public const TRANSITION_RESUME_SUSPENDED = 'resume';
+    public const TRANSITION_BLOCK   = 'block';
+    public const TRANSITION_UNLOCK  = 'unlock';
+    public const TRANSITION_SUSPEND = 'suspend';
+    public const TRANSITION_RESUME  = 'resume';
+    public const TRANSITION_REMOVE  = 'remove';
 
     /**
      * UserWorkflow constructor.
      *
      * @param \BetaKiller\Factory\UserFactoryInterface       $userFactory
-     * @param \BetaKiller\Workflow\StatusWorkflowInterface   $workflow
+     * @param \BetaKiller\Auth\PasswordHasherInterface       $hasher
+     * @param \BetaKiller\Workflow\StatusWorkflowInterface   $state
      * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
      * @param \BetaKiller\Repository\RoleRepositoryInterface $roleRepo
-     * @param \BetaKiller\Factory\EntityFactoryInterface     $entityFactory
      * @param \BetaKiller\MessageBus\EventBusInterface       $eventBus
      */
     public function __construct(
-        private UserFactoryInterface    $userFactory,
+        private UserFactoryInterface $userFactory,
         private PasswordHasherInterface $hasher,
         private StatusWorkflowInterface $state,
         private UserRepositoryInterface $userRepo,
         private RoleRepositoryInterface $roleRepo,
-        private EventBusInterface       $eventBus
+        private EventBusInterface $eventBus
     ) {
     }
 
@@ -123,11 +121,11 @@ final class UserWorkflow
 
     public function confirmEmail(UserInterface $user): void
     {
-        if ($user->isEmailConfirmed()) {
+        if ($user->isEmailVerified()) {
             return;
         }
 
-        $this->state->doTransition($user, self::TRANSITION_EMAIL_CONFIRMED, $user);
+        $user->markEmailAsVerified();
 
         $this->userRepo->save($user);
 
@@ -136,6 +134,10 @@ final class UserWorkflow
 
     public function confirmPhone(UserInterface $user): void
     {
+        if ($user->isPhoneVerified()) {
+            return;
+        }
+
         $user->markPhoneAsVerified();
 
         $this->userRepo->save($user);
@@ -146,11 +148,10 @@ final class UserWorkflow
     public function changeEmail(UserInterface $user, string $email): void
     {
         $user->setEmail($email);
+        $user->markEmailAsUnverified();
 
         // Save to keep email on errors
         $this->userRepo->save($user);
-
-        $this->state->doTransition($user, self::TRANSITION_CHANGE_EMAIL, $user);
 
         $this->eventBus->emit(new UserEmailChangedEvent($user));
     }
@@ -184,7 +185,7 @@ final class UserWorkflow
 
     public function resumeSuspended(UserInterface $user): void
     {
-        $this->state->doTransition($user, self::TRANSITION_RESUME_SUSPENDED, $user);
+        $this->state->doTransition($user, self::TRANSITION_RESUME, $user);
 
         $this->userRepo->save($user);
 
@@ -198,5 +199,14 @@ final class UserWorkflow
         $this->userRepo->save($user);
 
         $this->eventBus->emit(new UserRegistrationClaimedEvent($user));
+    }
+
+    public function remove(UserInterface $user): void
+    {
+        $this->state->doTransition($user, self::TRANSITION_REMOVE, $user);
+
+        $this->userRepo->save($user);
+
+        $this->eventBus->emit(new UserRemovedEvent($user));
     }
 }

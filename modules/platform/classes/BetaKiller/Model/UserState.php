@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Model;
@@ -9,17 +10,11 @@ final class UserState extends AbstractWorkflowStateOrmModel implements WorkflowS
 {
     public const TABLE_NAME = 'user_statuses';
 
-    public const CREATED         = 'created';       // Just created
-    public const EMAIL_CONFIRMED = 'confirmed';     // Email confirmed
-    public const EMAIL_CHANGED   = 'email-changed'; // Email changed
-    public const BLOCKED         = 'blocked';       // Blocked coz of hacking, spam, or app rules violation
-    public const SUSPENDED       = 'suspended';     // Account removal requested so it will be suspended for 6 months
-    public const RESUMED         = 'resumed';       // Resumed from suspend, requires additional confirmation (potential fraud)
-
-    public const ACTIVE_STATES = [
-        self::EMAIL_CONFIRMED,
-        self::EMAIL_CHANGED,
-    ];
+    public const CREATED   = 'created';       // Just created
+    public const BLOCKED   = 'blocked';       // Blocked coz of hacking, spam, or app rules violation
+    public const SUSPENDED = 'suspended';     // Account removal requested, so it will be suspended for 6 months
+    public const RESUMED   = 'resumed';       // Resumed from suspend, requires additional confirmation (potential fraud)
+    public const REMOVED   = 'removed';       // Soft delete (keep ID and email but delete personal data)
 
     protected function configure(): void
     {

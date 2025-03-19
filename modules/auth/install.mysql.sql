@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS `users` (
                          `last_login` int DEFAULT NULL,
                          `language_id` int unsigned DEFAULT NULL,
                          `phone` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+                         `is_email_verified` tinyint NOT NULL DEFAULT '0',
                          `is_phone_verified` tinyint unsigned NOT NULL DEFAULT '0',
                          `notify_by_email` tinyint unsigned NOT NULL DEFAULT '1',
                          `is_reg_claimed` tinyint unsigned NOT NULL DEFAULT '0',

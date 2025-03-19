@@ -79,11 +79,6 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     /**
      * @return bool
      */
-    public function isEmailConfirmed(): bool;
-
-    /**
-     * @return bool
-     */
     public function isBlocked(): bool;
 
     /**
@@ -250,9 +245,29 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     public function hasPhoneDefined(): bool;
 
     /**
+     * Mark email as verified
+     */
+    public function markEmailAsVerified(): void;
+
+    /**
+     * Mark email as non-verified
+     */
+    public function markEmailAsUnverified(): void;
+
+    /**
+     * Returns true if email is verified
+     */
+    public function isEmailVerified(): bool;
+
+    /**
      * Mark phone number as verified
      */
     public function markPhoneAsVerified(): void;
+
+    /**
+     * Mark phone number as non-verified
+     */
+    public function markPhoneAsUnverified(): void;
 
     /**
      * Returns true if phone is verified

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use BetaKiller\Acl\Resource\UserResource;
@@ -27,49 +28,9 @@ return [
                 ],
 
                 WorkflowConfig::TRANSITIONS => [
-                    UserWorkflow::TRANSITION_CHANGE_EMAIL    => UserState::EMAIL_CHANGED,
-                    UserWorkflow::TRANSITION_EMAIL_CONFIRMED => UserState::EMAIL_CONFIRMED,
-                    UserWorkflow::TRANSITION_SUSPEND         => UserState::SUSPENDED,
-                    UserWorkflow::TRANSITION_BLOCK           => UserState::BLOCKED,
-                ],
-            ],
-
-            UserState::EMAIL_CONFIRMED => [
-                WorkflowConfig::ACTIONS => [
-                    UserResource::ACTION_READ   => [
-                        RoleInterface::LOGIN,
-                        RoleInterface::USER_MANAGEMENT,
-                    ],
-                    UserResource::ACTION_UPDATE => [
-                        RoleInterface::LOGIN,
-                    ],
-                ],
-
-                WorkflowConfig::TRANSITIONS => [
-                    UserWorkflow::TRANSITION_EMAIL_CONFIRMED => UserState::EMAIL_CONFIRMED,
-                    UserWorkflow::TRANSITION_CHANGE_EMAIL    => UserState::EMAIL_CHANGED,
-                    UserWorkflow::TRANSITION_SUSPEND         => UserState::SUSPENDED,
-                    UserWorkflow::TRANSITION_BLOCK           => UserState::BLOCKED,
-                ],
-            ],
-
-            UserState::EMAIL_CHANGED => [
-                WorkflowConfig::ACTIONS => [
-                    UserResource::ACTION_READ   => [
-                        RoleInterface::LOGIN,
-                        RoleInterface::USER_MANAGEMENT,
-                    ],
-                    UserResource::ACTION_UPDATE => [
-                        RoleInterface::LOGIN,
-                    ],
-                ],
-
-                WorkflowConfig::TRANSITIONS => [
-                    UserWorkflow::TRANSITION_EMAIL_CONFIRMED => UserState::EMAIL_CONFIRMED,
-                    // Allow redo just in case of user mistake
-                    UserWorkflow::TRANSITION_CHANGE_EMAIL    => UserState::EMAIL_CHANGED,
-                    UserWorkflow::TRANSITION_SUSPEND         => UserState::SUSPENDED,
-                    UserWorkflow::TRANSITION_BLOCK           => UserState::BLOCKED,
+                    UserWorkflow::TRANSITION_SUSPEND => UserState::SUSPENDED,
+                    UserWorkflow::TRANSITION_BLOCK   => UserState::BLOCKED,
+                    UserWorkflow::TRANSITION_REMOVE  => UserState::REMOVED,
                 ],
             ],
 
@@ -86,8 +47,9 @@ return [
 
                 WorkflowConfig::TRANSITIONS => [
                     // Set "resumed" state to prevent workflow hacks (created => suspended => confirmed)
-                    UserWorkflow::TRANSITION_RESUME_SUSPENDED => UserState::RESUMED,
-                    UserWorkflow::TRANSITION_BLOCK            => UserState::BLOCKED,
+                    UserWorkflow::TRANSITION_RESUME => UserState::RESUMED,
+                    UserWorkflow::TRANSITION_BLOCK  => UserState::BLOCKED,
+                    UserWorkflow::TRANSITION_REMOVE => UserState::REMOVED,
                 ],
             ],
 
@@ -103,10 +65,9 @@ return [
                 ],
 
                 WorkflowConfig::TRANSITIONS => [
-                    UserWorkflow::TRANSITION_CHANGE_EMAIL    => UserState::EMAIL_CHANGED,
-                    UserWorkflow::TRANSITION_EMAIL_CONFIRMED => UserState::EMAIL_CONFIRMED,
-                    UserWorkflow::TRANSITION_SUSPEND         => UserState::SUSPENDED,
-                    UserWorkflow::TRANSITION_BLOCK           => UserState::BLOCKED,
+                    UserWorkflow::TRANSITION_SUSPEND => UserState::SUSPENDED,
+                    UserWorkflow::TRANSITION_BLOCK   => UserState::BLOCKED,
+                    UserWorkflow::TRANSITION_REMOVE  => UserState::REMOVED,
                 ],
             ],
 
@@ -126,25 +87,41 @@ return [
                 // No transitions for blocked Users
                 WorkflowConfig::TRANSITIONS => [
                     UserWorkflow::TRANSITION_UNLOCK => UserState::RESUMED,
+                    UserWorkflow::TRANSITION_REMOVE => UserState::REMOVED,
+                ],
+            ],
+
+            UserState::REMOVED => [
+                WorkflowConfig::IS_FINISH => true,
+
+                WorkflowConfig::ACTIONS => [
+                    UserResource::ACTION_READ   => [
+//                        RoleInterface::LOGIN,
+                        RoleInterface::USER_MANAGEMENT,
+                    ],
+                    UserResource::ACTION_UPDATE => [
+                        // No one can update
+                    ],
+                ],
+
+                WorkflowConfig::TRANSITIONS => [
+                    // No transitions for removed Users
                 ],
             ],
         ],
 
         WorkflowConfig::TRANSITIONS => [
-            UserWorkflow::TRANSITION_EMAIL_CONFIRMED => [
-                RoleInterface::LOGIN,
-            ],
-
-            UserWorkflow::TRANSITION_CHANGE_EMAIL => [
-                RoleInterface::LOGIN,
-            ],
-
             UserWorkflow::TRANSITION_SUSPEND => [
                 RoleInterface::LOGIN,
             ],
 
-            UserWorkflow::TRANSITION_RESUME_SUSPENDED => [
+            UserWorkflow::TRANSITION_RESUME => [
                 RoleInterface::LOGIN,
+            ],
+
+            UserWorkflow::TRANSITION_REMOVE => [
+                RoleInterface::LOGIN,
+                RoleInterface::USER_MANAGEMENT,
             ],
 
             UserWorkflow::TRANSITION_BLOCK => [

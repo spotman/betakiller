@@ -5,5 +5,6 @@ user.status.blocked: "Blocked"
 user.status.claimed: "Claimed"
 user.status.suspended: "Suspended"
 user.status.resumed: "Resumed"
+user.status.removed: "Removed"
 
 iface.auth.claim-thanks.title: "Thanks for your report!"
