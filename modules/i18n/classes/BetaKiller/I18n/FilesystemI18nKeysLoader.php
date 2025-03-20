@@ -95,14 +95,14 @@ class FilesystemI18nKeysLoader implements I18nKeysLoaderInterface
                 }
 
                 // Use universal new-line separator
-                if (str_contains($value, "\n")) {
+                if (str_contains($value, "\n") && !str_contains($value, "\r")) {
                     $value = \str_replace("\n", "\r\n", $value);
                 }
 
                 $values[$key] = $value;
             }
 
-            // Merge the language strings into the sub table
+            // Merge language strings into the sub table
             $t[] = $values;
         }
 

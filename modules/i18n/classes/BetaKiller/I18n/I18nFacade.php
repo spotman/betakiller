@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\I18n;
@@ -86,9 +87,9 @@ final class I18nFacade
     public function __construct(
         LanguageRepositoryInterface $langRepo,
         PluralBagFormatterInterface $formatter,
-        I18nKeysLoaderInterface     $loader,
-        I18nConfigInterface         $config,
-        LoggerInterface             $logger
+        I18nKeysLoaderInterface $loader,
+        I18nConfigInterface $config,
+        LoggerInterface $logger
     ) {
         $this->langRepo  = $langRepo;
         $this->loader    = $loader;
@@ -173,151 +174,45 @@ final class I18nFacade
     }
 
     /**
-     * Raw translation without placeholders and plural forms
+     * Translate any key (with plural forms and placeholders)
      *
-     * @param \BetaKiller\Model\LanguageInterface       $lang
-     * @param \BetaKiller\Model\HasI18nKeyNameInterface $hasKey
-     * @param array|null                                $values
-     * @param bool|null                                 $ignoreMissing
-     *
-     * @return string
-     * @throws \BetaKiller\I18n\I18nException
-     */
-    public function translateHasKeyName(
-        LanguageInterface       $lang,
-        HasI18nKeyNameInterface $hasKey,
-        ?array                  $values = null,
-        ?bool                   $ignoreMissing = null
-    ): string {
-        return $this->translateKeyName($lang, $hasKey->getI18nKeyName(), $values, $ignoreMissing);
-    }
-
-    /**
-     * @param \BetaKiller\Model\LanguageInterface $lang
-     * @param string                              $keyName
-     * @param array|null                          $values
-     * @param bool|null                           $ignoreMissing
+     * @param \BetaKiller\Model\LanguageInterface                                                 $lang
+     * @param string|\BetaKiller\Model\HasI18nKeyNameInterface|\BetaKiller\Model\I18nKeyInterface $key
+     * @param array|null                                                                          $values
+     * @param bool|null                                                                           $ignoreMissing
      *
      * @return string
      * @throws \BetaKiller\I18n\I18nException
      */
-    public function translateKeyName(
+    public function translate(
         LanguageInterface $lang,
-        string            $keyName,
-        ?array            $values = null,
-        ?bool             $ignoreMissing = null
+        string|HasI18nKeyNameInterface|I18nKeyInterface $key,
+        ?array $values = null,
+        ?bool $ignoreMissing = null
     ): string {
-        $key = $this->getKeyByName($keyName);
+        $key = match (true) {
+            is_string($key) => $this->getKeyByName($key),
+            $key instanceof I18nKeyInterface => $key, // More specific class first
+            $key instanceof HasI18nKeyNameInterface => $this->getKeyByName($key->getI18nKeyName()),
+        };
 
-        $string = $this->translate($key, $lang, false, $ignoreMissing);
+        // Translate key first
+        $str = $this->getKeyValue($key, $lang, false, $ignoreMissing);
 
-        return $this->replacePlaceholders($string, $values);
-    }
+        if ($this->formatter->isFormatted($str)) {
+            $form = $values ? reset($values) : null;
 
-    /**
-     * @param \BetaKiller\Model\LanguageInterface $lang
-     * @param \BetaKiller\Model\I18nKeyInterface  $key
-     * @param array|null                          $values
-     * @param bool|null                           $ignoreMissing
-     *
-     * @return string
-     */
-    public function translateKey(
-        LanguageInterface $lang,
-        I18nKeyInterface  $key,
-        ?array            $values = null,
-        ?bool             $ignoreMissing = null
-    ): string {
-        $string = $this->translate($key, $lang, false, $ignoreMissing);
+            if (!is_int($form)) {
+                throw new I18nException('Plural form can not be detected for key ":key" with values ":values"', [
+                    ':key'    => $key->getI18nKeyName(),
+                    ':values' => json_encode($values),
+                ]);
+            }
 
-        return $this->replacePlaceholders($string, $values);
-    }
-
-    /**
-     * @param \BetaKiller\Model\LanguageInterface $lang
-     * @param \BetaKiller\Model\I18nKeyInterface  $key
-     * @param array|null                          $values
-     * @param bool|null                           $ignoreMissing
-     *
-     * @return string
-     */
-    public function translateKeyAny(
-        LanguageInterface $lang,
-        I18nKeyInterface  $key,
-        ?array            $values = null,
-        ?bool             $ignoreMissing = null
-    ): string {
-        $string = $this->translate($key, $lang, true, $ignoreMissing);
-
-        return $this->replacePlaceholders($string, $values);
-    }
-
-    /**
-     * Translate provided key to all app languages
-     *
-     * @param \BetaKiller\Model\I18nKeyInterface $key
-     * @param array|null                         $values
-     * @param bool|null                          $ignoreMissing
-     *
-     * @return string[]
-     */
-    public function translateKeyAll(I18nKeyInterface $key, array $values = null, bool $ignoreMissing = null): array
-    {
-        $data = [];
-
-        foreach ($this->languages as $lang) {
-            $data[$lang->getIsoCode()] = $this->translateKey($lang, $key, $values, $ignoreMissing);
+            $str = $this->pluralize($lang, $str, $form);
         }
 
-        // Add placeholder for primary lang
-        $data[self::PRIMARY_LANG_ISO] = $data[$this->primaryLang->getIsoCode()];
-
-        return $data;
-    }
-
-    public function translateHasKeyNameAll(
-        HasI18nKeyNameInterface $key,
-        array                   $values = null,
-        bool                    $ignoreMissing = null
-    ): array {
-        $data = [];
-
-        foreach ($this->languages as $lang) {
-            $data[$lang->getIsoCode()] = $this->translateHasKeyName($lang, $key, $values, $ignoreMissing);
-        }
-
-        // Add placeholder for primary lang
-        $data[self::PRIMARY_LANG_ISO] = $data[$this->primaryLang->getIsoCode()];
-
-        return $data;
-    }
-
-    /**
-     * @param \BetaKiller\Model\LanguageInterface $lang
-     * @param string                              $keyName
-     * @param                                     $form
-     * @param array|null                          $values
-     * @param bool|null                           $ignoreMissing
-     *
-     * @return string
-     * @throws \BetaKiller\I18n\I18nException
-     * @throws \Punic\Exception\BadArgumentType
-     * @throws \Punic\Exception\ValueNotInList
-     */
-    public function pluralizeKeyName(
-        LanguageInterface $lang,
-        string            $keyName,
-                          $form,
-        array             $values = null,
-        ?bool             $ignoreMissing = null
-    ): string {
-        $key = $this->getKeyByName($keyName);
-
-        $string = $this->translate($key, $lang, false, $ignoreMissing);
-
-        $string = $this->pluralize($lang, $string, $form);
-
-        return $this->replacePlaceholders($string, $values);
+        return $this->replacePlaceholders($str, $values);
     }
 
     private function getKeyByName(string $name): I18nKeyInterface
@@ -335,32 +230,20 @@ final class I18nFacade
         return $keys[$name];
     }
 
-    public function pluralizeKey(string $langName, I18nKeyInterface $key, $form, array $values = null): string
-    {
-        $lang = $this->getLanguageByIsoCode($langName);
-
-        // Translate key first
-        $packedString = $this->translate($key, $lang);
-
-        $string = $this->pluralize($lang, $packedString, $form);
-
-        return $this->replacePlaceholders($string, $values);
-    }
-
     /**
      * @param string $locale
      *
      * @return string[]
      * @throws \Punic\Exception
      */
-    public function getPluralFormsForLocale(string $locale): array
+    public function getLanguagePluralForms(LanguageInterface $lang): array
     {
-        return Plural::getRules($locale);
+        return Plural::getRules($lang->getLocale());
     }
 
     public function validatePluralBag(PluralBagInterface $bag, LanguageInterface $lang): void
     {
-        $forms = $this->getPluralFormsForLocale($lang->getLocale());
+        $forms = $this->getLanguagePluralForms($lang);
 
         foreach ($bag->getAll() as $itemForm => $formValue) {
             if (!in_array($itemForm, $forms, true)) {
@@ -438,11 +321,11 @@ final class I18nFacade
      *
      * @return  string
      */
-    private function translate(
-        I18nKeyInterface  $key,
+    private function getKeyValue(
+        I18nKeyInterface $key,
         LanguageInterface $lang,
-        bool              $any = null,
-        bool              $ignoreMissing = null
+        bool $any = null,
+        bool $ignoreMissing = null
     ): string {
         if ($any) {
             $value = $key->getI18nValueOrAny($lang);
@@ -473,30 +356,13 @@ final class I18nFacade
             return $string;
         }
 
-//        if ($values) {
-//            // Add prefix if does not exists
-//            $values = self::addPlaceholderPrefixToKeys($values);
-//        }
-
         return strtr($string, array_filter($values, 'is_scalar'));
     }
 
-    private function pluralize(LanguageInterface $lang, string $packedString, $form): string
+    private function pluralize(LanguageInterface $lang, string $packedString, int $number): string
     {
-        // Detect form name if a $form is an integer-like
-        if ((string)(int)$form === (string)$form) {
-            // Detect form based on a count
-            $form = Plural::getRuleOfType($form, Plural::RULETYPE_CARDINAL, $lang->getLocale());
-        }
+        $form = Plural::getRuleOfType($number, Plural::RULETYPE_CARDINAL, $lang->getLocale());
 
-        if (!$this->formatter->isFormatted($packedString)) {
-            throw new I18nException('Translation in locale ":locale" is not plural but ":value"', [
-                ':value'  => $packedString,
-                ':locale' => $lang->getLocale(),
-            ]);
-        }
-
-        // Pluralize next
         return $this->formatter->parse($packedString)->getValue($form);
     }
 }

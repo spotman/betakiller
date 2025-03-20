@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\I18n;
@@ -28,6 +29,7 @@ class PluralBag implements PluralBagInterface
 
         if (!$value) {
             throw new I18nException('Missing form ":form" but these forms exist: ":exist"', [
+                ':form'  => $form,
                 ':exist' => \implode('", "', \array_keys($this->values)),
             ]);
         }

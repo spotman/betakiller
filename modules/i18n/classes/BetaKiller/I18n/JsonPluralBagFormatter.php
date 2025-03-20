@@ -54,13 +54,12 @@ class JsonPluralBagFormatter implements PluralBagFormatterInterface
     /**
      * Returns true if provided string is packed with current formatter
      *
-     * @param string $str
+     * @param string $packedString
      *
      * @return bool
      */
-    public function isFormatted(string $str): bool
+    public function isFormatted(string $packedString): bool
     {
-        return \mb_strstr($str, '{') === 0
-            && \mb_strrpos($str, '}', -1) === \mb_strlen($str) - 1;
+        return str_starts_with($packedString, '{') && str_ends_with($packedString, '}');
     }
 }

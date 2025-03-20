@@ -58,7 +58,7 @@ class StringPatternHelper
         ?int $limit = null
     ): string {
         if (I18nFacade::isI18nKey($source)) {
-            $source = $this->i18n->translateKeyName($lang, $source);
+            $source = $this->i18n->translate($lang, $source);
         }
 
         // Replace i18n keys
@@ -127,12 +127,8 @@ class StringPatternHelper
 
                 $param = $parameters->getParameter($key);
 
-                if ($param instanceof I18nKeyInterface) {
-                    return $this->i18n->translateKey($lang, $param);
-                }
-
                 if ($param instanceof HasI18nKeyNameInterface) {
-                    return $this->i18n->translateHasKeyName($lang, $param);
+                    return $this->i18n->translate($lang, $param);
                 }
 
                 throw new Exception('Can not translate i18n param ":name"', [

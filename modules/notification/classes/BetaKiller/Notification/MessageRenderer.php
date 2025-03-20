@@ -97,7 +97,7 @@ readonly class MessageRenderer implements MessageRendererInterface
         // Convert raw names to placeholders
         $data = I18nFacade::addPlaceholderPrefixToKeys($data);
 
-        $output = $this->i18n->translateKeyName($lang, $key, $data);
+        $output = $this->i18n->translate($lang, $key, $data);
 
         if ($output === $key) {
             throw new NotificationException('Missing translation for key [:value]', [

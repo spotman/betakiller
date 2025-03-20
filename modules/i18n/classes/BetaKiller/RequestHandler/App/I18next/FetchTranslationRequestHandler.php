@@ -72,7 +72,7 @@ class FetchTranslationRequestHandler implements RequestHandlerInterface
 
             foreach ($keys as $key) {
                 if (TextHelper::startsWith($name, $key)) {
-                    $data[$name] = $this->facade->translateKey($lang, $item);
+                    $data[$name] = $this->facade->translate($lang, $item);
                     break;
                 }
             }

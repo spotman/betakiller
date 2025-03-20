@@ -2,7 +2,7 @@
 
 {% if comments|length %}
   <div class="side-lines-header">
-    <span>{{ "comments.count"|plural({ ":count": comments|length }) }}</span>
+    <span>{{ "comments.count"|i18n({ ":count": comments|length }) }}</span>
   </div>
 
   <div id="comments-container" class="row">

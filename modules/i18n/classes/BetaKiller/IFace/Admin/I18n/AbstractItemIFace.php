@@ -86,7 +86,7 @@ abstract readonly class AbstractItemIFace extends AbstractAdminIFace
         $bag = $this->plural->parse($value);
 
         // Get all forms for current lang
-        $forms = $this->facade->getPluralFormsForLocale($lang->getLocale());
+        $forms = $this->facade->getLanguagePluralForms($lang);
 
         $output = [];
 

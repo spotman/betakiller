@@ -50,7 +50,7 @@ readonly class ListApiMethod extends AbstractApiMethod
         foreach ($this->repo->getAll() as $frequency) {
             $data[] = [
                 'codename' => $frequency->getCodename(),
-                'label'    => $this->i18n->translateHasKeyName($lang, $frequency),
+                'label'    => $this->i18n->translate($lang, $frequency),
             ];
         }
 

@@ -74,7 +74,7 @@ class ExceptionService
         if ($message) {
             // Translate if i18n key is used
             if (I18nFacade::isI18nKey($message)) {
-                $message = $this->i18n->translateKeyName($lang, $message, $variables);
+                $message = $this->i18n->translate($lang, $message, $variables);
             }
 
             return $message;
@@ -94,14 +94,14 @@ class ExceptionService
             ]);
         }
 
-        return $this->i18n->translateKeyName($lang, $i18nKey, $variables);
+        return $this->i18n->translate($lang, $i18nKey, $variables);
     }
 
     private function getMaskedMessage(\Throwable $e, LanguageInterface $lang): string
     {
         $key = $this->getLabelI18nKey($e);
 
-        return $this->i18n->translateKeyName($lang, $key);
+        return $this->i18n->translate($lang, $key);
     }
 
     private function getLabelI18nKey(\Throwable $e): string

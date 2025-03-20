@@ -27,6 +27,7 @@ return array(
             'defence',
             'email',
             'error',
+            'i18n',
             'iface',
             'jsonrpc',
             'log',

@@ -689,38 +689,18 @@ final class TwigExtension extends AbstractExtension
             }),
 
             /**
-             * International pluralization via translation strings
-             * The first key-value pair would be used if no context provided
+             * I18n via translation strings, with pluralization and placeholders
              *
-             * @example ":count lots"|plural({ ":count": lotsCount })
+             * @example "admin.user.total"|i18n({ ":count": users|length }) where "admin.user.total" is "Total users: :count"
              */
-            new TwigFilter('plural', function (array $context, string $key, array $values = null, $form = null) {
-                if (!\is_array($values)) {
-                    $values = [
-                        ':count' => (int)$values,
-                    ];
-                }
-
-                $values = I18nFacade::addPlaceholderPrefixToKeys($values);
-
-                $lang = $this->getRequestLang($context);
-
-                return $this->i18n->pluralizeKeyName($lang, $key, $form ?? current($values), $values);
-            }, ['needs_context' => true, 'is_safe' => ['html']]),
-
-            /**
-             * I18n via translation strings
-             *
-             * @example ":count lots"|i18n({ ":count": lotsCount })
-             */
-            new TwigFilter('i18n', function (array $context, string $text, array $values = null) {
+            new TwigFilter('i18n', function (array $context, string $key, array $values = null) {
                 if ($values) {
                     $values = I18nFacade::addPlaceholderPrefixToKeys($values);
                 }
 
                 $lang = $this->getRequestLang($context);
 
-                return $this->i18n->translateKeyName($lang, $text, $values);
+                return $this->i18n->translate($lang, $key, $values);
             }, ['needs_context' => true, 'is_safe' => ['html']]),
 
             /**
