@@ -92,7 +92,7 @@ return [
             ],
 
             UserState::REMOVED => [
-                WorkflowConfig::IS_FINISH => true,
+//                WorkflowConfig::IS_FINISH => true,
 
                 WorkflowConfig::ACTIONS => [
                     UserResource::ACTION_READ   => [
@@ -105,7 +105,7 @@ return [
                 ],
 
                 WorkflowConfig::TRANSITIONS => [
-                    // No transitions for removed Users
+                    UserWorkflow::TRANSITION_RESTORE => UserState::CREATED,
                 ],
             ],
         ],
@@ -116,6 +116,10 @@ return [
             ],
 
             UserWorkflow::TRANSITION_RESUME => [
+                RoleInterface::LOGIN,
+            ],
+
+            UserWorkflow::TRANSITION_RESTORE => [
                 RoleInterface::LOGIN,
             ],
 

@@ -32,6 +32,7 @@ final readonly class UserWorkflow
     public const TRANSITION_SUSPEND = 'suspend';
     public const TRANSITION_RESUME  = 'resume';
     public const TRANSITION_REMOVE  = 'remove';
+    public const TRANSITION_RESTORE = 'restore';
 
     /**
      * UserWorkflow constructor.
@@ -208,5 +209,12 @@ final readonly class UserWorkflow
         $this->userRepo->save($user);
 
         $this->eventBus->emit(new UserRemovedEvent($user));
+    }
+
+    public function restore(UserInterface $user): void
+    {
+        $this->state->doTransition($user, self::TRANSITION_RESTORE, $user);
+
+        $this->userRepo->save($user);
     }
 }

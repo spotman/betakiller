@@ -112,7 +112,7 @@ class User extends AbstractCreatedAt implements UserInterface
     {
         return parent::rules() + [
                 self::COL_STATUS_ID       => [
-                    ['max_length', [':value', 1]],
+                    ['max_length', [':value', 2]],
                 ],
                 self::COL_EMAIL           => $this->getColumnRulesEmail(),
                 self::COL_USERNAME        => $this->getColumnRulesUsername(),
@@ -169,7 +169,7 @@ class User extends AbstractCreatedAt implements UserInterface
     }
 
     /**
-     * @return bool
+     * @inheritDoc
      */
     public function isBlocked(): bool
     {
@@ -177,11 +177,19 @@ class User extends AbstractCreatedAt implements UserInterface
     }
 
     /**
-     * @return bool
+     * @inheritDoc
      */
     public function isSuspended(): bool
     {
         return $this->isInWorkflowState(UserState::SUSPENDED);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isRemoved(): bool
+    {
+        return $this->isInWorkflowState(UserState::REMOVED);
     }
 
     public function markAsRegistrationClaimed(): void
@@ -190,7 +198,7 @@ class User extends AbstractCreatedAt implements UserInterface
     }
 
     /**
-     * @return bool
+     * @inheritDoc
      */
     public function isRegistrationClaimed(): bool
     {
