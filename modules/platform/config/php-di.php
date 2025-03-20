@@ -38,6 +38,8 @@ use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
 use BetaKiller\Factory\OrmFactory;
 use BetaKiller\Factory\RepositoryFactory;
 use BetaKiller\Factory\RepositoryFactoryInterface;
+use BetaKiller\Factory\UserSessionFactory;
+use BetaKiller\Factory\UserSessionFactoryInterface;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\RequestLanguageHelperInterface;
 use BetaKiller\IdentityConverterInterface;
@@ -199,6 +201,7 @@ return [
             return $params;
         }),
 
+        UserSessionFactoryInterface::class => autowire(UserSessionFactory::class),
         SessionStorageInterface::class     => autowire(DatabaseSessionStorage::class),
         SessionPersistenceInterface::class => get(SessionStorageInterface::class),
 

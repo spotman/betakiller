@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
-use BetaKiller\Exception\DomainException;
-use BetaKiller\Model\GuestUserInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\UserSessionInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;

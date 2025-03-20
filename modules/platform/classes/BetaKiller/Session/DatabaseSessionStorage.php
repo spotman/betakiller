@@ -8,6 +8,7 @@ use BetaKiller\Config\SessionConfigInterface;
 use BetaKiller\Dev\RequestProfiler;
 use BetaKiller\Exception;
 use BetaKiller\Exception\DomainException;
+use BetaKiller\Factory\UserSessionFactoryInterface;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
@@ -32,12 +33,14 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
     /**
      * DatabaseSessionStorage constructor.
      *
+     * @param \BetaKiller\Factory\UserSessionFactoryInterface       $modelFactory
      * @param \BetaKiller\Repository\UserSessionRepositoryInterface $sessionRepo
      * @param \BetaKiller\Config\SessionConfigInterface             $config
      * @param \BetaKiller\Security\EncryptionInterface              $encryption
      * @param \BetaKiller\Helper\CookieHelper                       $cookieHelper
      */
     public function __construct(
+        private UserSessionFactoryInterface $modelFactory,
         private UserSessionRepositoryInterface $sessionRepo,
         private SessionConfigInterface $config,
         private EncryptionInterface $encryption,
@@ -272,13 +275,7 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
             ]);
         }
 
-        $model = new UserSession();
-
-        $model
-            ->setToken($session->getId())
-            ->setCreatedAt(new DateTimeImmutable());
-
-        return $model;
+        return $this->modelFactory->create($session->getId());
     }
 
     private function encodeData(array $data): string

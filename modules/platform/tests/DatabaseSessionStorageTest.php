@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Test;
@@ -6,16 +7,19 @@ namespace BetaKiller\Test;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\SessionConfigInterface;
 use BetaKiller\Env\AppEnvInterface;
+use BetaKiller\Factory\UserSessionFactoryInterface;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Middleware\SessionMiddleware;
 use BetaKiller\Model\UserSession;
+use BetaKiller\Model\UserSessionInterface;
 use BetaKiller\Repository\UserSessionRepositoryInterface;
 use BetaKiller\Security\EncryptionInterface;
 use BetaKiller\Session\DatabaseSessionStorage;
 use BetaKiller\Session\SessionStorageInterface;
+use DateTimeImmutable;
 use Dflydev\FigCookies\SetCookies;
 use Laminas\Diactoros\ServerRequest;
 use Middlewares\Utils\RequestHandler;
@@ -23,9 +27,11 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class DatabaseSessionStorageTest extends AbstractTestCase
 {
-    private const FAKE_KEY = '__persisted__';
+    private const FAKE_KEY = 'persisted';
 
-    private array $sessionData = [];
+    private array $sessionMocks = [];
+
+    private array $sessionContent = [];
 
     public function testConstructor(): void
     {
@@ -60,8 +66,10 @@ final class DatabaseSessionStorageTest extends AbstractTestCase
             })
         );
 
+//        d($this->sessionMocks, $firstResp);
+
         // Check data is saved
-        self::assertArrayHasKey($firstId, $this->sessionData, 'Session data has not been stored');
+        self::assertArrayHasKey($firstId, $this->sessionMocks, 'Session data has not been stored');
 
         // Fetch session ID
         $firstToken = SetCookies::fromResponse($firstResp)->get(DatabaseSessionStorage::COOKIE_NAME)->getValue();
@@ -164,7 +172,7 @@ final class DatabaseSessionStorageTest extends AbstractTestCase
         );
 
         // Check data is saved
-        self::assertArrayHasKey($firstId, $this->sessionData, 'Session data has not been stored');
+        self::assertArrayHasKey($firstId, $this->sessionMocks, 'Session data has not been stored');
 
         // Fetch session ID
         $firstToken = SetCookies::fromResponse($firstResp)->get(DatabaseSessionStorage::COOKIE_NAME)->getValue();
@@ -244,41 +252,51 @@ final class DatabaseSessionStorageTest extends AbstractTestCase
 
     private function createStorage(): DatabaseSessionStorage
     {
-        $appConfig     = $this->createMock(AppConfigInterface::class);
-        $appEnv        = $this->createMock(AppEnvInterface::class);
-        $sessionRepo   = $this->createMock(UserSessionRepositoryInterface::class);
-        $sessionConfig = $this->createMock(SessionConfigInterface::class);
-        $encryption    = $this->createMock(EncryptionInterface::class);
+        $appConfig      = $this->createMock(AppConfigInterface::class);
+        $appEnv         = $this->createMock(AppEnvInterface::class);
+        $sessionFactory = $this->createMock(UserSessionFactoryInterface::class);
+        $sessionRepo    = $this->createMock(UserSessionRepositoryInterface::class);
+        $sessionConfig  = $this->createMock(SessionConfigInterface::class);
+        $encryption     = $this->createMock(EncryptionInterface::class);
 
         // Retrieve data
-        $sessionRepo->method('findByToken')->willReturnCallback(function (string $token) {
+        $sessionRepo->method('findByToken')->willReturnCallback(function (string $token): ?UserSessionInterface {
 //            d('retrieve', $token);
 
-            if (!isset($this->sessionData[$token])) {
+            if (!isset($this->sessionMocks[$token])) {
                 return null;
             }
 
-            $model = new UserSession();
-
-            $model->setToken($token);
-            $model->values($this->sessionData[$token]);
-
-//            d('restore', $model->as_array());
-
-            return $model;
+            return $this->sessionMocks[$token];
         });
 
         // Store data
-        $sessionRepo->method('save')->willReturnCallback(function (UserSession $model) {
-//            d('save', $model->as_array());
-            $this->sessionData[$model->getToken()] = $model->as_array();
+        $sessionFactory->method('create')->willReturnCallback(function (string $id): UserSessionInterface {
+            $model = $this->createMock(UserSession::class);
+
+            $model->method('getToken')->willReturn($id);
+            $model->method('getCreatedAt')->willReturn(new DateTimeImmutable());
+
+            $model->method('setContents')->willReturnCallback(function (string $value) use ($model, $id): UserSessionInterface {
+                $this->sessionContent[$id] = $value;
+
+                return $model;
+            });
+
+            $model->method('getContents')->willReturnCallback(function () use ($id): string {
+                return $this->sessionContent[$id];
+            });
+
+            $this->sessionMocks[$id] = $model;
+
+            return $model;
         });
 
         $sessionConfig->method('getLifetime')->willReturn(new \DateInterval('P1W'));
 
         $cookies = new CookieHelper($appConfig, $appEnv);
 
-        return new DatabaseSessionStorage($sessionRepo, $sessionConfig, $encryption, $cookies);
+        return new DatabaseSessionStorage($sessionFactory, $sessionRepo, $sessionConfig, $encryption, $cookies);
     }
 
     private function prepareRequest(string $sid): ServerRequestInterface
