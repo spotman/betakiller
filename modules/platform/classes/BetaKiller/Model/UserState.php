@@ -10,8 +10,10 @@ final class UserState extends AbstractWorkflowStateOrmModel implements WorkflowS
 {
     public const TABLE_NAME = 'user_statuses';
 
+    public const COL_ID = 'id';
+
     public const CREATED   = 'created';       // Just created
-    public const BLOCKED   = 'blocked';       // Blocked coz of hacking, spam, or app rules violation
+    public const BANNED    = 'banned';        // Blocked coz of hacking, spam, or app rules violation
     public const SUSPENDED = 'suspended';     // Account removal requested, so it will be suspended for 6 months
     public const RESUMED   = 'resumed';       // Resumed from suspend, requires additional confirmation (potential fraud)
     public const REMOVED   = 'removed';       // Soft delete (keep ID and email but delete personal data)

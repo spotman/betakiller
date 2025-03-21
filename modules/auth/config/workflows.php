@@ -29,7 +29,7 @@ return [
 
                 WorkflowConfig::TRANSITIONS => [
                     UserWorkflow::TRANSITION_SUSPEND => UserState::SUSPENDED,
-                    UserWorkflow::TRANSITION_BLOCK   => UserState::BLOCKED,
+                    UserWorkflow::TRANSITION_BAN     => UserState::BANNED,
                     UserWorkflow::TRANSITION_REMOVE  => UserState::REMOVED,
                 ],
             ],
@@ -48,7 +48,7 @@ return [
                 WorkflowConfig::TRANSITIONS => [
                     // Set "resumed" state to prevent workflow hacks (created => suspended => confirmed)
                     UserWorkflow::TRANSITION_RESUME => UserState::RESUMED,
-                    UserWorkflow::TRANSITION_BLOCK  => UserState::BLOCKED,
+                    UserWorkflow::TRANSITION_BAN    => UserState::BANNED,
                     UserWorkflow::TRANSITION_REMOVE => UserState::REMOVED,
                 ],
             ],
@@ -66,13 +66,13 @@ return [
 
                 WorkflowConfig::TRANSITIONS => [
                     UserWorkflow::TRANSITION_SUSPEND => UserState::SUSPENDED,
-                    UserWorkflow::TRANSITION_BLOCK   => UserState::BLOCKED,
+                    UserWorkflow::TRANSITION_BAN     => UserState::BANNED,
                     UserWorkflow::TRANSITION_REMOVE  => UserState::REMOVED,
                 ],
             ],
 
-            UserState::BLOCKED => [
-                WorkflowConfig::IS_FINISH => true,
+            UserState::BANNED => [
+//                WorkflowConfig::IS_FINISH => true,
 
                 WorkflowConfig::ACTIONS     => [
                     UserResource::ACTION_READ   => [
@@ -86,7 +86,7 @@ return [
 
                 // No transitions for blocked Users
                 WorkflowConfig::TRANSITIONS => [
-                    UserWorkflow::TRANSITION_UNLOCK => UserState::RESUMED,
+                    UserWorkflow::TRANSITION_UNBAN  => UserState::RESUMED,
                     UserWorkflow::TRANSITION_REMOVE => UserState::REMOVED,
                 ],
             ],
@@ -128,11 +128,11 @@ return [
                 RoleInterface::USER_MANAGEMENT,
             ],
 
-            UserWorkflow::TRANSITION_BLOCK => [
+            UserWorkflow::TRANSITION_BAN => [
                 RoleInterface::USER_MANAGEMENT,
             ],
 
-            UserWorkflow::TRANSITION_UNLOCK => [
+            UserWorkflow::TRANSITION_UNBAN => [
                 RoleInterface::USER_MANAGEMENT,
             ],
         ],

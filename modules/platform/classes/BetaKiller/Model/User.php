@@ -173,7 +173,7 @@ class User extends AbstractCreatedAt implements UserInterface
      */
     public function isBlocked(): bool
     {
-        return $this->isInWorkflowState(UserState::BLOCKED);
+        return $this->isInWorkflowState(UserState::BANNED);
     }
 
     /**

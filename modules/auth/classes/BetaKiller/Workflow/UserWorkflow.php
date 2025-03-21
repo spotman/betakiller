@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BetaKiller\Workflow;
 
 use BetaKiller\Auth\PasswordHasherInterface;
-use BetaKiller\Event\UserBlockedEvent;
+use BetaKiller\Event\UserBannedEvent;
 use BetaKiller\Event\UserConfirmationEmailRequestedEvent;
 use BetaKiller\Event\UserCreatedEvent;
 use BetaKiller\Event\UserEmailChangedEvent;
@@ -15,7 +15,7 @@ use BetaKiller\Event\UserRegistrationClaimedEvent;
 use BetaKiller\Event\UserRemovedEvent;
 use BetaKiller\Event\UserResumedEvent;
 use BetaKiller\Event\UserSuspendedEvent;
-use BetaKiller\Event\UserUnlockedEvent;
+use BetaKiller\Event\UserUnbannedEvent;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Factory\UserFactoryInterface;
 use BetaKiller\Factory\UserInfo;
@@ -27,8 +27,8 @@ use BetaKiller\Repository\UserRepositoryInterface;
 
 final readonly class UserWorkflow
 {
-    public const TRANSITION_BLOCK   = 'block';
-    public const TRANSITION_UNLOCK  = 'unlock';
+    public const TRANSITION_BAN     = 'ban';
+    public const TRANSITION_UNBAN   = 'unban';
     public const TRANSITION_SUSPEND = 'suspend';
     public const TRANSITION_RESUME  = 'resume';
     public const TRANSITION_REMOVE  = 'remove';
@@ -157,22 +157,22 @@ final readonly class UserWorkflow
         $this->eventBus->emit(new UserEmailChangedEvent($user));
     }
 
-    public function block(UserInterface $user, UserInterface $adminUser): void
+    public function ban(UserInterface $user, UserInterface $adminUser): void
     {
-        $this->state->doTransition($user, self::TRANSITION_BLOCK, $adminUser);
+        $this->state->doTransition($user, self::TRANSITION_BAN, $adminUser);
 
         $this->userRepo->save($user);
 
-        $this->eventBus->emit(new UserBlockedEvent($user));
+        $this->eventBus->emit(new UserBannedEvent($user));
     }
 
-    public function unlock(UserInterface $user, UserInterface $adminUser): void
+    public function unban(UserInterface $user, UserInterface $adminUser): void
     {
-        $this->state->doTransition($user, self::TRANSITION_UNLOCK, $adminUser);
+        $this->state->doTransition($user, self::TRANSITION_UNBAN, $adminUser);
 
         $this->userRepo->save($user);
 
-        $this->eventBus->emit(new UserUnlockedEvent($user));
+        $this->eventBus->emit(new UserUnbannedEvent($user));
     }
 
     public function suspend(UserInterface $user): void
