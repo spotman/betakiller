@@ -4,8 +4,8 @@ error.auth.common:
 error.auth.required:
   Authorization required
 
-error.auth.blocked:
-  Your account was blocked
+error.auth.banned:
+  Your account was banned
 
 error.auth.incorrect-password:
   Incorrect password

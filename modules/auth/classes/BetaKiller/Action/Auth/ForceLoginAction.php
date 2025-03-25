@@ -56,7 +56,7 @@ final readonly class ForceLoginAction extends AbstractAction
      * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
      * @throws \BetaKiller\Auth\IncorrectCredentialsException
-     * @throws \BetaKiller\Auth\UserBlockedException
+     * @throws \BetaKiller\Auth\UserBannedException
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\MessageBus\MessageBusException
      * @throws \BetaKiller\Repository\RepositoryException

@@ -54,7 +54,7 @@ class DefaultUserUrlDetector implements UserUrlDetectorInterface
      */
     protected function commonChecks(UserInterface $user): ?string
     {
-        if ($user->isBlocked()) {
+        if ($user->isBanned()) {
             return $this->urlHelper->makeCodenameUrl(BlockedIFace::codename());
         }
 

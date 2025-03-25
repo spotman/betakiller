@@ -7,7 +7,7 @@ namespace BetaKiller\Service;
 use BetaKiller\Acl\Resource\UserResource;
 use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\Auth\PasswordHasherInterface;
-use BetaKiller\Auth\UserBlockedException;
+use BetaKiller\Auth\UserBannedException;
 use BetaKiller\Event\UserPasswordChangedEvent;
 use BetaKiller\Event\UserPasswordChangeRequestedEvent;
 use BetaKiller\Factory\GuestUserFactory;
@@ -132,7 +132,7 @@ class AuthService
      *
      * @return void
      * @throws \BetaKiller\Auth\AccessDeniedException
-     * @throws \BetaKiller\Auth\UserBlockedException
+     * @throws \BetaKiller\Auth\UserBannedException
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
@@ -141,8 +141,8 @@ class AuthService
         UserInterface $user
     ): void {
         // Check account is active
-        if (!$user->isActive()) {
-            throw new UserBlockedException();
+        if (!$user->isBanned()) {
+            throw new UserBannedException();
         }
 
         $userResource = $this->acl->getResource(User::getModelName());

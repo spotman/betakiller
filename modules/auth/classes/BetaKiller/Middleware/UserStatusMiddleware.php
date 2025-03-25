@@ -55,7 +55,7 @@ class UserStatusMiddleware implements MiddlewareInterface
         $user = ServerRequestHelper::getUser($request);
 
         switch (true) {
-            case $user->isBlocked():
+            case $user->isBanned():
                 return BlockedIFace::codename();
 
             case $user->isSuspended():

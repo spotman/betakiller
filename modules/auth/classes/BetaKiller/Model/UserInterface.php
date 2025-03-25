@@ -79,7 +79,7 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     /**
      * @return bool
      */
-    public function isBlocked(): bool;
+    public function isBanned(): bool;
 
     /**
      * @return bool

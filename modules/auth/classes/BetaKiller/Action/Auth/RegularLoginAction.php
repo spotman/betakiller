@@ -62,7 +62,7 @@ readonly class RegularLoginAction extends AbstractAction implements PostRequestA
      *
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Auth\AccessDeniedException
-     * @throws \BetaKiller\Auth\UserBlockedException
+     * @throws \BetaKiller\Auth\UserBannedException
      * @throws \BetaKiller\Auth\IncorrectCredentialsException
      * @throws \BetaKiller\Exception\BadRequestHttpException
      * @throws \BetaKiller\Exception\ValidationException
