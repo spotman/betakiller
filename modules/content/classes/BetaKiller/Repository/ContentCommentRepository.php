@@ -124,7 +124,7 @@ class ContentCommentRepository extends AbstractOrmBasedHasWorkflowStateRepositor
         $orm = $this->getOrmInstance();
 
         if ($status) {
-            $this->filterState($orm, $status);
+            $this->filterWorkflowState($orm, $status);
         }
 
         return $this
@@ -144,7 +144,7 @@ class ContentCommentRepository extends AbstractOrmBasedHasWorkflowStateRepositor
         $orm = $this->getOrmInstance();
 
         if ($status) {
-            $this->filterState($orm, $status);
+            $this->filterWorkflowState($orm, $status);
         }
 
         return $this
@@ -170,7 +170,7 @@ class ContentCommentRepository extends AbstractOrmBasedHasWorkflowStateRepositor
         $this->filterEntityOrEntityItemID($orm, $entity, $entityItemId);
 
         if ($status) {
-            $this->filterState($orm, $status);
+            $this->filterWorkflowState($orm, $status);
         }
 
         return $this->countAll($orm);

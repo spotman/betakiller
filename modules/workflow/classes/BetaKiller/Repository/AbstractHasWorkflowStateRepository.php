@@ -1,10 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
-use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use BetaKiller\Model\HasWorkflowStateInterface;
+use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use BetaKiller\Workflow\WorkflowStateInterface;
 
 abstract class AbstractHasWorkflowStateRepository extends AbstractOrmBasedDispatchableRepository implements
@@ -24,11 +25,12 @@ abstract class AbstractHasWorkflowStateRepository extends AbstractOrmBasedDispat
         return $this->findAll($orm);
     }
 
-    protected function filterState(OrmInterface $orm, WorkflowStateInterface $state): self
+    protected function filterWorkflowState(OrmInterface $orm, WorkflowStateInterface $state): self
     {
         $orm->where($this->getStateColumnName(), '=', $this->getStateColumnValue($state));
 
-        return $this;    }
+        return $this;
+    }
 
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
@@ -37,7 +39,7 @@ abstract class AbstractHasWorkflowStateRepository extends AbstractOrmBasedDispat
      *
      * @return $this
      */
-    protected function filterStates(OrmInterface $orm, array $states, bool $not = null): self
+    protected function filterWorkflowStates(OrmInterface $orm, array $states, bool $not = null): self
     {
         $values = array_map(fn (WorkflowStateInterface $state) => $this->getStateColumnValue($state), $states);
 
