@@ -43,7 +43,7 @@ final class DateTimeHelper
             $lang->getLocale(),
             IntlDateFormatter::RELATIVE_MEDIUM,
             IntlDateFormatter::SHORT,
-            self::getUtcTimezone()
+            $time->getTimezone() ?: self::getUtcTimezone()
         );
 
         return $fmt->format($time);
