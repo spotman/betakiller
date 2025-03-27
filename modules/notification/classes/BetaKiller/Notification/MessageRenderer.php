@@ -40,7 +40,7 @@ readonly class MessageRenderer implements MessageRendererInterface
 
         // Message hash (to distinguish messages)
         $data['__hash__'] = $message->getHash();
-        $data['__lang__'] = $target->getLanguageIsoCode();
+        $data['__lang_code__'] = $target->getLanguageIsoCode();
 
         // Get additional transport data
         if ($transport->isSubjectRequired()) {
