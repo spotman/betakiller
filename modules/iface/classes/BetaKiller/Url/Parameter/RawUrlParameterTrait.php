@@ -60,9 +60,8 @@ trait RawUrlParameterTrait
     {
         $className = static::class;
         $pos       = strrpos($className, '\\');
-        $baseName  = substr($className, $pos + 1);
 
-        return str_replace(RawUrlParameterInterface::CLASS_SUFFIX, '', $baseName);
+        return substr($className, $pos + 1);
     }
 
     protected static function getUriPrefix(): string

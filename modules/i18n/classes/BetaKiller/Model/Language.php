@@ -8,6 +8,7 @@ use ORM;
 
 class Language extends ORM implements LanguageInterface
 {
+    use ArgumentParameterModelTrait;
     use I18nKeyOrmTrait;
 
     public const TABLE_NAME     = 'languages';

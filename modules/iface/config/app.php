@@ -18,15 +18,15 @@ return [
 
         'parameters' => [
             // Common params
-            ID::getUrlContainerKey()          => ID::class,
-            Page::getUrlContainerKey()        => Page::class,
+            ID::class,
+            Page::class,
 
             // UTM markers
-            UtmCampaign::getUrlContainerKey() => UtmCampaign::class,
-            UtmContent::getUrlContainerKey()  => UtmContent::class,
-            UtmMedium::getUrlContainerKey()   => UtmMedium::class,
-            UtmSource::getUrlContainerKey()   => UtmSource::class,
-            UtmTerm::getUrlContainerKey()     => UtmTerm::class,
+            UtmCampaign::class,
+            UtmContent::class,
+            UtmMedium::class,
+            UtmSource::class,
+            UtmTerm::class,
         ],
     ],
 

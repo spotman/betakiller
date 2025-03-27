@@ -62,9 +62,9 @@ interface AppConfigInterface
     public function getIgnoredQueryParams(): array;
 
     /**
-     * Returns key=>value pairs where "key" is UrlContainer` key and "value" is FQCN
+     * Returns array of FQCN
      *
-     * @return array<string, string>
+     * @return string[]
      */
     public function getRawUrlParameters(): array;
 

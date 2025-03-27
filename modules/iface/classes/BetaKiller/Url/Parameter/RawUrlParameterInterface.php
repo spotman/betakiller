@@ -6,9 +6,6 @@ namespace BetaKiller\Url\Parameter;
 
 interface RawUrlParameterInterface extends UrlParameterInterface
 {
-    public const CLASS_NS     = ['Url', 'Parameter'];
-    public const CLASS_SUFFIX = ''; // 'UrlParameter'
-
     /**
      * Creates instance from uri value
      *

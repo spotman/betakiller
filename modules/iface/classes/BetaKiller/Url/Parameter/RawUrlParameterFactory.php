@@ -29,7 +29,7 @@ readonly class RawUrlParameterFactory
      */
     public function create(string $codename, string $uriValue): RawUrlParameterInterface
     {
-        $map = $this->appConfig->getRawUrlParameters();
+        $map = $this->getMap();
 
         $className = $map[$codename] ?? null;
 
@@ -39,13 +39,30 @@ readonly class RawUrlParameterFactory
             ]);
         }
 
-        if (!is_a($className, RawUrlParameterInterface::class, true)) {
-            throw new UrlParameterException('Class :class must implement :must', [
-                ':class' => $className,
-                ':must'  => RawUrlParameterInterface::class,
-            ]);
+        return $className::fromUriValue($uriValue);
+    }
+
+    /**
+     * @return array<string, \BetaKiller\Url\Parameter\RawUrlParameterInterface>
+     * @throws \BetaKiller\Url\Parameter\UrlParameterException
+     */
+    private function getMap(): array
+    {
+        static $map;
+
+        if (!$map) {
+            foreach ($this->appConfig->getRawUrlParameters() as $fqcn) {
+                if (!is_a($fqcn, RawUrlParameterInterface::class, true)) {
+                    throw new UrlParameterException('Class :class must implement :must', [
+                        ':class' => $fqcn,
+                        ':must'  => RawUrlParameterInterface::class,
+                    ]);
+                }
+
+                $map[$fqcn::getUrlContainerKey()] = $fqcn;
+            }
         }
 
-        return call_user_func([$className, 'fromUriValue'], $uriValue);
+        return $map;
     }
 }
