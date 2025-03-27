@@ -16,7 +16,7 @@ final class FakeParameterProviderFactory implements ParameterProviderFactoryInte
             throw new \LogicException('Test value must be "string"');
         }
 
-        return new FakeStringParameter($value);
+        return new FakeString($value);
     }
 
     public function createFor(ArgumentDefinitionInterface $argDef): ParameterProviderInterface

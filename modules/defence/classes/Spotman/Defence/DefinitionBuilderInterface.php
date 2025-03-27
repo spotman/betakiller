@@ -90,11 +90,11 @@ interface DefinitionBuilderInterface
      * Define string parameter argument
      *
      * @param string $name
-     * @param string $codename Provider codename
+     * @param string $fqcn Parameter class name
      *
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function param(string $name, string $codename): DefinitionBuilderInterface;
+    public function param(string $name, string $fqcn): DefinitionBuilderInterface;
 
     /**
      * Define indexed array of integers
@@ -127,11 +127,11 @@ interface DefinitionBuilderInterface
      * Define array of string parameter arguments
      *
      * @param string $name
-     * @param string $codename Provider codename
+     * @param string $fqcn Parameter class name
      *
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function paramArray(string $name, string $codename): DefinitionBuilderInterface;
+    public function paramArray(string $name, string $fqcn): DefinitionBuilderInterface;
 
     /**
      * Define indexed array of nested collections like [{}, {}, {}]

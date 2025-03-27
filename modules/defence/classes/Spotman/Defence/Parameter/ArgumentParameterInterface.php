@@ -12,4 +12,5 @@ namespace Spotman\Defence\Parameter;
 interface ArgumentParameterInterface
 {
     // No methods here, just marker for Entities and DTOs
+    public static function getParameterName(): string;
 }

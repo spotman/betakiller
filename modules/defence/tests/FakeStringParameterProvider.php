@@ -19,6 +19,6 @@ final class FakeStringParameterProvider implements ParameterProviderInterface
             throw new \LogicException('Test value must be "string"');
         }
 
-        return new FakeStringParameter('fake-'.$value.'-fake');
+        return new FakeString('fake-'.$value.'-fake');
     }
 }

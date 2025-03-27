@@ -11,7 +11,7 @@ use Spotman\Defence\Parameter\ParameterProviderFactoryInterface;
 
 include 'FakeParameterProviderFactory.php';
 include 'FakeStringParameterProvider.php';
-include 'FakeStringParameter.php';
+include 'FakeString.php';
 
 class ArgumentsFacadeTest extends AbstractDefenceTest
 {
@@ -210,10 +210,10 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             [$this->def()->string('a')->lowercase(), 'QWERTY', 'qwerty'],
             [$this->def()->string('a')->uppercase(), 'qwerty', 'QWERTY'],
 
-            [$this->def()->param('a', 'string'), 'qwerty', $this->makeStringParamInstance('qwerty')],
+            [$this->def()->param('a', FakeString::class), 'qwerty', $this->makeStringParamInstance('qwerty')],
 
             [
-                $this->def()->paramArray('a', 'string'),
+                $this->def()->paramArray('a', FakeString::class),
                 [
                     'qwerty',
                     'zxcvbn',
@@ -270,7 +270,7 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             ],
 
             'string parameter' => [
-                $this->def()->param('a', 'string')->optional(),
+                $this->def()->param('a', FakeString::class)->optional(),
                 [],
             ],
 
@@ -295,12 +295,12 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             ],
 
             'paramArray' => [
-                $this->def()->paramArray('a', 'string')->optional(),
+                $this->def()->paramArray('a', FakeString::class)->optional(),
                 [],
             ],
 
             'paramArray + default' => [
-                $this->def()->paramArray('a', 'string')->optional()->default(['qwerty', 'zxcvbn']),
+                $this->def()->paramArray('a', FakeString::class)->optional()->default(['qwerty', 'zxcvbn']),
                 [
                     'a' => [
                         $this->makeStringParamInstance('qwerty'),

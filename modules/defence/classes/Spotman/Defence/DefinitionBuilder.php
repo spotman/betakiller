@@ -148,16 +148,11 @@ class DefinitionBuilder implements DefinitionBuilderInterface
     }
 
     /**
-     * Define string parameter argument
-     *
-     * @param string $name
-     * @param string $codename Provider codename
-     *
-     * @return \Spotman\Defence\DefinitionBuilderInterface
+     * @inheritDoc
      */
-    public function param(string $name, string $codename): DefinitionBuilderInterface
+    public function param(string $name, string $fqcn): DefinitionBuilderInterface
     {
-        return $this->addArgument(new ParameterArgumentDefinition($name, $codename));
+        return $this->addArgument(new ParameterArgumentDefinition($name, $fqcn));
     }
 
     /**
@@ -199,11 +194,11 @@ class DefinitionBuilder implements DefinitionBuilderInterface
     /**
      * @inheritDoc
      */
-    public function paramArray(string $name, string $codename): DefinitionBuilderInterface
+    public function paramArray(string $name, string $fqcn): DefinitionBuilderInterface
     {
         return $this->addArgument(new SingleArrayArgumentDefinition(
             $name,
-            new ParameterArgumentDefinition($name, $codename))
+            new ParameterArgumentDefinition($name, $fqcn))
         );
     }
 
