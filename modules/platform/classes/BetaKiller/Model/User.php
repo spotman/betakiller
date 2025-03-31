@@ -681,13 +681,20 @@ class User extends AbstractCreatedAt implements UserInterface
         return true;
     }
 
+    public static function getEmailMaxLength(): int
+    {
+        return 128;
+    }
+
     private function getColumnRulesEmail(): array
     {
         if (!static::isEmailEnabled()) {
             return [];
         }
 
-        $rules = [];
+        $rules = [
+            ['max_length', [':value', static::getEmailMaxLength()]],
+        ];
 
         if (static::isEmailRequired()) {
             $rules[] = ['not_empty'];
@@ -783,6 +790,11 @@ class User extends AbstractCreatedAt implements UserInterface
         return false;
     }
 
+    public static function getPasswordMaxLength(): int
+    {
+        return 64;
+    }
+
     private function getColumnRulesPassword(): array
     {
         if (!static::isPasswordEnabled()) {
@@ -790,7 +802,7 @@ class User extends AbstractCreatedAt implements UserInterface
         }
 
         $rules = [
-            ['max_length', [':value', 64]],
+            ['max_length', [':value', static::getPasswordMaxLength()]],
         ];
 
         if (static::isPasswordRequired()) {
@@ -819,6 +831,11 @@ class User extends AbstractCreatedAt implements UserInterface
         return true;
     }
 
+    public static function getPhoneMaxLength(): int
+    {
+        return 32;
+    }
+
     private function getColumnRulesPhone(): array
     {
         if (!static::isPhoneEnabled()) {
@@ -826,7 +843,7 @@ class User extends AbstractCreatedAt implements UserInterface
         }
 
         $rules = [
-            ['max_length', [':value', 32]],
+            ['max_length', [':value', static::getPhoneMaxLength()]],
         ];
 
         if (static::isPhoneRequired()) {
