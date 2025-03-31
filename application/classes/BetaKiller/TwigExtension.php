@@ -371,7 +371,7 @@ final class TwigExtension extends AbstractExtension
             new TwigFunction(
                 'lang',
                 function (array $context): string {
-                    return $this->getRequestLang($context)->getIsoCode();
+                    return $this->getRequestLangIsoCode($context);
                 },
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),
@@ -751,6 +751,11 @@ final class TwigExtension extends AbstractExtension
     }
 
     private function getRequestLang(array $context): LanguageInterface
+    {
+        return $this->i18n->getLanguageByIsoCode($this->getRequestLangIsoCode($context));
+    }
+
+    private function getRequestLangIsoCode(array $context): string
     {
         return $context[TemplateContext::KEY_LANG];
     }

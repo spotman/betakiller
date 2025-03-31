@@ -181,7 +181,7 @@ class TemplateContext
             self::KEY_META    => $this->meta,
 
             // Language to perform i18n
-            self::KEY_LANG    => $this->lang,
+            self::KEY_LANG    => $this->lang->getIsoCode(),
         ];
     }
 
