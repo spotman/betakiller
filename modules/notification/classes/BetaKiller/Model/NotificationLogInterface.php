@@ -70,6 +70,11 @@ interface NotificationLogInterface extends DispatchableEntityInterface, SearchRe
     public function markAsSucceeded(): NotificationLogInterface;
 
     /**
+     * @return \BetaKiller\Model\NotificationLogInterface
+     */
+    public function markAsRejected(): NotificationLogInterface;
+
+    /**
      * @param string|null $result
      *
      * @return \BetaKiller\Model\NotificationLogInterface

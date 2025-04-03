@@ -270,6 +270,8 @@ final class NotificationFacade
 
             if ($transport->send($message, $target, $body)) {
                 $logRecord->markAsSucceeded();
+            } else {
+                $logRecord->markAsRejected();
             }
         } catch (Throwable $e) {
             LoggerHelper::logRawException($this->logger, $e);

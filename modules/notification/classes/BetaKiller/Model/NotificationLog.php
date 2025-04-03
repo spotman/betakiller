@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-use BetaKiller\Helper\TextHelper;
 use BetaKiller\Notification\MessageInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\TransportInterface;
@@ -30,6 +29,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
 
     public const STATUS_PENDING   = 'pending';
     public const STATUS_SUCCEEDED = 'succeeded';
+    public const STATUS_REJECTED  = 'rejected';
     public const STATUS_FAILED    = 'failed';
 
     public const MAX_LENGTH_CODENAME = 64;
@@ -183,6 +183,14 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     public function markAsSucceeded(): NotificationLogInterface
     {
         return $this->setStatus(self::STATUS_SUCCEEDED);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function markAsRejected(): NotificationLogInterface
+    {
+        return $this->setStatus(self::STATUS_REJECTED);
     }
 
     public function markAsFailed(string $result = null): NotificationLogInterface
