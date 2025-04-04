@@ -10,6 +10,7 @@ use BetaKiller\Acl\UrlElementAccessResolver;
 use BetaKiller\Acl\UrlElementAccessResolverInterface;
 use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
 use BetaKiller\Api\ApiLanguageDetector;
+use BetaKiller\Api\Method\EntityBasedApiMethodHelper;
 use BetaKiller\Assets\StaticAssets;
 use BetaKiller\Cache\SymfonyCacheProvider;
 use BetaKiller\Config\AppConfig;
@@ -120,6 +121,7 @@ use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
 use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
 use Spotman\Api\AccessResolver\ApiMethodAccessResolverDetectorInterface;
 use Spotman\Api\ApiLanguageDetectorInterface;
+use Spotman\Api\EntityDetectorInterface;
 use Spotman\Defence\Parameter\ParameterProviderFactoryInterface;
 use Symfony\Component\Cache\Psr16Cache;
 
@@ -331,6 +333,9 @@ return [
 
         // Custom access resolver detector
         ApiMethodAccessResolverDetectorInterface::class => autowire(CustomApiMethodAccessResolverDetector::class),
+
+        // Api Method Entity detector
+        EntityDetectorInterface::class => autowire(EntityBasedApiMethodHelper::class),
 
         // Use default renderer for notification messages
         MessageRendererInterface::class                 => autowire(MessageRenderer::class),

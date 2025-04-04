@@ -27,16 +27,7 @@ abstract readonly class AbstractEntityBasedApiMethod extends AbstractApiMethod i
      */
     protected function getEntity(ArgumentsInterface $arguments): AbstractEntityInterface
     {
-        if (!$arguments->hasID()) {
-            throw new ApiMethodException('Missing identity is required for entity processing');
-        }
-
-        // Entity name is equal to API collection name
-        $entityName = $this::getCollectionName();
-
-        $id = $this->decodeIdentity($entityName, $arguments->getID());
-
-        return $this->getRepository()->getById($id);
+        return $this->helper->getEntity($this, $arguments);
     }
 
     /**

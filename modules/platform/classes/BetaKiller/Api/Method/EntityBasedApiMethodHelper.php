@@ -9,9 +9,10 @@ use BetaKiller\IdentityConverterInterface;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Repository\RepositoryInterface;
 use Spotman\Api\ApiMethodException;
+use Spotman\Api\EntityDetectorInterface;
 use Spotman\Defence\ArgumentsInterface;
 
-final readonly class EntityBasedApiMethodHelper
+final readonly class EntityBasedApiMethodHelper implements EntityDetectorInterface
 {
     public function __construct(private RepositoryFactoryInterface $repositoryFactory, private IdentityConverterInterface $converter)
     {
