@@ -3,10 +3,15 @@ namespace BetaKiller\Api\Method;
 
 use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodResponse;
+use Spotman\Api\Method\AbstractApiMethod;
 use Spotman\Defence\ArgumentsInterface;
 
-abstract readonly class AbstractEntityCreateApiMethod extends AbstractEntityBasedApiMethod
+abstract readonly class AbstractEntityCreateApiMethod extends AbstractApiMethod
 {
+    public function __construct(private EntityBasedApiMethodHelper $helper)
+    {
+    }
+
     /**
      * @param \Spotman\Defence\ArgumentsInterface $arguments
      * @param \BetaKiller\Model\UserInterface     $user
@@ -19,7 +24,7 @@ abstract readonly class AbstractEntityCreateApiMethod extends AbstractEntityBase
     {
         $entity = $this->create($arguments, $user);
 
-        $this->saveEntity($entity);
+        $this->helper->saveEntity($this, $entity);
 
         return $this->makeResponse($entity, $user);
     }

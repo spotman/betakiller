@@ -9,6 +9,7 @@ use BetaKiller\IdentityConverterInterface;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Repository\RepositoryInterface;
 use Spotman\Api\ApiMethodException;
+use Spotman\Api\ApiMethodInterface;
 use Spotman\Api\EntityDetectorInterface;
 use Spotman\Defence\ArgumentsInterface;
 
@@ -27,7 +28,7 @@ final readonly class EntityBasedApiMethodHelper implements EntityDetectorInterfa
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Spotman\Api\ApiMethodException
      */
-    public function getEntity(EntityBasedApiMethodInterface $method, ArgumentsInterface $arguments): AbstractEntityInterface
+    public function getEntity(ApiMethodInterface $method, ArgumentsInterface $arguments): AbstractEntityInterface
     {
         if (!$arguments->hasID()) {
             throw new ApiMethodException('Missing identity is required for entity processing');
@@ -42,12 +43,12 @@ final readonly class EntityBasedApiMethodHelper implements EntityDetectorInterfa
     }
 
     /**
-     * @param \BetaKiller\Api\Method\EntityBasedApiMethodInterface $method
+     * @param \Spotman\Api\ApiMethodInterface $method
      *
      * @return \BetaKiller\Repository\RepositoryInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function getRepository(EntityBasedApiMethodInterface $method): RepositoryInterface
+    public function getRepository(ApiMethodInterface $method): RepositoryInterface
     {
         // Repository name is equal to API collection name
         $repoName = $method::getCollectionName();
@@ -56,25 +57,25 @@ final readonly class EntityBasedApiMethodHelper implements EntityDetectorInterfa
     }
 
     /**
-     * @param \BetaKiller\Api\Method\EntityBasedApiMethodInterface $method
-     * @param \BetaKiller\Model\AbstractEntityInterface            $entity
+     * @param \Spotman\Api\ApiMethodInterface           $method
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
      *
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function saveEntity(EntityBasedApiMethodInterface $method, AbstractEntityInterface $entity): void
+    public function saveEntity(ApiMethodInterface $method, AbstractEntityInterface $entity): void
     {
         $this->getRepository($method)->save($entity);
     }
 
     /**
-     * @param \BetaKiller\Api\Method\EntityBasedApiMethodInterface $method
-     * @param \BetaKiller\Model\AbstractEntityInterface            $entity
+     * @param \Spotman\Api\ApiMethodInterface           $method
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
      *
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function deleteEntity(EntityBasedApiMethodInterface $method, AbstractEntityInterface $entity): void
+    public function deleteEntity(ApiMethodInterface $method, AbstractEntityInterface $entity): void
     {
         $this->getRepository($method)->delete($entity);
     }
@@ -88,5 +89,4 @@ final readonly class EntityBasedApiMethodHelper implements EntityDetectorInterfa
     {
         return $this->converter->encode($entity);
     }
-
 }
