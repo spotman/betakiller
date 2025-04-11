@@ -528,6 +528,13 @@ final class Runner extends AbstractTask
         $this->pingDbTimer = $this->loop->addPeriodicTimer(5, function () {
             foreach (Database::pingAll() as $error) {
                 LoggerHelper::logRawException($this->logger, $error);
+
+                // Stop checks
+                $this->loop->cancelTimer($this->pingDbTimer);
+                $this->pingDbTimer = null;
+
+                // Request graceful restart (prevent Supervisor from disabling this daemon)
+                $this->requestShutdown();
             }
         });
     }
