@@ -1850,7 +1850,9 @@ class Kohana_ORM extends Model implements Serializable
 
     protected function _serialize_value($value)
     {
-        return json_encode($value, JSON_THROW_ON_ERROR);
+        return !is_null($value)
+            ? json_encode($value, JSON_THROW_ON_ERROR)
+            : null;
     }
 
     protected function _unserialize_value($value)
