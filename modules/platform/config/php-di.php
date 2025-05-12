@@ -20,6 +20,8 @@ use BetaKiller\Config\WebConfig;
 use BetaKiller\Config\WebConfigInterface;
 use BetaKiller\Console\ConsoleOptionBuilder;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\Console\ConsoleTaskFactory;
+use BetaKiller\Console\ConsoleTaskFactoryInterface;
 use BetaKiller\Console\ConsoleTaskLocator;
 use BetaKiller\Console\ConsoleTaskLocatorInterface;
 use BetaKiller\DefenceParameterProviderFactory;
@@ -359,6 +361,7 @@ return [
 
         ConsoleOptionBuilderInterface::class => autowire(ConsoleOptionBuilder::class),
         ConsoleTaskLocatorInterface::class   => autowire(ConsoleTaskLocator::class),
+        ConsoleTaskFactoryInterface::class   => autowire(ConsoleTaskFactory::class),
 
         DebugBarFactoryInterface::class       => autowire(DebugBarFactory::class),
         DebugBarAccessControlInterface::class => autowire(DebugBarAccessControl::class),

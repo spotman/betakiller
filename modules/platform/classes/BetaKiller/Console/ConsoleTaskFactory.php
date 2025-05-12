@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace BetaKiller\Task;
+namespace BetaKiller\Console;
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Console\ConsoleTaskInterface;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface;
@@ -15,9 +14,10 @@ use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
+use BetaKiller\Task\WithCliUserInterface;
 use BetaKiller\Workflow\UserWorkflow;
 
-class TaskFactory
+class ConsoleTaskFactory implements ConsoleTaskFactoryInterface
 {
     /**
      * @var \BetaKiller\Factory\NamespaceBasedFactoryInterface
@@ -25,12 +25,14 @@ class TaskFactory
     private NamespaceBasedFactoryInterface $factory;
 
     /**
-     * TaskFactory constructor.
+     * ConsoleTaskFactory constructor.
      *
      * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilderInterface $factoryBuilder
      * @param \BetaKiller\Env\AppEnvInterface                           $appEnv
      * @param \BetaKiller\Repository\UserRepositoryInterface            $userRepo
      * @param \BetaKiller\Factory\GuestUserFactory                      $guestFactory
+     * @param \BetaKiller\Config\AppConfigInterface                     $appConfig
+     * @param \BetaKiller\Workflow\UserWorkflow                         $userWorkflow
      *
      * @throws \BetaKiller\Factory\FactoryException
      */
@@ -44,7 +46,16 @@ class TaskFactory
     ) {
         $this->factory = $factoryBuilder
             ->createFactory()
-            ->setExpectedInterface(ConsoleTaskInterface::class);
+            ->setExpectedInterface(ConsoleTaskInterface::class)
+            ->prepareArgumentsWith(function (?array $arguments, string $className): array {
+                $arguments ??= [];
+
+                if (is_a($className, WithCliUserInterface::class, true)) {
+                    $arguments['user'] = $this->detectCliUser() ?? $this->createCliUser();
+                }
+
+                return $arguments;
+            });
     }
 
     /**
@@ -55,9 +66,7 @@ class TaskFactory
      */
     public function create(string $className): ConsoleTaskInterface
     {
-        return $this->factory->create($className, [
-            'user' => $this->detectCliUser() ?? $this->createCliUser(),
-        ]);
+        return $this->factory->create($className);
     }
 
     private function detectCliUser(): ?UserInterface

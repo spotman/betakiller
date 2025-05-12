@@ -9,16 +9,16 @@ use BetaKiller\Console\ConsoleHelper;
 use BetaKiller\Console\ConsoleInput;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Console\ConsoleOptionCollection;
+use BetaKiller\Console\ConsoleTaskFactoryInterface;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
-use BetaKiller\Task\TaskFactory;
 use BetaKiller\View\ViewFactoryInterface;
 
 final readonly class ConsoleAppRunner implements CliAppRunnerInterface
 {
     public function __construct(
         private AppEnvInterface $appEnv,
-        private TaskFactory $taskFactory,
+        private ConsoleTaskFactoryInterface $taskFactory,
         private ConsoleOptionBuilderInterface $optionBuilder,
         private ViewFactoryInterface $viewFactory,
         private Collector $metrics
