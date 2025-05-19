@@ -140,7 +140,7 @@ class ArgumentsFacade
         $value,
         ArgumentDefinitionInterface $parent = null
     ) {
-        if ($value === null) {
+        if (in_array($value,  [null, 'null'], true)) {
             if ($argument->isNullable()) {
                 return null;
             }

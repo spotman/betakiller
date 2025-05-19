@@ -64,6 +64,15 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
         $this->getFacade()->prepareArguments(['a' => true, 'b' => false], $def);
     }
 
+    public function testNullableConversion(): void
+    {
+        $def = $this->def()->string('a')->nullable();
+
+        $result = $this->getFacade()->prepareArguments(['a' => 'null'], $def);
+
+        $this->assertEquals($result->getAll(), ['a' => null]);
+    }
+
     public function testIndexed(): void
     {
         $def = $this->def()
