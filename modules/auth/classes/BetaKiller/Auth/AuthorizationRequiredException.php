@@ -5,9 +5,9 @@ use BetaKiller\Exception\HttpException;
 
 class AuthorizationRequiredException extends HttpException
 {
-    public function __construct()
+    public function __construct(string $message = null)
     {
-        parent::__construct(401);
+        parent::__construct(401, $message);
     }
 
     /**

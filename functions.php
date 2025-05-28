@@ -8,6 +8,7 @@ use BetaKiller\DI\Container;
 use BetaKiller\Env\AppEnv;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Env\FakeConfigReader;
+use BetaKiller\Exception\HttpExceptionInterface;
 use BetaKiller\Factory\AppRunnerFactoryInterface;
 use BetaKiller\ModuleInitializerInterface;
 use JetBrains\PhpStorm\NoReturn;
@@ -413,6 +414,9 @@ if (!function_exists('registerExceptionHandler')) {
         // Preload pretty stacktrace renderer (used in fallbackExceptionHandler)
         spl_autoload_call(Debug::class);
 
+        // Preload based interface for HTTP-related exceptions (used in fallbackExceptionHandler)
+        spl_autoload_call(HttpExceptionInterface::class);
+
         set_exception_handler(function (Throwable $e) {
             fallbackExceptionHandler($e);
         });
@@ -447,7 +451,11 @@ if (!function_exists('fallbackExceptionHandler')) {
         $inProd  = $appEnv->inProductionMode();
 
         if (!$isCli && !headers_sent()) {
-            http_response_code(500);
+            $httpCode = $e instanceof HttpExceptionInterface
+                ? $e->getCode()
+                : 500;
+
+            http_response_code($httpCode);
             header('Content-Type: text/html; charset=utf-8');
         }
 
