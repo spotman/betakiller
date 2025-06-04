@@ -167,9 +167,13 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     /**
      * @param string                                           $name
      * @param OrmInterface[]|AbstractEntityInterface[]|mixed[] $newModels
+     *
+     * @return bool Returns true if dataset is changed
      */
-    protected function mergeRelatedModels(string $name, array $newModels): void
+    protected function mergeRelatedModels(string $name, array $newModels): bool
     {
+        $isChanged = false;
+
         // Get old models
         $oldModels = $this->getAllRelated($name);
 
@@ -177,6 +181,7 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         foreach ($oldModels as $old) {
             if (!$this->findModelInList($old, $newModels)) {
                 $this->removeRelated($name, $old);
+                $isChanged = true;
             }
         }
 
@@ -185,14 +190,19 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
             $existing = $this->findModelInList($new, $oldModels);
             if (!$existing) {
                 $this->addRelated($name, $new);
+                $isChanged = true;
             } else {
                 // Import data from new model into existing one (keep primary key of existing model)
                 $existing->values($new->as_array());
+
+                $isChanged = $isChanged || $existing->changed();
 
                 // Save existing model
                 $existing->save();
             }
         }
+
+        return $isChanged;
     }
 
     /**
