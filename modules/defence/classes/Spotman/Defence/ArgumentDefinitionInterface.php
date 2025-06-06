@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Spotman\Defence;
@@ -14,6 +15,7 @@ interface ArgumentDefinitionInterface
     public const TYPE_EMAIL    = 'email';
     public const TYPE_TEXT     = 'text';
     public const TYPE_HTML     = 'html';
+    public const TYPE_DATE     = 'date';
     public const TYPE_DATETIME = 'datetime';
 
     // String with auto-conversion to object
@@ -37,6 +39,7 @@ interface ArgumentDefinitionInterface
         self::TYPE_EMAIL,
         self::TYPE_TEXT,
         self::TYPE_HTML,
+        self::TYPE_DATE,
         self::TYPE_DATETIME,
         self::TYPE_PARAMETER,
         self::TYPE_COMPOSITE,
@@ -151,6 +154,13 @@ interface ArgumentDefinitionInterface
      * @return bool
      */
     public function isEmail(): bool;
+
+    /**
+     * Returns true if rule defines a string containing date
+     *
+     * @return bool
+     */
+    public function isDate(): bool;
 
     /**
      * Returns true if rule defines a string containing datetime

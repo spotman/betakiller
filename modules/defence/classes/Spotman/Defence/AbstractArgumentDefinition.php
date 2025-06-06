@@ -181,6 +181,14 @@ abstract class AbstractArgumentDefinition implements ArgumentDefinitionInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function isDate(): bool
+    {
+        return $this->getType() === self::TYPE_DATE;
+    }
+
+    /**
      * Returns true if rule defines a string containing datetime
      *
      * @return bool

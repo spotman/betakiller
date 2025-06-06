@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Spotman\Defence;
 
+use DateTimeZone;
 use Spotman\Defence\Filter\FilterInterface;
 use Spotman\Defence\Filter\LowercaseFilter;
 use Spotman\Defence\Filter\UppercaseFilter;
@@ -133,6 +134,14 @@ class DefinitionBuilder implements DefinitionBuilderInterface
     public function datetime(string $name): DefinitionBuilderInterface
     {
         return $this->addArgument(new DateTimeArgumentDefinition($name));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function date(string $name, DateTimeZone $tz = null): DefinitionBuilderInterface
+    {
+        return $this->addArgument(new DateArgumentDefinition($name, $tz));
     }
 
     /**
@@ -483,6 +492,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
         return $this;
     }
 
+
     private function addFilter(FilterInterface $filter): self
     {
         $argument = $this->getLastArgument();
@@ -495,7 +505,6 @@ class DefinitionBuilder implements DefinitionBuilderInterface
 
         return $this;
     }
-
 
     private function getLastArgument(): ArgumentDefinitionInterface
     {

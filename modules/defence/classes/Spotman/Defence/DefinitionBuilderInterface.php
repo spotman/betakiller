@@ -1,7 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Spotman\Defence;
+
+use DateTimeZone;
 
 interface DefinitionBuilderInterface
 {
@@ -67,6 +70,16 @@ interface DefinitionBuilderInterface
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
     public function html(string $name): DefinitionBuilderInterface;
+
+    /**
+     * Define date argument (string convert to DateTimeImmutable with zero time)
+     *
+     * @param string             $name
+     * @param \DateTimeZone|null $tz
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function date(string $name, DateTimeZone $tz = null): DefinitionBuilderInterface;
 
     /**
      * Define datetime argument (string convert to DateTimeImmutable)
