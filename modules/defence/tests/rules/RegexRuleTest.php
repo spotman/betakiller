@@ -52,6 +52,13 @@ class RegexRuleTest extends AbstractRuleTest
         ];
     }
 
+    public function testCyrillic(): void
+    {
+        $filter = new RegexRule('/[\p{Cyrillic}]+/u');
+
+        $this->assertTrue($filter->check('Вася'));
+    }
+
     protected function makeInstance(): DefinitionRuleInterface
     {
         return new RegexRule('/^[\d.]+$/');

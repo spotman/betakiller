@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Spotman\Defence;
@@ -46,14 +47,18 @@ class ArgumentsFacade
                 $requestKeys = \array_keys($requestArguments);
 
                 throw new \InvalidArgumentException(
-                    \sprintf('Unnecessary arguments in a call: "%s"',
-                        implode('", "', \array_diff($requestKeys, $allowedArgs)))
+                    \sprintf(
+                        'Unnecessary arguments in a call: "%s"',
+                        implode('", "', \array_diff($requestKeys, $allowedArgs))
+                    )
                 );
             }
 
             throw new \InvalidArgumentException(
-                \sprintf('Unnecessary arguments in a call, "%s" only allowed',
-                    implode('", "', \array_keys($allowedArgs)))
+                \sprintf(
+                    'Unnecessary arguments in a call, "%s" only allowed',
+                    implode('", "', \array_keys($allowedArgs))
+                )
             );
         }
 
@@ -140,7 +145,7 @@ class ArgumentsFacade
         $value,
         ArgumentDefinitionInterface $parent = null
     ) {
-        if (in_array($value,  [null, 'null'], true)) {
+        if (in_array($value, [null, 'null'], true)) {
             if ($argument->isNullable()) {
                 return null;
             }
@@ -166,9 +171,12 @@ class ArgumentsFacade
                 return $this->processCompositeArrayValue($argument, $value);
 
             default:
-                throw new \InvalidArgumentException(sprintf(
-                    'Unknown argument instance for type "%s"', $argument->getType()
-                ));
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Unknown argument instance for type "%s"',
+                        $argument->getType()
+                    )
+                );
         }
     }
 
@@ -194,12 +202,14 @@ class ArgumentsFacade
 
         // Check for nested data type
         if (!\is_array($values)) {
-            throw new \InvalidArgumentException(sprintf(
-                'SingleArray data must be an array for "%s" but "%s" provided: %s',
-                $argument->getName(),
-                \gettype($values),
-                \json_encode($values, JSON_THROW_ON_ERROR)
-            ));
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'SingleArray data must be an array for "%s" but "%s" provided: %s',
+                    $argument->getName(),
+                    \gettype($values),
+                    \json_encode($values, JSON_THROW_ON_ERROR)
+                )
+            );
         }
 
         // Check array rules
@@ -214,11 +224,13 @@ class ArgumentsFacade
 
             // Prevent null values in single arrays
             if ($itemValue === null) {
-                throw new \InvalidArgumentException(sprintf(
-                    'SingleArray data for "%s" contains NULL item: %s',
-                    $argument->getName(),
-                    \json_encode($values, JSON_THROW_ON_ERROR)
-                ));
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'SingleArray data for "%s" contains NULL item: %s',
+                        $argument->getName(),
+                        \json_encode($values, JSON_THROW_ON_ERROR)
+                    )
+                );
             }
 
             $output[] = $itemValue;
@@ -247,12 +259,14 @@ class ArgumentsFacade
 
         // Check for nested data type
         if (!\is_array($value)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Composite value must be an array for "%s" but "%s" provided: %s',
-                $argument->getName(),
-                \gettype($value),
-                \json_encode($value, JSON_THROW_ON_ERROR)
-            ));
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Composite value must be an array for "%s" but "%s" provided: %s',
+                    $argument->getName(),
+                    \gettype($value),
+                    \json_encode($value, JSON_THROW_ON_ERROR)
+                )
+            );
         }
 
         // Recursion for children definitions
@@ -268,12 +282,14 @@ class ArgumentsFacade
 
         // Check for nested data type
         if (!\is_array($value)) {
-            throw new \InvalidArgumentException(sprintf(
-                'CompositeArray data must be an array for "%s" but "%s" provided: %s',
-                $argument->getName(),
-                \gettype($value),
-                \json_encode($value, JSON_THROW_ON_ERROR)
-            ));
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'CompositeArray data must be an array for "%s" but "%s" provided: %s',
+                    $argument->getName(),
+                    \gettype($value),
+                    \json_encode($value, JSON_THROW_ON_ERROR)
+                )
+            );
         }
 
         $composite = $argument->getComposite();
@@ -286,12 +302,14 @@ class ArgumentsFacade
 
             // Prevent null values in composite arrays
             if ($itemValue === null) {
-                throw new \InvalidArgumentException(sprintf(
-                    'CompositeArray data for "%s" contains NULL item at index [%d]: %s',
-                    $argument->getName(),
-                    $index,
-                    \json_encode($value, JSON_THROW_ON_ERROR)
-                ));
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'CompositeArray data for "%s" contains NULL item at index [%d]: %s',
+                        $argument->getName(),
+                        $index,
+                        \json_encode($value, JSON_THROW_ON_ERROR)
+                    )
+                );
             }
 
             $output[$index] = $itemValue;
@@ -378,7 +396,7 @@ class ArgumentsFacade
                         $argument->getName(),
                         $rule->getName(),
                         \gettype($value),
-                        \json_encode($value, JSON_THROW_ON_ERROR)
+                        is_string($value) ? sprintf('"%s"', $value) : \json_encode($value, JSON_THROW_ON_ERROR)
                     )
                 );
             }
