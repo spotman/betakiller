@@ -867,6 +867,11 @@ class User extends AbstractCreatedAt implements UserInterface
         return true;
     }
 
+    public static function getFirstNameMaxLength(): int
+    {
+        return 16;
+    }
+
     private function getColumnRulesFirstName(): array
     {
         if (!static::isFirstNameEnabled()) {
@@ -874,7 +879,7 @@ class User extends AbstractCreatedAt implements UserInterface
         }
 
         $rules = [
-            ['max_length', [':value', 16]],
+            ['max_length', [':value', static::getFirstNameMaxLength()]],
         ];
 
         if (static::isFirstNameRequired()) {
