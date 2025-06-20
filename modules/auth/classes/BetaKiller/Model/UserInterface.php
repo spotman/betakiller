@@ -231,18 +231,18 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     public function getEmail(): string;
 
     /**
-     * @param string $number
+     * @param \BetaKiller\Model\Phone $number
      *
      * @return \BetaKiller\Model\UserInterface
      */
-    public function setPhone(string $number): UserInterface;
+    public function setPhone(Phone $number): UserInterface;
 
     /**
      * Returns primary phone number
      *
-     * @return string
+     * @return \BetaKiller\Model\Phone
      */
-    public function getPhone(): string;
+    public function getPhone(): Phone;
 
     /**
      * @return bool

@@ -6,7 +6,6 @@ namespace BetaKiller\Model;
 use BetaKiller\Auth\AuthorizationRequiredException;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\MessageBus\RestrictionTargetInterface;
-use BetaKiller\Task\AbstractTask;
 use DateTimeImmutable;
 
 /**
@@ -474,18 +473,19 @@ class User extends AbstractCreatedAt implements UserInterface
     }
 
     /**
-     * @param string $number
+     * @param \BetaKiller\Model\Phone $number
      *
      * @return \BetaKiller\Model\UserInterface
      */
-    public function setPhone(string $number): UserInterface
+    public function setPhone(Phone $number): UserInterface
     {
-        if ($this->hasPhoneDefined() && $this->getPhone() !== $number) {
+        if (!$this->hasPhoneDefined() || !$this->getPhone()->isEqualTo($number)) {
             // Changed phone => needs verification
             $this->set(self::COL_IS_PHONE_VERIFIED, false);
+            $this->set(self::COL_PHONE, $number->dbValue());
         }
 
-        return $this->set(self::COL_PHONE, $number);
+        return $this;
     }
 
     /**
@@ -493,17 +493,19 @@ class User extends AbstractCreatedAt implements UserInterface
      */
     public function hasPhoneDefined(): bool
     {
-        return (string)$this->get(self::COL_PHONE) !== '';
+        return !empty($this->get(self::COL_PHONE));
     }
 
     /**
      * Возвращает основной номер телефона
      *
-     * @return string
+     * @return \BetaKiller\Model\Phone
      */
-    public function getPhone(): string
+    public function getPhone(): Phone
     {
-        return (string)$this->get(self::COL_PHONE);
+        $db = (string)$this->get(self::COL_PHONE);
+
+        return Phone::fromDb($db);
     }
 
     /**
@@ -569,7 +571,7 @@ class User extends AbstractCreatedAt implements UserInterface
 
     public function getMessagePhone(): string
     {
-        return $this->getPhone();
+        return $this->getPhone()->e164();
     }
 
     public function isPhoneNotificationAllowed(): bool
@@ -587,7 +589,7 @@ class User extends AbstractCreatedAt implements UserInterface
             'email'     => $this->getEmail(),
             'firstName' => $this->getFirstName(),
             'lastName'  => $this->getLastName(),
-            'phone'     => $this->getPhone(),
+            'phone'     => $this->getPhone()->e164(),
         ];
     }
 

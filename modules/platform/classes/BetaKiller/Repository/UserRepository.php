@@ -2,6 +2,7 @@
 namespace BetaKiller\Repository;
 
 use BetaKiller\Model\ExtendedOrmInterface;
+use BetaKiller\Model\Phone;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
@@ -81,7 +82,7 @@ class UserRepository extends AbstractOrmBasedHasWorkflowStateRepository implemen
             ->findOne($orm);
     }
 
-    public function findByPhone(string $phone): ?UserInterface
+    public function findByPhone(Phone $phone): ?UserInterface
     {
         $orm = $this->getOrmInstance();
 
@@ -177,9 +178,9 @@ class UserRepository extends AbstractOrmBasedHasWorkflowStateRepository implemen
         return $this;
     }
 
-    protected function filterPhone(OrmInterface $orm, string $value): self
+    protected function filterPhone(OrmInterface $orm, Phone $value): self
     {
-        $orm->where($orm->object_column(User::COL_PHONE), '=', trim($value, '+'));
+        $orm->where($orm->object_column(User::COL_PHONE), '=', $value->dbValue());
 
         return $this;
     }

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
+use BetaKiller\Model\Phone;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\UserInterface;
 
@@ -40,7 +41,7 @@ interface UserRepositoryInterface extends RepositoryInterface
 
     public function findByEmail(string $email): ?UserInterface;
 
-    public function findByPhone(string $phone): ?UserInterface;
+    public function findByPhone(Phone $phone): ?UserInterface;
 
     public function findByUsername(string $username): ?UserInterface;
 

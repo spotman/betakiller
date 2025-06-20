@@ -45,10 +45,6 @@ final readonly class UpdateProfileApiMethod extends AbstractEntityBasedApiMethod
             $user->setLastName(HTML::chars($data['lastName']));
         }
 
-        if (isset($data['phone'])) {
-            $user->setPhone(HTML::chars($data['phone']));
-        }
-
         $this->saveEntity($entity);
 
         return null;

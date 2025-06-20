@@ -80,8 +80,8 @@ final readonly class UserWorkflow
         }
 
         if ($user::isPhoneUniqueEnabled() && $info->phone && $this->userRepo->findByPhone($info->phone)) {
-            throw new DomainException('User ":email" already exists', [
-                ':email' => $info->email,
+            throw new DomainException('User ":phone" already exists', [
+                ':phone' => $info->phone->formatted(),
             ]);
         }
 

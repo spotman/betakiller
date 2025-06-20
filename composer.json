@@ -20,6 +20,7 @@
     "geocoder-php/geonames-provider": "^4.4",
     "geocoder-php/google-maps-provider": "^4.6",
     "geocoder-php/yandex-provider": "^4.5",
+    "giggsey/libphonenumber-for-php": "^9.0",
     "guzzlehttp/guzzle": "^7.0",
     "hansott/psr7-cookies": "^3.0",
     "imangazaliev/didom": "^1.14",
