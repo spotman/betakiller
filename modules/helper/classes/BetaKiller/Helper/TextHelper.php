@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Helper;
@@ -131,30 +132,34 @@ class TextHelper
             : $haystack;
     }
 
-    public static function maskWord(string $str, string $symbol = null): string
+    public static function maskWord(string $str, int $keep = null, string $symbol = null): string
     {
+        $keep   ??= 1;
         $symbol ??= '*';
 
         $len = mb_strlen($str);
 
         // Do not modify short strings
-        if ($len <= 3) {
+        if ($len <= $keep * 2) {
             return $str;
         }
 
+        // Randomize filler to prevent guessing
+        $fillerLength = max($len - $keep * 2 + mt_rand(-3, 3), 3);
+
         // Keep first and last letters, mask others
-        return mb_substr($str, 0, 1).str_repeat($symbol, $len - 2).mb_substr($str, -1, 1);
+        return mb_substr($str, 0, $keep).str_repeat($symbol, $fillerLength).mb_substr($str, -$keep, $keep);
     }
 
     public static function maskEmail(string $address): string
     {
         [$login, $host] = explode('@', $address);
 
-        // Process each domain level
-        $domains = explode('.', $host);
+        return self::maskWord($login).'@'.self::maskWord($host);
+    }
 
-        $domains = array_map(fn(string $part) => self::maskWord($part), $domains);
-
-        return self::maskWord($login).'@'.implode('.', $domains);
+    public static function maskPhone(string $number): string
+    {
+        return '+'.self::maskWord(trim($number, '+'), 2);
     }
 }
