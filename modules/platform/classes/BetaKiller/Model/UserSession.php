@@ -1,9 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
 use BetaKiller\Exception\DomainException;
+use BetaKiller\Session\SessionCause;
 use DateInterval;
 use DateTimeImmutable;
 
@@ -12,6 +14,7 @@ class UserSession extends \ORM implements UserSessionInterface
     public const TOKEN_LENGTH = 40;
 
     public const COL_IS_REGENERATED = 'is_regenerated';
+    public const COL_CAUSE          = 'cause';
 
     /**
      * Custom configuration (set table name, configure relations, load_with(), etc)
@@ -97,7 +100,7 @@ class UserSession extends \ORM implements UserSessionInterface
 
     public function isExpiredIn(DateInterval $interval): bool
     {
-        return $this->getCreatedAt()->add($interval)->getTimestamp() < time();
+        return $this->getLastActiveAt() < (new DateTimeImmutable())->sub($interval);
     }
 
     public function getContents(): string
@@ -123,5 +126,24 @@ class UserSession extends \ORM implements UserSessionInterface
     public function isRegenerated(): bool
     {
         return (bool)$this->get(self::COL_IS_REGENERATED);
+    }
+
+    public function setCause(SessionCause $value): UserSessionInterface
+    {
+        $this->setOnce(self::COL_CAUSE, $value->getCodename());
+
+        return $this;
+    }
+
+    public function hasCause(): bool
+    {
+        return !empty($this->get(self::COL_CAUSE));
+    }
+
+    public function getCause(): SessionCause
+    {
+        $raw = $this->get(self::COL_CAUSE);
+
+        return SessionCause::fromCodename($raw);
     }
 }

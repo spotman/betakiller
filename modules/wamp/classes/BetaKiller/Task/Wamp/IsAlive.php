@@ -13,6 +13,7 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\MaintenanceModeService;
+use BetaKiller\Session\SessionCause;
 use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Wamp\WampClient;
@@ -131,7 +132,7 @@ class IsAlive extends AbstractTask
 
     private function createSession(): void
     {
-        $this->session = $this->sessionStorage->createSession();
+        $this->session = $this->sessionStorage->createSession(SessionCause::Auth);
 
         SessionHelper::setUserID($this->session, $this->user);
 

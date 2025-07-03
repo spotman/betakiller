@@ -69,10 +69,14 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
         $cookies = $request->getCookieParams();
         $token   = $cookies[self::COOKIE_NAME] ?? null;
 
-        // Bots, fake requests, etc => reuse empty session
         // No session (cleared by browser or new visitor) => regenerate empty session
-        if (!$token || !$userAgent) {
-            return $this->createSession($token);
+        if (!$token) {
+            return $this->createSession(SessionCause::Absent);
+        }
+
+        // Bots, fake requests, etc => reuse empty session
+        if (!$userAgent) {
+            return $this->createSession(SessionCause::Fake, $token);
         }
 
         return $this->getByToken($token);
@@ -99,8 +103,10 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
         // Decode session data
         $data = $this->decodeData($content);
 
+        $cause = $model->hasCause() ? $model->getCause() : SessionCause::Unknown;
+
         // Create session DTO
-        $session = $this->createSession($model->getToken(), $data);
+        $session = $this->createSession($cause, $model->getToken(), $data);
 
         // Restore user in session if exists
         if ($model->hasUser()) {
@@ -120,17 +126,17 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
 
         if (!$model) {
             // Missing session (cleared by gc or stale) => regenerate empty session
-            return $this->createSession($token);
+            return $this->createSession(SessionCause::Missing, $token);
         }
 
         if ($model->isRegenerated()) {
             // Session exists, but was regenerated => create empty (for security purpose)
-            return $this->createSession();
+            return $this->createSession(SessionCause::Invalid);
         }
 
         if ($this->isExpired($model)) {
             // Session exists, but expired => create empty
-            return $this->createSession();
+            return $this->createSession(SessionCause::Expired);
         }
 
         // No user agent / IP checks coz of annoying session issues
@@ -151,10 +157,14 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
     /**
      * @inheritDoc
      */
-    public function createSession(?string $id = null, array $data = null): SessionInterface
+    public function createSession(SessionCause $cause, ?string $id = null, array $data = null): SessionInterface
     {
         // Generate new token and fresh session object without data
-        return new Session($data ?? [], $id ?? $this->generateToken());
+        $session = new Session($data ?? [], $id ?? $this->generateToken());
+
+        SessionHelper::setCause($session, $cause);
+
+        return $session;
     }
 
     /**
@@ -172,12 +182,17 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
         $this->storeSession($session);
 
         if ($session->isRegenerated()) {
-            // Generate new token and create fresh session with original user agent and IP address
+            // Generate new token and create fresh session with original data
             $session = $this->regenerateSession($session);
 
             // Keep new session
             $this->storeSession($session);
         }
+
+//        // Do not send a token for an empty session
+//        if (SessionHelper::isEmpty($session)) {
+//            return $response;
+//        }
 
         // Set cookie
         return $this->cookieHelper->set(
@@ -203,14 +218,20 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
 
     private function storeSession(SessionInterface $session): void
     {
-        // Do not store empty sessions
-        if (SessionHelper::isEmpty($session)) {
-            return;
-        }
+//        // Do not store empty sessions
+//        if (SessionHelper::isEmpty($session)) {
+//            return;
+//        }
 
         // Fetch session model if exists
         // Create new model for provided token
         $model = $this->getSessionModel($session) ?? $this->createSessionModel($session);
+
+        // Import creation reason
+        if (SessionHelper::hasCause($session) && !$model->hasCause()) {
+            $cause = SessionHelper::getCause($session);
+            $model->setCause($cause);
+        }
 
         // Import user ID from Session only once
         if (SessionHelper::hasUserID($session) && !$model->hasUser()) {
@@ -235,8 +256,12 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
 
     private function regenerateSession(SessionInterface $oldSession): SessionInterface
     {
+        $oldCause = SessionHelper::hasCause($oldSession)
+            ? SessionHelper::getCause($oldSession)
+            : SessionCause::Regenerated;
+
         // Generate new token and create fresh session with empty data
-        $newSession = $this->createSession();
+        $newSession = $this->createSession($oldCause);
 
         $userID = SessionHelper::getUserID($oldSession);
 

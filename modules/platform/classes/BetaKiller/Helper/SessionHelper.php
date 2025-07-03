@@ -8,6 +8,7 @@ use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\Model\GuestUserInterface;
 use BetaKiller\Model\TokenInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Session\SessionCause;
 use DateTimeImmutable;
 use LogicException;
 use Mezzio\Session\SessionIdentifierAwareInterface;
@@ -123,5 +124,27 @@ class SessionHelper
     public static function isDebugEnabled(SessionInterface $session): ?bool
     {
         return (bool)$session->get(self::DEBUG);
+    }
+
+    public static function hasCause(SessionInterface $session): bool
+    {
+        return $session->has(self::getCauseKey());
+    }
+
+    public static function getCause(SessionInterface $session): SessionCause
+    {
+        $raw = $session->get(self::getCauseKey());
+
+        return SessionCause::fromCodename($raw);
+    }
+
+    public static function setCause(SessionInterface $session, SessionCause $value): void
+    {
+        $session->set(self::getCauseKey(), $value->getCodename());
+    }
+
+    private static function getCauseKey(): string
+    {
+        return self::makeServiceKey('cause');
     }
 }

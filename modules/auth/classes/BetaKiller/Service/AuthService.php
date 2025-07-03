@@ -16,6 +16,7 @@ use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
+use BetaKiller\Session\SessionCause;
 use BetaKiller\Session\SessionStorageInterface;
 use Laminas\Diactoros\Response\EmptyResponse;
 use Mezzio\Session\SessionInterface;
@@ -163,6 +164,7 @@ class AuthService
 
         // Store user in session
         SessionHelper::setUserID($session, $user);
+        SessionHelper::setCause($session, SessionCause::Auth);
 
         // Always create new session on successful login to prevent stale sessions
         $session->regenerate();

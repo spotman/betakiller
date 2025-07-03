@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
+use BetaKiller\Session\SessionCause;
 use DateInterval;
 use DateTimeImmutable;
 
@@ -28,6 +29,12 @@ interface UserSessionInterface extends AbstractEntityInterface
     public function hasUser(): bool;
 
     public function getUser(): UserInterface;
+
+    public function setCause(SessionCause $value): UserSessionInterface;
+
+    public function hasCause(): bool;
+
+    public function getCause(): SessionCause;
 
     public function isExpiredIn(DateInterval $interval): bool;
 

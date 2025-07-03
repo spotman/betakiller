@@ -11,12 +11,13 @@ use Ramsey\Uuid\UuidInterface;
 interface SessionStorageInterface extends SessionPersistenceInterface
 {
     /**
-     * @param string|null $id
-     * @param array|null  $data
+     * @param \BetaKiller\Session\SessionCause $cause
+     * @param string|null                      $id
+     * @param array|null                       $data
      *
      * @return \Mezzio\Session\SessionInterface
      */
-    public function createSession(?string $id = null, array $data = null): SessionInterface;
+    public function createSession(SessionCause $cause, ?string $id = null, array $data = null): SessionInterface;
 
     /**
      * @param string $token
