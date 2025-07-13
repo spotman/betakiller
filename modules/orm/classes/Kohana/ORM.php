@@ -767,9 +767,16 @@ class Kohana_ORM extends Model implements Serializable
         if (array_key_exists($column, $this->_object)) {
             // Filter the data
             $value = $this->run_filter($column, $value);
+            $oldValue = $this->_object[$column];
 
-            // See if the data really changed
-            if ($value !== $this->_object[$column]) {
+            // Check serialized version of serializable fields (prevent false-positives on same arrays/objects)
+            // MySQL formatting of JSON field differs from PHP json_encode() format
+            if (in_array($column, $this->_serialize_columns)) {
+                $oldValue = $this->_serialize_value($this->_unserialize_value($oldValue));
+            }
+
+            // See if the data really changed, cast integer values to their string representation
+            if ((string)$value !== (string)$oldValue) {
                 $this->_object[$column] = $value;
 
                 // Data has changed
