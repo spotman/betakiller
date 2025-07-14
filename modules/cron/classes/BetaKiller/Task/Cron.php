@@ -281,7 +281,7 @@ class Cron extends AbstractTask
         $command = $this->cmdRepo->findByNameAndParams($name, $params);
 
         if (!$command) {
-            $command = new CronCommand;
+            $command = new CronCommand();
 
             $command
                 ->setName($name)
