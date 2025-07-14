@@ -7,6 +7,8 @@ use BetaKiller\Model\CronCommand;
 use BetaKiller\Model\CronCommandInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
+use function json_encode;
+
 final class CronCommandRepository extends AbstractOrmBasedRepository implements CronCommandRepositoryInterface
 {
     /**
@@ -55,7 +57,11 @@ final class CronCommandRepository extends AbstractOrmBasedRepository implements 
      */
     private function filterParams(OrmInterface $orm, array $params): self
     {
-        $orm->where($orm->object_column(CronCommand::COL_PARAMS), '=', \json_encode($params, JSON_THROW_ON_ERROR));
+        $filter = $params
+            ? json_encode($params, JSON_THROW_ON_ERROR)
+            : null;
+
+        $orm->where($orm->object_column(CronCommand::COL_PARAMS), '=', $filter);
 
         return $this;
     }
