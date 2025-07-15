@@ -232,6 +232,19 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
                     $this->makeStringParamInstance('zxcvbn'),
                 ],
             ],
+
+            // Empty arrays for x-www-form-urlencoded
+            [
+                $this->def()->intArray('a'),
+                '[]',
+                [],
+            ],
+
+            [
+                $this->def()->paramArray('a', FakeString::class),
+                '[]',
+                [],
+            ],
         ];
     }
 

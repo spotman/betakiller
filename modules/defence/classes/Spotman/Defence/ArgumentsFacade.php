@@ -195,10 +195,12 @@ class ArgumentsFacade
 
     private function processSingleArrayValue(SingleArrayArgumentDefinitionInterface $argument, $values): array
     {
-        if (\is_object($values)) {
-            // Cast any incoming object to array for simplicity
+        // Cast any incoming object to array for simplicity
+        if (is_object($values)) {
             $values = (array)$values;
         }
+
+        $values = $this->filterValue($argument, $values);
 
         // Check for nested data type
         if (!\is_array($values)) {
