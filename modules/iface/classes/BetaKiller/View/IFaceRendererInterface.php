@@ -16,7 +16,7 @@ interface IFaceRendererInterface
      * @param \BetaKiller\IFace\IFaceInterface         $iface
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @return string
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    public function render(IFaceInterface $iface, ServerRequestInterface $request): string;
+    public function render(IFaceInterface $iface, ServerRequestInterface $request): ResponseInterface;
 }

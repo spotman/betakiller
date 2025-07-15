@@ -64,9 +64,7 @@ readonly class IFaceUrlElementProcessor implements UrlElementProcessorInterface
         }
 
         try {
-            $output = $this->renderer->render($iface, $request);
-
-            $response = ResponseHelper::html($output);
+            $response = $this->renderer->render($iface, $request);
 
             return $model->isCacheEnabled()
                 ? ResponseHelper::enableCaching($response, new DateTimeImmutable('now'), $model->getExpiresInterval())

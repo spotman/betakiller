@@ -3,6 +3,7 @@
 namespace BetaKiller\View;
 
 use BetaKiller\Dev\RequestProfiler;
+use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Repository\IFaceLayoutRepository;
@@ -10,6 +11,7 @@ use BetaKiller\Repository\RepositoryException;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementException;
 use LogicException;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 readonly class DefaultIFaceRenderer implements IFaceRendererInterface
@@ -38,12 +40,11 @@ readonly class DefaultIFaceRenderer implements IFaceRendererInterface
 
     /**
      * @param \BetaKiller\IFace\IFaceInterface         $iface
-     *
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @return string
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    public function render(IFaceInterface $iface, ServerRequestInterface $request): string
+    public function render(IFaceInterface $iface, ServerRequestInterface $request): ResponseInterface
     {
         $model = $this->elementHelper->getInstanceModel($iface);
 
@@ -84,11 +85,11 @@ readonly class DefaultIFaceRenderer implements IFaceRendererInterface
         RequestProfiler::end($prepareRenderPack);
         $renderPack = RequestProfiler::begin($request, $codename.' IFace render');
 
-        $result = $this->layoutView->render($ifaceView, $context);
+        $html = $this->layoutView->render($ifaceView, $context);
 
         RequestProfiler::end($renderPack);
 
-        return $result;
+        return ResponseHelper::html($html);
     }
 
     /**

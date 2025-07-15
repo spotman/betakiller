@@ -16,7 +16,6 @@ use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\View\IFaceRendererInterface;
-use Laminas\Diactoros\Response\HtmlResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -106,9 +105,7 @@ readonly class ErrorPageRenderer implements ErrorPageRendererInterface
                 $request = AbstractHttpErrorIFace::injectException($request, $exception);
             }
 
-            $body = $this->ifaceRenderer->render($iface, $request);
-
-            return new HtmlResponse($body, $httpCode);
+            return $this->ifaceRenderer->render($iface, $request)->withStatus($httpCode);
         } catch (Throwable $e) {
             LoggerHelper::logRequestException($this->logger, $e, $request);
 
