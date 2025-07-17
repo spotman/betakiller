@@ -393,8 +393,11 @@ class Kohana_ORM extends Model implements Serializable
 
             foreach ($this->_has_many as $alias => $details) {
                 if (!isset($details['model'])) {
-                    $defaults['model'] = str_replace(' ', '_',
-                        ucwords(str_replace('_', ' ', Inflector::singular($alias))));
+                    $defaults['model'] = str_replace(
+                        ' ',
+                        '_',
+                        ucwords(str_replace('_', ' ', Inflector::singular($alias)))
+                    );
                 }
 
                 $defaults['foreign_key'] = $this->_object_name.$this->_foreign_key_suffix;
@@ -722,8 +725,10 @@ class Kohana_ORM extends Model implements Serializable
 
             return $model->where($col, '=', $val);
         } else {
-            throw new Kohana_Exception('The :property property does not exist in the :class class',
-                [':property' => $column, ':class' => get_class($this)]);
+            throw new Kohana_Exception('The :property property does not exist in the :class class', [
+                ':property' => $column,
+                ':class'    => get_class($this),
+            ]);
         }
     }
 
@@ -766,7 +771,7 @@ class Kohana_ORM extends Model implements Serializable
 
         if (array_key_exists($column, $this->_object)) {
             // Filter the data
-            $value = $this->run_filter($column, $value);
+            $value    = $this->run_filter($column, $value);
             $oldValue = $this->_object[$column];
 
             // Check serialized version of serializable fields (prevent false-positives on same arrays/objects)
@@ -796,8 +801,10 @@ class Kohana_ORM extends Model implements Serializable
 
             $this->_changed[$column] = $this->_belongs_to[$column]['foreign_key'];
         } else {
-            throw new Kohana_Exception('The :property: property does not exist in the :class: class',
-                [':property:' => $column, ':class:' => get_class($this)]);
+            throw new Kohana_Exception('The :property: property does not exist in the :class: class', [
+                ':property:' => $column,
+                ':class:'    => get_class($this),
+            ]);
         }
 
         return $this;
@@ -1406,8 +1413,10 @@ class Kohana_ORM extends Model implements Serializable
     public function create(Validation $validation = null)
     {
         if ($this->_loaded) {
-            throw new Kohana_Exception('Cannot create :model model because it is already loaded.',
-                [':model' => $this->_object_name]);
+            throw new Kohana_Exception(
+                'Cannot create :model model because it is already loaded.',
+                [':model' => $this->_object_name]
+            );
         }
 
         // Require model validation before saving
@@ -1464,8 +1473,10 @@ class Kohana_ORM extends Model implements Serializable
     public function update(Validation $validation = null)
     {
         if (!$this->_loaded) {
-            throw new Kohana_Exception('Cannot update :model model because it is not loaded.',
-                [':model' => $this->_object_name]);
+            throw new Kohana_Exception(
+                'Cannot update :model model because it is not loaded.',
+                [':model' => $this->_object_name]
+            );
         }
 
         // Run validation if the model isn't valid or we have additional validation rules.
@@ -1540,8 +1551,10 @@ class Kohana_ORM extends Model implements Serializable
     public function delete()
     {
         if (!$this->_loaded) {
-            throw new Kohana_Exception('Cannot delete :model model because it is not loaded.',
-                [':model' => $this->_object_name]);
+            throw new Kohana_Exception(
+                'Cannot delete :model model because it is not loaded.',
+                [':model' => $this->_object_name]
+            );
         }
 
         // Use primary key value
@@ -1866,7 +1879,7 @@ class Kohana_ORM extends Model implements Serializable
     {
         return $value
             ? json_decode($value, true, 512, JSON_THROW_ON_ERROR)
-            : [];
+            : null;
     }
 
     public function object_name()
