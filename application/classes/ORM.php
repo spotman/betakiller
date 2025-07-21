@@ -121,6 +121,17 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         return $this->getRelation($alias)->loaded();
     }
 
+    protected function fetchRelatedEntity(string $alias): mixed
+    {
+        $rel = $this->getRelation($alias);
+
+        if (!$rel->loaded()) {
+            $rel->reload();
+        }
+
+        return $rel;
+    }
+
     /**
      * @param string $name
      *
