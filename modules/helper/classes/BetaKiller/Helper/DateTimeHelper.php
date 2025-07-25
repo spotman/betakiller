@@ -98,6 +98,11 @@ final class DateTimeHelper
         return self::formatAtom($time);
     }
 
+    public static function createFromJsDate(string $value): DateTimeImmutable
+    {
+        return new DateTimeImmutable($value);
+    }
+
     /**
      * Compare dates only (ignore time)
      *
