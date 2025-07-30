@@ -7,6 +7,7 @@ error.http.403.label: "Доступ запрещён"
 error.http.403.message: "У Вас недостаточно привилегий для просмотра этой страницы."
 error.http.403.login-button: "Войти"
 error.http.403.email: 'Ваш емейл: :email'
+error.http.403.url: 'URL: :url'
 error.http.back-button: "Вернуться назад"
 
 error.http.404.label: "Страница не найдена"

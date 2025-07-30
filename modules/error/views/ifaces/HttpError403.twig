@@ -26,11 +26,12 @@
             </p>
           </div>
 
-          {% if email %}
           <div class="card-footer">
-            <p>{{ "error.http.403.email"|i18n({email: email}) }}</p>
+            {% if email %}
+              <p>{{ "error.http.403.email"|i18n({email: email}) }}</p>
+            {% endif %}
+            <p>{{ "error.http.403.url"|i18n({url: url}) }}</p>
           </div>
-          {% endif %}
         </div>
 
         {% if not in_production() %}

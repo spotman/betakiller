@@ -7,6 +7,7 @@ error.http.403.label: "Access denied"
 error.http.403.message: "You have no enough privileges for viewing current page."
 error.http.403.login-button: "Sign in"
 error.http.403.email: 'Your email: :email'
+error.http.403.url: 'URL: :url'
 error.http.back-button: "Return to the safe place"
 
 error.http.404.label: "Page not found"
