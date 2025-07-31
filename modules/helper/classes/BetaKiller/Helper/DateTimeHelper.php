@@ -95,12 +95,12 @@ final class DateTimeHelper
 
     public static function formatJsDate(DateTimeImmutable $time): string
     {
-        return self::formatAtom($time);
+        return $time->format(DateTimeImmutable::RFC3339_EXTENDED);
     }
 
     public static function createFromJsDate(string $value): DateTimeImmutable
     {
-        return new DateTimeImmutable($value);
+        return DateTimeImmutable::createFromFormat(DateTimeImmutable::RFC3339_EXTENDED, $value);
     }
 
     /**
