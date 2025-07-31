@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Spotman\Defence\Test;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use Spotman\Defence\Filter\DateTimeFilter;
 use Spotman\Defence\Filter\FilterInterface;
 
@@ -13,7 +16,7 @@ class DateTimeFilterTest extends AbstractFilterTest
      */
     public function passData(): array
     {
-        $date = new \DateTimeImmutable;
+        $date = new DateTimeImmutable;
 
         return [
             $date->format($date::ATOM),
@@ -36,12 +39,17 @@ class DateTimeFilterTest extends AbstractFilterTest
 
     public function sanitizeData(): array
     {
-        $text = '2021-07-05T12:13:39.000000+0000';
-        $date = new \DateTimeImmutable($text);
-
         // Filter converts string to DateTimeImmutable, they can not be compared
         return [
-            $text => $date,
+            '2021-07-05T12:13:39.123456+0000' => (new DateTimeImmutable())
+                ->setDate(2021, 7, 5)
+                ->setTime(12, 13, 39,123456)
+                ->setTimezone(new DateTimeZone('UTC')),
+
+            '2024-07-31T14:30:58.123Z' => (new DateTimeImmutable())
+                ->setDate(2024, 7, 31)
+                ->setTime(14, 30, 58, 123000)
+                ->setTimezone(new DateTimeZone('UTC')),
         ];
     }
 
