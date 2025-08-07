@@ -114,7 +114,17 @@ interface NotificationLogInterface extends DispatchableEntityInterface, SearchRe
     /**
      * @return bool
      */
+    public function isPending(): bool;
+
+    /**
+     * @return bool
+     */
     public function isSucceeded(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isFailed(): bool;
 
     /**
      * @return bool
@@ -149,6 +159,23 @@ interface NotificationLogInterface extends DispatchableEntityInterface, SearchRe
      * @return string
      */
     public function getLanguageIsoCode(): string;
+
+    /**
+     * @param string $url
+     *
+     * @return \BetaKiller\Model\NotificationLogInterface
+     */
+    public function setActionUrl(string $url): NotificationLogInterface;
+
+    /**
+     * @return bool
+     */
+    public function hasActionUrl(): bool;
+
+    /**
+     * @return string
+     */
+    public function getActionUrl(): string;
 
     /**
      * Mark notification as "read" (email opened, etc)

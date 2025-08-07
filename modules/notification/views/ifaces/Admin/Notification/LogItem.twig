@@ -2,12 +2,26 @@
 
 {% block content %}
 
+  {# default for unknown statuses items #}
+  {% set itemStatusClass = "primary-text" %}
+
+  {% if item.is_succeeded %}
+    {% set itemStatusClass = "green-text" %}
+  {% elseif item.is_failed %}
+    {% set itemStatusClass = "red-text" %}
+  {% elseif item.is_pending %}
+    {% set itemStatusClass = "secondary-text" %}
+  {% endif %}
+
   <div class="row">
     <div class="col s12">
       <ul>
-        <li class="{{ item.is_succeeded ? "green-text" : "red-text" }}">{{ item.status|upper }}</li>
+        <li class="{{ itemStatusClass }}">{{ item.status_label|upper }}</li>
         <li>{{ item.date }}</li>
         <li>{{ item.target }}</li>
+        {% if item.action_url %}
+          <li><a href="{{ item.action_url }}" target="_blank">{{ item.action_url }}</a></li>
+        {% endif %}
       </ul>
 
       {% if item.subject %}

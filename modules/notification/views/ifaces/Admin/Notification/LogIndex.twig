@@ -67,17 +67,25 @@
 
             {% if item.is_read %}
               {% set item_classes = "light-green lighten-4" %}
-            {% elseif not item.is_succeeded %}
+            {% elseif item.is_succeeded %}
+              {% set item_classes = "" %}
+            {% elseif item.is_pending %}
+              {% set item_classes = "light-gray" %}
+            {% elseif item.is_failed %}
               {% set item_classes = "red white-text" %}
             {% endif %}
 
             <tr class="{{ item_classes }}">
               <td>
                 <a href="{{ item.status_url }}">
-                  {% if item.is_succeeded %}
+                  {% if item.is_pending %}
+                    <i class="material-icons">access_time</i>
+                  {% elseif item.is_succeeded %}
                     <i class="material-icons">done</i>
-                  {% else %}
+                  {% elseif item.is_failed %}
                     <i class="material-icons">close</i>
+                  {% else %}
+                    <i class="material-icons">help</i>
                   {% endif %}
                 </a>
               </td>

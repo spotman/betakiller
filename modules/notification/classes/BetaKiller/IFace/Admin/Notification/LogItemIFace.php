@@ -29,11 +29,14 @@ readonly class LogItemIFace extends AbstractAdminIFace
         return [
             'item' => [
                 'date'         => $item->getProcessedAt()->format('d.m.Y H:i:s'),
-                'status'       => $item->getStatus(),
+                'status_label' => $item->getStatus(),
+                'is_pending'   => $item->isPending(),
                 'is_succeeded' => $item->isSucceeded(),
+                'is_failed'    => $item->isFailed(),
                 'target'       => $item->getTargetIdentity(),
                 'subject'      => $item->getSubject(),
                 'result'       => $item->getFailureReason(),
+                'action_url'   => $item->hasActionUrl() ? $item->getActionUrl() : null,
                 'body_url'     => $urlHelper->makeCodenameUrl(NotificationLogItemBodyAction::codename()),
             ],
         ];

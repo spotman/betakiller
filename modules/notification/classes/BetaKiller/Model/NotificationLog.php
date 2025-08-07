@@ -24,6 +24,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     public const COL_LANG         = 'lang';
     public const COL_SUBJ         = 'subject';
     public const COL_BODY         = 'body';
+    public const COL_ACTION_URL         = 'action_url';
     public const COL_RESULT       = 'result';
     public const COL_READ_AT      = 'read_at';
 
@@ -71,6 +72,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     status VARCHAR(16) NOT NULL,
     transport VARCHAR(16) NOT NULL,
     subject VARCHAR(255) NULL DEFAULT NULL,
+    action_url VARCHAR(255) NULL DEFAULT NULL,
     body TEXT NULL DEFAULT NULL,
     result TEXT NULL DEFAULT NULL,
     read_at DATETIME DEFAULT NULL
@@ -87,7 +89,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     {
         $target = $message->getTarget();
 
-        return (new self())
+        $entity = (new self())
             ->setHash($message->getHash())
             ->setProcessedAt(new DateTimeImmutable())
             ->setMessageName($message->getCodename())
@@ -95,6 +97,12 @@ class NotificationLog extends \ORM implements NotificationLogInterface
             ->setTransport($transport)
             ->setLanguageIsoCode($target->getLanguageIsoCode())
             ->markAsPending();
+
+        if ($message->hasActionUrl()) {
+            $entity->setActionUrl($message->getActionUrl());
+        }
+
+        return $entity;
     }
 
     /**
@@ -256,9 +264,28 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         return (string)$this->get(self::COL_STATUS);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function isPending(): bool
+    {
+        return $this->getStatus() === self::STATUS_PENDING;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function isSucceeded(): bool
     {
         return $this->getStatus() === self::STATUS_SUCCEEDED;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isFailed(): bool
+    {
+        return $this->getStatus() === self::STATUS_FAILED;
     }
 
     private function setStatus(string $value): NotificationLogInterface
@@ -336,5 +363,31 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     public function isRetryAvailable(): bool
     {
         return !$this->isSucceeded() && $this->getBody();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setActionUrl(string $url): NotificationLogInterface
+    {
+        $this->set(self::COL_ACTION_URL, $url);
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasActionUrl(): bool
+    {
+        return !empty($this->get(self::COL_ACTION_URL));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getActionUrl(): string
+    {
+        return $this->get(self::COL_ACTION_URL);
     }
 }
