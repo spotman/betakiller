@@ -4,6 +4,7 @@ namespace BetaKiller\Helper;
 
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\NotificationGroupUserConfigInterface;
+use BetaKiller\Model\Phone;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\EmailMessageTargetInterface;
 use BetaKiller\Notification\MessageTargetInterface;
@@ -69,12 +70,12 @@ interface NotificationGatewayInterface
     /**
      * Generate target from phone number
      *
-     * @param string      $phone
-     * @param null|string $lang Target language alpha-2 ISO code
+     * @param \BetaKiller\Model\Phone $phone
+     * @param null|string             $lang Target language alpha-2 ISO code
      *
      * @return \BetaKiller\Notification\PhoneMessageTargetInterface
      */
-    public function phoneTarget(string $phone, ?string $lang = null): PhoneMessageTargetInterface;
+    public function phoneTarget(Phone $phone, ?string $lang = null): PhoneMessageTargetInterface;
 
     /**
      * @param string|null $name

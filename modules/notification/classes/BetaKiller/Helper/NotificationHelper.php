@@ -5,6 +5,7 @@ namespace BetaKiller\Helper;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\NotificationGroupUserConfigInterface;
+use BetaKiller\Model\Phone;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\EmailMessageTarget;
 use BetaKiller\Notification\EmailMessageTargetInterface;
@@ -113,11 +114,11 @@ final readonly class NotificationHelper implements NotificationGatewayInterface
     /**
      * @inheritDoc
      */
-    public function phoneTarget(string $phone, ?string $lang = null): PhoneMessageTargetInterface
+    public function phoneTarget(Phone $phone, ?string $lang = null): PhoneMessageTargetInterface
     {
         $lang = $lang ?? $this->i18n->getPrimaryLanguage()->getIsoCode();
 
-        return new PhoneMessageTarget($phone, $lang);
+        return new PhoneMessageTarget($phone->e164(), $lang);
     }
 
     /**
