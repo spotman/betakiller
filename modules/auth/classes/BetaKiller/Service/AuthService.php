@@ -152,7 +152,7 @@ class AuthService
         $loginAction = UserResource::ACTION_LOGIN;
 
         if (!$this->acl->isAllowedToUser($userResource, $loginAction, $user)) {
-            throw new AccessDeniedException('Action "name" is not allowed to User ":id"', [
+            throw new AccessDeniedException('Action ":name" is not allowed to User ":id"', [
                 ':name' => UserResource::ACTION_LOGIN,
                 ':id'   => $user->getID(),
             ]);
