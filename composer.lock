@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aa55f6a14a5f7f56e0249770d57517c9",
+    "content-hash": "0b72dec6d1f6db84ef293037134cc855",
     "packages": [
         {
             "name": "aidantwoods/secureheaders",
@@ -540,6 +540,60 @@
                 "source": "https://github.com/ratchetphp/Ratchet/tree/v0.4.4"
             },
             "time": "2021-12-14T00:20:41+00:00"
+        },
+        {
+            "name": "cherif/inertia-psr15",
+            "version": "v0.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cherifGsoul/inertia-psr15.git",
+                "reference": "551660e0792ad90c1b106435f5b85f8c85037bfb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cherifGsoul/inertia-psr15/zipball/551660e0792ad90c1b106435f5b85f8c85037bfb",
+                "reference": "551660e0792ad90c1b106435f5b85f8c85037bfb",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4",
+                "psr/http-server-middleware": "^1.0"
+            },
+            "require-dev": {
+                "laminas/laminas-diactoros": "^2.5",
+                "mezzio/mezzio-template": "^2.0",
+                "phpspec/prophecy-phpunit": "^2.0",
+                "phpunit/phpunit": "^9.4",
+                "psr/container": "^1.0",
+                "twig/twig": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laminas": {
+                    "config-provider": "Cherif\\InertiaPsr15\\ConfigProvider"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Cherif\\InertiaPsr15\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Cherif BOUCHELAGHEM",
+                    "email": "cherif.bouchelaghem@gmail.com"
+                }
+            ],
+            "description": "InertiaJS server-side adapter for PSR-7 and PSR-15 applications",
+            "support": {
+                "issues": "https://github.com/cherifGsoul/inertia-psr15/issues",
+                "source": "https://github.com/cherifGsoul/inertia-psr15/tree/v0.4.0"
+            },
+            "time": "2024-07-25T00:21:34+00:00"
         },
         {
             "name": "clue/redis-protocol",
