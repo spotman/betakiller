@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Model;
@@ -32,13 +33,13 @@ class User extends AbstractCreatedAt implements UserInterface
     public const COL_IS_PHONE_VERIFIED = 'is_phone_verified';
     public const COL_NOTIFY_BY_EMAIL   = 'notify_by_email';
     public const COL_LOGINS            = 'logins';
-    public const COL_LAST_LOGIN        = 'last_login';
+    public const COL_LAST_LOGIN_AT     = 'last_login_at';
     public const COL_CREATED_FROM_IP   = 'created_from_ip';
     public const COL_IS_CLAIMED        = 'is_reg_claimed';
 
-    public const  REL_LANGUAGE  = 'language';
-    public const  REL_ROLES     = 'roles';
-    public const  REL_SESSIONS  = 'sessions';
+    public const  REL_LANGUAGE = 'language';
+    public const  REL_ROLES    = 'roles';
+    public const  REL_SESSIONS = 'sessions';
 
     public const  DEFAULT_IP   = '127.0.0.1';
     public const  CLI_USERNAME = 'minion';
@@ -138,9 +139,9 @@ class User extends AbstractCreatedAt implements UserInterface
                 self::COL_LOGINS          => [
                     ['max_length', [':value', 10]],
                 ],
-                self::COL_LAST_LOGIN      => [
-                    ['max_length', [':value', 10]],
-                ],
+//                self::COL_LAST_LOGIN_AT => [
+//                    ['max_length', [':value', 10]],
+//                ],
             ];
     }
 //
@@ -342,10 +343,10 @@ class User extends AbstractCreatedAt implements UserInterface
     public function completeLogin(): void
     {
         // Update the number of logins
-        $this->set('logins', new \Database_Expression('logins + 1'));
+        $this->set(self::COL_LOGINS, new \Database_Expression(sprintf('%s + 1', self::COL_LOGINS)));
 
         // Set the last login date
-        $this->set('last_login', time());
+        $this->set_datetime_column_value(self::COL_LAST_LOGIN_AT, new DateTimeImmutable());
     }
 
     /**
@@ -647,11 +648,7 @@ class User extends AbstractCreatedAt implements UserInterface
      */
     public function getLastLoggedIn(): ?DateTimeImmutable
     {
-        $ts = (int)$this->get(self::COL_LAST_LOGIN);
-
-        return $ts
-            ? (new DateTimeImmutable())->setTimestamp($ts)
-            : null;
+        return $this->get_datetime_column_value(self::COL_LAST_LOGIN_AT);
     }
 
     public function equalsTo(RestrictionTargetInterface $target): bool
