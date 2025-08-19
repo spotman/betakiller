@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace BetaKiller\View;
 
+use BetaKiller\Env\AppEnvInterface;
 use Cherif\InertiaPsr15\Service\InertiaInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final readonly class EmptyInertiaDataProvider implements InertiaDataProviderInterface
+readonly class DefaultInertiaDataProvider implements InertiaDataProviderInterface
 {
+    public function __construct(private AppEnvInterface $appEnv)
+    {
+    }
+
     public function injectSharedData(ServerRequestInterface $request, InertiaInterface $inertia): void
     {
-        // No data provided
+        $inertia
+            ->version($this->appEnv->getRevisionKey());
     }
 }

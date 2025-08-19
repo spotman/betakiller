@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use BetaKiller\View\DefaultInertiaTemplateContextFactory;
-use BetaKiller\View\EmptyInertiaDataProvider;
+use BetaKiller\View\DefaultInertiaDataProvider;
 use BetaKiller\View\IFaceRendererInterface;
 use BetaKiller\View\InertiaDataProviderInterface;
 use BetaKiller\View\InertiaFactory;
@@ -19,6 +19,6 @@ return [
         InertiaFactoryInterface::class                => autowire(InertiaFactory::class),
         IFaceRendererInterface::class                 => autowire(InertiaIFaceRenderer::class),
         InertiaTemplateContextFactoryInterface::class => autowire(DefaultInertiaTemplateContextFactory::class),
-        InertiaDataProviderInterface::class           => autowire(EmptyInertiaDataProvider::class),
+        InertiaDataProviderInterface::class           => autowire(DefaultInertiaDataProvider::class),
     ],
 ];
