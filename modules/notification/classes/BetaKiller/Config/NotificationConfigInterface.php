@@ -70,6 +70,15 @@ interface NotificationConfigInterface
     public function getMessageTransport(string $messageCodename): string;
 
     /**
+     * Returns class name of specific message
+     *
+     * @param string $messageCodename
+     *
+     * @return string
+     */
+    public function getMessageClassName(string $messageCodename): string;
+
+    /**
      * May return empty array if no events defined
      *
      * @param string $messageCodename
@@ -77,22 +86,6 @@ interface NotificationConfigInterface
      * @return array
      */
     public function getMessageDismissOnEvents(string $messageCodename): array;
-
-    /**
-     * @param string $messageCodename
-     *
-     * @return bool
-     */
-    public function isMessageBroadcast(string $messageCodename): bool;
-
-    /**
-     * Returns true if message must be prioritized
-     *
-     * @param string $messageCodename
-     *
-     * @return bool
-     */
-    public function isMessageCritical(string $messageCodename): bool;
 
     /**
      * Returns UTM markers for provided transport

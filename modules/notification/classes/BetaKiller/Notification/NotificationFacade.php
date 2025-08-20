@@ -14,6 +14,8 @@ use BetaKiller\Model\NotificationGroupUserConfigInterface;
 use BetaKiller\Model\NotificationLog;
 use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Notification\Message\BroadcastMessageInterface;
+use BetaKiller\Notification\Message\MessageInterface;
 use BetaKiller\Notification\Transport\DismissibleTransportInterface;
 use BetaKiller\Repository\NotificationFrequencyRepositoryInterface;
 use BetaKiller\Repository\NotificationGroupRepositoryInterface;
@@ -28,7 +30,7 @@ use Psr\Log\LoggerInterface;
 use Spotman\Acl\AclInterface;
 use Throwable;
 
-final class NotificationFacade
+final readonly class NotificationFacade
 {
     public const QUEUE_NAME_REGULAR  = 'notifications';
     public const QUEUE_NAME_PRIORITY = 'notifications.priority';
@@ -94,107 +96,103 @@ final class NotificationFacade
     /**
      * Create raw message
      *
-     * @param string                                          $messageCodename
-     * @param \BetaKiller\Notification\MessageTargetInterface $target
-     * @param array|null                                      $data
-     * @param array|null                                      $attachments Array of files to attach
+     * @param string     $messageCodename
+     * @param array|null $data
+     * @param array|null $attachments Array of files to attach
      *
-     * @return \BetaKiller\Notification\MessageInterface
+     * @return \BetaKiller\Notification\Message\MessageInterface
+     * @throws \BetaKiller\Notification\NotificationException
      */
     public function createMessage(
         string $messageCodename,
-        MessageTargetInterface $target,
         array $data = null,
         array $attachments = null
     ): MessageInterface {
-        $transportName = $this->config->getMessageTransport($messageCodename);
-        $isCritical    = $this->config->isMessageCritical($messageCodename);
-
-        $message = $this->messageFactory->create($messageCodename, $target, $transportName, $isCritical);
-
-        if ($data) {
-            $message->setTemplateData($data);
-        }
-
-        if ($attachments) {
-            foreach ($attachments as $attach) {
-                $message->addAttachment($attach);
-            }
-        }
-
-        $actionUrl = $this->actionUrlGenerator->make($message);
-
-        if ($actionUrl) {
-            $message->setActionUrl($actionUrl);
-        }
-
-        return $message;
+        return $this->messageFactory->create($messageCodename, $data, $attachments);
     }
 
     /**
      * Enqueue immediate message for future processing (highest priority)
      *
-     * @param \BetaKiller\Notification\MessageInterface $message
+     * @param \BetaKiller\Notification\EnvelopeInterface $envelope
      *
+     * @throws \BetaKiller\Exception\DomainException
      * @throws \BetaKiller\Notification\NotificationException
+     * @throws \Interop\Queue\Exception
+     * @throws \Interop\Queue\Exception\InvalidDestinationException
+     * @throws \Interop\Queue\Exception\InvalidMessageException
      */
-    public function enqueueImmediate(MessageInterface $message): void
+    public function enqueueImmediate(EnvelopeInterface $envelope): void
     {
-        if ($this->isMessageScheduled($message)) {
+        if ($this->isMessageScheduled($envelope->getMessage())) {
             throw new NotificationException('Message ":name" is scheduled and must be sent via dedicated processor');
         }
 
-        $this->enqueue($message);
+        $this->enqueue($envelope);
     }
 
     /**
      * Enqueue scheduled message for future processing (lowest priority)
      *
-     * @param \BetaKiller\Notification\MessageInterface $message
+     * @param \BetaKiller\Notification\EnvelopeInterface $envelope
      *
+     * @throws \BetaKiller\Exception\DomainException
      * @throws \BetaKiller\Notification\NotificationException
+     * @throws \Interop\Queue\Exception
+     * @throws \Interop\Queue\Exception\InvalidDestinationException
+     * @throws \Interop\Queue\Exception\InvalidMessageException
      */
-    public function enqueueScheduled(MessageInterface $message): void
+    public function enqueueScheduled(EnvelopeInterface $envelope): void
     {
-        if (!$this->isMessageScheduled($message)) {
+        if (!$this->isMessageScheduled($envelope->getMessage())) {
             throw new NotificationException('Message ":name" is not scheduled and must be send directly');
         }
 
-        $this->enqueue($message);
+        $this->enqueue($envelope);
+    }
+
+    public function testDelivery(string $messageCodename, MessageTargetInterface $target): void
+    {
+        $message = $this->messageFactory->createFromTarget($messageCodename, $target);
+
+        $this->enqueueImmediate(new Envelope($target, $message));
     }
 
     /**
      * Send message immediately
      *
-     * @param \BetaKiller\Notification\MessageInterface $message
+     * @param \BetaKiller\Notification\EnvelopeInterface $envelope
      *
      * @return bool
+     * @throws \BetaKiller\Notification\TransportException
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function send(MessageInterface $message): bool
+    public function send(EnvelopeInterface $envelope): bool
     {
-        $transport = $this->transportFactory->create($message->getTransportName());
+        $target = $envelope->getTarget();
+        $message = $envelope->getMessage();
 
-        if (!$this->isTransportSupported($message, $transport)) {
+        $transport = $this->getMessageTransport($message);
+
+        if (!$this->isTransportSupported($envelope, $transport)) {
             return false;
         }
 
-        $log = NotificationLog::createFrom($message, $transport);
-
-        $target = $message->getTarget();
+        $log = NotificationLog::createFrom($message, $target, $transport);
 
         try {
-            // Render message template
-            $body = $this->renderer->makeBody($message, $target, $transport);
-
-            // Save body first to allow retry
-            $log->setBody($body);
-
             // Fill subject line if the transport needs it
             if ($transport->isSubjectRequired()) {
                 $subj = $this->renderer->makeSubject($message, $target);
                 $message->setSubject($subj);
                 $log->setSubject($subj);
             }
+
+            // Render message template
+            $body = $this->renderer->makeBody($message, $target, $transport);
+
+            // Save body first to allow retry
+            $log->setBody($body);
 
             // Send message via transport
             if ($transport->send($message, $target, $body)) {
@@ -212,16 +210,18 @@ final class NotificationFacade
         return $log->isSucceeded();
     }
 
-    private function isTransportSupported(MessageInterface $message, TransportInterface $transport): bool
+    private function isTransportSupported(EnvelopeInterface $envelope, TransportInterface $transport): bool
     {
-        if (!$transport->canHandle($message)) {
+        $message = $envelope->getMessage();
+
+        if (!$transport->canHandle($envelope)) {
             throw new TransportException('Transport ":transport" can not handle message ":message"', [
                 ':transport' => $transport::getName(),
-                ':message'   => $message->getCodename(),
+                ':message'   => $message::getCodename(),
             ]);
         }
 
-        $target = $message->getTarget();
+        $target = $envelope->getTarget();
 
         return $transport->isEnabledFor($target);
     }
@@ -251,10 +251,8 @@ final class NotificationFacade
         }
 
         try {
-            $transportName = $logRecord->getTransportName();
-
-            $message   = $this->messageFactory->create($logRecord->getMessageName(), $target, $transportName, true);
-            $transport = $this->transportFactory->create($transportName);
+            $message   = $this->messageFactory->create($logRecord->getMessageName());
+            $transport = $this->getMessageTransport($message);
 
             if ($transport->isSubjectRequired()) {
                 $subject = $logRecord->getSubject();
@@ -266,6 +264,11 @@ final class NotificationFacade
                 }
 
                 $message->setSubject($subject);
+            }
+
+            // Keep action URL
+            if ($logRecord->hasActionUrl()) {
+                $message->setActionUrl($logRecord->getActionUrl());
             }
 
             if ($transport->send($message, $target, $body)) {
@@ -316,7 +319,9 @@ final class NotificationFacade
 
     public function isBroadcastMessage(string $messageCodename): bool
     {
-        return $this->config->isMessageBroadcast($messageCodename);
+        $fqcn = $this->config->getMessageClassName($messageCodename);
+
+        return is_a($fqcn, BroadcastMessageInterface::class, true);
     }
 
     public function getGroupByMessageCodename(string $messageCodename): NotificationGroupInterface
@@ -534,15 +539,15 @@ final class NotificationFacade
         $this->queueContext->purgeQueue($this->regularQueue);
     }
 
-    private function isMessageEnabledForTarget(
-        MessageInterface $message
-    ): bool {
-        $target = $message->getTarget();
+    private function isMessageEnabledForTarget(EnvelopeInterface $envelope): bool {
+        $target = $envelope->getTarget();
 
         if (!$target instanceof UserInterface) {
             // Custom target types can not be checked here and always allowed
             return true;
         }
+
+        $message = $envelope->getMessage();
 
         // Fetch group by message codename
         $group = $this->getMessageGroup($message);
@@ -551,7 +556,7 @@ final class NotificationFacade
             return false;
         }
 
-        $transport = $this->transportFactory->create($message->getTransportName());
+        $transport = $this->getMessageTransport($message);
 
         if (!$transport->isEnabledFor($target)) {
             return false;
@@ -568,38 +573,57 @@ final class NotificationFacade
     }
 
     /**
-     * @param \BetaKiller\Notification\MessageInterface $message
+     * @param \BetaKiller\Notification\Message\MessageInterface $message
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      * @throws \BetaKiller\Notification\NotificationException
      */
     private function getMessageGroup(MessageInterface $message): NotificationGroupInterface
     {
-        $messageCodename = $message->getCodename();
+        $messageCodename = $message::getCodename();
 
         return $this->getGroupByMessageCodename($messageCodename);
+    }
+
+    private function getMessageTransport(MessageInterface $message): TransportInterface
+    {
+        $name = $this->config->getMessageTransport($message::getCodename());
+
+        return $this->transportFactory->create($name);
     }
 
     /**
      * Enqueue message for future processing
      *
-     * @param \BetaKiller\Notification\MessageInterface $message
+     * @param \BetaKiller\Notification\EnvelopeInterface $envelope
      *
-     * @throws \BetaKiller\Notification\NotificationException
+     * @throws \BetaKiller\Exception\DomainException
+     * @throws \Interop\Queue\Exception
+     * @throws \Interop\Queue\Exception\InvalidDestinationException
+     * @throws \Interop\Queue\Exception\InvalidMessageException
      */
-    private function enqueue(MessageInterface $message): void
+    private function enqueue(EnvelopeInterface $envelope): void
     {
         // Send only if targets were specified or message group was allowed
-        if (!$this->isMessageEnabledForTarget($message)) {
+        if (!$this->isMessageEnabledForTarget($envelope)) {
             return;
         }
 
-        $body = $this->serializer->serialize($message);
+        $message = $envelope->getMessage();
+
+        // Preset right before serialization (all template data will be scalar after deserialization)
+        $actionUrl = $this->actionUrlGenerator->make($message);
+
+        if ($actionUrl) {
+            $message->setActionUrl($actionUrl);
+        }
+
+        $body = $this->serializer->serialize($envelope);
 
         $queueMessage = $this->queueContext->createMessage($body);
 
         // Priority queue for critical messages
-        $targetQueue = $message->isCritical()
+        $targetQueue = $envelope->getMessage()::isCritical()
             ? $this->priorityQueue
             : $this->regularQueue;
 

@@ -7,39 +7,31 @@ use BetaKiller\Model\NotificationGroupUserConfigInterface;
 use BetaKiller\Model\Phone;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\EmailMessageTargetInterface;
+use BetaKiller\Notification\Message\BroadcastMessageInterface;
+use BetaKiller\Notification\Message\DirectMessageInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\PhoneMessageTargetInterface;
 
 interface NotificationGatewayInterface
 {
     /**
-     * Send message to a linked group
-     *
-     * @param string        $name
-     * @param array|null    $templateData
-     *
-     * @param string[]|null $attachments
-     *
-     * @throws \BetaKiller\Notification\NotificationException
-     */
-    public function broadcastMessage(string $name, array $templateData = null, array $attachments = null): void;
-
-    /**
      * Send direct message to a single user
      *
-     * @param string                                          $name
-     * @param \BetaKiller\Notification\MessageTargetInterface $target
-     * @param array|null                                      $templateData
-     * @param string[]                                        $attachments Array of files to attach
+     * @param \BetaKiller\Notification\MessageTargetInterface         $target
+     * @param \BetaKiller\Notification\Message\DirectMessageInterface $message
      *
-     * @throws \BetaKiller\Notification\NotificationException
+     * @return void
      */
-    public function directMessage(
-        string $name,
-        MessageTargetInterface $target,
-        array $templateData = null,
-        array $attachments = null
-    ): void;
+    public function sendDirect(MessageTargetInterface $target, DirectMessageInterface $message): void;
+
+    /**
+     * Send message to a linked group
+     *
+     * @param \BetaKiller\Notification\Message\BroadcastMessageInterface $message
+     *
+     * @return void
+     */
+    public function sendBroadcast(BroadcastMessageInterface $message): void;
 
     /**
      * @param string $name
@@ -60,12 +52,12 @@ interface NotificationGatewayInterface
      * Generate target from email
      *
      * @param string      $email
-     * @param string      $name Full name of recipient
+     * @param string|null $name Full name of recipient
      * @param null|string $lang Target language alpha-2 ISO code
      *
      * @return \BetaKiller\Notification\EmailMessageTargetInterface
      */
-    public function emailTarget(string $email, string $name, ?string $lang = null): EmailMessageTargetInterface;
+    public function emailTarget(string $email, string $name = null, ?string $lang = null): EmailMessageTargetInterface;
 
     /**
      * Generate target from phone number

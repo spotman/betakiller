@@ -6,7 +6,8 @@ use BetaKiller\Config\EmailConfigInterface;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Exception\LogicException;
 use BetaKiller\Notification\EmailMessageTargetInterface;
-use BetaKiller\Notification\MessageInterface;
+use BetaKiller\Notification\EnvelopeInterface;
+use BetaKiller\Notification\Message\MessageInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\MessageTargetResolverInterface;
 use BetaKiller\Notification\TransportException;
@@ -45,14 +46,14 @@ final readonly class EmailTransport extends AbstractTransport
     /**
      * Returns true if current transport can handle provided message
      *
-     * @param \BetaKiller\Notification\MessageInterface $message
+     * @param \BetaKiller\Notification\EnvelopeInterface $envelope
      *
      * @return bool
      */
-    public function canHandle(MessageInterface $message): bool
+    public function canHandle(EnvelopeInterface $envelope): bool
     {
         // Any message can be handled if there is a template
-        return true;
+        return $envelope->getTarget() instanceof EmailMessageTargetInterface;
     }
 
     /**
@@ -66,9 +67,9 @@ final readonly class EmailTransport extends AbstractTransport
     }
 
     /**
-     * @param \BetaKiller\Notification\MessageInterface       $message
-     * @param \BetaKiller\Notification\MessageTargetInterface $target
-     * @param string                                          $body
+     * @param \BetaKiller\Notification\Message\MessageInterface $message
+     * @param \BetaKiller\Notification\MessageTargetInterface   $target
+     * @param string                                            $body
      *
      * @return bool Number of messages sent
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
@@ -86,19 +87,7 @@ final readonly class EmailTransport extends AbstractTransport
             ]);
         }
 
-        $fromUser = $message->getFrom();
-
-        if ($fromUser && !$fromUser instanceof EmailMessageTargetInterface) {
-            throw new LogicException('Email message "from" field must implement :class', [
-                ':class' => EmailMessageTargetInterface::class,
-            ]);
-        }
-
         $sender = new Address($this->config->getFromEmail(), $this->config->getFromName());
-
-        $from = $fromUser
-            ? new Address($fromUser->getMessageEmail(), $fromUser->getFullName())
-            : $sender;
 
         $to          = $target->getMessageEmail();
         $subj        = $message->getSubject();
@@ -120,11 +109,11 @@ final readonly class EmailTransport extends AbstractTransport
 
         $email = (new Email())
             ->sender($sender)
-            ->from($from)
+            ->from($sender)
             ->to($to)
             ->subject($subj)
             ->html($body)
-            ->priority($message->isCritical() ? 1 : 5);
+            ->priority($message::isCritical() ? 1 : 5);
 
         foreach ($attachments as $attach) {
             $email->attachFromPath($attach, basename($attach));

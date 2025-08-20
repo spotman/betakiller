@@ -1,11 +1,13 @@
 <?php
+
 declare(strict_types=1);
 
+use BetaKiller\Config\NotificationConfig;
 use BetaKiller\Model\RoleInterface;
+use BetaKiller\Notification\Message\DeveloperErrorPhpExceptionMessage;
 use BetaKiller\Notification\Transport\EmailTransport;
-use BetaKiller\Task\Error\Notify;
 
-define('ERROR_MANAGEMENT_GROUP', 'error-management');
+const ERROR_MANAGEMENT_GROUP = 'error-management';
 
 return [
     /**
@@ -17,9 +19,9 @@ return [
      *   ..
      * ]
      */
-    'groups'   => [
+    NotificationConfig::ROOT_GROUPS   => [
         ERROR_MANAGEMENT_GROUP => [
-            'roles' => [
+            NotificationConfig::ROLES => [
                 RoleInterface::DEVELOPER,
             ],
         ],
@@ -35,11 +37,11 @@ return [
      *   messageCodename2:[..],
      * ]
      */
-    'messages' => [
-        Notify::NOTIFICATION_PHP_EXCEPTION => [
-            'group'     => ERROR_MANAGEMENT_GROUP,
-            'transport' => EmailTransport::getName(),
-            'critical'  => true,
+    NotificationConfig::ROOT_MESSAGES => [
+        DeveloperErrorPhpExceptionMessage::getCodename() => [
+            NotificationConfig::FQCN      => DeveloperErrorPhpExceptionMessage::class,
+            NotificationConfig::GROUP     => ERROR_MANAGEMENT_GROUP,
+            NotificationConfig::TRANSPORT => EmailTransport::getName(),
         ],
     ],
 ];

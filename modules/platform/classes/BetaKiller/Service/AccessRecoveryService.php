@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Service;
@@ -7,12 +8,11 @@ use BetaKiller\Event\AccessRecoveryRequestedEvent;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Notification\Message\UserAccessRecoveryMessage;
 use BetaKiller\Url\Container\UrlContainerInterface;
 
 class AccessRecoveryService
 {
-    public const NOTIFICATION_NAME = 'email/user/access-recovery';
-
     private const TOKEN_PERIOD = 'PT4H';
 
     /**
@@ -57,7 +57,7 @@ class AccessRecoveryService
      * @param \BetaKiller\Model\UserInterface                 $user
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParams
      *
-     * @throws \BetaKiller\Notification\NotificationException
+     * @throws \BetaKiller\MessageBus\MessageBusException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function sendEmail(UserInterface $user, UrlContainerInterface $urlParams): void
@@ -65,10 +65,7 @@ class AccessRecoveryService
         $ttl   = $this->getTokenPeriod();
         $token = $this->tokenService->create($user, $ttl);
 
-        $this->notification->directMessage(self::NOTIFICATION_NAME, $user, [
-            // User Language will be fetched from Token
-            '$token' => $token,
-        ]);
+        $this->notification->sendDirect($user, UserAccessRecoveryMessage::createFrom($token));
 
         $this->eventBus->emit(new AccessRecoveryRequestedEvent($user, $urlParams));
     }

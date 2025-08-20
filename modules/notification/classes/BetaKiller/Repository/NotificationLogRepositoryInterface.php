@@ -34,4 +34,11 @@ interface NotificationLogRepositoryInterface extends DispatchableRepositoryInter
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function search(NotificationLogQuery $query, int $page, int $itemsPerPage): SearchResultsInterface;
+
+    /**
+     * Returns last record
+     *
+     * @return \BetaKiller\Model\NotificationLogInterface
+     */
+    public function getLast(): NotificationLogInterface;
 }

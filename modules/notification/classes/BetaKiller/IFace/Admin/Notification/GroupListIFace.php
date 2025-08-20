@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\Notification;
 
+use BetaKiller\Action\Admin\NotificationMessageTestAction;
 use BetaKiller\Config\NotificationConfigInterface;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlHelperInterface;
@@ -12,10 +13,9 @@ use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Notification\MessageRendererInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Repository\NotificationGroupRepositoryInterface;
+use BetaKiller\Url\Parameter\NotificationMessageCodename;
 use BetaKiller\Url\Zone;
 use Psr\Http\Message\ServerRequestInterface;
-
-use function http_build_query;
 
 readonly class GroupListIFace extends AbstractAdminIFace
 {
@@ -78,13 +78,16 @@ readonly class GroupListIFace extends AbstractAdminIFace
     {
         $messages = [];
 
-        $logIndexUrl = $urlHelper->makeCodenameUrl(LogIndexIFace::codename());
-
         foreach ($this->config->getGroupMessages($group->getCodename()) as $messageCodename) {
+            $itemParams = $urlHelper->createUrlContainer()->setParameter(NotificationMessageCodename::create($messageCodename));
+
+            $isTestable = !empty($this->config->getMessageClassName($messageCodename));
+
             $messages[] = [
                 'name'      => $messageCodename,
                 'templates' => $this->checkMessageTemplates($messageCodename),
-                'logs_url'  => $logIndexUrl.'?'.http_build_query([LogIndexIFace::ARG_MESSAGE => $messageCodename]),
+                'logs_url'  => $urlHelper->makeCodenameUrl(LogIndexIFace::codename(), $itemParams),
+                'test_url'  => $isTestable ? $urlHelper->makeCodenameUrl(NotificationMessageTestAction::codename(), $itemParams) : null,
             ];
         }
 

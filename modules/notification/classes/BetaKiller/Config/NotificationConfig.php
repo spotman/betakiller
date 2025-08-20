@@ -26,10 +26,13 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     /**
      * Message keys below
      */
-    public const GROUP      = 'group';
-    public const ACTION     = 'action';
-    public const TRANSPORT  = 'transport';
-    public const BROADCAST  = 'broadcast';
+    public const FQCN      = 'fqcn';
+    public const GROUP     = 'group';
+    public const ACTION    = 'action';
+    public const TRANSPORT = 'transport';
+    /**
+     * @deprecated
+     */
     public const CRITICAL   = 'critical';
     public const DISMISS_ON = 'dismiss_on';
 
@@ -40,11 +43,10 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     private const PATH_GROUP_FREQ_CTRL    = [self::ROOT_GROUPS, 'groupCodename' => '', self::FREQ_CONTROL];
     private const PATH_GROUP_ROLES        = [self::ROOT_GROUPS, 'groupCodename' => '', self::ROLES];
     private const PATH_MESSAGES           = [self::ROOT_MESSAGES];
+    private const PATH_MESSAGE_FQCN       = [self::ROOT_MESSAGES, 'messageCodename' => '', self::FQCN];
     private const PATH_MESSAGE_GROUP      = [self::ROOT_MESSAGES, 'messageCodename' => '', self::GROUP];
     private const PATH_MESSAGE_ACTION     = [self::ROOT_MESSAGES, 'messageCodename' => '', self::ACTION];
     private const PATH_MESSAGE_TRANSPORT  = [self::ROOT_MESSAGES, 'messageCodename' => '', self::TRANSPORT];
-    private const PATH_MESSAGE_BROADCAST  = [self::ROOT_MESSAGES, 'messageCodename' => '', self::BROADCAST];
-    private const PATH_MESSAGE_CRITICAL   = [self::ROOT_MESSAGES, 'messageCodename' => '', self::CRITICAL];
     private const PATH_MESSAGE_DISMISS_ON = [self::ROOT_MESSAGES, 'messageCodename' => '', self::DISMISS_ON];
 
     private const PATH_UTM_TRANSPORT = [self::ROOT_UTM, 'transportCodename' => ''];
@@ -95,6 +97,17 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
         $path['groupCodename'] = $groupCodename;
 
         return (bool)$this->get($path, true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getMessageClassName(string $messageCodename): string
+    {
+        $path                    = self::PATH_MESSAGE_FQCN;
+        $path['messageCodename'] = $messageCodename;
+
+        return (string)$this->get($path);
     }
 
     /**
@@ -174,28 +187,6 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
         $path['messageCodename'] = $messageCodename;
 
         return (array)($this->get($path, true) ?? []);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function isMessageBroadcast(string $messageCodename): bool
-    {
-        $path                    = self::PATH_MESSAGE_BROADCAST;
-        $path['messageCodename'] = $messageCodename;
-
-        return (bool)$this->get($path, true);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function isMessageCritical(string $messageCodename): bool
-    {
-        $path                    = self::PATH_MESSAGE_CRITICAL;
-        $path['messageCodename'] = $messageCodename;
-
-        return (bool)$this->get($path, true);
     }
 
     /**

@@ -12,6 +12,7 @@ use BetaKiller\Model\NotificationGroup;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Notification\DismissBroadcastOnEventMessageInterface;
 use BetaKiller\Notification\DismissDirectOnEventMessageInterface;
+use BetaKiller\Notification\MessageFactory;
 use BetaKiller\Notification\NotificationException;
 use BetaKiller\Notification\Transport\DismissibleTransportInterface;
 use BetaKiller\Notification\TransportException;
@@ -28,6 +29,7 @@ final readonly class ImportGroups implements ConsoleTaskInterface
      * @param \BetaKiller\Repository\NotificationGroupRepository $groupRepo
      * @param \BetaKiller\Config\NotificationConfigInterface     $config
      * @param \BetaKiller\Repository\RoleRepositoryInterface     $roleRepo
+     * @param \BetaKiller\Notification\MessageFactory            $messageFactory
      * @param \BetaKiller\Notification\TransportFactory          $transportFactory
      * @param \Psr\Log\LoggerInterface                           $logger
      */
@@ -35,6 +37,7 @@ final readonly class ImportGroups implements ConsoleTaskInterface
         private NotificationGroupRepository $groupRepo,
         private NotificationConfigInterface $config,
         private RoleRepositoryInterface $roleRepo,
+        private MessageFactory $messageFactory,
         private TransportFactory $transportFactory,
         private LoggerInterface $logger
     ) {
@@ -172,9 +175,11 @@ final readonly class ImportGroups implements ConsoleTaskInterface
         }
 
         foreach ($messages as $messageCodename) {
+            $messageInstance = $this->messageFactory->create($messageCodename);
+
             $transportCodename = $this->config->getMessageTransport($messageCodename);
             $dismissOnEvents   = $this->config->getMessageDismissOnEvents($messageCodename);
-            $isBroadcast       = $this->config->isMessageBroadcast($messageCodename);
+            $isBroadcast       = $messageInstance->isBroadcast();
 
             $transport = $this->transportFactory->create($transportCodename);
 

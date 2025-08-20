@@ -13,7 +13,8 @@
         </iface>
 
         <iface uri="logs" name="Admin\Notification\LogIndex" label="Logs" menu="admin"
-               entity="NotificationLog" entityAction="list" query="page=Page,target,message,status,transport">
+               entity="NotificationLog" entityAction="list"
+               query="page=Page,target,message=NotificationMessageCodename,status,transport">
             <iface uri="{NotificationLog.id}" name="Admin\Notification\LogItem" label="{NotificationLog.id}"
                    entity="NotificationLog" entityAction="read">
                 <action uri="body" name="Admin\NotificationLogItemBody"/>
@@ -21,5 +22,7 @@
             </iface>
         </iface>
 
+        <action uri="test" name="Admin\NotificationMessageTest" label="Test message delivery"
+                query="codename=NotificationMessageCodename"/>
     </iface>
 </root>

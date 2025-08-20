@@ -8,14 +8,13 @@ use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Console\ConsoleTaskInterface;
 use BetaKiller\Helper\NotificationGatewayInterface;
+use BetaKiller\Notification\Message\DeveloperTestDirectMessage;
 use BetaKiller\Repository\UserRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
 final readonly class SendDirect implements ConsoleTaskInterface
 {
     private const ARG_TARGET = 'target';
-
-    public const NOTIFICATION_TEST_DIRECT = 'developer/test/direct';
 
     /**
      * SendDirect constructor.
@@ -56,7 +55,7 @@ final readonly class SendDirect implements ConsoleTaskInterface
             ? $this->userRepo->findByEmail($userEmail)
             : $this->notification->debugEmailTarget();
 
-        $this->notification->directMessage(self::NOTIFICATION_TEST_DIRECT, $target);
+        $this->notification->sendDirect($target, DeveloperTestDirectMessage::create());
 
         $this->logger->info('Message sent to ":email"', [
             ':email' => $target->getMessageEmail(),

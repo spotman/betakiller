@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Action\Auth;
@@ -10,17 +11,15 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Auth\RegistrationClaimThanksIFace;
 use BetaKiller\Model\NotificationLogInterface;
+use BetaKiller\Notification\Message\EmailSupportClaimRegistrationMessage;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
-use BetaKiller\Url\Zone;
 use BetaKiller\Workflow\UserWorkflow;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 readonly class ClaimRegistrationAction extends AbstractAction
 {
-    public const NOTIFICATION = 'email/support/claim-registration';
-
     /**
      * ClaimRegistrationAction constructor.
      *
@@ -64,14 +63,13 @@ readonly class ClaimRegistrationAction extends AbstractAction
 
         // Prevent errors on multiple calls from different emails
         if (!$user->isRegistrationClaimed()) {
-            $this->userWorkflow->notRegisteredClaim($user);
-
-            $this->notification->broadcastMessage(self::NOTIFICATION, [
-                'email'             => $log->getTargetIdentity(),
-                'ip'                => ServerRequestHelper::getIpAddress($request),
-                'notification_url'  => $urlHelper->getReadEntityUrl($log, Zone::admin()),
-                'notification_hash' => $log->getHash(),
-            ]);
+            $this->notification->sendBroadcast(
+                EmailSupportClaimRegistrationMessage::createFrom(
+                    $log,
+                    $urlHelper,
+                    ServerRequestHelper::getIpAddress($request)
+                )
+            );
 
             // User went from an email link, so confirm email too
             $this->userWorkflow->confirmEmail($user);

@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\Workflow;
 
 use BetaKiller\Acl\Resource\ContentCommentResource;
@@ -7,13 +8,14 @@ use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\ContentComment;
 use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Notification\Message\CommentAuthorApproveMessage;
+use BetaKiller\Notification\Message\CommentAuthorReplyMessage;
 use BetaKiller\Repository\ContentCommentStateRepositoryInterface;
 use Spotman\Acl\AclInterface;
 
 class ContentCommentWorkflow
 {
-    public const NOTIFICATION_AUTHOR_APPROVE = 'email/user/comment/author-approve';
-    public const NOTIFICATION_PARENT_REPLY   = 'email/user/comment/parent-author-reply';
+    public const NOTIFICATION_PARENT_REPLY = 'email/user/comment/parent-author-reply';
 
     public const APPROVE            = 'approve';
     public const REJECT             = 'reject';
@@ -150,17 +152,9 @@ class ContentCommentWorkflow
             }
         }
 
-        $email = $comment->getAuthorEmail();
-        $name  = $comment->getAuthorName();
+        $target = $authorUser ?: $this->notification->emailTarget($comment->getAuthorEmail(), $comment->getAuthorName());
 
-        $target = $authorUser ?: $this->notification->emailTarget($email, $name);
-
-        $this->notification->directMessage(self::NOTIFICATION_AUTHOR_APPROVE, $target, [
-            'name'       => $name,
-            'url'        => $comment->getPublicReadUrl($this->urlHelper),
-            'created_at' => $comment->getCreatedAt()->format('H:i:s d.m.Y'),
-            'label'      => $comment->getRelatedContentLabel(),
-        ]);
+        $this->notification->sendDirect($target, CommentAuthorApproveMessage::createFrom($comment, $this->urlHelper));
     }
 
     /**
@@ -189,11 +183,7 @@ class ContentCommentWorkflow
 
         $target = $parentAuthor ?: $this->notification->emailTarget($parentEmail, $parent->getAuthorName());
 
-        $this->notification->directMessage(self::NOTIFICATION_PARENT_REPLY, $target, [
-            'url'        => $reply->getPublicReadUrl($this->urlHelper),
-            'created_at' => $reply->getCreatedAt()->format('H:i:s d.m.Y'),
-            'label'      => $reply->getRelatedContentLabel(),
-        ]);
+        $this->notification->sendDirect($target, CommentAuthorReplyMessage::createFrom($reply, $this->urlHelper));
     }
 
     /**

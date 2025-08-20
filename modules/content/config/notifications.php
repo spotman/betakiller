@@ -1,14 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
+use BetaKiller\Config\NotificationConfig;
 use BetaKiller\Helper\ContentHelper;
 use BetaKiller\Model\RoleInterface;
+use BetaKiller\Notification\Message\CommentAuthorApproveMessage;
+use BetaKiller\Notification\Message\CommentAuthorReplyMessage;
+use BetaKiller\Notification\Message\ModeratorPostCompleteMessage;
 use BetaKiller\Notification\Transport\EmailTransport;
-use BetaKiller\Workflow\ContentCommentWorkflow;
-use BetaKiller\Workflow\ContentPostWorkflow;
 
-define('POST_MODERATION', 'post-moderation');
-define('COMMENT_USER_EVENT', 'comment-user-event');
+const GROUP_POST_MODERATION    = 'post-moderation';
+const GROUP_COMMENT_USER_EVENT = 'comment-user-event';
 
 return [
     /**
@@ -21,13 +24,13 @@ return [
      * ]
      */
     'groups'   => [
-        POST_MODERATION => [
-            'roles'     => [
+        GROUP_POST_MODERATION => [
+            'roles' => [
                 ContentHelper::ROLE_CONTENT_MODERATOR,
             ],
         ],
 
-        COMMENT_USER_EVENT => [
+        GROUP_COMMENT_USER_EVENT => [
             'roles' => [
                 // Direct messaging to any user
                 RoleInterface::GUEST,
@@ -46,20 +49,22 @@ return [
      * ]
      */
     'messages' => [
-        ContentPostWorkflow::NOTIFICATION_POST_COMPLETE => [
-            'group'     => POST_MODERATION,
-            'transport' => EmailTransport::getName(),
-            'broadcast' => true,
+        ModeratorPostCompleteMessage::getCodename() => [
+            NotificationConfig::FQCN      => ModeratorPostCompleteMessage::class,
+            NotificationConfig::GROUP     => GROUP_POST_MODERATION,
+            NotificationConfig::TRANSPORT => EmailTransport::getName(),
         ],
 
-        ContentCommentWorkflow::NOTIFICATION_AUTHOR_APPROVE => [
-            'group'     => COMMENT_USER_EVENT,
-            'transport' => EmailTransport::getName(),
+        CommentAuthorApproveMessage::getCodename() => [
+            NotificationConfig::FQCN      => CommentAuthorApproveMessage::class,
+            NotificationConfig::GROUP     => GROUP_COMMENT_USER_EVENT,
+            NotificationConfig::TRANSPORT => EmailTransport::getName(),
         ],
 
-        ContentCommentWorkflow::NOTIFICATION_PARENT_REPLY => [
-            'group'     => COMMENT_USER_EVENT,
-            'transport' => EmailTransport::getName(),
+        CommentAuthorReplyMessage::getCodename() => [
+            NotificationConfig::FQCN      => CommentAuthorReplyMessage::class,
+            NotificationConfig::GROUP     => GROUP_COMMENT_USER_EVENT,
+            NotificationConfig::TRANSPORT => EmailTransport::getName(),
         ],
     ],
 ];

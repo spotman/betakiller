@@ -155,7 +155,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         }
 
         // Getting unique hash for current message
-        $hash = $this->makeHashFor($message);
+        $hash = PhpException::makeHashFor($message);
 
         // Searching for existing exception
         $model = $this->repository->findByHash($hash);
@@ -169,11 +169,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             // Mark exception as repeated
             $model->markAsRepeated($user);
         } else {
-            $model = new PhpException();
-            $model
-                ->setHash($hash)
-                ->setMessage($message)
-                ->markAsNew($user);
+            $model = PhpException::createFrom($user, $message, $hash);
         }
 
         // Increase occurrence counter
@@ -208,11 +204,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
         // Saving
         $this->repository->save($model);
-    }
-
-    protected function makeHashFor($message)
-    {
-        return sha1($message);
     }
 
     /**

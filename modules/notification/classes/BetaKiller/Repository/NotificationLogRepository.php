@@ -54,6 +54,18 @@ class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository i
             ->findAllResults($orm, $page, $itemsPerPage);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getLast(): NotificationLogInterface
+    {
+        $orm = $this->getOrmInstance();
+
+        return $this
+            ->orderByProcessedAtDesc($orm)
+            ->getOne($orm);
+    }
+
     private function orderByProcessedAtDesc(ExtendedOrmInterface $orm): self
     {
         $orm->order_by($orm->object_column(NotificationLog::COL_PROCESSED_AT), 'desc');

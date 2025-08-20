@@ -3,7 +3,8 @@ namespace BetaKiller\Notification\Transport;
 
 use BetaKiller\Exception\LogicException;
 use BetaKiller\Exception\NotImplementedHttpException;
-use BetaKiller\Notification\MessageInterface;
+use BetaKiller\Notification\EnvelopeInterface;
+use BetaKiller\Notification\Message\MessageInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\OnlineMessageTargetInterface;
 
@@ -38,20 +39,20 @@ final readonly class OnlineTransport extends AbstractTransport
     /**
      * Returns true if current transport can handle provided message
      *
-     * @param \BetaKiller\Notification\MessageInterface $message
+     * @param \BetaKiller\Notification\EnvelopeInterface $envelope
      *
      * @return bool
      */
-    public function canHandle(MessageInterface $message): bool
+    public function canHandle(EnvelopeInterface $envelope): bool
     {
         // Temporary disabled
         return false;
     }
 
     /**
-     * @param \BetaKiller\Notification\MessageInterface       $message
-     * @param \BetaKiller\Notification\MessageTargetInterface $target
-     * @param string                                          $body
+     * @param \BetaKiller\Notification\Message\MessageInterface $message
+     * @param \BetaKiller\Notification\MessageTargetInterface   $target
+     * @param string                                            $body
      *
      * @return bool Number of messages sent
      * @throws \BetaKiller\Exception\NotImplementedHttpException

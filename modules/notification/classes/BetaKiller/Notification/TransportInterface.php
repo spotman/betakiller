@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Notification;
 
+use BetaKiller\Notification\Message\MessageInterface;
+
 interface TransportInterface
 {
     /**
@@ -18,16 +20,16 @@ interface TransportInterface
     /**
      * Returns true if current transport can handle provided message
      *
-     * @param \BetaKiller\Notification\MessageInterface $message
+     * @param \BetaKiller\Notification\EnvelopeInterface $envelope
      *
      * @return bool
      */
-    public function canHandle(MessageInterface $message): bool;
+    public function canHandle(EnvelopeInterface $envelope): bool;
 
     /**
-     * @param \BetaKiller\Notification\MessageInterface       $message
-     * @param \BetaKiller\Notification\MessageTargetInterface $target
-     * @param string                                          $body
+     * @param \BetaKiller\Notification\Message\MessageInterface $message
+     * @param \BetaKiller\Notification\MessageTargetInterface   $target
+     * @param string                                            $body
      *
      * @return bool Number of messages sent
      */

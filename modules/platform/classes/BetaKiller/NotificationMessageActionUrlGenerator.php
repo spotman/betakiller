@@ -1,13 +1,18 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller;
 
 use BetaKiller\Config\NotificationConfigInterface;
 use BetaKiller\Factory\UrlHelperFactory;
+use BetaKiller\Notification\Message\MessageInterface;
 use BetaKiller\Notification\MessageActionUrlGeneratorInterface;
-use BetaKiller\Notification\MessageInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
+use BetaKiller\Helper\UrlHelperInterface;
+
+use function http_build_query;
+use function mb_strpos;
 
 /**
  * Class NotificationMessageActionUrlGenerator
@@ -15,17 +20,9 @@ use BetaKiller\Url\Parameter\UrlParameterInterface;
  *
  * @package BetaKiller\Notification
  */
-final class NotificationMessageActionUrlGenerator implements MessageActionUrlGeneratorInterface
+final readonly class NotificationMessageActionUrlGenerator implements MessageActionUrlGeneratorInterface
 {
-    /**
-     * @var \BetaKiller\Config\NotificationConfigInterface
-     */
-    private $config;
-
-    /**
-     * @var \BetaKiller\Helper\UrlHelperInterface
-     */
-    private $urlHelper;
+    private UrlHelperInterface $urlHelper;
 
     /**
      * NotificationMessageActionUrlGenerator constructor.
@@ -33,15 +30,16 @@ final class NotificationMessageActionUrlGenerator implements MessageActionUrlGen
      * @param \BetaKiller\Factory\UrlHelperFactory           $urlHelperFactory
      * @param \BetaKiller\Config\NotificationConfigInterface $config
      */
-    public function __construct(UrlHelperFactory $urlHelperFactory, NotificationConfigInterface $config)
+    public function __construct(UrlHelperFactory $urlHelperFactory, private NotificationConfigInterface $config)
     {
         $this->urlHelper = $urlHelperFactory->create();
-        $this->config    = $config;
     }
 
     public function make(MessageInterface $message): ?string
     {
-        $actionName = $this->config->getMessageAction($message->getCodename());
+        $messageCodename = $message::getCodename();
+
+        $actionName = $this->config->getMessageAction($messageCodename);
 
         if (!$actionName) {
             return null;
@@ -63,11 +61,12 @@ final class NotificationMessageActionUrlGenerator implements MessageActionUrlGen
 
         $url = $this->urlHelper->makeCodenameUrl($actionName, $params);
 
-        $utm = $this->config->getUtmMarkers($message->getTransportName());
+        $transportName = $this->config->getMessageTransport($messageCodename);
+        $utmMarkers    = $this->config->getUtmMarkers($transportName);
 
-        if ($utm) {
-            $sep = \mb_strpos($url, '?') ? '&' : '?';
-            $url .= $sep.\http_build_query($utm);
+        if ($utmMarkers) {
+            $sep = mb_strpos($url, '?') ? '&' : '?';
+            $url .= $sep.http_build_query($utmMarkers);
         }
 
         return $url;

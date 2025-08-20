@@ -1,13 +1,12 @@
 <?php
+
 namespace BetaKiller\Workflow;
 
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
-use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Model\ContentPostInterface;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Url\Zone;
-use BetaKiller\Url\ZoneInterface;
+use BetaKiller\Notification\Message\ModeratorPostCompleteMessage;
 use URL;
 
 class ContentPostWorkflow
@@ -16,8 +15,6 @@ class ContentPostWorkflow
     public const PUBLISH  = 'publish';
     public const PAUSE    = 'pause';
     public const FIX      = 'fix';
-
-    public const NOTIFICATION_POST_COMPLETE = 'moderator/post/complete';
 
     /**
      * @var \BetaKiller\Helper\NotificationHelper
@@ -84,15 +81,11 @@ class ContentPostWorkflow
     /**
      * @param \BetaKiller\Model\ContentPostInterface $post
      *
-     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      */
     private function notifyModeratorAboutCompletePost(ContentPostInterface $post): void
     {
-        $this->notification->broadcastMessage(self::NOTIFICATION_POST_COMPLETE, [
-            'url'   => $this->urlHelper->getReadEntityUrl($post, Zone::admin()),
-            'label' => $post->getLabel(),
-        ]);
+        $this->notification->sendBroadcast(ModeratorPostCompleteMessage::createFrom($post, $this->urlHelper));
     }
 
     /**

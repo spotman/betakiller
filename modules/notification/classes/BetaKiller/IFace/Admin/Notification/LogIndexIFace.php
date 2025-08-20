@@ -11,6 +11,7 @@ use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Query\NotificationLogQuery;
 use BetaKiller\Repository\NotificationLogRepositoryInterface;
+use BetaKiller\Url\Parameter\NotificationMessageCodename;
 use BetaKiller\Url\Parameter\Page;
 use BetaKiller\Url\Zone;
 use Psr\Http\Message\ServerRequestInterface;
@@ -37,7 +38,10 @@ final readonly class LogIndexIFace extends AbstractAdminIFace
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
         $urlParams = ServerRequestHelper::getUrlContainer($request);
 
-        $filterMessageName   = $urlParams->getQueryPart(self::ARG_MESSAGE);
+        /** @var NotificationMessageCodename|null $codenameParam */
+        $codenameParam = $urlParams->getParameterByClassName(NotificationMessageCodename::class);
+
+        $filterMessageName   = $codenameParam?->getValue();
         $filterTargetId      = $urlParams->getQueryPart(self::ARG_TARGET);
         $filterStatusName    = $urlParams->getQueryPart(self::ARG_STATUS);
         $filterTransportName = $urlParams->getQueryPart(self::ARG_TRANSPORT);

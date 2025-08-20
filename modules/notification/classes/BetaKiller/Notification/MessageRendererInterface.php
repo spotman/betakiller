@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Notification;
 
+use BetaKiller\Notification\Message\MessageInterface;
+
 interface MessageRendererInterface
 {
     public function makeBody(

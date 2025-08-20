@@ -8,6 +8,7 @@ use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Console\ConsoleTaskInterface;
 use BetaKiller\Helper\LoggerHelper;
+use BetaKiller\Notification\Envelope;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\ScheduleProcessor\ScheduleProcessorInterface;
@@ -109,7 +110,7 @@ final readonly class SendScheduled implements ConsoleTaskInterface
         string $messageCodename,
         MessageTargetInterface $target
     ): void {
-        $message = $this->notification->createMessage($messageCodename, $target, []);
+        $message = $this->notification->createMessage($messageCodename);
 
         // Message does not need to be sent
         if (!$processor->fillUpMessage($message, $target)) {
@@ -121,6 +122,6 @@ final readonly class SendScheduled implements ConsoleTaskInterface
             ':who'  => $target->getMessageIdentity(),
         ]);
 
-        $this->notification->enqueueScheduled($message);
+        $this->notification->enqueueScheduled(new Envelope($target, $message));
     }
 }

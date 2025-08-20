@@ -8,6 +8,7 @@ use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Console\ConsoleTaskInterface;
 use BetaKiller\Helper\NotificationGatewayInterface;
+use BetaKiller\Notification\Message\DeveloperTestBroadcastMessage;
 use Psr\Log\LoggerInterface;
 
 final readonly class SendBroadcast implements ConsoleTaskInterface
@@ -43,7 +44,7 @@ final readonly class SendBroadcast implements ConsoleTaskInterface
 
     public function run(ConsoleInputInterface $params): void
     {
-        $this->notification->broadcastMessage(self::NOTIFICATION_TEST_BROADCAST, []);
+        $this->notification->sendBroadcast(DeveloperTestBroadcastMessage::create());
 
         $this->logger->info('Broadcast message sent');
     }

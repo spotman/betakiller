@@ -1,16 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\EventHandler;
 
 use BetaKiller\Event\AbstractUserWorkflowEvent;
 use BetaKiller\Helper\NotificationHelper;
+use BetaKiller\Notification\Message\UserVerificationMessage;
 use BetaKiller\Service\TokenService;
+use DateInterval;
 
 final class UserConfirmationEmailHandler
 {
-    public const EMAIL_VERIFICATION = 'email/user/verification';
-
     /**
      * @var \BetaKiller\Helper\NotificationHelper
      */
@@ -38,13 +39,8 @@ final class UserConfirmationEmailHandler
             return;
         }
 
-        $token = $this->tokenService->create($user, new \DateInterval('P14D'));
+        $token = $this->tokenService->create($user, new DateInterval('P14D'));
 
-        $emailData = [
-            // For action URL generation
-            '$token' => $token,
-        ];
-
-        $this->notification->directMessage(self::EMAIL_VERIFICATION, $user, $emailData);
+        $this->notification->sendDirect($user, UserVerificationMessage::createFrom($token));
     }
 }

@@ -3,6 +3,7 @@
 namespace BetaKiller\Notification;
 
 use BetaKiller\I18n\I18nFacade;
+use BetaKiller\Notification\Message\MessageInterface;
 use BetaKiller\View\ViewFactoryInterface;
 
 readonly class MessageRenderer implements MessageRendererInterface
@@ -20,9 +21,9 @@ readonly class MessageRenderer implements MessageRendererInterface
     /**
      * Render message for sending via provided transport
      *
-     * @param \BetaKiller\Notification\MessageInterface       $message
-     * @param \BetaKiller\Notification\MessageTargetInterface $target
-     * @param \BetaKiller\Notification\TransportInterface     $transport
+     * @param \BetaKiller\Notification\Message\MessageInterface $message
+     * @param \BetaKiller\Notification\MessageTargetInterface   $target
+     * @param \BetaKiller\Notification\TransportInterface       $transport
      *
      * @return string
      * @throws \BetaKiller\Notification\NotificationException
@@ -39,7 +40,7 @@ readonly class MessageRenderer implements MessageRendererInterface
         $data = $this->getFullDataForTarget($message, $target);
 
         // Message hash (to distinguish messages)
-        $data['__hash__'] = $message->getHash();
+        $data['__hash__'] = $message::calculateHashFor($target);
         $data['__lang__'] = $target->getLanguageIsoCode();
 
         // Get additional transport data
@@ -124,39 +125,39 @@ readonly class MessageRenderer implements MessageRendererInterface
         // User language in templates
         $langName = $target->getLanguageIsoCode();
 
-        $localizedFile = $this->makeTemplateFileName($message->getCodename(), $langName);
+        $localizedFile = $this->makeTemplateFileName($message::getCodename(), $langName);
 
         if ($this->viewFactory->exists($localizedFile)) {
             return $localizedFile;
         }
 
-        $commonFile = $this->makeTemplateFileName($message->getCodename());
+        $commonFile = $this->makeTemplateFileName($message::getCodename());
 
         if ($this->viewFactory->exists($commonFile)) {
             return $commonFile;
         }
 
         throw new NotificationException('Missing ":name" message template for ":transport" in lang ":lang"', [
-            ':name'      => $message->getCodename(),
+            ':name'      => $message::getCodename(),
             ':transport' => $transport::getName(),
             ':lang'      => $langName,
         ]);
     }
 
     /**
-     * @param \BetaKiller\Notification\MessageInterface $message
+     * @param \BetaKiller\Notification\Message\MessageInterface $message
      *
      * @return string
      */
     private function getBaseI18nKey(MessageInterface $message): string
     {
         // Make i18n key by replacing "slash" with "dot"
-        return 'notification.'.str_replace('/', '.', $message->getCodename());
+        return 'notification.'.str_replace('/', '.', $message::getCodename());
     }
 
     /**
-     * @param \BetaKiller\Notification\MessageInterface       $message
-     * @param \BetaKiller\Notification\MessageTargetInterface $targetUser
+     * @param \BetaKiller\Notification\Message\MessageInterface $message
+     * @param \BetaKiller\Notification\MessageTargetInterface   $targetUser
      *
      * @return array
      */

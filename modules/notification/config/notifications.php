@@ -5,9 +5,9 @@ declare(strict_types=1);
 use BetaKiller\Config\NotificationConfig;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\RoleInterface;
+use BetaKiller\Notification\Message\DeveloperTestBroadcastMessage;
+use BetaKiller\Notification\Message\DeveloperTestDirectMessage;
 use BetaKiller\Notification\Transport\EmailTransport;
-use BetaKiller\Task\Test\Notification\SendBroadcast;
-use BetaKiller\Task\Test\Notification\SendDirect;
 
 return [
     NotificationConfig::ROOT_TRANSPORTS => [
@@ -43,16 +43,16 @@ return [
      * ]
      */
     NotificationConfig::ROOT_MESSAGES   => [
-        SendDirect::NOTIFICATION_TEST_DIRECT => [
+        DeveloperTestDirectMessage::getCodename() => [
+            NotificationConfig::FQCN      => DeveloperTestDirectMessage::class,
             NotificationConfig::GROUP     => NotificationHelper::TEST_NOTIFICATIONS_GROUP,
             NotificationConfig::TRANSPORT => EmailTransport::getName(),
-            NotificationConfig::CRITICAL  => true,
         ],
 
-        SendBroadcast::NOTIFICATION_TEST_BROADCAST => [
+        DeveloperTestBroadcastMessage::getCodename() => [
+            NotificationConfig::FQCN      => DeveloperTestBroadcastMessage::class,
             NotificationConfig::GROUP     => NotificationHelper::TEST_NOTIFICATIONS_GROUP,
             NotificationConfig::TRANSPORT => EmailTransport::getName(),
-            NotificationConfig::BROADCAST => true,
         ],
     ],
 ];

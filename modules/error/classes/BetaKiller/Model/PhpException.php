@@ -16,6 +16,21 @@ class PhpException extends ORM implements PhpExceptionModelInterface
 
     private static $tablesChecked = false;
 
+    public static function makeHashFor($message)
+    {
+        return sha1($message);
+    }
+
+    public static function createFrom(UserInterface $user, string $message, string $hash): PhpExceptionModelInterface
+    {
+        $model = new self();
+
+        return $model
+            ->setHash($hash)
+            ->setMessage($message)
+            ->markAsNew($user);
+    }
+
     /**
      * Prepares the model database connection, determines the table name,
      * and loads column information.

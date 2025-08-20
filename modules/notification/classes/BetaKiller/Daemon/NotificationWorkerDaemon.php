@@ -157,11 +157,11 @@ final class NotificationWorkerDaemon extends AbstractDaemon
         try {
             $this->logger->debug($queueMessage->getBody());
 
-            // Unserialize message
-            $message = $this->serializer->unserialize($queueMessage->getBody());
+            // Unserialize envelope
+            $envelope = $this->serializer->unserialize($queueMessage->getBody());
 
             // Send through transports
-            return $this->notification->send($message);
+            return $this->notification->send($envelope);
         } catch (\Throwable $e) {
             LoggerHelper::logRawException($this->logger, $e);
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-use BetaKiller\Notification\MessageInterface;
+use BetaKiller\Notification\Message\MessageInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\TransportInterface;
 use Database;
@@ -85,14 +85,12 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         DB::query(Database::SELECT, 'PRAGMA auto_vacuum = FULL')->execute($this->_db_group);
     }
 
-    public static function createFrom(MessageInterface $message, TransportInterface $transport): NotificationLogInterface
+    public static function createFrom(MessageInterface $message, MessageTargetInterface $target, TransportInterface $transport): NotificationLogInterface
     {
-        $target = $message->getTarget();
-
         $entity = (new self())
-            ->setHash($message->getHash())
+            ->setHash($message::calculateHashFor($target))
             ->setProcessedAt(new DateTimeImmutable())
-            ->setMessageName($message->getCodename())
+            ->setMessageName($message::getCodename())
             ->setTarget($target)
             ->setTransport($transport)
             ->setLanguageIsoCode($target->getLanguageIsoCode())

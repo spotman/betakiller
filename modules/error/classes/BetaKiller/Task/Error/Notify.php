@@ -9,17 +9,14 @@ use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\PhpExceptionModelInterface;
+use BetaKiller\Notification\Message\DeveloperErrorPhpExceptionMessage;
 use BetaKiller\Repository\PhpExceptionRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
-use BetaKiller\Url\Zone;
-use BetaKiller\Url\ZoneInterface;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
 
 class Notify extends AbstractTask
 {
-    public const NOTIFICATION_PHP_EXCEPTION = 'developer/error/php-exception';
-
     /**
      * @var \BetaKiller\Repository\PhpExceptionRepositoryInterface
      */
@@ -92,7 +89,6 @@ class Notify extends AbstractTask
     /**
      * @param \BetaKiller\Model\PhpExceptionModelInterface $model
      *
-     * @throws \BetaKiller\Url\UrlElementException
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
@@ -102,15 +98,10 @@ class Notify extends AbstractTask
         $target = $this->notification->debugEmailTarget('Bug Hunters');
 
         // Notify developers
-        $this->notification->directMessage(self::NOTIFICATION_PHP_EXCEPTION, $target, [
-            'message'  => $model->getMessage(),
-            'urls'     => $model->getUrls(),
-            'paths'    => $model->getPaths(),
-            'adminUrl' => $this->urlHelper->getReadEntityUrl($model, Zone::admin()),
-        ]);
+        $this->notification->sendDirect($target, DeveloperErrorPhpExceptionMessage::createFrom($model, $this->urlHelper));
 
         // Saving last notification timestamp
-        $model->wasNotified(new DateTimeImmutable);
+        $model->wasNotified(new DateTimeImmutable());
 
         $this->repository->save($model);
     }

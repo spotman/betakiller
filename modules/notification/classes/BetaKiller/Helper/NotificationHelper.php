@@ -9,11 +9,15 @@ use BetaKiller\Model\Phone;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\EmailMessageTarget;
 use BetaKiller\Notification\EmailMessageTargetInterface;
+use BetaKiller\Notification\Envelope;
+use BetaKiller\Notification\Message\BroadcastMessageInterface;
+use BetaKiller\Notification\Message\DirectMessageInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\NotificationException;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\PhoneMessageTarget;
 use BetaKiller\Notification\PhoneMessageTargetInterface;
+use BetaKiller\Repository\UserRepositoryInterface;
 
 final readonly class NotificationHelper implements NotificationGatewayInterface
 {
@@ -22,32 +26,31 @@ final readonly class NotificationHelper implements NotificationGatewayInterface
     /**
      * NotificationHelper constructor.
      *
-     * @param \BetaKiller\Notification\NotificationFacade $notification
-     * @param \BetaKiller\I18n\I18nFacade                 $i18n
+     * @param \BetaKiller\Notification\NotificationFacade    $notification
+     * @param \BetaKiller\I18n\I18nFacade                    $i18n
+     * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
      */
     public function __construct(
         private NotificationFacade $notification,
-        private I18nFacade $i18n
+        private I18nFacade $i18n,
+        private UserRepositoryInterface $userRepo
     ) {
-    }
-
-    private function getMessageGroup(string $messageCodename): NotificationGroupInterface
-    {
-        return $this->notification->getGroupByMessageCodename($messageCodename);
     }
 
     /**
      * @inheritDoc
      */
-    public function broadcastMessage(string $name, array $templateData = null, array $attachments = null): void
+    public function sendDirect(MessageTargetInterface $target, DirectMessageInterface $message): void
     {
-        if (!$this->notification->isBroadcastMessage($name)) {
-            throw new NotificationException('Direct message ":name" must not be send via broadcast', [
-                ':name' => $name,
-            ]);
-        }
+        $this->notification->enqueueImmediate(new Envelope($target, $message));
+    }
 
-        $group = $this->getMessageGroup($name);
+    /**
+     * @inheritDoc
+     */
+    public function sendBroadcast(BroadcastMessageInterface $message): void
+    {
+        $group = $this->getMessageGroup($message::getCodename());
 
         $targets = $this->notification->getGroupTargets($group);
 
@@ -58,31 +61,13 @@ final readonly class NotificationHelper implements NotificationGatewayInterface
         }
 
         foreach ($targets as $target) {
-            $message = $this->notification->createMessage($name, $target, $templateData, $attachments);
-
-            $this->notification->enqueueImmediate($message);
+            $this->notification->enqueueImmediate(new Envelope($target, $message));
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function directMessage(
-        string $name,
-        MessageTargetInterface $target,
-        array $templateData = null,
-        array $attachments = null
-    ): void {
-        if ($this->notification->isBroadcastMessage($name)) {
-            throw new NotificationException('Broadcast message ":name" can not be send directly', [
-                ':name' => $name,
-            ]);
-        }
-
-        $message = $this->notification->createMessage($name, $target, $templateData, $attachments);
-
-        // Send only if target user allowed this message group
-        $this->notification->enqueueImmediate($message);
+    private function getMessageGroup(string $messageCodename): NotificationGroupInterface
+    {
+        return $this->notification->getGroupByMessageCodename($messageCodename);
     }
 
     /**
@@ -104,11 +89,17 @@ final readonly class NotificationHelper implements NotificationGatewayInterface
     /**
      * @inheritDoc
      */
-    public function emailTarget(string $email, string $name, ?string $lang = null): EmailMessageTargetInterface
+    public function emailTarget(string $email, string $name = null, ?string $lang = null): EmailMessageTargetInterface
     {
+        $user = $this->userRepo->findByEmail($email);
+
+        if ($user) {
+            return $user;
+        }
+
         $lang = $lang ?? $this->i18n->getPrimaryLanguage()->getIsoCode();
 
-        return new EmailMessageTarget($email, $name, $lang);
+        return new EmailMessageTarget($email, $name ?? $email, $lang);
     }
 
     /**
@@ -116,6 +107,12 @@ final readonly class NotificationHelper implements NotificationGatewayInterface
      */
     public function phoneTarget(Phone $phone, ?string $lang = null): PhoneMessageTargetInterface
     {
+        $user = $this->userRepo->findByPhone($phone);
+
+        if ($user) {
+            return $user;
+        }
+
         $lang = $lang ?? $this->i18n->getPrimaryLanguage()->getIsoCode();
 
         return new PhoneMessageTarget($phone->e164(), $lang);
