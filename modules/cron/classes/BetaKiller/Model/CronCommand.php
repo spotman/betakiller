@@ -79,7 +79,7 @@ final class CronCommand extends \ORM implements CronCommandInterface
      */
     public function setParams(array $value): CronCommandInterface
     {
-        $this->set(self::COL_PARAMS, $value);
+        $this->set(self::COL_PARAMS, $value ?: null);
 
         return $this;
     }
