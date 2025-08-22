@@ -1,78 +1,87 @@
 <?php
+
 namespace BetaKiller\Api\Method\ContentElement;
 
 use BetaKiller\Content\Shortcode\ContentElementShortcodeInterface;
 use BetaKiller\Content\Shortcode\ShortcodeFacade;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\EntityRepository;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\Method\AbstractApiMethod;
+use Spotman\Defence\ArgumentsInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 
-class ListApiMethod extends AbstractApiMethod
+final readonly class ListApiMethod extends AbstractApiMethod
 {
-    /**
-     * @var \BetaKiller\Content\Shortcode\ContentElementShortcodeInterface
-     */
-    private $shortcode;
-
-    /**
-     * @var \BetaKiller\Model\EntityModelInterface
-     */
-    private $entity;
-
-    /**
-     * @var int|null
-     */
-    private $entityItemId;
+    private const ARG_NAME           = 'name';
+    private const ARG_ENTITY_SLUG    = 'slug';
+    private const ARG_ENTITY_ITEM_ID = 'id';
 
     /**
      * ListApiMethod constructor.
      *
-     * @param string                                        $name
-     * @param null|string                                   $entitySlug
-     * @param int|null                                      $entityItemId
      * @param \BetaKiller\Content\Shortcode\ShortcodeFacade $facade
      *
      * @param \BetaKiller\Repository\EntityRepository       $entityRepository
-     *
-     * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \Spotman\Api\ApiMethodException
      */
     public function __construct(
-        string $name,
-        ?string $entitySlug,
-        ?int $entityItemId,
-        ShortcodeFacade $facade,
-        EntityRepository $entityRepository
+        private ShortcodeFacade $facade,
+        private EntityRepository $entityRepository
     ) {
-        $this->shortcode = $facade->createFromCodename($name);
+    }
 
-        if (!$this->shortcode instanceof ContentElementShortcodeInterface) {
+    public function defineArguments(DefinitionBuilderInterface $builder): void
+    {
+        $builder
+            ->string(self::ARG_NAME);
+
+        $builder
+            ->string(self::ARG_ENTITY_SLUG)
+            ->optional();
+
+        $builder
+            ->int(self::ARG_ENTITY_ITEM_ID)
+            ->optional();
+    }
+
+    /**
+     * @param \Spotman\Defence\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface     $user
+     *
+     * @return \Spotman\Api\ApiMethodResponse|null
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \Spotman\Api\ApiMethodException
+     */
+    public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
+    {
+        $name = $arguments->getString(self::ARG_NAME);
+
+        $shortcode = $this->facade->createFromCodename($name);
+
+        if (!$shortcode instanceof ContentElementShortcodeInterface) {
             throw new ApiMethodException('Content element [:name] must implement :must', [
                 ':name' => $name,
                 ':must' => ContentElementShortcodeInterface::class,
             ]);
         }
 
-        if ($entitySlug) {
-            $this->entity = $entityRepository->findBySlug($entitySlug);
-        }
+        $entitySlug = $arguments->has(self::ARG_ENTITY_SLUG)
+            ? $arguments->getString(self::ARG_ENTITY_SLUG)
+            : null;
 
-        $this->entityItemId = $entityItemId;
-    }
+        $entityItemId = $arguments->has(self::ARG_ENTITY_ITEM_ID)
+            ? $arguments->getInt(self::ARG_ENTITY_ITEM_ID)
+            : null;
 
-    /**
-     * @param \BetaKiller\Api\Method\ContentElement\ArgumentsInterface $arguments
-     * @param \BetaKiller\Api\Method\ContentElement\UserInterface      $user
-     *
-     * @return \Spotman\Api\ApiMethodResponse|null
-     */
-    public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
-    {
+        $entity = $entitySlug
+            ? $this->entityRepository->findBySlug($entitySlug)
+            : null;
+
         // Return data
         return $this->response(
-            $this->shortcode->getEditorListingItems($this->entity, $this->entityItemId)
+            $shortcode->getEditorListingItems($entity, $entityItemId)
         );
     }
 }
