@@ -185,24 +185,24 @@ class ResponseHelper
         return $response->withHeader('Age', (string)$seconds);
     }
 
-    public static function successJson($message = null): ResponseInterface
+    public static function successJson($message = null, int $httpStatus = null): ResponseInterface
     {
-        return self::prepareJson(self::JSON_SUCCESS, $message);
+        return self::prepareJson(self::JSON_SUCCESS, $message, $httpStatus);
     }
 
-    public static function errorJson($message = null): ResponseInterface
+    public static function errorJson($message = null, int $httpStatus = null): ResponseInterface
     {
-        return self::prepareJson(self::JSON_ERROR, $message);
+        return self::prepareJson(self::JSON_ERROR, $message, $httpStatus);
     }
 
-    public static function customJson(string $result, $message = null): ResponseInterface
+    public static function customJson(string $result, $message = null, int $httpStatus = null): ResponseInterface
     {
-        return self::prepareJson($result, $message);
+        return self::prepareJson($result, $message, $httpStatus);
     }
 
-    public static function json(array $data, int $status = null): ResponseInterface
+    public static function json(array $data, int $httpStatus = null): ResponseInterface
     {
-        return new JsonResponse($data, $status ?? 200);
+        return new JsonResponse($data, $httpStatus ?? 200);
     }
 
     private static function prepareJson(string $result, $message = null, int $status = null): ResponseInterface
