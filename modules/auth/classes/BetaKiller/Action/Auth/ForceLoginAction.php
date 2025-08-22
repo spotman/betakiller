@@ -93,6 +93,8 @@ final readonly class ForceLoginAction extends AbstractAction
         // Notify other subsystems
         $this->eventBus->emit(new WebLoginEvent($user, ServerRequestHelper::getUrlContainer($request)));
 
-        return ResponseHelper::redirect($this->urlDetector->detect($user));
+        return ServerRequestHelper::isJsonPreferred($request)
+            ? ResponseHelper::successJson()
+            : ResponseHelper::redirect($this->urlDetector->detect($user));
     }
 }
