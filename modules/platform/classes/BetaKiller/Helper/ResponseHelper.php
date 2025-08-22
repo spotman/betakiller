@@ -211,7 +211,7 @@ class ResponseHelper
             'response' => $result,
         ];
 
-        if ($message) {
+        if ($message !== null) {
             $response['message'] = $message;
         }
 
