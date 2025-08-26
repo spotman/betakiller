@@ -15,7 +15,7 @@ use BetaKiller\Repository\PhpExceptionRepositoryInterface;
 use BetaKiller\Url\Zone;
 use DateTimeImmutable;
 
-final class DeveloperErrorPhpExceptionMessage extends AbstractDirectMessage
+final class DeveloperErrorPhpExceptionMessage extends AbstractBroadcastMessage
 {
     use CriticalMessageTrait;
 

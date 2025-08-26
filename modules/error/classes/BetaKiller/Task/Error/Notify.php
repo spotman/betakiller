@@ -6,55 +6,38 @@ namespace BetaKiller\Task\Error;
 
 use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\Console\ConsoleTaskInterface;
 use BetaKiller\Factory\UrlHelperFactory;
-use BetaKiller\Helper\NotificationHelper;
+use BetaKiller\Helper\NotificationGatewayInterface;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Notification\Message\DeveloperErrorPhpExceptionMessage;
 use BetaKiller\Repository\PhpExceptionRepositoryInterface;
-use BetaKiller\Task\AbstractTask;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
 
-class Notify extends AbstractTask
+final readonly class Notify implements ConsoleTaskInterface
 {
-    /**
-     * @var \BetaKiller\Repository\PhpExceptionRepositoryInterface
-     */
-    private $repository;
-
-    /**
-     * @var \BetaKiller\Helper\NotificationHelper
-     */
-    private $notification;
-
     /**
      * @var \BetaKiller\Helper\UrlHelperInterface
      */
-    private $urlHelper;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
+    private UrlHelperInterface $urlHelper;
 
     /**
      * Notify constructor.
      *
      * @param \BetaKiller\Repository\PhpExceptionRepository $repository
-     * @param \BetaKiller\Helper\NotificationHelper         $notificationHelper
+     * @param \BetaKiller\Helper\NotificationHelper         $notification
      * @param \BetaKiller\Factory\UrlHelperFactory          $urlHelperFactory
      * @param \Psr\Log\LoggerInterface                      $logger
      */
     public function __construct(
-        PhpExceptionRepositoryInterface $repository,
-        NotificationHelper $notificationHelper,
-        UrlHelperFactory $urlHelperFactory,
-        LoggerInterface $logger
+        private PhpExceptionRepositoryInterface $repository,
+        private NotificationGatewayInterface $notification,
+        private LoggerInterface $logger,
+        UrlHelperFactory $urlHelperFactory
     ) {
-        $this->urlHelper    = $urlHelperFactory->create();
-        $this->repository   = $repository;
-        $this->notification = $notificationHelper;
-        $this->logger       = $logger;
+        $this->urlHelper = $urlHelperFactory->create();
     }
 
     public function defineOptions(ConsoleOptionBuilderInterface $builder): array
@@ -95,10 +78,8 @@ class Notify extends AbstractTask
      */
     private function notifyAboutException(PhpExceptionModelInterface $model): void
     {
-        $target = $this->notification->debugEmailTarget('Bug Hunters');
-
         // Notify developers
-        $this->notification->sendDirect($target, DeveloperErrorPhpExceptionMessage::createFrom($model, $this->urlHelper));
+        $this->notification->sendBroadcast(DeveloperErrorPhpExceptionMessage::createFrom($model, $this->urlHelper));
 
         // Saving last notification timestamp
         $model->wasNotified(new DateTimeImmutable());
