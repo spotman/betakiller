@@ -25,6 +25,14 @@ trait GuestUserTrait
     /**
      * @inheritDoc
      */
+    public function isBanned(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getWorkflowState(): WorkflowStateInterface
     {
         throw new NotImplementedHttpException();
