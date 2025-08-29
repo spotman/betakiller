@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0b72dec6d1f6db84ef293037134cc855",
+    "content-hash": "d9a2217af6220854c95b4244ebcd21e8",
     "packages": [
         {
             "name": "aidantwoods/secureheaders",
@@ -2191,29 +2191,28 @@
         },
         {
             "name": "geocoder-php/geonames-provider",
-            "version": "4.4.0",
+            "version": "4.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/geocoder-php/geonames-provider.git",
-                "reference": "5247f7f807ed78724e4ab6e781c4b4a22e09a8b9"
+                "reference": "ff93c69faaf0e95ada3a9ae36491fe6b6f8b4065"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/geocoder-php/geonames-provider/zipball/5247f7f807ed78724e4ab6e781c4b4a22e09a8b9",
-                "reference": "5247f7f807ed78724e4ab6e781c4b4a22e09a8b9",
+                "url": "https://api.github.com/repos/geocoder-php/geonames-provider/zipball/ff93c69faaf0e95ada3a9ae36491fe6b6f8b4065",
+                "reference": "ff93c69faaf0e95ada3a9ae36491fe6b6f8b4065",
                 "shasum": ""
             },
             "require": {
                 "geocoder-php/common-http": "^4.0",
-                "php": "^7.4 || ^8.0",
-                "willdurand/geocoder": "^4.0"
+                "php": "^8.0",
+                "willdurand/geocoder": "^4.0|^5.0"
             },
             "provide": {
                 "geocoder-php/provider-implementation": "1.0"
             },
             "require-dev": {
-                "geocoder-php/provider-integration-tests": "^1.0",
-                "php-http/curl-client": "^2.2",
+                "geocoder-php/provider-integration-tests": "^1.6.3",
                 "php-http/message": "^1.0",
                 "phpunit/phpunit": "^9.5"
             },
@@ -2244,9 +2243,9 @@
             "description": "Geocoder Geonames adapter",
             "homepage": "http://geocoder-php.org/Geocoder/",
             "support": {
-                "source": "https://github.com/geocoder-php/geonames-provider/tree/4.4.0"
+                "source": "https://github.com/geocoder-php/geonames-provider/tree/4.5.0"
             },
-            "time": "2022-07-30T12:09:30+00:00"
+            "time": "2025-04-15T13:24:32+00:00"
         },
         {
             "name": "geocoder-php/google-maps-provider",

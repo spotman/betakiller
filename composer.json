@@ -18,7 +18,7 @@
     "enqueue/enqueue": "^0.10.18",
     "enqueue/redis": "^0.10.18",
     "geocoder-php/chain-provider": "^4.0",
-    "geocoder-php/geonames-provider": "^4.4",
+    "geocoder-php/geonames-provider": "^4.5",
     "geocoder-php/google-maps-provider": "^4.6",
     "geocoder-php/yandex-provider": "^4.5",
     "giggsey/libphonenumber-for-php": "^9.0",
