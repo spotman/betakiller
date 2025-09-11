@@ -1,33 +1,17 @@
 {% extends layout %}
 
 {% macro group_list(groups_data) %}
-  {% for group in groups_data %}
-
-    {% if group.messages|length > 0 %}
       <table>
-        <thead>
-        <tr>
-          <td colspan="2">
-            <h3><a href="{{ group.url }}">{{ group.name|upper }}</a></h3>
-          </td>
-        </tr>
-        </thead>
         <tbody>
 
-        {% for message in group.messages %}
-          <tr>
+        {% for group in groups_data %}
+          <tr class="{{ group.is_enabled ? "" : "grey lighten-3" }}">
             <td>
-              {{ message.name }}<br/>
-              {% for lang, is_exists in message.templates %}
-                <span class="badge white-text {{ is_exists ? "green" : "red" }}">{{ lang }}</span>
+              <a href="{{ group.url }}">{{ group.name|upper }}</a><br/>
+
+              {% for role in group.roles %}
+                <span class="badge grey white-text">{{ role }}</span>
               {% endfor %}
-            </td>
-            <td>
-              <a href="{{ message.logs_url }}" class="btn blue right">Logs</a>
-              {% if message.test_url %}
-                <span class="right">&nbsp;</span>
-                <a href="{{ message.test_url }}" class="btn secondary right">Test</a>
-              {% endif %}
             </td>
           </tr>
         {% endfor %}
@@ -35,26 +19,17 @@
         </tbody>
       </table>
 
-      <br/>
-      <br/>
-    {% endif %}
-
-  {% endfor %}
 {% endmacro %}
 
 {% import _self as this %}
 
 {% block content %}
 
-  {% if enabled_groups|length %}
-    <h1>Enabled groups</h1>
-
+  {% if enabled_groups|length > 0 %}
     {{ this.group_list(enabled_groups) }}
   {% endif %}
 
-  {% if disabled_groups|length %}
-    <h1>Disabled groups</h1>
-
+  {% if disabled_groups|length > 0 %}
     {{ this.group_list(disabled_groups) }}
   {% endif %}
 

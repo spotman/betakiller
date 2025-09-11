@@ -26,7 +26,7 @@ return [
     NotificationConfig::ROOT_GROUPS     => [
         NotificationHelper::TEST_NOTIFICATIONS_GROUP => [
             NotificationConfig::ROLES => [
-                RoleInterface::DEVELOPER,
+                RoleInterface::LOGIN,
             ],
         ],
     ],

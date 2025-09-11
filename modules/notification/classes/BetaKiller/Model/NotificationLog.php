@@ -286,6 +286,14 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         return $this->getStatus() === self::STATUS_FAILED;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function isRejected(): bool
+    {
+        return $this->getStatus() === self::STATUS_REJECTED;
+    }
+
     private function setStatus(string $value): NotificationLogInterface
     {
         $this->set(self::COL_STATUS, $value);

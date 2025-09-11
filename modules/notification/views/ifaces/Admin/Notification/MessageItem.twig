@@ -1,0 +1,33 @@
+{% extends layout %}
+
+{% block content %}
+
+  {{ js("ifaces/admin/notifications/message-item.js") }}
+
+  {% if test_url %}
+    <div class="row">
+      <form id="test-notification" action="{{ test_url }}" method="post" class="col s12">
+        <input id="test-notification-user-id" name="user_id" type="hidden" value="{{ user_id }}"/>
+        <button type="submit" class="btn secondary right">Test</button>
+      </form>
+    </div>
+  {% endif %}
+
+  {# Logs list #}
+  {% if logs_items|length > 0 %}
+    {% import "@templates/notification-logs-macros" as logs_macros %}
+
+    {{ logs_macros.logs_list(logs_items) }}
+
+    {% if logs_url %}
+      <div>
+        <a href="{{ logs_url }}" class="btn blue center-align">More logs</a>
+      </div>
+    {% endif %}
+  {% else %}
+    <p class="center-align">
+      No logs yet.
+    </p>
+  {% endif %}
+
+{% endblock %}
