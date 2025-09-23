@@ -3,16 +3,17 @@ declare(strict_types=1);
 
 namespace Spotman\Defence\Rule;
 
+use InvalidArgumentException;
 use Spotman\Defence\ArgumentDefinitionInterface;
 
-class PositiveIntegerRule implements DefinitionRuleInterface
+class PositiveNumberRule implements DefinitionRuleInterface
 {
     /**
      * @return string
      */
     public function getName(): string
     {
-        return 'positiveInteger';
+        return 'positiveNumber';
     }
 
     /**
@@ -22,6 +23,7 @@ class PositiveIntegerRule implements DefinitionRuleInterface
     {
         return [
             ArgumentDefinitionInterface::TYPE_INTEGER,
+            ArgumentDefinitionInterface::TYPE_FLOAT,
         ];
     }
 
@@ -32,8 +34,8 @@ class PositiveIntegerRule implements DefinitionRuleInterface
      */
     public function check($value): bool
     {
-        if (!\is_int($value)) {
-            throw new \InvalidArgumentException;
+        if (!is_int($value) && !is_float($value)) {
+            throw new InvalidArgumentException;
         }
 
         return $value > 0;

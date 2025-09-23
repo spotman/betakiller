@@ -11,7 +11,7 @@ use Spotman\Defence\Rule\DefinitionRuleInterface;
 use Spotman\Defence\Rule\LengthBetweenRule;
 use Spotman\Defence\Rule\MaxLengthRule;
 use Spotman\Defence\Rule\MinLengthRule;
-use Spotman\Defence\Rule\PositiveIntegerRule;
+use Spotman\Defence\Rule\PositiveNumberRule;
 use Spotman\Defence\Rule\RegexRule;
 use Spotman\Defence\Rule\WhitelistRule;
 
@@ -444,7 +444,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
      */
     public function positive(): DefinitionBuilderInterface
     {
-        return $this->addRule(new PositiveIntegerRule);
+        return $this->addRule(new PositiveNumberRule);
     }
 
     /**

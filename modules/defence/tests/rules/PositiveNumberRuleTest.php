@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Spotman\Defence\Test;
 
 use Spotman\Defence\Rule\DefinitionRuleInterface;
-use Spotman\Defence\Rule\PositiveIntegerRule;
+use Spotman\Defence\Rule\PositiveNumberRule;
 
-class PositiveIntegerRuleTest extends AbstractRuleTest
+class PositiveNumberRuleTest extends AbstractRuleTest
 {
     /**
      * Array of valid values
@@ -19,6 +19,7 @@ class PositiveIntegerRuleTest extends AbstractRuleTest
             1,
             10,
             1000000,
+            1.0,
         ];
     }
 
@@ -33,6 +34,7 @@ class PositiveIntegerRuleTest extends AbstractRuleTest
             0,
             -1,
             -100,
+            -0.01,
         ];
     }
 
@@ -53,6 +55,6 @@ class PositiveIntegerRuleTest extends AbstractRuleTest
 
     protected function makeInstance(): DefinitionRuleInterface
     {
-        return new PositiveIntegerRule;
+        return new PositiveNumberRule;
     }
 }
