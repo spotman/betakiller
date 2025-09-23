@@ -530,8 +530,10 @@ final class Runner extends AbstractTask
                 LoggerHelper::logRawException($this->logger, $error);
 
                 // Stop checks
-                $this->loop->cancelTimer($this->pingDbTimer);
-                $this->pingDbTimer = null;
+                if ($this->pingDbTimer) {
+                    $this->loop->cancelTimer($this->pingDbTimer);
+                    $this->pingDbTimer = null;
+                }
 
                 // Request graceful restart (prevent Supervisor from disabling this daemon)
                 $this->requestShutdown();

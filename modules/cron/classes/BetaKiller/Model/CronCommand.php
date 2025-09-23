@@ -42,7 +42,7 @@ final class CronCommand extends \ORM implements CronCommandInterface
         \DB::query(\Database::SELECT, 'CREATE TABLE IF NOT EXISTS `cron_commands` (
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             name VARCHAR(32) NOT NULL,
-            params VARCHAR(255) NULL,
+            params VARCHAR(255) NULL DEFAULT NULL,
             cmd VARCHAR(255) UNIQUE NOT NULL
         );')->execute($this->_db_group);
     }

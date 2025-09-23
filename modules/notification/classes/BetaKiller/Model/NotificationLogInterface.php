@@ -129,6 +129,11 @@ interface NotificationLogInterface extends DispatchableEntityInterface, SearchRe
     /**
      * @return bool
      */
+    public function isRejected(): bool;
+
+    /**
+     * @return bool
+     */
     public function isRetryAvailable(): bool;
 
     /**

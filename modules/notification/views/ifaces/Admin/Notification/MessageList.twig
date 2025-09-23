@@ -1,0 +1,56 @@
+{% extends layout %}
+
+{% macro group_list(groups_data) %}
+  {% for group in groups_data %}
+
+    {% if group.messages|length > 0 %}
+      <table>
+        <thead>
+        <tr>
+          <td>
+            <h5><a href="{{ group.url }}">{{ group.name|upper }}</a></h5>
+          </td>
+          {#<td style="text-align: right">#}
+          {#</td>#}
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for message in group.messages %}
+          <tr class="{{ group.is_enabled ? "" : "grey lighten-3" }}">
+            <td>
+              <a href="{{ message.url }}">{{ message.name }}</a><br/>
+
+              {% for lang, is_exists in message.templates %}
+                <span class="badge white-text {{ is_exists ? "green" : "red" }}">{{ lang }}</span>
+              {% endfor %}
+            </td>
+            {#<td>#}
+            {#  <a href="{{ message.logs_url }}" class="btn blue right">Logs</a>#}
+            {#</td>#}
+          </tr>
+        {% endfor %}
+
+        </tbody>
+      </table>
+
+      <br/>
+      <br/>
+    {% endif %}
+
+  {% endfor %}
+{% endmacro %}
+
+{% import _self as this %}
+
+{% block content %}
+
+  {% if enabled_groups|length > 0 %}
+    {{ this.group_list(enabled_groups) }}
+  {% endif %}
+
+  {% if disabled_groups|length > 0 %}
+    {{ this.group_list(disabled_groups) }}
+  {% endif %}
+
+{% endblock %}

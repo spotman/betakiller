@@ -3,11 +3,12 @@
     <action uri="mark-notification-as-read" name="MarkNotificationAsRead"
             zone="public" query="h=NotificationLog.hash"/>
 
-    <iface uri="notifications" name="Admin\Notification\Index" parent="Admin\Index" zone="admin" label="Notification"
-           menu="admin" entity="NotificationGroup" entityAction="list">
+    <iface uri="notifications" name="Admin\Notification\MessageList" parent="Admin\Index" zone="admin"
+           menu="admin" label="Notifications"
+           entity="NotificationGroup" entityAction="list">
 
-        <iface uri="groups" name="Admin\Notification\GroupList" label="Groups" menu="admin" entity="NotificationGroup"
-               entityAction="list">
+        <iface uri="groups" name="Admin\Notification\GroupList" label="Groups" menu="admin"
+               entity="NotificationGroup" entityAction="list">
             <iface uri="{NotificationGroup.codename}" name="Admin\Notification\GroupItem"
                    label="{NotificationGroup.codename}" entity="NotificationGroup" entityAction="read"/>
         </iface>
@@ -22,7 +23,9 @@
             </iface>
         </iface>
 
-        <action uri="test" name="Admin\NotificationMessageTest" label="Test message delivery"
-                query="codename=NotificationMessageCodename"/>
+        <iface uri="{NotificationMessageCodename}" name="Admin\Notification\MessageItem"
+               label="{NotificationMessageCodename.getValue()}">
+            <action uri="test" name="Admin\NotificationMessageTest" label="Test message delivery"/>
+        </iface>
     </iface>
 </root>

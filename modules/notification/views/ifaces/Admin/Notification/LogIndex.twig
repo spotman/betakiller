@@ -48,75 +48,10 @@
     <div class="col s12">
 
       {% if items|length > 0 %}
-        <table>
 
-          <thead>
-          <tr>
-            <th>State</th>
-            <th>Processed at</th>
-            <th>Target</th>
-            <th>Name</th>
-            <th>Transport</th>
-            <th>&nbsp;</th>
-          </tr>
-          </thead>
+        {% import "@templates/notification-logs-macros" as logs_macros %}
 
-          <tbody>
-          {% for item in items %}
-            {% set item_classes = "" %}
-
-            {% if item.is_read %}
-              {% set item_classes = "light-green lighten-4" %}
-            {% elseif item.is_succeeded %}
-              {% set item_classes = "" %}
-            {% elseif item.is_pending %}
-              {% set item_classes = "light-gray" %}
-            {% elseif item.is_failed %}
-              {% set item_classes = "red white-text" %}
-            {% endif %}
-
-            <tr class="{{ item_classes }}">
-              <td>
-                <a href="{{ item.status_url }}">
-                  {% if item.is_pending %}
-                    <i class="material-icons">access_time</i>
-                  {% elseif item.is_succeeded %}
-                    <i class="material-icons">done</i>
-                  {% elseif item.is_failed %}
-                    <i class="material-icons">close</i>
-                  {% else %}
-                    <i class="material-icons">help</i>
-                  {% endif %}
-                </a>
-              </td>
-              <td>{{ item.processed_at|date("d.m.Y @ H:i:s") }}</td>
-              <td>
-                <a href="{{ item.user_url }}">
-                  {{ item.target }}
-                </a>
-              </td>
-              <td>
-                <a href="{{ item.message_url }}">
-                  {{ item.name }}
-                </a>
-              </td>
-              <td>
-                <a href="{{ item.transport_url }}">
-                  {{ item.transport }}
-                </a>
-              </td>
-              <td class="right-align">
-                {% if item.retry_url %}
-                  <a href="{{ item.retry_url }}" class="btn blue" target="_blank">Retry</a>
-                {% endif %}
-
-                <a href="{{ item.body_url }}" class="btn blue" target="_blank">Check body</a>
-              </td>
-            </tr>
-          {% endfor %}
-          </tbody>
-
-        </table>
+        {{ logs_macros.logs_list(items) }}
 
         <div>
           <br />

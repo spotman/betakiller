@@ -15,6 +15,6 @@ class HttpException extends Exception implements HttpExceptionInterface
      */
     public function __construct(int $code, string $message = null, array $variables = null, \Throwable $previous = null)
     {
-        parent::__construct($message ?? 'HTTP error', $variables, $code, $previous);
+        parent::__construct($message ?? '', $variables, $code, $previous);
     }
 }
