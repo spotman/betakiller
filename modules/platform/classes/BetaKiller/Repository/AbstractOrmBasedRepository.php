@@ -8,6 +8,7 @@ use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Search\SearchResultsInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmQueryBuilderInterface;
+use Database_Expression;
 use DB;
 use ORM\PaginateHelper;
 
@@ -184,6 +185,15 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         $orm->custom_select([
             [DB::expr('COUNT(*)'), 'total'],
         ], true, false);
+
+        return (int)$orm->execute_query()->get('total');
+    }
+
+    protected function countCustom(OrmInterface $orm, Database_Expression $expr, bool $joinWith = null, bool $selectWith = null): int
+    {
+        $orm->custom_select([
+            [$expr, 'total'],
+        ], $joinWith, $selectWith);
 
         return (int)$orm->execute_query()->get('total');
     }
