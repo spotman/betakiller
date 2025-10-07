@@ -275,6 +275,9 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         int                  $itemsPerPage
     ): SearchResultsInterface {
         try {
+            // Add ordering
+            $this->customOrderBy($orm);
+
             // Wrap in a pager
             $pager = PaginateHelper::create(
                 $orm,
