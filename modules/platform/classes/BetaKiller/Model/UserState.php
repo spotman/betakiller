@@ -18,6 +18,11 @@ final class UserState extends AbstractWorkflowStateOrmModel implements WorkflowS
     public const RESUMED   = 'resumed';       // Resumed from suspend, requires additional confirmation (potential fraud)
     public const REMOVED   = 'removed';       // Soft delete (keep ID and email but delete personal data)
 
+    public const ACTIVE_CODENAMES = [
+        self::CREATED,
+        self::RESUMED,
+    ];
+
     protected function configure(): void
     {
         $this->_table_name = self::TABLE_NAME;
