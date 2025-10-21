@@ -123,11 +123,13 @@ class PaginateHelper
         return (($this->currentPage - 1) >= 0);
     }
 
-    public function getSearchResults(): SearchResultsInterface
+    public function getSearchResults(bool $reverse = null): SearchResultsInterface
     {
+        $items = $this->getResults();
+
         // Wrap results in a DTO
         return new SearchResults(
-            $this->getResults(),
+            $reverse ? array_reverse($items) : $items,
             $this->getTotalItems(),
             $this->getTotalPages(),
             $this->hasNextPage(), $this->hasNextPage()

@@ -18,10 +18,12 @@ trait HasSearchQueryTrait
 
         $this->applySearchQuery($orm, $query);
 
-        return $this->findAllResults($orm, $page, $itemsPerPage);
+        return $this->findAllResults($orm, $page, $itemsPerPage, $this->hasReverseSearchResults());
     }
 
     abstract protected function applySearchQuery(ExtendedOrmInterface $orm, RepositoryQueryInterface $query): void;
 
     abstract protected function getDefaultItemsPerPage(): int;
+
+    abstract protected function hasReverseSearchResults(): bool;
 }
