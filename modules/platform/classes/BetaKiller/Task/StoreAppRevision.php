@@ -40,12 +40,6 @@ class StoreAppRevision extends AbstractTask
         $path     = $params->getString(self::ARG_PATH);
         $revision = $params->getString(self::ARG_REVISION);
 
-        if (!file_exists($path)) {
-            throw new TaskException('Missing .env file at ":path"', [
-                ':path' => $path,
-            ]);
-        }
-
         $this->writer->update($path, [
             AppEnvInterface::APP_REVISION => $revision,
         ]);
