@@ -60,7 +60,7 @@ class DotEnvWriter
 
         $newContent = implode('', $newLines);
 
-        if (!file_put_contents($envFile, $newContent)) {
+        if (!file_put_contents($envFile, $newContent, LOCK_EX)) {
             throw new Exception('.env file was not updated at ":path"', [
                 ':path' => $envFile,
             ]);
