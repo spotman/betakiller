@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Dev;
@@ -62,6 +63,7 @@ class DebugBarUserDataCollector extends DataCollector implements Renderable
             'username' => $user->hasUsername() ? $user->getUsername() : null,
             'email'    => $user->getEmail(),
             'roles'    => implode('", "', $this->getAssignedRoles($user)),
+            'ip'       => ServerRequestHelper::getIpAddress($this->request),
         ]);
     }
 
