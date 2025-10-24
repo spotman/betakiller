@@ -7,7 +7,7 @@ namespace BetaKiller\Monitoring;
 use BetaKiller\Exception\LogicException;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Metrics\MeterInterface;
-use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
 
 final class OpenTelemetryMetricsCollector implements MetricsCollectorInterface
 {
@@ -64,12 +64,8 @@ final class OpenTelemetryMetricsCollector implements MetricsCollectorInterface
      */
     public function flush(): void
     {
-        $this->getProvider()->forceFlush();
-    }
-
-    public function __destruct()
-    {
-        $this->getProvider()->shutdown();
+        // No op for now (test automatic periodic flush inside SDK)
+//        $this->getProvider()->forceFlush();
     }
 
     private function getMeter(): MeterInterface
@@ -81,9 +77,9 @@ final class OpenTelemetryMetricsCollector implements MetricsCollectorInterface
     {
         $provider = Globals::meterProvider();
 
-        if (!$provider instanceof MeterProviderInterface) {
-            throw new LogicException('Incorrect data type of OpenTelemetry MeterProvider');
-        }
+//        if (!$provider instanceof MeterProviderInterface) {
+//            throw new LogicException('Incorrect data type of OpenTelemetry MeterProvider');
+//        }
 
         return $provider;
     }
