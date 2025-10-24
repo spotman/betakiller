@@ -1,20 +1,22 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Daemon;
 
-use Beberlei\Metrics\Collector\Collector;
 use BetaKiller\Event\HeartbeatBoundedEvent;
 use BetaKiller\Event\HeartbeatOutboundEvent;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\MessageBus\BoundedEventTransportInterface;
 use BetaKiller\MessageBus\OutboundEventTransportInterface;
+use BetaKiller\Monitoring\MetricsCollectorInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
 use React\Promise\PromiseInterface;
 use Throwable;
 use Thruway\Logging\Logger;
+
 use function React\Promise\resolve;
 
 /**
@@ -61,21 +63,21 @@ final class EsbPingDaemon extends AbstractDaemon
     private ?TimerInterface $checkTimer = null;
 
     /**
-     * @var \Beberlei\Metrics\Collector\Collector
+     * @var \BetaKiller\Monitoring\MetricsCollectorInterface
      */
-    private Collector $metrics;
+    private MetricsCollectorInterface $metrics;
 
     /**
      * @param \BetaKiller\MessageBus\BoundedEventTransportInterface  $boundedTransport
      * @param \BetaKiller\MessageBus\OutboundEventTransportInterface $outboundTransport
-     * @param \Beberlei\Metrics\Collector\Collector                  $metrics
+     * @param \BetaKiller\Monitoring\MetricsCollectorInterface       $metrics
      * @param \Psr\Log\LoggerInterface                               $logger
      */
     public function __construct(
-        BoundedEventTransportInterface  $boundedTransport,
+        BoundedEventTransportInterface $boundedTransport,
         OutboundEventTransportInterface $outboundTransport,
-        Collector                       $metrics,
-        LoggerInterface                 $logger
+        MetricsCollectorInterface $metrics,
+        LoggerInterface $logger
     ) {
         $this->outboundTransport = $outboundTransport;
         $this->boundedTransport  = $boundedTransport;
@@ -89,8 +91,8 @@ final class EsbPingDaemon extends AbstractDaemon
 
         // Emit heartbeat every 5 seconds
         $this->heartbeatTimer = $loop->addPeriodicTimer(self::HEARTBEAT_INTERVAL, function () {
-            $boundedEvent  = new HeartbeatBoundedEvent;
-            $outboundEvent = new HeartbeatOutboundEvent;
+            $boundedEvent  = new HeartbeatBoundedEvent();
+            $outboundEvent = new HeartbeatOutboundEvent();
 
             $this->boundedTransport->publishBounded($boundedEvent);
             $this->outboundTransport->publishOutbound($outboundEvent);

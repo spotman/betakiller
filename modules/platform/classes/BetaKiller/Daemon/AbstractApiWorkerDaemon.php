@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace BetaKiller\Daemon;
 
-use Beberlei\Metrics\Collector\Collector;
 use BetaKiller\Api\ApiFacade;
 use BetaKiller\Error\ExceptionService;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Monitoring\MetricsCollectorInterface;
 use BetaKiller\Service\MaintenanceModeService;
 use BetaKiller\Wamp\WampClient;
 use BetaKiller\Wamp\WampClientBuilder;
@@ -16,8 +16,6 @@ use BetaKiller\Wamp\WampClientHelper;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Promise\PromiseInterface;
-use Spotman\Api\ApiMethodResponse;
-use Spotman\Api\ApiResourceProxyInterface;
 use stdClass;
 use Throwable;
 use Thruway\ClientSession;
@@ -73,18 +71,18 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
     private MaintenanceModeService $maintenance;
 
     /**
-     * @var \Beberlei\Metrics\Collector\Collector
+     * @var \BetaKiller\Monitoring\MetricsCollectorInterface
      */
-    private Collector $metrics;
+    private MetricsCollectorInterface $metrics;
 
     /**
-     * @param \BetaKiller\Wamp\WampClientBuilder         $clientFactory
-     * @param \BetaKiller\Api\ApiFacade                  $apiFacade
-     * @param \BetaKiller\Error\ExceptionService         $exceptionService
-     * @param \BetaKiller\Wamp\WampClientHelper          $clientHelper
-     * @param \BetaKiller\Service\MaintenanceModeService $maintenance
-     * @param \Beberlei\Metrics\Collector\Collector      $metrics
-     * @param \Psr\Log\LoggerInterface                   $logger
+     * @param \BetaKiller\Wamp\WampClientBuilder               $clientFactory
+     * @param \BetaKiller\Api\ApiFacade                        $apiFacade
+     * @param \BetaKiller\Error\ExceptionService               $exceptionService
+     * @param \BetaKiller\Wamp\WampClientHelper                $clientHelper
+     * @param \BetaKiller\Service\MaintenanceModeService       $maintenance
+     * @param \BetaKiller\Monitoring\MetricsCollectorInterface $metrics
+     * @param \Psr\Log\LoggerInterface                         $logger
      */
     public function __construct(
         WampClientBuilder $clientFactory,
@@ -92,7 +90,7 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
         ExceptionService $exceptionService,
         WampClientHelper $clientHelper,
         MaintenanceModeService $maintenance,
-        Collector $metrics,
+        MetricsCollectorInterface $metrics,
         LoggerInterface $logger
     ) {
         $this->clientBuilder    = $clientFactory;
@@ -176,8 +174,6 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
                 ];
             }
 
-            $queriesAtStart = \Database_Query::getQueryCount();
-
             $userBegin = \microtime(true);
 
             $wampSession = $this->clientHelper->getProcedureSession(func_get_args());
@@ -213,46 +209,13 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
                 ':value' => json_encode($arguments),
             ]);
 
-            $callStart = \microtime(true);
+            $this->metrics->timing('api.worker.prepare.user', $userTime);
+            $this->metrics->timing('api.worker.prepare.maintenance', $maintenanceTime);
 
-            $result = $this->callApiMethod($resource, $method, $arguments, $user)->jsonSerialize();
-
-            $wallTime = (microtime(true) - $callStart) * 1000;
-
-            $this->logger->debug(':resource.:method executed in :time ms', [
-                ':resource' => $resource,
-                ':method'   => $method,
-                ':time'     => (int)$wallTime,
-            ]);
-
-            $queryCount = \Database_Query::getQueryCount() - $queriesAtStart;
-
-            // Send metrics
-            $this->metrics->increment('api.call');
-            $this->metrics->increment(sprintf('api.call.user.%s', $user->getID()));
-            $this->metrics->timing('api.prepare.user', $userTime);
-            $this->metrics->timing('api.prepare.maintenance', $maintenanceTime);
-            $this->metrics->timing(sprintf('api.call.%s.%s', $resource, $method), $wallTime);
-            $this->metrics->measure('api.sql', $queryCount);
-            $this->metrics->measure(sprintf('api.sql.%s.%s', $resource, $method), $queryCount);
+            return $this->apiFacade->call($resource, $method, $arguments, $user)->jsonSerialize();
         } catch (Throwable $e) {
             return $this->makeApiError($e, $user);
         }
-
-//        $this->logger->debug('Result is :value', [':value' => json_encode($result)]);
-
-        return $result;
-    }
-
-    private function callApiMethod(
-        string $resource,
-        string $method,
-        array $arguments,
-        UserInterface $user
-    ): ApiMethodResponse {
-        return $this->apiFacade
-            ->getProxy(ApiResourceProxyInterface::INTERNAL)
-            ->call($resource, $method, $arguments, $user);
     }
 
     private function makeApiError(Throwable $e, UserInterface $user = null): array
@@ -263,7 +226,7 @@ abstract class AbstractApiWorkerDaemon extends AbstractDaemon
             LoggerHelper::logRawException($this->logger, $e);
         }
 
-        $lang  = $user ? $user->getLanguage() : null;
+        $lang  = $user?->getLanguage();
         $error = $this->exceptionService->getExceptionMessage($e, $lang);
 
         $this->logger->debug('Error is ":value"', [':value' => $error]);

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace BetaKiller;
 
-use Beberlei\Metrics\Collector\Collector;
 use BetaKiller\Console\ConsoleHelper;
 use BetaKiller\Console\ConsoleInput;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
 use BetaKiller\Console\ConsoleOptionCollection;
 use BetaKiller\Console\ConsoleTaskFactoryInterface;
 use BetaKiller\Env\AppEnvInterface;
+use BetaKiller\Monitoring\MetricsCollectorInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\View\ViewFactoryInterface;
 
@@ -21,7 +21,7 @@ final readonly class ConsoleAppRunner implements CliAppRunnerInterface
         private ConsoleTaskFactoryInterface $taskFactory,
         private ConsoleOptionBuilderInterface $optionBuilder,
         private ViewFactoryInterface $viewFactory,
-        private Collector $metrics
+        private MetricsCollectorInterface $metrics
     ) {
     }
 
@@ -65,7 +65,8 @@ final readonly class ConsoleAppRunner implements CliAppRunnerInterface
 
         $metricsName = str_replace(ConsoleHelper::$task_separator, '.', $taskName);
 
-        $this->metrics->measure(sprintf('task.%s', $metricsName), $duration);
+        $this->metrics->increment(sprintf('task.%s.counter', $metricsName));
+        $this->metrics->timing(sprintf('task.%s.timing', $metricsName), $duration);
         $this->metrics->flush();
     }
 

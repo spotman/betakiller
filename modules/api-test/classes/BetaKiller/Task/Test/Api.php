@@ -94,7 +94,7 @@ class Api extends AbstractTask
         \Database_Query::enableQueryLog();
 
         try {
-            $response = $this->api->getProxy()->call($resourceName, $methodName, $arguments, $this->user);
+            $response = $this->api->call($resourceName, $methodName, $arguments, $this->user);
         } catch (\Throwable $e) {
             $this->printQueries();
 
