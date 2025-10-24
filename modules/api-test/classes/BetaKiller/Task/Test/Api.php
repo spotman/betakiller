@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Test;
 
 use BetaKiller\Api\ApiFacade;
-use BetaKiller\Console\ConsoleInput;
 use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\Console\ConsoleTaskInterface;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
+use BetaKiller\Task\WithCliUserInterface;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
 
 use const JSON_PRETTY_PRINT;
 
-class Api extends AbstractTask
+final readonly class Api implements ConsoleTaskInterface, WithCliUserInterface
 {
     private const ARG_TARGET = 'target';
     private const ARG_REQ    = 'req';
@@ -26,32 +26,14 @@ class Api extends AbstractTask
     private const ARG_P4     = 'p4';
 
     /**
-     * @var \BetaKiller\Api\ApiFacade
-     */
-    private $api;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var \BetaKiller\Model\UserInterface
-     */
-    private UserInterface $user;
-
-    /**
      * Api constructor.
      *
      * @param \BetaKiller\Api\ApiFacade       $api
      * @param \Psr\Log\LoggerInterface        $logger
      * @param \BetaKiller\Model\UserInterface $user
      */
-    public function __construct(ApiFacade $api, LoggerInterface $logger, UserInterface $user)
+    public function __construct(private ApiFacade $api, private LoggerInterface $logger, private UserInterface $user)
     {
-        $this->api    = $api;
-        $this->logger = $logger;
-        $this->user   = $user;
     }
 
     /**
@@ -66,11 +48,11 @@ class Api extends AbstractTask
     {
         return [
             $builder->string(self::ARG_TARGET)->required(),
-            $builder->string(self::ARG_REQ),
-            $builder->string(self::ARG_P1),
-            $builder->string(self::ARG_P2),
-            $builder->string(self::ARG_P3),
-            $builder->string(self::ARG_P4),
+            $builder->string(self::ARG_REQ)->optional(),
+            $builder->string(self::ARG_P1)->optional(),
+            $builder->string(self::ARG_P2)->optional(),
+            $builder->string(self::ARG_P3)->optional(),
+            $builder->string(self::ARG_P4)->optional(),
         ];
     }
 
@@ -138,7 +120,9 @@ class Api extends AbstractTask
             return (array)json_decode($stdin, true, 5, \JSON_THROW_ON_ERROR);
         }
 
-        $req = $input->getString(self::ARG_REQ);
+        $req = $input->has(self::ARG_REQ)
+            ? $input->getString(self::ARG_REQ)
+            : null;
 
         if ($req) {
             return (array)json_decode($req, true, 5, \JSON_THROW_ON_ERROR);
