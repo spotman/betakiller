@@ -18,6 +18,6 @@ readonly class PhpExceptionHttp500IFace extends AbstractErrorAdminIFace
      */
     public function getData(ServerRequestInterface $request): array
     {
-        throw new ServerErrorHttpException();
+        throw new ServerErrorHttpException('Test exception from IFace');
     }
 }

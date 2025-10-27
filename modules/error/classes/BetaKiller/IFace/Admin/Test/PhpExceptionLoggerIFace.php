@@ -29,7 +29,7 @@ readonly class PhpExceptionLoggerIFace extends AbstractErrorAdminIFace
      */
     public function getData(ServerRequestInterface $request): array
     {
-        $e = new ServerErrorHttpException();
+        $e = new ServerErrorHttpException('Test exception for logger');
 
         LoggerHelper::logRequestException($this->logger, $e, $request);
 
