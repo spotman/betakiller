@@ -26,7 +26,9 @@ final readonly class ErrorPageMiddleware implements MiddlewareInterface
         try {
             return $handler->handle($request);
         } catch (Throwable $e) {
-            if (!$e instanceof HttpExceptionInterface) {
+            $isIgnored = $e instanceof HttpExceptionInterface && !$e->isServerError();
+
+            if (!$isIgnored) {
                 // Log non-HTTP exception
                 LoggerHelper::logRequestException($this->logger, $e, $request);
             }
