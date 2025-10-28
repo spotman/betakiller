@@ -51,23 +51,19 @@ final class AppEnv implements AppEnvInterface
 
     private bool $isCachingEnabled;
 
+    public static function instance(): AppEnvInterface
+    {
+        return self::$instance ??= self::createFromEnv();
+    }
+
+    public static function createFromEnv(): self
+    {
+        return self::createFrom($_ENV, $_SERVER);
+    }
+
     public static function createFrom(array $envVars, array $serverVars): self
     {
         return self::$instance = new self($envVars, $serverVars);
-    }
-
-    public static function isInitialized(): bool
-    {
-        return (bool)self::$instance;
-    }
-
-    public static function instance(): AppEnvInterface
-    {
-        if (!self::$instance) {
-            throw new LogicException('AppEnv must be initialized before calling AppEnv::instance()');
-        }
-
-        return self::$instance;
     }
 
     private function __construct(private readonly array $envVars, private readonly array $serverVars)

@@ -254,7 +254,7 @@ if (!function_exists('bootstrapPlatform')) {
     {
         configureKohana();
 
-        $appEnv = AppEnv::createFrom($_ENV, $_SERVER);
+        $appEnv = AppEnv::instance();
 
         bootstrapKohana($appEnv);
 
@@ -435,7 +435,7 @@ if (!function_exists('fallbackExceptionHandler')) {
         // Drop any output
         ob_get_length() && ob_end_clean();
 
-        $appEnv = (class_exists(AppEnv::class, false) && AppEnv::isInitialized())
+        $appEnv = class_exists(AppEnv::class, false)
             ? AppEnv::instance()
             : null;
 
