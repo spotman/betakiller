@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Monitoring;
 
-use BetaKiller\Exception\LogicException;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
@@ -56,7 +55,7 @@ final class OpenTelemetryMetricsCollector implements MetricsCollectorInterface
      */
     public function timing(string $variable, int|float $time): void
     {
-        $this->getMeter()->createHistogram($variable)->record($time);
+        $this->getMeter()->createHistogram($variable, 'ms')->record($time);
     }
 
     /**
