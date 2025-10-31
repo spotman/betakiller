@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller;
@@ -41,6 +42,14 @@ class UnderscoreIdentityConverter implements IdentityConverterInterface
      */
     public function decode(string $entityName, string $value): string
     {
+        // Check for underscores
+        if (!str_starts_with($value, '_') || !str_ends_with($value, '_')) {
+            throw new Exception('Entity ":name" ID must be surrounded by "underscore" symbols but ":value" provided', [
+                ':value' => $value,
+                ':name'  => $entityName,
+            ]);
+        }
+
         $result = trim($value, "_\r\n\0\x0B");
 
         if (!$result) {

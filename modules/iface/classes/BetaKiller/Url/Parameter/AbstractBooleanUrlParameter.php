@@ -27,11 +27,21 @@ abstract readonly class AbstractBooleanUrlParameter implements BooleanUrlParamet
             ]);
         }
 
-        $value = $value !== self::TRUE;
+        $value = $value !== self::FALSE;
 
         static::check($value);
 
         return static::createInstance($value);
+    }
+
+    public static function createTrue(): static
+    {
+        return static::createInstance(true);
+    }
+
+    public static function createFalse(): static
+    {
+        return static::createInstance(false);
     }
 
     protected static function createInstance(bool $value): static
