@@ -84,6 +84,8 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     }
 
     /**
+     * Fetch preloaded related entity
+     *
      * @param string    $alias
      * @param bool|null $isNullable
      *
@@ -121,15 +123,24 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         return $this->getRelation($alias)->loaded();
     }
 
-    protected function fetchRelatedEntity(string $alias): mixed
+    /**
+     * Fetch non-preloaded related entity
+     *
+     * @param string    $alias
+     * @param bool|null $isNullable
+     *
+     * @return mixed
+     */
+    protected function fetchRelatedEntity(string $alias, bool $isNullable = null): mixed
     {
-        $rel = $this->getRelation($alias);
+        $rel = $this->_related[$alias] ?? null;
 
-        if (!$rel->loaded()) {
-            $rel->reload();
+        // Clear initial values on non-loaded entities
+        if ($rel && !$rel->loaded()) {
+            unset($this->{$alias});
         }
 
-        return $rel;
+        return $this->getRelatedEntity($alias, $isNullable);
     }
 
     /**
