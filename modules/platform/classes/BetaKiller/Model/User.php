@@ -582,13 +582,29 @@ class User extends AbstractCreatedAt implements UserInterface
      */
     public function as_array(): array
     {
-        return [
-            'username'  => $this->getUsername(),
-            'email'     => $this->getEmail(),
-            'firstName' => $this->getFirstName(),
-            'lastName'  => $this->getLastName(),
-            'phone'     => $this->getPhone()->e164(),
-        ];
+        $data = [];
+
+        if (static::isUsernameEnabled()) {
+            $data['username'] = $this->getUsername();
+        }
+
+        if (static::isEmailEnabled()) {
+            $data['email'] = $this->getEmail();
+        }
+
+        if (static::isFirstNameEnabled()) {
+            $data['firstName'] = $this->getFirstName();
+        }
+
+        if (static::isLastNameEnabled()) {
+            $data['lastName'] = $this->getLastName();
+        }
+
+        if (static::isPhoneEnabled()) {
+            $data['phone'] = $this->getPhone()->e164();
+        }
+
+        return $data;
     }
 
     /**
