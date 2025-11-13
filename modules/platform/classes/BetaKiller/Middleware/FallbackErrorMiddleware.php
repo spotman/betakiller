@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
@@ -6,34 +7,18 @@ namespace BetaKiller\Middleware;
 use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ResponseHelper;
+use Debug;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
-final class FallbackErrorMiddleware implements MiddlewareInterface
+final readonly class FallbackErrorMiddleware implements MiddlewareInterface
 {
-    /**
-     * @var \BetaKiller\Env\AppEnvInterface
-     */
-    private $appEnv;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private LoggerInterface $logger;
-
-    /**
-     * FallbackErrorMiddleware constructor.
-     *
-     * @param \BetaKiller\Env\AppEnvInterface $appEnv
-     * @param \Psr\Log\LoggerInterface        $logger
-     */
-    public function __construct(AppEnvInterface $appEnv, LoggerInterface $logger)
+    public function __construct(private AppEnvInterface $appEnv, private LoggerInterface $logger)
     {
-        $this->appEnv = $appEnv;
-        $this->logger = $logger;
     }
 
     /**
@@ -43,13 +28,15 @@ final class FallbackErrorMiddleware implements MiddlewareInterface
     {
         try {
             return $handler->handle($request);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // Keep minimal data (no session at this point)
             LoggerHelper::logRawException($this->logger, $e);
 
-            return $this->appEnv->inProductionMode()
+            $response = $this->appEnv->inProductionMode()
                 ? ResponseHelper::text('System error', 500)
-                : \Debug::renderStackTrace($e, $request);
+                : Debug::renderStackTrace($e, $request);
+
+            return $response->withHeader('X-Error-Handler', 'fallback-middleware');
         }
     }
 }
