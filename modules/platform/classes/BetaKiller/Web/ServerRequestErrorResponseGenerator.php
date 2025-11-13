@@ -25,6 +25,7 @@ readonly class ServerRequestErrorResponseGenerator
         ]);
 
         // No exception info here for security reasons
-        return new TextResponse('System error', 500);
+        return (new TextResponse('System error', 500))
+            ->withHeader('X-Error-Handler', 'request-error-generator');
     }
 }
