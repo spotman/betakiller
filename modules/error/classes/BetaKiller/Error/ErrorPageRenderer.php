@@ -111,7 +111,7 @@ readonly class ErrorPageRenderer implements ErrorPageRendererInterface
 
             return $isDebug
                 ? $this->makeDebugResponse($e, $request)
-                : ResponseHelper::text('Error', $httpCode);
+                : ResponseHelper::text('Error', 500);
         }
     }
 

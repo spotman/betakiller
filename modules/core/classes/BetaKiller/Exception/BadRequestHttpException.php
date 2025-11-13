@@ -9,4 +9,9 @@ class BadRequestHttpException extends HttpException
     {
         parent::__construct(400, $message, $variables, $previous);
     }
+
+    public function showOriginalMessageToUser(): bool
+    {
+        return true;
+    }
 }

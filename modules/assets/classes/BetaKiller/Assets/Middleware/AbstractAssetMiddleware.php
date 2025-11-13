@@ -284,9 +284,9 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
                 }
 
                 if (!$model instanceof HasPreviewAssetsModelInterface) {
-                    throw new BadRequestHttpException('Action ":name" requires model implementing ":int" ', [
-                        ':name' => $action,
-                        ':int'  => HasPreviewAssetsModelInterface::class,
+                    throw new BadRequestHttpException('Action ":action" is not allowed for model ":model" ', [
+                        ':action' => $action,
+                        ':model'  => $model::class,
                     ]);
                 }
 

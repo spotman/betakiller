@@ -33,7 +33,7 @@ final readonly class ErrorPageMiddleware implements MiddlewareInterface
                 LoggerHelper::logRequestException($this->logger, $e, $request);
             }
 
-            $response = $this->renderer->render($request, $e);
+            $response = $this->renderer->render($request, $e)->withHeader('X-Error-Handler', 'middleware');
 
             return ResponseHelper::disableCaching($response);
         }

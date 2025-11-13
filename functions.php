@@ -457,6 +457,7 @@ if (!function_exists('fallbackExceptionHandler')) {
 
             http_response_code($httpCode);
             header('Content-Type: text/html; charset=utf-8');
+            header('X-Error-Handler: fallback');
         }
 
         // Detect root exception
