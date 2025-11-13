@@ -59,6 +59,8 @@ use BetaKiller\MessageBus\NativeEventSerializer;
 use BetaKiller\MessageBus\OutboundEventTransportInterface;
 use BetaKiller\MezzioWebAppRunner;
 use BetaKiller\Middleware\CspReportBodyParamsStrategy;
+use BetaKiller\Middleware\ResolvableMiddlewareFactory;
+use BetaKiller\Middleware\ResolvableMiddlewareFactoryInterface;
 use BetaKiller\Notification\MessageActionUrlGeneratorInterface;
 use BetaKiller\Notification\MessageRenderer;
 use BetaKiller\Notification\MessageRendererInterface;
@@ -205,6 +207,8 @@ return [
             return $params;
         }),
 
+        ResolvableMiddlewareFactoryInterface::class => autowire(ResolvableMiddlewareFactory::class),
+
         UserSessionFactoryInterface::class => autowire(UserSessionFactory::class),
         SessionStorageInterface::class     => autowire(DatabaseSessionStorage::class),
         SessionPersistenceInterface::class => get(SessionStorageInterface::class),
@@ -337,7 +341,7 @@ return [
         ApiMethodAccessResolverDetectorInterface::class => autowire(CustomApiMethodAccessResolverDetector::class),
 
         // Api Method Entity detector
-        EntityDetectorInterface::class => autowire(EntityBasedApiMethodHelper::class),
+        EntityDetectorInterface::class                  => autowire(EntityBasedApiMethodHelper::class),
 
         // Use default renderer for notification messages
         MessageRendererInterface::class                 => autowire(MessageRenderer::class),

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use BetaKiller\Config\WebConfig;
@@ -11,5 +12,9 @@ return [
             // Throws raw 501 exception, proceeded by ErrorPageMiddleware
             ErrorPageMiddleware::class,
         ],
+    ],
+
+    WebConfig::KEY_PIPE => [
+        MaintenanceModeMiddleware::class,
     ],
 ];

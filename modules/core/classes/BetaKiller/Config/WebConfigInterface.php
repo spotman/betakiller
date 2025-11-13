@@ -8,9 +8,16 @@ interface WebConfigInterface
     /**
      * "middleware class" => "array of dependencies (middleware classes)"
      *
-     * @return array[]
+     * @return string[]
      */
-    public function getMiddlewares(): array;
+    public function getPipeMiddlewares(): array;
+
+    /**
+     * @param string $fqcn Middleware class
+     *
+     * @return string[] array of dependencies (middleware classes) on null if no dependencies defined
+     */
+    public function getMiddlewareDependencies(string $fqcn): array;
 
     /**
      * "pattern" => "middleware class"
@@ -34,9 +41,9 @@ interface WebConfigInterface
     public function fetchAnyRoutes(): array;
 
     /**
-     * Returns array of middlewares` classes which should be executed if no matched route is found
+     * Returns middleware class which should be executed if no matched route is found
      *
-     * @return string[]
+     * @return string
      */
-    public function getNotFoundPipeline(): array;
+    public function getNotFoundHandler(): string;
 }

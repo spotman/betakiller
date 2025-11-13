@@ -22,4 +22,12 @@ return [
 //            UrlElementDispatchMiddleware::class,
 //        ],
     ],
+
+    WebConfig::KEY_PIPE => [
+        // Fetch Session
+        SessionMiddleware::class,
+
+        // Bind RequestUserProvider
+        UserMiddleware::class,
+    ],
 ];

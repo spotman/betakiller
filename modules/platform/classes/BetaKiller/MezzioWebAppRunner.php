@@ -13,6 +13,8 @@ use BetaKiller\Middleware\FallbackErrorMiddleware;
 use BetaKiller\Middleware\PhpBuiltInServerMiddleware;
 use BetaKiller\Middleware\ProfilerMiddleware;
 use BetaKiller\Middleware\RequestUuidMiddleware;
+use BetaKiller\Middleware\ResolvableMiddleware;
+use BetaKiller\Middleware\ResolvableMiddlewareFactoryInterface;
 use BetaKiller\Middleware\SchemeMiddleware;
 use Mezzio\Application;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
@@ -22,29 +24,15 @@ use Mezzio\Router\Middleware\ImplicitOptionsMiddleware;
 use Mezzio\Router\Middleware\MethodNotAllowedMiddleware;
 use Mezzio\Router\Middleware\RouteMiddleware;
 use Middlewares\ContentType;
+use Psr\Http\Server\MiddlewareInterface;
 
-final class MezzioWebAppRunner implements WebAppRunnerInterface
+final readonly class MezzioWebAppRunner implements WebAppRunnerInterface
 {
-    /**
-     * @var \Mezzio\Application
-     */
-    private Application $app;
-
-    /**
-     * @var \BetaKiller\Config\WebConfigInterface
-     */
-    private WebConfigInterface $config;
-
-    /**
-     * WebApp constructor.
-     *
-     * @param \Mezzio\Application                   $app
-     * @param \BetaKiller\Config\WebConfigInterface $config
-     */
-    public function __construct(Application $app, WebConfigInterface $config)
-    {
-        $this->app    = $app;
-        $this->config = $config;
+    public function __construct(
+        private Application $app,
+        private WebConfigInterface $config,
+        private ResolvableMiddlewareFactoryInterface $middlewareFactory
+    ) {
     }
 
     public function run(): void
@@ -62,48 +50,77 @@ final class MezzioWebAppRunner implements WebAppRunnerInterface
     {
         $p = StartupProfiler::getInstance()->start('Configure pipeline');
 
+        // Core middlewares (common for all requests)
+        $this->pipeCoreMiddlewares($this->app);
+
+        // Resolve middlewares (common for all requests)
+        $this->pipeDynamicMiddlewares($this->app);
+
+        // TODO Check If-Modified-Since and send 304 Not modified
+
+        $this->pipeRoutingMiddlewares($this->app);
+
+        // At this point, if no Response is returned by any middleware, the
+        // NotFoundHandler kicks in; alternately, you can provide other fallback
+        // middleware to execute.
+
+        $this->app->pipe($this->resolvable($this->config->getNotFoundHandler()));
+
+        StartupProfiler::getInstance()->stop($p);
+    }
+
+    private function pipeCoreMiddlewares(Application $app): void
+    {
         // The error handler should be the first (most outer) middleware to catch all Exceptions.
-        $this->app->pipe(FallbackErrorMiddleware::class);
+        $app->pipe(FallbackErrorMiddleware::class);
 
         // Generate and bind request ID
-        $this->app->pipe(RequestUuidMiddleware::class);
+        $app->pipe(RequestUuidMiddleware::class);
 
         // Profiling
-        $this->app->pipe(ProfilerMiddleware::class);
+        $app->pipe(ProfilerMiddleware::class);
 
         // Marker header for built-in PHP web-server
-        $this->app->pipe(PhpBuiltInServerMiddleware::class);
+        $app->pipe(PhpBuiltInServerMiddleware::class);
 
         // Check scheme and domain name
-        $this->app->pipe(SchemeMiddleware::class);
+        $app->pipe(SchemeMiddleware::class);
 
         // Prepare request data
-        $this->app->pipe(BodyParamsMiddleware::class);
+        $app->pipe(BodyParamsMiddleware::class);
 
         // Content negotiation
-        $this->app->pipe(ContentNegotiationMiddleware::class);
-        $this->app->pipe(ContentType::class);
+        $app->pipe(ContentNegotiationMiddleware::class);
+        $app->pipe(ContentType::class);
+    }
 
+    private function pipeDynamicMiddlewares(Application $app): void
+    {
+        $pipeConfig = $this->config->getPipeMiddlewares();
+        $pipeTable  = [];
 
-        $config = $this->config->getMiddlewares();
+        foreach ($pipeConfig as $pipeFqcn) {
+            $pipeTable[$pipeFqcn] = $this->config->getMiddlewareDependencies($pipeFqcn);
+        }
 
         // Place first middlewares without dependencies
-        uasort($config, fn(array $a, array $b) => count($a) <=> count($b));
+        uasort($pipeTable, fn(array $a, array $b) => count($a) <=> count($b));
 
         $behaviour = ResolveBehaviour::create()
             ->setThrowOnMissingReference(true)
             ->setThrowOnCircularReference(true);
 
-        $resolved = DependencyResolver::resolve($config, $behaviour);
+        $resolvedPipe = DependencyResolver::resolve($pipeTable, $behaviour);
 
-        foreach ($resolved as $className) {
-            $this->app->pipe($className);
+        foreach ($resolvedPipe as $className) {
+            $app->pipe($className);
         }
+    }
 
-        // TODO Check If-Modified-Since and send 304 Not modified
-
+    private function pipeRoutingMiddlewares(Application $app): void
+    {
         // Register the routing middleware in the middleware pipeline.
-        $this->app->pipe(RouteMiddleware::class);
+        $app->pipe(RouteMiddleware::class);
 
         // The following handle routing failures for common conditions:
         // - HEAD request but no routes answer that method
@@ -111,22 +128,12 @@ final class MezzioWebAppRunner implements WebAppRunnerInterface
         // - method not allowed
         // Order here matters; the MethodNotAllowedMiddleware should be placed
         // after the Implicit*Middleware.
-        $this->app->pipe(ImplicitHeadMiddleware::class);
-        $this->app->pipe(ImplicitOptionsMiddleware::class);
-        $this->app->pipe(MethodNotAllowedMiddleware::class);
+        $app->pipe(ImplicitHeadMiddleware::class);
+        $app->pipe(ImplicitOptionsMiddleware::class);
+        $app->pipe(MethodNotAllowedMiddleware::class);
 
         // Register the dispatch middleware in the middleware pipeline
-        $this->app->pipe(DispatchMiddleware::class);
-
-        // At this point, if no Response is returned by any middleware, the
-        // NotFoundHandler kicks in; alternately, you can provide other fallback
-        // middleware to execute.
-
-        foreach ($this->config->getNotFoundPipeline() as $className) {
-            $this->app->pipe($className);
-        }
-
-        StartupProfiler::getInstance()->stop($p);
+        $app->pipe(DispatchMiddleware::class);
     }
 
     private function addRoutes(Application $app): void
@@ -134,17 +141,22 @@ final class MezzioWebAppRunner implements WebAppRunnerInterface
         $p = StartupProfiler::getInstance()->start('Configure routes');
 
         foreach ($this->config->fetchGetRoutes() as $path => $handler) {
-            $app->get($path, $handler);
+            $app->get($path, $this->resolvable($handler));
         }
 
         foreach ($this->config->fetchPostRoutes() as $path => $handler) {
-            $app->post($path, $handler);
+            $app->post($path, $this->resolvable($handler));
         }
 
         foreach ($this->config->fetchAnyRoutes() as $path => $handler) {
-            $app->any($path, $handler);
+            $app->any($path, $this->resolvable($handler));
         }
 
         StartupProfiler::getInstance()->stop($p);
+    }
+
+    private function resolvable(string $fqcn): MiddlewareInterface
+    {
+        return new ResolvableMiddleware($this->middlewareFactory, $fqcn);
     }
 }

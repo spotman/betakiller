@@ -6,8 +6,9 @@ namespace BetaKiller\Config;
 
 final class WebConfig extends AbstractConfig implements WebConfigInterface
 {
-    public const KEY_MIDDLEWARES    = 'middlewares';
-    public const KEY_NOT_FOUND_PIPE = 'not_found';
+    public const KEY_PIPE           = 'pipe';
+    public const KEY_MIDDLEWARES       = 'middlewares';
+    public const KEY_NOT_FOUND_HANDLER = 'not_found';
 
     public const KEY_ROUTES = 'routes';
 
@@ -20,34 +21,42 @@ final class WebConfig extends AbstractConfig implements WebConfigInterface
         return 'web';
     }
 
-    public function getMiddlewares(): array
+    public function getPipeMiddlewares(): array
     {
-        return $this->getArray([self::KEY_MIDDLEWARES]);
-    }
-
-    public function fetchGetRoutes(): array
-    {
-        // Reverse so more specific are placed before less specific
-        return array_reverse($this->getArray([self::KEY_ROUTES, self::KEY_GET]));
-    }
-
-    public function fetchPostRoutes(): array
-    {
-        // Reverse so more specific are placed before less specific
-        return array_reverse($this->getArray([self::KEY_ROUTES, self::KEY_POST]));
-    }
-
-    public function fetchAnyRoutes(): array
-    {
-        // Reverse so more specific are placed before less specific
-        return array_reverse($this->getArray([self::KEY_ROUTES, self::KEY_ANY]));
+        return $this->getArray([self::KEY_PIPE]);
     }
 
     /**
      * @inheritDoc
      */
-    public function getNotFoundPipeline(): array
+    public function getMiddlewareDependencies(string $fqcn): array
     {
-        return $this->getArray([self::KEY_NOT_FOUND_PIPE]);
+        return $this->getArray([self::KEY_MIDDLEWARES, $fqcn], true);
+    }
+
+    public function fetchGetRoutes(): array
+    {
+        // Reverse so more specific are placed before less specific
+        return array_reverse($this->getArray([self::KEY_ROUTES, self::KEY_GET], true));
+    }
+
+    public function fetchPostRoutes(): array
+    {
+        // Reverse so more specific are placed before less specific
+        return array_reverse($this->getArray([self::KEY_ROUTES, self::KEY_POST], true));
+    }
+
+    public function fetchAnyRoutes(): array
+    {
+        // Reverse so more specific are placed before less specific
+        return array_reverse($this->getArray([self::KEY_ROUTES, self::KEY_ANY], true));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getNotFoundHandler(): string
+    {
+        return $this->getString([self::KEY_NOT_FOUND_HANDLER]);
     }
 }

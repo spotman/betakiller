@@ -38,8 +38,8 @@ abstract class AbstractConfig
     {
         $value = $this->config->load($this->getConfigRootGroup(), $path);
 
-        // empty() treats false as an empty value
-        if (is_bool($value)) {
+        // empty() treats "false" and "zero" as an empty value
+        if (is_bool($value) || is_integer($value)) {
             return $value;
         }
 
@@ -61,7 +61,7 @@ abstract class AbstractConfig
      */
     protected function getArray(array $path, bool $optional = null): array
     {
-        return $this->getTypedValue(self::TYPE_ARRAY, $path, $optional);
+        return $this->getTypedValue(self::TYPE_ARRAY, $path, $optional, []);
     }
 
     /**
@@ -103,12 +103,12 @@ abstract class AbstractConfig
     /**
      * @throws \BetaKiller\Exception
      */
-    private function getTypedValue(string $type, array $path, bool $optional = null): array|string|int|bool|null
+    private function getTypedValue(string $type, array $path, bool $optional = null, $default = null): array|string|int|bool|null
     {
         $value = $this->get($path, $optional);
 
         if (is_null($value)) {
-            return null;
+            return $default;
         }
 
         $checks = [

@@ -12,6 +12,10 @@ return [
         I18nMiddleware::class => [],
     ],
 
+    WebConfig::KEY_PIPE => [
+        I18nMiddleware::class,
+    ],
+
     WebConfig::KEY_ROUTES => [
         WebConfig::KEY_GET => [
             '/i18n/{lang}' => FetchTranslationRequestHandler::class,

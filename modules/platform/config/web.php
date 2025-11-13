@@ -18,7 +18,7 @@ use BetaKiller\Middleware\UserStatusMiddleware;
 use Mezzio\Flash\FlashMessageMiddleware;
 
 return [
-    WebConfig::KEY_MIDDLEWARES => [
+    WebConfig::KEY_MIDDLEWARES       => [
 
         // Debugging (depends on session, user and profiler)
         DebugMiddleware::class => [
@@ -26,13 +26,13 @@ return [
             UserMiddleware::class,
         ],
 
-        UserLanguageMiddleware::class => [
+        UserLanguageMiddleware::class     => [
             I18nMiddleware::class,
             UserMiddleware::class,
         ],
 
         // Flash messages for Post-Redirect-Get flow (requires Session)
-        FlashMessageMiddleware::class => [
+        FlashMessageMiddleware::class     => [
             SessionMiddleware::class,
         ],
 
@@ -57,27 +57,34 @@ return [
 //            UrlElementDispatchMiddleware::class,
 //            UserStatusMiddleware::class,
 //        ],
-    ],
 
-    // UrlElement processing
-    WebConfig::KEY_NOT_FOUND_PIPE => [
-        // Heavy operation
-        UrlHelperMiddleware::class,
+        // UrlElement processing
+        UrlElementRenderMiddleware::class => [
+            // Heavy operation
+            UrlHelperMiddleware::class,
 
-        // Save stat (referrer, target, utm markers, etc) (depends on UrlContainer)
-        class_exists(HitStatMiddleware::class) ? HitStatMiddleware::class : DummyMiddleware::class,
+            // Display custom 404 page for dispatched UrlElement
+            CustomNotFoundPageMiddleware::class,
 
-        // Display custom 404 page for dispatched UrlElement
-        CustomNotFoundPageMiddleware::class,
-
-        // Depends on UrlHelper
-        UrlElementDispatchMiddleware::class,
+            // Depends on UrlHelper
+            UrlElementDispatchMiddleware::class,
+        ],
 
         // Prevent access for locked users
-        UserStatusMiddleware::class,
-
-        // Render UrlElement
-        UrlElementRenderMiddleware::class,
+        UserStatusMiddleware::class => [
+            UserMiddleware::class,
+            UrlElementDispatchMiddleware::class,
+        ],
     ],
+
+    // Common pipe
+    WebConfig::KEY_PIPE              => [
+        DebugMiddleware::class,
+        UserLanguageMiddleware::class,
+        FlashMessageMiddleware::class,
+    ],
+
+    // Render UrlElement
+    WebConfig::KEY_NOT_FOUND_HANDLER => UrlElementRenderMiddleware::class,
 
 ];

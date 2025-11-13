@@ -19,4 +19,9 @@ return [
             ErrorPageMiddleware::class,
         ],
     ],
+
+    WebConfig::KEY_PIPE => [
+        ErrorPageMiddleware::class,
+        ExpectedExceptionMiddleware::class,
+    ],
 ];

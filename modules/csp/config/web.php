@@ -10,6 +10,10 @@ return [
         SecureHeadersMiddleware::class => [],
     ],
 
+    WebConfig::KEY_PIPE => [
+        SecureHeadersMiddleware::class,
+    ],
+
     WebConfig::KEY_ROUTES => [
         WebConfig::KEY_POST => [
             CspReportHandler::URL => CspReportHandler::class,
