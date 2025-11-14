@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Dev;
 
 use BetaKiller\Helper\ServerRequestHelper;
+use Database_Query;
 use DebugBar\DataCollector\TimeDataCollector;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -18,6 +19,7 @@ class DebugBarTimeDataCollector extends TimeDataCollector
     {
         $this->collectStartupMeasures();
         $this->collectRequestMeasures();
+        $this->collectDatabaseMeasures();
 
         return parent::collect();
     }
@@ -46,6 +48,27 @@ class DebugBarTimeDataCollector extends TimeDataCollector
 
         // Push request measures to DebugBar
         $this->importProfilerMeasures($requestProfiler);
+    }
+
+    private function collectDatabaseMeasures(): void
+    {
+        if (!Database_Query::isQueryLogEnabled()) {
+            return;
+        }
+
+        foreach (Database_Query::getQueries() as $item) {
+            if (!isset($item['index'], $item['start'], $item['duration'])) {
+                continue;
+            }
+
+            $index = $item['index'];
+            $startedOn = (float)$item['start'];
+            $duration = (float)$item['duration'];
+
+            $label = sprintf('SQL %s', $index);
+
+            $this->addMeasure($label, $startedOn, $startedOn + $duration);
+        }
     }
 
     private function importProfilerMeasures(AbstractProfiler $profiler): void

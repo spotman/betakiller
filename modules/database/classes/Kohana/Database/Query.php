@@ -76,6 +76,11 @@ class Kohana_Database_Query
         self::$logQueries = false;
     }
 
+    public static function isQueryLogEnabled(): bool
+    {
+        return self::$logQueries;
+    }
+
     public static function getQueries(): array
     {
         return self::$queries;
@@ -282,6 +287,7 @@ class Kohana_Database_Query
         $logKey = self::$logQueries ? (string)$startedOn : null;
 
         if ($logKey) {
+            $index = 'Kohana#'.count(self::$queries);
             $btr = DebugHelper::findNearestStackTraceItem('orm');
 
             $sql .= $btr->oneLiner();
@@ -289,6 +295,7 @@ class Kohana_Database_Query
             $memoryOnStart = memory_get_usage(true);
 
             self::$queries[$logKey] = [
+                'index' => $index,
                 'query' => $sql,
             ];
         }
@@ -318,6 +325,7 @@ class Kohana_Database_Query
             $memoryOnEnd = memory_get_usage(true);
 
             self::$queries[$logKey] += [
+                'start'    => $startedOn,
                 'duration' => $endedOn - $startedOn,
                 'memory'   => $memoryOnEnd - $memoryOnStart,
             ];
