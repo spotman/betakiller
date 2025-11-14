@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
@@ -12,30 +13,14 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class UrlElementRenderMiddleware implements MiddlewareInterface
+readonly class UrlElementRenderMiddleware implements MiddlewareInterface
 {
-    /**
-     * @var \BetaKiller\Url\UrlElementRendererInterface
-     */
-    private $renderer;
-
-    /**
-     * UrlElementRenderMiddleware constructor.
-     *
-     * @param \BetaKiller\Url\UrlElementRendererInterface $renderer
-     */
-    public function __construct(UrlElementRendererInterface $renderer)
+    public function __construct(private UrlElementRendererInterface $renderer)
     {
-        $this->renderer = $renderer;
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Psr\Http\Server\RequestHandlerInterface $handler
-     *
-     * @return \Psr\Http\Message\ResponseInterface
-     * @throws \BetaKiller\Exception\FoundHttpException
-     * @throws \BetaKiller\Url\MissingUrlElementException
+     * @inheritDoc
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
