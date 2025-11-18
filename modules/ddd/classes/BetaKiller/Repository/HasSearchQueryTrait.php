@@ -18,6 +18,10 @@ trait HasSearchQueryTrait
 
         $this->applySearchQuery($orm, $query);
 
+        if ($query->hasLimit()) {
+            $itemsPerPage = $query->getLimit();
+        }
+
         return $this->findAllResults($orm, $page, $itemsPerPage, $this->hasReverseSearchResults());
     }
 

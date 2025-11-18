@@ -9,4 +9,9 @@ namespace BetaKiller\Query;
  */
 interface RepositoryQueryInterface
 {
+    public function limit(int $value): RepositoryQueryInterface;
+
+    public function hasLimit(): bool;
+
+    public function getLimit(): int;
 }

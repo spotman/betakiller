@@ -379,6 +379,13 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         return $this;
     }
 
+    protected function orderByRand(OrmInterface $orm): static
+    {
+        $orm->order_by(DB::expr('RAND()'));
+
+        return $this;
+    }
+
     protected function customOrderBy(OrmInterface $orm): void
     {
         // Empty by default
