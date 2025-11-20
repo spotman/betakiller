@@ -1,10 +1,10 @@
 <?php
+
 namespace BetaKiller\Helper;
 
 use BetaKiller\Exception;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\HasI18nKeyNameInterface;
-use BetaKiller\Model\I18nKeyInterface;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlPrototypeService;
@@ -42,11 +42,11 @@ class StringPatternHelper
     /**
      * Pattern consists of tags like [N[Text]] where N is tag priority
      *
-     * @param string                     $source
-     * @param UrlContainerInterface|null $params
+     * @param string                $source
+     * @param UrlContainerInterface $params
      *
-     * @param LanguageInterface          $lang
-     * @param int|null                   $limit
+     * @param LanguageInterface     $lang
+     * @param int|null              $limit
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException

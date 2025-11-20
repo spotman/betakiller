@@ -10,7 +10,7 @@ use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\StringPatternHelper;
-use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Helper\UrlHelperInterface;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\RoleInterface;
@@ -728,7 +728,7 @@ final class TwigExtension extends AbstractExtension
         return $context[TemplateContext::KEY_REQUEST];
     }
 
-    private function getRequestUrlHelper(array $context): UrlHelper
+    private function getRequestUrlHelper(array $context): UrlHelperInterface
     {
         $request = $this->getRequest($context);
 
