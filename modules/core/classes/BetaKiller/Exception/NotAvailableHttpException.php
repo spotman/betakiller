@@ -34,10 +34,7 @@ class NotAvailableHttpException extends HttpException
     }
 
     /**
-     * Overwrite this method with "return TRUE" to show custom message in all cases
-     * Override this method with *true* return if this exception type has dedicated error page like 404
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function alwaysShowNiceMessage(): bool
     {
@@ -45,10 +42,7 @@ class NotAvailableHttpException extends HttpException
     }
 
     /**
-     * Returns TRUE if someone must be notified about current exception type
-     * Override this method with *false* return if notification about exceptions of concrete class is not needed
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function isNotificationEnabled(): bool
     {

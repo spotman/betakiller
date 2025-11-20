@@ -1,6 +1,8 @@
 <?php
-namespace BetaKiller\Exception;
 
+declare(strict_types=1);
+
+namespace BetaKiller\Exception;
 
 trait DefaultExceptionBehaviourTrait
 {
@@ -43,7 +45,7 @@ trait DefaultExceptionBehaviourTrait
      * Useful for custom exception types
      * Return null if no default message allowed
      *
-     * @return string
+     * @return ?string
      */
     public function getDefaultMessageI18nKey(): ?string
     {
