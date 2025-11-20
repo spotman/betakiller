@@ -15,6 +15,10 @@ error.http.404.p1: "The page you are looking for is not exists."
 error.http.404.p2: "Check page URL, there may be mistake."
 error.http.404.search.message: "You may use the search form."
 
+error.http.410.label: "Page is gone"
+error.http.410.p1: "The page you are looking for was removed permanently."
+error.http.410.p2: "Try navigating back to find another way around."
+
 error.http.500.label: "System error"
 error.http.500.p1: "We are on our way to fix it."
 error.http.500.p2: "The page will be refreshed in 45 seconds."

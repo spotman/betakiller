@@ -5,6 +5,7 @@
         <iface name="HttpError401" uri="401" label="error.http.401.label" zone="public" layout="auth"/>
         <iface name="HttpError403" uri="403" label="error.http.403.label" zone="public"/>
         <iface name="HttpError404" uri="404" label="error.http.404.label" zone="public"/>
+        <iface name="HttpError410" uri="410" label="error.http.410.label" zone="public"/>
         <iface name="HttpError500" uri="500" label="error.http.500.label" zone="public"/>
         <iface name="HttpError503" uri="503" label="error.http.503.label" zone="public"/>
     </iface>

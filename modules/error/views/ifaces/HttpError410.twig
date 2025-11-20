@@ -1,0 +1,35 @@
+{% extends layout %}
+
+{% block content %}
+  {{ css("ifaces/HttpError410.css") }}
+  {{ js("ifaces/HttpError410.js") }}
+
+  <div class="container error-410">
+    <div class="row align-items-center h-100">
+      <div class="col">
+
+        <div class="card">
+          {% block card_header %}
+            <div class="card-header">
+              <h4 class="center-align">{{ "error.http.410.label"|i18n }}</h4>
+            </div>
+          {% endblock %}
+
+          <div class="card-body">
+            <p>
+              {{ "error.http.410.p1"|i18n }}<br/>
+              {{ "error.http.410.p2"|i18n }}
+            </p>
+
+            <p>
+              <button class="btn btn-primary back-button">
+                {{ "error.http.back-button"|i18n }}
+              </button>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+{% endblock %}
