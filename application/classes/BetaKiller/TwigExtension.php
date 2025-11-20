@@ -583,10 +583,10 @@ final class TwigExtension extends AbstractExtension
              */
             new TwigFunction(
                 'meta_title',
-                function (array $context, string $value): void {
+                function (array $context, string $value, bool $replace = null): void {
                     $value = $this->processStringPattern($context, $value);
 
-                    $this->getMeta($context)->setTitle($value, Meta::TITLE_APPEND);
+                    $this->getMeta($context)->setTitle($value, $replace ? Meta::TITLE_REPLACE : Meta::TITLE_APPEND);
                 },
                 ['needs_context' => true,]
             ),
