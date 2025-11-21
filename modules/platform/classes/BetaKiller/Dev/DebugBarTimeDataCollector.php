@@ -11,9 +11,13 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class DebugBarTimeDataCollector extends TimeDataCollector
 {
-    public function __construct(private readonly ServerRequestInterface $request)
+    public function __construct(private readonly ?ServerRequestInterface $request = null)
     {
-        parent::__construct(RequestProfiler::getRequestStartTime($request));
+        $startedOn = $request
+            ? RequestProfiler::getRequestStartTime($request)
+            : null;
+
+        parent::__construct($startedOn);
     }
 
     public function collect()
@@ -28,7 +32,7 @@ class DebugBarTimeDataCollector extends TimeDataCollector
     private function collectStartupMeasures(): void
     {
         // Reduce data sent in ajax response
-        if (ServerRequestHelper::isAjax($this->request)) {
+        if ($this->request && ServerRequestHelper::isAjax($this->request)) {
             return;
         }
 
@@ -44,6 +48,10 @@ class DebugBarTimeDataCollector extends TimeDataCollector
 
     private function collectRequestMeasures(): void
     {
+        if (!$this->request) {
+            return;
+        }
+
         // Add Request measures
         $requestProfiler = RequestProfiler::fetch($this->request);
 
