@@ -1,8 +1,12 @@
 <?php
+
 namespace BetaKiller\Repository;
 
+use BetaKiller\Model\PhpException;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
+use Database;
+use DB;
 
 /**
  * Class PhpExceptionRepository
@@ -98,6 +102,64 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository impl
         return $this
             ->filterHash($orm, $hash)
             ->findOne($orm);
+    }
+
+    public function save($entity): void
+    {
+        $this->createTablesIfNotExists();
+
+        parent::save($entity);
+    }
+
+    public function delete($entity): void
+    {
+        parent::delete($entity);
+
+        DB::query(Database::SELECT, 'VACUUM')->execute(PhpException::DB_GROUP);
+    }
+
+    protected function createTablesIfNotExists()
+    {
+        $this->createErrorsTableIfNotExists();
+        $this->createErrorHistoryTableIfNotExists();
+    }
+
+    protected function createErrorsTableIfNotExists()
+    {
+        DB::query(
+            Database::SELECT,
+            'CREATE TABLE IF NOT EXISTS errors (
+          id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          hash VARCHAR(64) NOT NULL,
+          urls TEXT NULL,
+          paths TEXT NULL,
+          modules TEXT NULL,
+          created_at DATETIME NOT NULL,
+          last_seen_at DATETIME NOT NULL,
+          last_notified_at DATETIME NULL,
+          resolved_by INTEGER UNSIGNED NULL,
+          status VARCHAR(16) NOT NULL,
+          message TEXT NOT NULL,
+          trace BLOB NULL,
+          total INTEGER UNSIGNED NOT NULL DEFAULT 0,
+          notification_required UNSIGNED INTEGER(1) NOT NULL DEFAULT 0
+        )'
+        )->execute(PhpException::DB_GROUP);
+    }
+
+    protected function createErrorHistoryTableIfNotExists()
+    {
+        DB::query(
+            Database::SELECT,
+            'CREATE TABLE IF NOT EXISTS error_history (
+          id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          error_id INTEGER NOT NULL,
+          user INTEGER NULL,
+          ts DATETIME NOT NULL,
+          status VARCHAR(16) NOT NULL,
+          FOREIGN KEY(error_id) REFERENCES errors(id)
+        )'
+        )->execute(PhpException::DB_GROUP);
     }
 
     /**

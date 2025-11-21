@@ -1,9 +1,8 @@
 <?php
+
 namespace BetaKiller\Model;
 
-use Database;
 use DateTimeImmutable;
-use DB;
 use ORM;
 
 class PhpException extends ORM implements PhpExceptionModelInterface
@@ -14,7 +13,7 @@ class PhpException extends ORM implements PhpExceptionModelInterface
     public const COLUMN_LAST_SEEN_AT = 'last_seen_at';
     public const COLUMN_MESSAGE      = 'message';
 
-    private static $tablesChecked = false;
+    public const DB_GROUP = 'errors';
 
     public static function makeHashFor($message)
     {
@@ -40,10 +39,8 @@ class PhpException extends ORM implements PhpExceptionModelInterface
      */
     protected function configure(): void
     {
-        $this->_db_group   = 'errors';
+        $this->_db_group   = self::DB_GROUP;
         $this->_table_name = 'errors';
-
-        $this->createTablesIfNotExists();
 
         /**
          * Auto-serialize and unserialize columns on get/set
@@ -62,53 +59,6 @@ class PhpException extends ORM implements PhpExceptionModelInterface
                 'foreign_key' => 'error_id',
             ],
         ]);
-    }
-
-    protected function createTablesIfNotExists()
-    {
-        if (!static::$tablesChecked) {
-            $this->enableAutoVacuum();
-            $this->createErrorsTableIfNotExists();
-            $this->createErrorHistoryTableIfNotExists();
-            static::$tablesChecked = true;
-        }
-    }
-
-    protected function createErrorsTableIfNotExists()
-    {
-        DB::query(Database::SELECT, 'CREATE TABLE IF NOT EXISTS errors (
-          id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-          hash VARCHAR(64) NOT NULL,
-          urls TEXT NULL,
-          paths TEXT NULL,
-          modules TEXT NULL,
-          created_at DATETIME NOT NULL,
-          last_seen_at DATETIME NOT NULL,
-          last_notified_at DATETIME NULL,
-          resolved_by INTEGER UNSIGNED NULL,
-          status VARCHAR(16) NOT NULL,
-          message TEXT NOT NULL,
-          trace BLOB NULL,
-          total INTEGER UNSIGNED NOT NULL DEFAULT 0,
-          notification_required UNSIGNED INTEGER(1) NOT NULL DEFAULT 0
-        )')->execute($this->_db_group);
-    }
-
-    protected function createErrorHistoryTableIfNotExists()
-    {
-        DB::query(Database::SELECT, 'CREATE TABLE IF NOT EXISTS error_history (
-          id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-          error_id INTEGER NOT NULL,
-          user INTEGER NULL,
-          ts DATETIME NOT NULL,
-          status VARCHAR(16) NOT NULL,
-          FOREIGN KEY(error_id) REFERENCES errors(id)
-        )')->execute($this->_db_group);
-    }
-
-    private function enableAutoVacuum()
-    {
-        DB::query(Database::SELECT, 'PRAGMA auto_vacuum = FULL')->execute($this->_db_group);
     }
 
     /**
