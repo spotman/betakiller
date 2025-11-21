@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Dev;
@@ -61,9 +62,9 @@ class DebugBarTimeDataCollector extends TimeDataCollector
                 continue;
             }
 
-            $index = $item['index'];
+            $index     = $item['index'];
             $startedOn = (float)$item['start'];
-            $duration = (float)$item['duration'];
+            $duration  = (float)$item['duration'];
 
             $label = sprintf('SQL %s', $index);
 

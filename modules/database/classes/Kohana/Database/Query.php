@@ -83,6 +83,8 @@ class Kohana_Database_Query
 
     public static function getQueries(): array
     {
+        self::collectQueriesFromKohanaProfiler();
+
         return self::$queries;
     }
 
@@ -284,30 +286,22 @@ class Kohana_Database_Query
 
         $startedOn = microtime(true);
 
-        $logKey = self::$logQueries ? (string)$startedOn : null;
-
-        if ($logKey) {
-            $index = 'Kohana#'.count(self::$queries);
+        if (self::$logQueries) {
             $btr = DebugHelper::findNearestStackTraceItem('orm');
 
             $sql .= $btr->oneLiner();
 
             $memoryOnStart = memory_get_usage(true);
 
-            self::$queries[$logKey] = [
-                'index' => $index,
-                'query' => $sql,
-            ];
+            self::startMeasure($sql, $startedOn, $memoryOnStart);
         }
 
         // Execute the query
         try {
             $result = $db->query($this->_type, $sql, $as_object, $object_params);
         } catch (Throwable $e) {
-            if ($logKey) {
-                self::$queries[$logKey] += [
-                    'error' => $e,
-                ];
+            if (self::$logQueries) {
+                self::errorMeasure($sql, $e);
             }
 
             throw \BetaKiller\Exception::wrap($e, sprintf('%s | %s', $e->getMessage(), htmlspecialchars($sql)));
@@ -320,18 +314,95 @@ class Kohana_Database_Query
             Kohana::cache($cache_key, $result->as_array(), $this->_lifetime);
         }
 
-        if ($logKey) {
+        if (self::$logQueries) {
             $endedOn     = microtime(true);
             $memoryOnEnd = memory_get_usage(true);
 
-            self::$queries[$logKey] += [
-                'start'    => $startedOn,
-                'duration' => $endedOn - $startedOn,
-                'memory'   => $memoryOnEnd - $memoryOnStart,
-            ];
+            self::stopMeasure($sql, $endedOn, $memoryOnEnd);
         }
 
         return $result;
+    }
+
+    private static function hasMeasure(string $sql): bool
+    {
+        foreach (self::$queries as $item) {
+            if (str_starts_with($item['query'], $sql)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function startMeasure(string $sql, float $startedOn, int $memoryOnStart): void
+    {
+        $logKey = self::getQueryKey($sql);
+
+        self::$queries[$logKey] ??= [
+            'index'        => 'Kohana#'.count(self::$queries),
+            'query'        => $sql,
+            'start'        => $startedOn,
+            'memory_start' => $memoryOnStart,
+        ];
+    }
+
+    private static function stopMeasure(string $sql, float $endedOn, int $memoryOnEnd): void
+    {
+        $logKey = self::getQueryKey($sql);
+
+        self::$queries[$logKey] += [
+            'duration' => $endedOn - self::$queries[$logKey]['start'],
+            'memory'   => $memoryOnEnd - self::$queries[$logKey]['memory_on_start'],
+        ];
+    }
+
+    private static function errorMeasure(string $sql, Throwable $error): void
+    {
+        $logKey = self::getQueryKey($sql);
+
+        self::$queries[$logKey] += [
+            'error' => $error,
+        ];
+    }
+
+    private static function getQueryKey(string $query): string
+    {
+        return hash('xxh128', $query);
+    }
+
+    private static function collectQueriesFromKohanaProfiler(): void
+    {
+        static $processed;
+
+        if ($processed) {
+            return;
+        }
+
+        if (!self::$logQueries) {
+            return;
+        }
+
+        foreach (Kohana_Profiler::groups() as $group => $benchmarks) {
+            if (!str_starts_with($group, 'database')) {
+                continue;
+            }
+
+            foreach ($benchmarks as $sql => $tokens) {
+                if (Database_Query::hasMeasure($sql)) {
+                    continue;
+                }
+
+                foreach ($tokens as $token) {
+                    $mark = Kohana_Profiler::$_marks[$token];
+
+                    self::startMeasure($sql, $mark['start_time'], $mark['start_memory']);
+                    self::stopMeasure($sql, $mark['stop_time'], $mark['stop_memory']);
+                }
+            }
+        }
+
+        $processed = true;
     }
 
 } // End Database_Query
