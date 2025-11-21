@@ -13,7 +13,6 @@ use BetaKiller\Helper\DebugHelper;
  */
 class Kohana_Database_Query
 {
-
     // Query type
     protected $_type;
 
@@ -340,10 +339,10 @@ class Kohana_Database_Query
         $logKey = self::getQueryKey($sql);
 
         self::$queries[$logKey] ??= [
-            'index'        => 'Kohana#'.count(self::$queries),
-            'query'        => $sql,
-            'start'        => $startedOn,
-            'memory_start' => $memoryOnStart,
+            'index'     => 'Kohana#'.count(self::$queries),
+            'query'     => $sql,
+            'start'     => $startedOn,
+            'mem_start' => $memoryOnStart,
         ];
     }
 
@@ -353,7 +352,7 @@ class Kohana_Database_Query
 
         self::$queries[$logKey] += [
             'duration' => $endedOn - self::$queries[$logKey]['start'],
-            'memory'   => $memoryOnEnd - self::$queries[$logKey]['memory_on_start'],
+            'memory'   => $memoryOnEnd - self::$queries[$logKey]['mem_start'],
         ];
     }
 
