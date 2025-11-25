@@ -3,10 +3,8 @@
 declare(strict_types=1);
 
 use BetaKiller\Config\WebConfig;
-use BetaKiller\HitStat\HitStatMiddleware;
 use BetaKiller\Middleware\CustomNotFoundPageMiddleware;
 use BetaKiller\Middleware\DebugMiddleware;
-use BetaKiller\Middleware\DummyMiddleware;
 use BetaKiller\Middleware\I18nMiddleware;
 use BetaKiller\Middleware\SessionMiddleware;
 use BetaKiller\Middleware\UrlElementDispatchMiddleware;
@@ -71,7 +69,7 @@ return [
         ],
 
         // Prevent access for locked users
-        UserStatusMiddleware::class => [
+        UserStatusMiddleware::class       => [
             UserMiddleware::class,
             UrlElementDispatchMiddleware::class,
         ],
