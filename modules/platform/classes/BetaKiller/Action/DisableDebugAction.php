@@ -12,7 +12,7 @@ final readonly class DisableDebugAction extends AbstractDebugAction
     protected function updateState(SessionInterface $session): void
     {
         // Skip duplicate calls
-        if (!SessionHelper::isDebugEnabled($session)) {
+        if (SessionHelper::hasDebugDefined($session) && !SessionHelper::isDebugEnabled($session)) {
             return;
         }
 
