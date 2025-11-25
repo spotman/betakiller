@@ -41,14 +41,14 @@ interface RepositoryInterface
     public function getAllPaginated(int $currentPage, int $itemsPerPage): array;
 
     /**
-     * @param $entity
+     * @param AbstractEntityInterface $entity
      *
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function save($entity): void;
 
     /**
-     * @param $entity
+     * @param AbstractEntityInterface $entity
      *
      * @throws \BetaKiller\Repository\RepositoryException
      */

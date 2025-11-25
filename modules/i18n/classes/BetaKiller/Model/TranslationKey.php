@@ -78,6 +78,6 @@ class TranslationKey extends \ORM implements TranslationKeyModelInterface
 
     private function setPlural(bool $value): void
     {
-        $this->set(self::COL_IS_PLURAL, $value);
+        $this->set(self::COL_IS_PLURAL, (int)$value);
     }
 }
