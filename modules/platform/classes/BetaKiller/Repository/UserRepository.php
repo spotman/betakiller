@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\Repository;
 
 use BetaKiller\Model\ExtendedOrmInterface;
@@ -9,6 +10,7 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\UserState;
 use BetaKiller\Utils\Kohana\ORM;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
+
 use function mb_strtolower;
 
 /**
@@ -37,11 +39,13 @@ class UserRepository extends AbstractOrmBasedHasWorkflowStateRepository implemen
      */
     public static function makeFullNameExpression(string $relName): \Database_Expression
     {
-        return \DB::expr(sprintf(
-            'CONCAT(`%s`, " ", `%s`)',
-            $relName.ORM::REL_SEP.User::COL_FIRST_NAME,
-            $relName.ORM::REL_SEP.User::COL_LAST_NAME
-        ));
+        return \DB::expr(
+            sprintf(
+                'CONCAT(`%s`, " ", `%s`)',
+                $relName.ORM::REL_SEP.User::COL_FIRST_NAME,
+                $relName.ORM::REL_SEP.User::COL_LAST_NAME
+            )
+        );
     }
 
     /**
@@ -168,9 +172,11 @@ class UserRepository extends AbstractOrmBasedHasWorkflowStateRepository implemen
      */
     private function filterRoles(OrmInterface $orm, array $roles): self
     {
-        $ids = \array_unique(\array_map(static function (RoleInterface $role) {
-            return $role->getID();
-        }, $roles));
+        $ids = \array_unique(
+            \array_map(static function (RoleInterface $role) {
+                return $role->getID();
+            }, $roles)
+        );
 
         $orm->join_related('roles', 'roles');
         $orm->where('roles.id', 'IN', $ids);
@@ -199,10 +205,25 @@ class UserRepository extends AbstractOrmBasedHasWorkflowStateRepository implemen
         return $this;
     }
 
+    protected function filterActiveStates(ExtendedOrmInterface $orm): self
+    {
+        // Already joined by default
+        $orm
+            ->join_related(User::getWorkflowStateRelationKey(), 'active_states')
+            ->where(ORM::col('active_states', UserState::COL_CODENAME), 'IN', $this->getActiveStatesCodenames());
+
+        return $this;
+    }
+
+    protected function getActiveStatesCodenames(): array
+    {
+        return UserState::getActiveCodenames();
+    }
+
     /**
      * Allows a model use both email and username as unique identifiers for login
      *
-     * @param string  unique value
+     * @param string $value unique value
      *
      * @return  string  field name
      */

@@ -360,7 +360,15 @@ class User extends AbstractCreatedAt implements UserInterface
             return false;
         }
 
-        return $this->isInWorkflowStates(UserState::ACTIVE_CODENAMES);
+        return $this->isInWorkflowStates($this->getActiveStatesCodenames());
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getActiveStatesCodenames(): array
+    {
+        return UserState::getActiveCodenames();
     }
 
     /**
