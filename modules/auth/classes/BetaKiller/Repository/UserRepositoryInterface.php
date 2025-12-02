@@ -63,4 +63,11 @@ interface UserRepositoryInterface extends RepositoryInterface
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getUsersWithRoles(array $roles): array;
+
+    /**
+     * @param int $page
+     *
+     * @return UserInterface[]
+     */
+    public function getBanned(int $page): array;
 }

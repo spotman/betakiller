@@ -146,6 +146,17 @@ class UserRepository extends AbstractOrmBasedHasWorkflowStateRepository implemen
             ->findAll($orm);
     }
 
+    public function getBanned(int $page): array
+    {
+        $orm = $this->getOrmInstance();
+
+        return $this
+            ->filterStatesCodenames($orm, [
+                UserState::BANNED,
+            ])
+            ->findAll($orm, $page, 100);
+    }
+
     protected function getStateRelationKey(): string
     {
         return User::getWorkflowStateRelationKey();
@@ -207,10 +218,15 @@ class UserRepository extends AbstractOrmBasedHasWorkflowStateRepository implemen
 
     protected function filterActiveStates(ExtendedOrmInterface $orm): self
     {
+        return $this->filterStatesCodenames($orm, $this->getActiveStatesCodenames());
+    }
+
+    protected function filterStatesCodenames(ExtendedOrmInterface $orm, array $codenames): self
+    {
         // Already joined by default
         $orm
-            ->join_related(User::getWorkflowStateRelationKey(), 'active_states')
-            ->where(ORM::col('active_states', UserState::COL_CODENAME), 'IN', $this->getActiveStatesCodenames());
+            ->join_related(User::getWorkflowStateRelationKey(), 'filter_states')
+            ->where(ORM::col('filter_states', UserState::COL_CODENAME), 'IN', $codenames);
 
         return $this;
     }
