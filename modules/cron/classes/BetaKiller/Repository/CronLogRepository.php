@@ -9,6 +9,26 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 class CronLogRepository extends AbstractOrmBasedRepository implements CronLogRepositoryInterface
 {
+    use SqliteOrmRepositoryTrait;
+
+    protected function getDatabaseGroup(): string
+    {
+        return CronLog::DB_GROUP;
+    }
+
+    protected function createTableIfNotExists(): void
+    {
+        \DB::query(\Database::SELECT, 'CREATE TABLE IF NOT EXISTS `cron_log` (
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            command_id INTEGER NOT NULL,
+            result VARCHAR(10) CHECK( result IN ("started","queued","succeeded","failed") ) NOT NULL,
+            queued_at DATETIME NOT NULL,
+            started_at DATETIME DEFAULT NULL,
+            stopped_at DATETIME DEFAULT NULL,
+            FOREIGN KEY(command_id) REFERENCES cron_commands(id)
+        );')->execute($this->getDatabaseGroup());
+    }
+
     /**
      * @inheritDoc
      */
@@ -18,9 +38,7 @@ class CronLogRepository extends AbstractOrmBasedRepository implements CronLogRep
 
         $orm->filter_datetime_column_value(CronLog::COL_QUEUED_AT, $beforeDate, '<');
 
-        foreach ($this->findAll($orm) as $record) {
-            $this->delete($record);
-        }
+        $this->deleteAll($orm);
     }
 
     /**

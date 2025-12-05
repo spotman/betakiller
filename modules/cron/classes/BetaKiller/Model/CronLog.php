@@ -1,12 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
+use Database;
 use DateTimeImmutable;
+use DB;
 
 final class CronLog extends \ORM implements CronLogInterface
 {
+    public const DB_GROUP = 'cron';
+
     private const RESULT_QUEUED    = 'queued';
     private const RESULT_STARTED   = 'started';
     private const RESULT_SUCCEEDED = 'succeeded';
@@ -27,10 +32,10 @@ final class CronLog extends \ORM implements CronLogInterface
      */
     protected function configure(): void
     {
-        $this->_db_group   = 'cron';
+        $this->_db_group   = self::DB_GROUP;
         $this->_table_name = 'cron_log';
 
-        $this->createTablesIfNotExists();
+        $this->enableForeignKeys();
 
         $this->belongs_to([
             self::REL_COMMAND => [
@@ -45,37 +50,12 @@ final class CronLog extends \ORM implements CronLogInterface
 //        ]);
     }
 
-    private function createTablesIfNotExists(): void
-    {
-        if (!static::$tablesChecked) {
-            $this->enableAutoVacuum();
-            $this->enableForeignKeys();
-            $this->createCronLogTableIfNotExists();
-            static::$tablesChecked = true;
-        }
-    }
-
-    private function createCronLogTableIfNotExists(): void
-    {
-        \DB::query(\Database::SELECT, 'CREATE TABLE IF NOT EXISTS `cron_log` (
-            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            command_id INTEGER NOT NULL,
-            result VARCHAR(10) CHECK( result IN ("started","queued","succeeded","failed") ) NOT NULL,
-            queued_at DATETIME NOT NULL,
-            started_at DATETIME DEFAULT NULL,
-            stopped_at DATETIME DEFAULT NULL,
-            FOREIGN KEY(command_id) REFERENCES cron_commands(id)
-        );')->execute($this->_db_group);
-    }
-
     private function enableForeignKeys(): void
     {
-        \DB::query(\Database::SELECT, 'PRAGMA foreign_keys=ON;')->execute($this->_db_group);
-    }
-
-    private function enableAutoVacuum(): void
-    {
-        \DB::query(\Database::SELECT, 'PRAGMA auto_vacuum = FULL')->execute($this->_db_group);
+        if (!self::$tablesChecked) {
+            DB::query(Database::SELECT, 'PRAGMA foreign_keys=ON;')->execute($this->_db_group);
+            self::$tablesChecked = true;
+        }
     }
 
     /**

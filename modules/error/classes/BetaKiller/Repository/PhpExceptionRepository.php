@@ -16,12 +16,19 @@ use DB;
  */
 class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository implements PhpExceptionRepositoryInterface
 {
+    use SqliteOrmRepositoryTrait;
+
     /**
      * @return string
      */
     public function getUrlKeyName(): string
     {
         return 'hash';
+    }
+
+    protected function getDatabaseGroup(): string
+    {
+        return PhpException::DB_GROUP;
     }
 
     /**
@@ -104,21 +111,7 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository impl
             ->findOne($orm);
     }
 
-    public function save($entity): void
-    {
-        $this->createTablesIfNotExists();
-
-        parent::save($entity);
-    }
-
-    public function delete($entity): void
-    {
-        parent::delete($entity);
-
-        DB::query(Database::SELECT, 'VACUUM')->execute(PhpException::DB_GROUP);
-    }
-
-    protected function createTablesIfNotExists()
+    protected function createTableIfNotExists(): void
     {
         $this->createErrorsTableIfNotExists();
         $this->createErrorHistoryTableIfNotExists();

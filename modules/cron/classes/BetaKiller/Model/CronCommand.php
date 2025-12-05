@@ -1,55 +1,28 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-use DateTimeImmutable;
-
 final class CronCommand extends \ORM implements CronCommandInterface
 {
-    public const COL_NAME       = 'name';
-    public const COL_CMD     = 'cmd';
-    public const COL_PARAMS     = 'params';
+    public const DB_GROUP = CronLog::DB_GROUP;
 
-    private static bool $tablesChecked = false;
+    public const COL_NAME   = 'name';
+    public const COL_CMD    = 'cmd';
+    public const COL_PARAMS = 'params';
 
     /**
      * Custom configuration (set table name, configure relations, load_with(), etc)
      */
     protected function configure(): void
     {
-        $this->_db_group   = 'cron';
+        $this->_db_group   = self::DB_GROUP;
         $this->_table_name = 'cron_commands';
-
-        $this->createTablesIfNotExists();
 
         $this->serialize_columns([
             self::COL_PARAMS,
         ]);
-    }
-
-    private function createTablesIfNotExists(): void
-    {
-        if (!static::$tablesChecked) {
-            $this->enableAutoVacuum();
-            $this->createCronLogTableIfNotExists();
-            static::$tablesChecked = true;
-        }
-    }
-
-    private function createCronLogTableIfNotExists(): void
-    {
-        \DB::query(\Database::SELECT, 'CREATE TABLE IF NOT EXISTS `cron_commands` (
-            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            name VARCHAR(32) NOT NULL,
-            params VARCHAR(255) NULL DEFAULT NULL,
-            cmd VARCHAR(255) UNIQUE NOT NULL
-        );')->execute($this->_db_group);
-    }
-
-    private function enableAutoVacuum(): void
-    {
-        \DB::query(\Database::SELECT, 'PRAGMA auto_vacuum = FULL')->execute($this->_db_group);
     }
 
     /**

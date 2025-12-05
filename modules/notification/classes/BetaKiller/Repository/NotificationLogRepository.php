@@ -9,6 +9,8 @@ use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Query\NotificationLogQuery;
 use BetaKiller\Search\SearchResultsInterface;
+use Database;
+use DB;
 
 /**
  * Class NotificationLogRepository
@@ -18,6 +20,36 @@ use BetaKiller\Search\SearchResultsInterface;
 class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository implements
     NotificationLogRepositoryInterface
 {
+    use SqliteOrmRepositoryTrait;
+
+    protected function getDatabaseGroup(): string
+    {
+        return NotificationLog::DB_GROUP;
+    }
+
+    protected function createTableIfNotExists(): void
+    {
+        DB::query(
+            Database::SELECT,
+            'CREATE TABLE IF NOT EXISTS `notification_log` (
+    id INTEGER PRIMARY KEY NOT NULL,
+    hash VARCHAR(128) NOT NULL,
+    name VARCHAR(64) NOT NULL,
+    user_id INTEGER NULL DEFAULT NULL,
+    target VARCHAR(128) NOT NULL,
+    lang VARCHAR(2) NOT NULL,
+    processed_at DATETIME NOT NULL,
+    status VARCHAR(16) NOT NULL,
+    transport VARCHAR(16) NOT NULL,
+    subject VARCHAR(255) NULL DEFAULT NULL,
+    action_url VARCHAR(255) NULL DEFAULT NULL,
+    body TEXT NULL DEFAULT NULL,
+    result TEXT NULL DEFAULT NULL,
+    read_at DATETIME DEFAULT NULL
+)'
+        )->execute($this->getDatabaseGroup());
+    }
+
     /**
      * @return string
      */

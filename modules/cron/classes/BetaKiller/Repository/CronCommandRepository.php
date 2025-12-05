@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Repository;
@@ -11,6 +12,26 @@ use function json_encode;
 
 final class CronCommandRepository extends AbstractOrmBasedRepository implements CronCommandRepositoryInterface
 {
+    use SqliteOrmRepositoryTrait;
+
+    protected function getDatabaseGroup(): string
+    {
+        return CronCommand::DB_GROUP;
+    }
+
+    protected function createTableIfNotExists(): void
+    {
+        \DB::query(
+            \Database::SELECT,
+            'CREATE TABLE IF NOT EXISTS `cron_commands` (
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            name VARCHAR(32) NOT NULL,
+            params VARCHAR(255) NULL DEFAULT NULL,
+            cmd VARCHAR(255) UNIQUE NOT NULL
+        );'
+        )->execute($this->getDatabaseGroup());
+    }
+
     /**
      * @inheritDoc
      */

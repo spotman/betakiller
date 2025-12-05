@@ -7,12 +7,12 @@ namespace BetaKiller\Model;
 use BetaKiller\Notification\Message\MessageInterface;
 use BetaKiller\Notification\MessageTargetInterface;
 use BetaKiller\Notification\TransportInterface;
-use Database;
 use DateTimeImmutable;
-use DB;
 
 class NotificationLog extends \ORM implements NotificationLogInterface
 {
+    public const DB_GROUP = 'notifications';
+
     public const COL_ID           = 'id';
     public const COL_HASH         = 'hash';
     public const COL_USER_ID      = 'user_id';
@@ -24,7 +24,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     public const COL_LANG         = 'lang';
     public const COL_SUBJ         = 'subject';
     public const COL_BODY         = 'body';
-    public const COL_ACTION_URL         = 'action_url';
+    public const COL_ACTION_URL   = 'action_url';
     public const COL_RESULT       = 'result';
     public const COL_READ_AT      = 'read_at';
 
@@ -35,58 +35,20 @@ class NotificationLog extends \ORM implements NotificationLogInterface
 
     public const MAX_LENGTH_CODENAME = 64;
 
-    private static bool $tablesChecked = false;
-
     /**
      * Custom configuration (set table name, configure relations, load_with(), etc)
      */
     protected function configure(): void
     {
-        $this->_db_group   = 'notifications';
+        $this->_db_group   = self::DB_GROUP;
         $this->_table_name = 'notification_log';
-
-        $this->initSqliteDB();
     }
 
-    protected function initSqliteDB(): void
-    {
-        if (!static::$tablesChecked) {
-            $this->enableAutoVacuum();
-            $this->createTableIfNotExists();
-            static::$tablesChecked = true;
-        }
-    }
-
-    protected function createTableIfNotExists(): void
-    {
-        DB::query(
-            Database::SELECT,
-            'CREATE TABLE IF NOT EXISTS `notification_log` (
-    id INTEGER PRIMARY KEY NOT NULL,
-    hash VARCHAR(128) NOT NULL,
-    name VARCHAR(64) NOT NULL,
-    user_id INTEGER NULL DEFAULT NULL,
-    target VARCHAR(128) NOT NULL,
-    lang VARCHAR(2) NOT NULL,
-    processed_at DATETIME NOT NULL,
-    status VARCHAR(16) NOT NULL,
-    transport VARCHAR(16) NOT NULL,
-    subject VARCHAR(255) NULL DEFAULT NULL,
-    action_url VARCHAR(255) NULL DEFAULT NULL,
-    body TEXT NULL DEFAULT NULL,
-    result TEXT NULL DEFAULT NULL,
-    read_at DATETIME DEFAULT NULL
-)'
-        )->execute($this->_db_group);
-    }
-
-    private function enableAutoVacuum(): void
-    {
-        DB::query(Database::SELECT, 'PRAGMA auto_vacuum = FULL')->execute($this->_db_group);
-    }
-
-    public static function createFrom(MessageInterface $message, MessageTargetInterface $target, TransportInterface $transport): NotificationLogInterface
-    {
+    public static function createFrom(
+        MessageInterface $message,
+        MessageTargetInterface $target,
+        TransportInterface $transport
+    ): NotificationLogInterface {
         $entity = (new self())
             ->setHash($message::calculateHashFor($target))
             ->setProcessedAt(new DateTimeImmutable())
