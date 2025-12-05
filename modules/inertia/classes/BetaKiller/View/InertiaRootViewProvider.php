@@ -23,7 +23,7 @@ final readonly class InertiaRootViewProvider implements RootViewProviderInterfac
     {
         $rvp = RequestProfiler::begin($this->request, 'Inertia.js root view');
 
-        $view = $this->viewFactory->create('@templates/app.inertia');
+        $view = $this->viewFactory->create('@templates/inertia');
 
         $view->set('page', $page);
 
