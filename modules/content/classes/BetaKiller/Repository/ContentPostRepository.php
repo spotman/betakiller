@@ -156,7 +156,7 @@ class ContentPostRepository extends AbstractOrmBasedHasWorkflowStateRepository i
         $orm->search_query($term, [
             $revisionKey.'.label',
             $revisionKey.'.content',
-        ]);
+        ], true);
 
         return $this;
     }
