@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace BetaKiller\Workflow;
 
 use BetaKiller\Auth\PasswordHasherInterface;
+use BetaKiller\Event\UserApprovedEvent;
 use BetaKiller\Event\UserBannedEvent;
 use BetaKiller\Event\UserConfirmationEmailRequestedEvent;
 use BetaKiller\Event\UserCreatedEvent;
 use BetaKiller\Event\UserEmailChangedEvent;
 use BetaKiller\Event\UserEmailConfirmedEvent;
+use BetaKiller\Event\UserPendingEvent;
 use BetaKiller\Event\UserPhoneConfirmedEvent;
 use BetaKiller\Event\UserRegistrationClaimedEvent;
 use BetaKiller\Event\UserRemovedEvent;
@@ -27,6 +29,8 @@ use BetaKiller\Repository\UserRepositoryInterface;
 
 final readonly class UserWorkflow
 {
+    public const TRANSITION_CHECK   = 'check';
+    public const TRANSITION_APPROVE = 'approve';
     public const TRANSITION_BAN     = 'ban';
     public const TRANSITION_UNBAN   = 'unban';
     public const TRANSITION_SUSPEND = 'suspend';
@@ -112,7 +116,35 @@ final readonly class UserWorkflow
 
         $this->eventBus->emit(new UserCreatedEvent($user));
 
+        // Auto-approve (if enabled)
+        if ($user::isAutoApproveEnabled()) {
+            $this->requestCheck($user);
+        }
+
         return $user;
+    }
+
+    public function requestCheck(UserInterface $user): void
+    {
+        $this->state->doTransition($user, self::TRANSITION_CHECK, $user);
+
+        $this->userRepo->save($user);
+
+        // Auto-approve (if enabled)
+        if ($user::isAutoApproveEnabled()) {
+            $this->approve($user, $user);
+        } else {
+            $this->eventBus->emit(new UserPendingEvent($user));
+        }
+    }
+
+    public function approve(UserInterface $user, UserInterface $byUser): void
+    {
+        $this->state->doTransition($user, self::TRANSITION_APPROVE, $byUser);
+
+        $this->userRepo->save($user);
+
+        $this->eventBus->emit(new UserApprovedEvent($user));
     }
 
     public function requestConfirmationEmail(UserInterface $user): void
@@ -191,6 +223,11 @@ final readonly class UserWorkflow
         $this->userRepo->save($user);
 
         $this->eventBus->emit(new UserResumedEvent($user));
+
+        // Auto-approve (if enabled)
+        if ($user::isAutoApproveEnabled()) {
+            $this->approve($user, $user);
+        }
     }
 
     public function notRegisteredClaim(UserInterface $user): void

@@ -163,11 +163,14 @@ class Import extends AbstractTask
             ]);
         }
 
+        /** @var \BetaKiller\Repository\HasWorkflowStateRepositoryInterface $modelRepo */
+        $modelRepo = $this->repoFactory->create($modelName);
+
         // Remove unused states
         foreach ($stateRepo->getAll() as $existingState) {
             $stateName = $existingState->getCodename();
 
-            if (!in_array($stateName, $configStates, true)) {
+            if (!in_array($stateName, $configStates, true) && $modelRepo->countInState($existingState) === 0) {
                 $this->logger->debug('Removing unused state ":name"', [
                     ':name' => $stateName,
                 ]);
@@ -175,9 +178,6 @@ class Import extends AbstractTask
                 $stateRepo->delete($existingState);
             }
         }
-
-        /** @var \BetaKiller\Repository\HasWorkflowStateRepositoryInterface $modelRepo */
-        $modelRepo = $this->repoFactory->create($modelName);
 
         $startState = $stateRepo->getStartState();
 

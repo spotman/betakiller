@@ -22,6 +22,8 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     EmailMessageTargetInterface, PhoneMessageTargetInterface, OnlineMessageTargetInterface, AclUserInterface,
     EntityWithAclSpecInterface, RequestUserInterface, CreatedAtInterface, RestrictionTargetInterface
 {
+    public static function isAutoApproveEnabled(): bool;
+
     public static function isIpAddressEnabled(): bool;
 
     public static function isIpAddressRequired(): bool;
@@ -79,17 +81,32 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     /**
      * @return bool
      */
-    public function isBanned(): bool;
+    public function inStateCreated(): bool;
 
     /**
      * @return bool
      */
-    public function isSuspended(): bool;
+    public function inStatePending(): bool;
 
     /**
      * @return bool
      */
-    public function isRemoved(): bool;
+    public function inStateApproved(): bool;
+
+    /**
+     * @return bool
+     */
+    public function inStateBanned(): bool;
+
+    /**
+     * @return bool
+     */
+    public function inStateSuspended(): bool;
+
+    /**
+     * @return bool
+     */
+    public function inStateRemoved(): bool;
 
     /**
      * @return bool

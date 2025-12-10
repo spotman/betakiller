@@ -142,7 +142,7 @@ class AuthService
         UserInterface $user
     ): void {
         // Check account is active
-        if ($user->isBanned()) {
+        if ($user->inStateBanned()) {
             throw new UserBannedException();
         }
 

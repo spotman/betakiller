@@ -46,7 +46,7 @@ abstract readonly class AbstractTokenVerificationAction extends AbstractAction
         // Get token user
         $user = $token->getUser();
 
-        if ($user->isBanned()) {
+        if ($user->inStateBanned()) {
             // Mark token as used
             $this->tokenService->used($token);
 

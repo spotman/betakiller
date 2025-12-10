@@ -25,6 +25,15 @@ abstract class AbstractHasWorkflowStateRepository extends AbstractOrmBasedDispat
         return $this->findAll($orm);
     }
 
+    public function countInState(WorkflowStateInterface $state): int
+    {
+        $orm = $this->getOrmInstance();
+
+        $this->filterWorkflowState($orm, $state);
+
+        return $this->countSelf($orm);
+    }
+
     protected function filterWorkflowState(OrmInterface $orm, WorkflowStateInterface $state): self
     {
         $orm->where($this->getStateColumnName(), '=', $this->getStateColumnValue($state));

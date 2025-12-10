@@ -25,7 +25,47 @@ trait GuestUserTrait
     /**
      * @inheritDoc
      */
-    public function isBanned(): bool
+    public function inStateCreated(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function inStatePending(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function inStateApproved(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function inStateBanned(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function inStateSuspended(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function inStateRemoved(): bool
     {
         return false;
     }

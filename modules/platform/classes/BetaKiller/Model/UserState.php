@@ -13,16 +13,16 @@ class UserState extends AbstractWorkflowStateOrmModel implements WorkflowStateIn
     public const COL_ID = 'id';
 
     public const CREATED   = 'created';       // Just created
+    public const PENDING   = 'pending';       // Waiting for approval (profile is complete)
+    public const APPROVED  = 'approved';      // Approved by moderator (or auto-approved on sign-up)
     public const BANNED    = 'banned';        // Blocked coz of hacking, spam, or app rules violation
     public const SUSPENDED = 'suspended';     // Account removal requested, so it will be suspended for 6 months
-    public const RESUMED   = 'resumed';       // Resumed from suspend, requires additional confirmation (potential fraud)
     public const REMOVED   = 'removed';       // Soft delete (keep ID and email but delete personal data)
 
     public static function getActiveCodenames(): array
     {
         return [
-            self::CREATED,
-            self::RESUMED,
+            self::APPROVED,
         ];
     }
 

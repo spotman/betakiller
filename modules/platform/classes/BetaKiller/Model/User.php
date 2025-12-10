@@ -171,7 +171,31 @@ class User extends AbstractCreatedAt implements UserInterface
     /**
      * @inheritDoc
      */
-    public function isBanned(): bool
+    public function inStateCreated(): bool
+    {
+        return $this->isInWorkflowState(UserState::CREATED);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function inStatePending(): bool
+    {
+        return $this->isInWorkflowState(UserState::PENDING);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function inStateApproved(): bool
+    {
+        return $this->isInWorkflowState(UserState::APPROVED);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function inStateBanned(): bool
     {
         return $this->isInWorkflowState(UserState::BANNED);
     }
@@ -179,7 +203,7 @@ class User extends AbstractCreatedAt implements UserInterface
     /**
      * @inheritDoc
      */
-    public function isSuspended(): bool
+    public function inStateSuspended(): bool
     {
         return $this->isInWorkflowState(UserState::SUSPENDED);
     }
@@ -187,7 +211,7 @@ class User extends AbstractCreatedAt implements UserInterface
     /**
      * @inheritDoc
      */
-    public function isRemoved(): bool
+    public function inStateRemoved(): bool
     {
         return $this->isInWorkflowState(UserState::REMOVED);
     }
@@ -917,6 +941,11 @@ class User extends AbstractCreatedAt implements UserInterface
     public static function isLastNameRequired(): bool
     {
         return true;
+    }
+
+    public static function isAutoApproveEnabled(): bool
+    {
+        return false;
     }
 
     private function getColumnRulesLastName(): array

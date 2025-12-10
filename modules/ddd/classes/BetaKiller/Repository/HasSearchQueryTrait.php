@@ -25,6 +25,15 @@ trait HasSearchQueryTrait
         return $this->findAllResults($orm, $page, $itemsPerPage, $this->hasReverseSearchResults());
     }
 
+    public function count(RepositoryQueryInterface $query): int
+    {
+        $orm = $this->getOrmInstance();
+
+        $this->applySearchQuery($orm, $query);
+
+        return $this->countSelf($orm);
+    }
+
     abstract protected function applySearchQuery(ExtendedOrmInterface $orm, RepositoryQueryInterface $query): void;
 
     abstract protected function getDefaultItemsPerPage(): int;

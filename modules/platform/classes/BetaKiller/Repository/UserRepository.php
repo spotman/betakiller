@@ -10,6 +10,7 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\UserState;
 use BetaKiller\Utils\Kohana\ORM;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
+use DB;
 
 use function mb_strtolower;
 
@@ -39,7 +40,7 @@ class UserRepository extends AbstractOrmBasedHasWorkflowStateRepository implemen
      */
     public static function makeFullNameExpression(string $relName): \Database_Expression
     {
-        return \DB::expr(
+        return DB::expr(
             sprintf(
                 'CONCAT(`%s`, " ", `%s`)',
                 $relName.ORM::REL_SEP.User::COL_FIRST_NAME,

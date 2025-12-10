@@ -76,7 +76,7 @@ readonly class SendRecoveryEmailAction extends AbstractAction implements PostReq
         }
 
         // Separate status and message for blocked users
-        if ($user->isBanned()) {
+        if ($user->inStateBanned()) {
             $flash->flash(AccessRecoveryRequestIFace::FLASH_STATUS, AccessRecoveryRequestIFace::FLASH_STATUS_BLOCKED);
 
             return $response;

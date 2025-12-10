@@ -1,11 +1,14 @@
 <?php
 declare(strict_types=1);
 
+use BetaKiller\Event\UserApprovedEvent;
 use BetaKiller\Event\UserBannedEvent;
 use BetaKiller\Event\UserConfirmationEmailRequestedEvent;
+use BetaKiller\Event\UserCreatedEvent;
 use BetaKiller\Event\UserEmailChangedEvent;
 use BetaKiller\Event\UserPasswordChangedEvent;
 use BetaKiller\Event\UserPasswordChangeRequestedEvent;
+use BetaKiller\Event\UserPendingEvent;
 use BetaKiller\Event\UserResumedEvent;
 use BetaKiller\Event\UserSuspendedEvent;
 use BetaKiller\Event\UserUnbannedEvent;
@@ -14,6 +17,18 @@ use BetaKiller\EventHandler\UserPasswordChangedClearTokensHandler;
 use BetaKiller\EventHandler\UserPasswordChangeRequestedEmailHandler;
 
 return [
+    UserCreatedEvent::class => [
+        // Bind handlers here if needed
+    ],
+
+    UserPendingEvent::class => [
+        // Bind handlers here if needed
+    ],
+
+    UserApprovedEvent::class => [
+        // Bind handlers here if needed
+    ],
+
     UserBannedEvent::class => [
         // Bind handlers here if needed
     ],

@@ -1,4 +1,5 @@
 user.status.created: "Just created"
+user.status.approved: "Approved"
 user.status.banned: "Banned"
 user.status.claimed: "Claimed"
 user.status.suspended: "Suspended"
