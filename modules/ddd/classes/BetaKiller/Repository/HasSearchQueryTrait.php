@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
+use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Query\RepositoryQueryInterface;
 use BetaKiller\Search\SearchResultsInterface;
@@ -23,6 +24,20 @@ trait HasSearchQueryTrait
         }
 
         return $this->findAllResults($orm, $page, $itemsPerPage, $this->hasReverseSearchResults());
+    }
+
+    /**
+     * @param \BetaKiller\Query\RepositoryQueryInterface $query
+     *
+     * @return \BetaKiller\Model\AbstractEntityInterface|null|mixed
+     */
+    public function find(RepositoryQueryInterface $query): mixed
+    {
+        $orm = $this->getOrmInstance();
+
+        $this->applySearchQuery($orm, $query);
+
+        return $this->findOne($orm);
     }
 
     public function count(RepositoryQueryInterface $query): int
