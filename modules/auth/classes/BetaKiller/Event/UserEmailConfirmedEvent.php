@@ -3,6 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Event;
 
-final class UserEmailConfirmedEvent extends AbstractUserWorkflowEvent
+final readonly class UserEmailConfirmedEvent extends AbstractUserWorkflowEvent
 {
 }

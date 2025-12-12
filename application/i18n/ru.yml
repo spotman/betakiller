@@ -1,0 +1,10 @@
+user.status.created: "Создан"
+user.status.pending: "На проверке"
+user.status.approved: "Одобрен"
+user.status.rejected: "Отклонён"
+user.status.banned: "Бан"
+user.status.claimed: "Жалоба"
+user.status.suspended: "Приостановлен"
+user.status.removed: "Удалён"
+
+iface.auth.claim-thanks.title: "Спасибо за обращение!"

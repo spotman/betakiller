@@ -6,7 +6,7 @@ namespace BetaKiller\Event;
 use BetaKiller\MessageBus\EventMessageInterface;
 use BetaKiller\Model\UserInterface;
 
-abstract class AbstractUserWorkflowEvent implements EventMessageInterface
+abstract readonly class AbstractUserWorkflowEvent implements EventMessageInterface
 {
     /**
      * @var \BetaKiller\Model\UserInterface

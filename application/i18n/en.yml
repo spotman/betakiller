@@ -1,9 +1,10 @@
 user.status.created: "Just created"
+user.status.pending: "Pending"
 user.status.approved: "Approved"
+user.status.rejected: "Rejected"
 user.status.banned: "Banned"
 user.status.claimed: "Claimed"
 user.status.suspended: "Suspended"
-user.status.resumed: "Resumed"
 user.status.removed: "Removed"
 
 iface.auth.claim-thanks.title: "Thanks for your report!"

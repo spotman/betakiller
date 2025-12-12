@@ -5,7 +5,7 @@ namespace BetaKiller\Event;
 
 use BetaKiller\MessageBus\MessageWithHandlersInterface;
 
-final class UserConfirmationEmailRequestedEvent extends AbstractUserWorkflowEvent implements
+final readonly class UserConfirmationEmailRequestedEvent extends AbstractUserWorkflowEvent implements
     MessageWithHandlersInterface
 {
 }

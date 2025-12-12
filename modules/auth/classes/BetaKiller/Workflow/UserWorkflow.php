@@ -14,6 +14,7 @@ use BetaKiller\Event\UserEmailConfirmedEvent;
 use BetaKiller\Event\UserPendingEvent;
 use BetaKiller\Event\UserPhoneConfirmedEvent;
 use BetaKiller\Event\UserRegistrationClaimedEvent;
+use BetaKiller\Event\UserRejectedEvent;
 use BetaKiller\Event\UserRemovedEvent;
 use BetaKiller\Event\UserResumedEvent;
 use BetaKiller\Event\UserSuspendedEvent;
@@ -31,6 +32,7 @@ final readonly class UserWorkflow
 {
     public const TRANSITION_CHECK   = 'check';
     public const TRANSITION_APPROVE = 'approve';
+    public const TRANSITION_REJECT = 'reject';
     public const TRANSITION_BAN     = 'ban';
     public const TRANSITION_UNBAN   = 'unban';
     public const TRANSITION_SUSPEND = 'suspend';
@@ -145,6 +147,15 @@ final readonly class UserWorkflow
         $this->userRepo->save($user);
 
         $this->eventBus->emit(new UserApprovedEvent($user));
+    }
+
+    public function reject(UserInterface $user, UserInterface $byUser): void
+    {
+        $this->state->doTransition($user, self::TRANSITION_REJECT, $byUser);
+
+        $this->userRepo->save($user);
+
+        $this->eventBus->emit(new UserRejectedEvent($user));
     }
 
     public function requestConfirmationEmail(UserInterface $user): void

@@ -45,6 +45,24 @@ return [
 
                 WorkflowConfig::TRANSITIONS => [
                     UserWorkflow::TRANSITION_APPROVE => UserState::APPROVED,
+                    UserWorkflow::TRANSITION_REJECT  => UserState::REJECTED,
+                    UserWorkflow::TRANSITION_BAN     => UserState::BANNED,
+                    UserWorkflow::TRANSITION_REMOVE  => UserState::REMOVED,
+                ],
+            ],
+
+            UserState::REJECTED => [
+                WorkflowConfig::ACTIONS => [
+                    UserResource::ACTION_READ   => [
+                        RoleInterface::USER_MANAGEMENT,
+                    ],
+                    UserResource::ACTION_UPDATE => [
+                        RoleInterface::LOGIN,
+                    ],
+                ],
+
+                WorkflowConfig::TRANSITIONS => [
+                    UserWorkflow::TRANSITION_APPROVE => UserState::APPROVED,
                     UserWorkflow::TRANSITION_BAN     => UserState::BANNED,
                     UserWorkflow::TRANSITION_REMOVE  => UserState::REMOVED,
                 ],
@@ -131,6 +149,11 @@ return [
                 // Self-service via auto-approve
                 RoleInterface::LOGIN,
                 // Approved by moderator
+                RoleInterface::USER_MANAGEMENT,
+            ],
+
+            UserWorkflow::TRANSITION_REJECT => [
+                // Rejected by moderator
                 RoleInterface::USER_MANAGEMENT,
             ],
 

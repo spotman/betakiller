@@ -5,6 +5,6 @@ namespace BetaKiller\Event;
 
 use BetaKiller\MessageBus\MessageWithHandlersInterface;
 
-final class UserPasswordChangeRequestedEvent extends AbstractUserWorkflowEvent implements MessageWithHandlersInterface
+final readonly class UserPasswordChangeRequestedEvent extends AbstractUserWorkflowEvent implements MessageWithHandlersInterface
 {
 }
