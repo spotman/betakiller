@@ -327,4 +327,10 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
      * @return \BetaKiller\Model\UserInterface
      */
     public function setCreatedFromIP(string $ip): UserInterface;
+
+    public function setApprovedAt(DateTimeImmutable $date = null): UserInterface;
+
+    public function hasApprovedAt(): bool;
+
+    public function getApprovedAt(): DateTimeImmutable;
 }

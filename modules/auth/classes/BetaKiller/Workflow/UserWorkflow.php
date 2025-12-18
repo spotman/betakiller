@@ -144,6 +144,7 @@ final readonly class UserWorkflow
     {
         $this->state->doTransition($user, self::TRANSITION_APPROVE, $byUser);
 
+        $user->setApprovedAt();
         $this->userRepo->save($user);
 
         $this->eventBus->emit(new UserApprovedEvent($user));

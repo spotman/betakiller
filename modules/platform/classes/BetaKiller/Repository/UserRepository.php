@@ -10,6 +10,7 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\UserState;
 use BetaKiller\Utils\Kohana\ORM;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
+use DateTimeImmutable;
 use DB;
 
 use function mb_strtolower;
@@ -228,6 +229,20 @@ class UserRepository extends AbstractOrmBasedHasWorkflowStateRepository implemen
         $orm
             ->join_related(User::getWorkflowStateRelationKey(), 'filter_states')
             ->where(ORM::col('filter_states', UserState::COL_CODENAME), 'IN', $codenames);
+
+        return $this;
+    }
+
+    protected function filterApprovedAtBefore(ExtendedOrmInterface $orm, DateTimeImmutable $before): self
+    {
+        $orm->filter_datetime_column_value($orm->object_column(User::COL_APPROVED_AT), $before, '<');
+
+        return $this;
+    }
+
+    protected function filterApprovedAtAfter(ExtendedOrmInterface $orm, DateTimeImmutable $after): self
+    {
+        $orm->filter_datetime_column_value($orm->object_column(User::COL_APPROVED_AT), $after, '>');
 
         return $this;
     }

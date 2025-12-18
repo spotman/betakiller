@@ -34,6 +34,7 @@ class User extends AbstractCreatedAt implements UserInterface
     public const COL_NOTIFY_BY_EMAIL   = 'notify_by_email';
     public const COL_LOGINS            = 'logins';
     public const COL_LAST_LOGIN_AT     = 'last_login_at';
+    public const COL_APPROVED_AT       = 'approved_at';
     public const COL_CREATED_FROM_IP   = 'created_from_ip';
     public const COL_IS_CLAIMED        = 'is_reg_claimed';
 
@@ -694,6 +695,23 @@ class User extends AbstractCreatedAt implements UserInterface
     public function getLastLoggedIn(): ?DateTimeImmutable
     {
         return $this->get_datetime_column_value(self::COL_LAST_LOGIN_AT);
+    }
+
+    public function setApprovedAt(DateTimeImmutable $date = null): UserInterface
+    {
+        $this->set_datetime_column_value(self::COL_APPROVED_AT, $date ?? new DateTimeImmutable());
+
+        return $this;
+    }
+
+    public function hasApprovedAt(): bool
+    {
+        return !empty($this->get(self::COL_APPROVED_AT));
+    }
+
+    public function getApprovedAt(): DateTimeImmutable
+    {
+        return $this->get_datetime_column_value(self::COL_APPROVED_AT);
     }
 
     public function equalsTo(RestrictionTargetInterface $target): bool
