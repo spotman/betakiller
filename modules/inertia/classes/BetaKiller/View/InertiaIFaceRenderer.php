@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\View;
 
-use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\InertiaIFaceInterface;
 use Cherif\InertiaPsr15\Middleware\InertiaMiddleware;
@@ -14,7 +13,6 @@ use Psr\Http\Message\ServerRequestInterface;
 final readonly class InertiaIFaceRenderer implements IFaceRendererInterface
 {
     public function __construct(
-        private AppEnvInterface $appEnv,
         private DefaultIFaceRenderer $defaultRenderer,
         private InertiaDataProviderInterface $dataProvider
     ) {
@@ -28,8 +26,6 @@ final readonly class InertiaIFaceRenderer implements IFaceRendererInterface
 
         /** @var \Cherif\InertiaPsr15\Service\InertiaInterface $inertia */
         $inertia = $request->getAttribute(InertiaMiddleware::INERTIA_ATTRIBUTE);
-
-        $inertia->version($this->appEnv->getRevisionKey());
 
         $this->dataProvider->injectSharedData($request, $inertia);
 
