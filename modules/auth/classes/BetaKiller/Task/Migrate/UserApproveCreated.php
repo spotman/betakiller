@@ -22,6 +22,8 @@ use Psr\Log\LoggerInterface;
  */
 final readonly class UserApproveCreated implements ConsoleTaskInterface
 {
+    private const ARG_FORCE = 'force';
+
     public function __construct(
         private EntityFactoryInterface $entityFactory,
         private LoggerInterface $logger
@@ -30,8 +32,12 @@ final readonly class UserApproveCreated implements ConsoleTaskInterface
 
     public function defineOptions(ConsoleOptionBuilderInterface $builder): array
     {
-        // No cli arguments
-        return [];
+        return [
+            $builder
+                ->bool(self::ARG_FORCE)
+                ->optional(false)
+                ->label('Proceed even if auto-approve is disabled (risky)'),
+        ];
     }
 
     public function run(ConsoleInputInterface $params): void
@@ -42,8 +48,8 @@ final readonly class UserApproveCreated implements ConsoleTaskInterface
             throw new LogicException();
         }
 
-        if (!$userEntity::isAutoApproveEnabled()) {
-            throw new LogicException('Auto-approve is not enabled');
+        if (!$params->getBool(self::ARG_FORCE) && !$userEntity::isAutoApproveEnabled()) {
+            throw new LogicException('Auto-approve is not enabled, use "force" option to proceed anyway');
         }
 
         $stateEntity = $this->entityFactory->create($userEntity::getWorkflowStateModelName());
