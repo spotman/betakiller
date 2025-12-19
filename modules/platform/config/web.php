@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use BetaKiller\Config\WebConfig;
-use BetaKiller\Middleware\CustomNotFoundPageMiddleware;
+use BetaKiller\Middleware\CustomErrorPageMiddleware;
 use BetaKiller\Middleware\DebugMiddleware;
 use BetaKiller\Middleware\I18nMiddleware;
 use BetaKiller\Middleware\SessionMiddleware;
@@ -62,7 +62,7 @@ return [
             UrlHelperMiddleware::class,
 
             // Display custom 404 page for dispatched UrlElement
-            CustomNotFoundPageMiddleware::class,
+            CustomErrorPageMiddleware::class,
 
             // Depends on UrlHelper
             UrlElementDispatchMiddleware::class,

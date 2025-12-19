@@ -23,8 +23,6 @@ class UserState extends AbstractWorkflowStateOrmModel implements WorkflowStateIn
     public static function getActiveCodenames(): array
     {
         return [
-            self::CREATED,
-            self::PENDING,
             self::APPROVED,
         ];
     }

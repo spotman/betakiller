@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Url;
 
 use BetaKiller\Helper\RequestLanguageHelperInterface;
+use BetaKiller\Model\RequestUserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 
 interface AfterUrlDispatchingInterface
@@ -14,7 +15,7 @@ interface AfterUrlDispatchingInterface
      *
      * @param \BetaKiller\Url\UrlElementStack                   $stack
      * @param \BetaKiller\Url\Container\UrlContainerInterface   $params
-     * @param \BetaKiller\Url\RequestUserInterface              $user
+     * @param \BetaKiller\Model\RequestUserInterface            $user
      * @param \BetaKiller\Helper\RequestLanguageHelperInterface $i18n
      */
     public function afterDispatching(

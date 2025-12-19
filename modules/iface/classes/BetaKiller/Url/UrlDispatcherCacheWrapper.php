@@ -6,6 +6,7 @@ namespace BetaKiller\Url;
 
 use BetaKiller\Helper\LoggerHelper;
 use BetaKiller\Helper\RequestLanguageHelperInterface;
+use BetaKiller\Model\RequestUserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
 use Psr\Log\LoggerInterface;
@@ -60,7 +61,7 @@ class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
      *
      * @param \BetaKiller\Url\UrlElementStack                   $stack
      * @param \BetaKiller\Url\Container\UrlContainerInterface   $params
-     * @param \BetaKiller\Url\RequestUserInterface              $user
+     * @param \BetaKiller\Model\RequestUserInterface            $user
      * @param \BetaKiller\Helper\RequestLanguageHelperInterface $i18n
      *
      * @return void

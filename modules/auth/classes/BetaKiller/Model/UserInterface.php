@@ -8,7 +8,6 @@ use BetaKiller\MessageBus\RestrictionTargetInterface;
 use BetaKiller\Notification\EmailMessageTargetInterface;
 use BetaKiller\Notification\OnlineMessageTargetInterface;
 use BetaKiller\Notification\PhoneMessageTargetInterface;
-use BetaKiller\Url\RequestUserInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use DateTimeImmutable;
 use Spotman\Acl\AclUserInterface;
@@ -146,13 +145,6 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
      * @return bool
      */
     public function hasPassword(): bool;
-
-    /**
-     * Returns true if current user is guest
-     *
-     * @return bool
-     */
-    public function isGuest(): bool;
 
     /**
      * Returns true if current user is developer

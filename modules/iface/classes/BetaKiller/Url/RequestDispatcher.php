@@ -1,14 +1,13 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Url;
 
 use BetaKiller\Acl\EntityPermissionResolverInterface;
 use BetaKiller\Acl\UrlElementAccessResolverInterface;
-use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -48,10 +47,10 @@ class RequestDispatcher
      * @param \BetaKiller\Url\Zone\ZoneAccessSpecFactory        $specFactory
      */
     public function __construct(
-        UrlDispatcherInterface            $urlDispatcher,
+        UrlDispatcherInterface $urlDispatcher,
         UrlElementAccessResolverInterface $elementAccessResolver,
         EntityPermissionResolverInterface $entityPermissionResolver,
-        ZoneAccessSpecFactory             $specFactory
+        ZoneAccessSpecFactory $specFactory
     ) {
         $this->urlDispatcher            = $urlDispatcher;
         $this->elementAccessResolver    = $elementAccessResolver;
@@ -84,7 +83,6 @@ class RequestDispatcher
         // Check current user access for all URL elements
         foreach ($stack as $urlElement) {
             if ($urlElement->isAclBypassed()) {
-
                 if ($urlElement instanceof EntityLinkedUrlElementInterface) {
                     $skippedEntities[] = $urlElement->getEntityModelName();
                 }
@@ -95,13 +93,15 @@ class RequestDispatcher
             $this->checkUrlElementAccess($urlElement, $params, $user);
         }
 
+        $currentUrlElement = $stack->getCurrent();
+
         // Check access to UrlParameters
         foreach ($params->getAllParameters() as $urlParameter) {
             if (in_array($urlParameter::getUrlContainerKey(), $skippedEntities, true)) {
                 continue;
             }
 
-            $this->checkUrlParameterAccess($urlParameter, $user);
+            $this->checkUrlParameterAccess($currentUrlElement, $urlParameter, $user);
         }
     }
 
@@ -117,37 +117,22 @@ class RequestDispatcher
      * @throws \Spotman\Acl\AclException
      */
     private function checkUrlElementAccess(
-        UrlElementInterface   $urlElement,
+        UrlElementInterface $urlElement,
         UrlContainerInterface $urlParameters,
-        UserInterface         $user
+        UserInterface $user
     ): void {
         // Force authorization for non-public zones before security check
         $this->forceAuthorizationIfNeeded($urlElement, $user);
 
-        if ($this->elementAccessResolver->isAllowed($user, $urlElement, $urlParameters)) {
-            return;
+        if (!$this->elementAccessResolver->isAllowed($user, $urlElement, $urlParameters)) {
+            throw new UrlElementNotAllowedException($urlElement, $urlParameters, $user);
         }
-
-        $params = [];
-
-        foreach ($urlParameters->getAllParameters() as $item) {
-            $id = $item instanceof AbstractEntityInterface
-                ? $item->getID()
-                : null;
-
-            $params[] = sprintf('%s (%s)', $item::getUrlContainerKey(), $id);
-        }
-
-        throw new AccessDeniedException('UrlElement ":name" is not allowed to User ":who" with :params', [
-            ':name'   => $urlElement->getCodename(),
-            ':who'    => $user->isGuest() ? 'Guest' : $user->getID(),
-            ':params' => implode(', ', $params),
-        ]);
     }
 
     private function checkUrlParameterAccess(
+        UrlElementInterface $element,
         UrlParameterInterface $param,
-        UserInterface         $user
+        UserInterface $user
     ): void {
         if (!$param instanceof DispatchableEntityInterface) {
             return;
@@ -157,11 +142,7 @@ class RequestDispatcher
 
         // Perform Entity check
         if (!$this->entityPermissionResolver->isAllowed($user, $param, $action)) {
-            throw new AccessDeniedException('Entity ":name" is not allowed to User ":who" with action ":action"', [
-                ':name'   => $param::getModelName(),
-                ':action' => $action,
-                ':who'    => $user->isGuest() ? 'Guest' : $user->getID(),
-            ]);
+            throw new EntityNotAllowedException($param, $action, $element, $user);
         }
     }
 

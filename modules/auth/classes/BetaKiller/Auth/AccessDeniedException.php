@@ -2,12 +2,13 @@
 namespace BetaKiller\Auth;
 
 use BetaKiller\Exception\HttpException;
+use Throwable;
 
 class AccessDeniedException extends HttpException
 {
-    public function __construct(string $message = null, array $variables = null)
+    public function __construct(string $message = null, array $variables = null, Throwable $previous = null)
     {
-        parent::__construct(403, $message, $variables);
+        parent::__construct(403, $message, $variables, $previous);
     }
 
     /**

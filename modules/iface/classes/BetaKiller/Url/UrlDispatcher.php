@@ -7,6 +7,7 @@ use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Factory\UrlElementInstanceFactory;
 use BetaKiller\Helper\RequestLanguageHelperInterface;
+use BetaKiller\Model\RequestUserInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -39,7 +40,7 @@ readonly class UrlDispatcher implements UrlDispatcherInterface
      *
      * @param \BetaKiller\Url\UrlElementStack                   $stack
      * @param \BetaKiller\Url\Container\UrlContainerInterface   $params
-     * @param \BetaKiller\Url\RequestUserInterface              $user
+     * @param \BetaKiller\Model\RequestUserInterface            $user
      * @param \BetaKiller\Helper\RequestLanguageHelperInterface $i18n
      *
      * @return void
