@@ -32,7 +32,7 @@ final readonly class UserWorkflow
 {
     public const TRANSITION_CHECK   = 'check';
     public const TRANSITION_APPROVE = 'approve';
-    public const TRANSITION_REJECT = 'reject';
+    public const TRANSITION_REJECT  = 'reject';
     public const TRANSITION_BAN     = 'ban';
     public const TRANSITION_UNBAN   = 'unban';
     public const TRANSITION_SUSPEND = 'suspend';
