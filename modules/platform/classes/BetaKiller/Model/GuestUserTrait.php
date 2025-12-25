@@ -49,6 +49,14 @@ trait GuestUserTrait
     /**
      * @inheritDoc
      */
+    public function inStateRejected(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function inStateBanned(): bool
     {
         return false;

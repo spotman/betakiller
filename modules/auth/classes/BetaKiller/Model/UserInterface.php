@@ -95,6 +95,11 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     /**
      * @return bool
      */
+    public function inStateRejected(): bool;
+
+    /**
+     * @return bool
+     */
     public function inStateBanned(): bool;
 
     /**

@@ -196,6 +196,14 @@ class User extends AbstractCreatedAt implements UserInterface
     /**
      * @inheritDoc
      */
+    public function inStateRejected(): bool
+    {
+        return $this->isInWorkflowState(UserState::REJECTED);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function inStateBanned(): bool
     {
         return $this->isInWorkflowState(UserState::BANNED);
