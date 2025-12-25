@@ -36,6 +36,10 @@ abstract readonly class AbstractHttpErrorIFace extends AbstractIFace
 
         $e = self::fetchException($request);
 
+        while ($prev = $e?->getPrevious()) {
+            $e = $prev;
+        }
+
         return [
             'url'     => $request->getUri()->getPath(),
             'email'   => $user?->getEmail(),
