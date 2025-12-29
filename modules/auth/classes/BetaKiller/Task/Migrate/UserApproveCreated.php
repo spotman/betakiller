@@ -75,7 +75,7 @@ final readonly class UserApproveCreated implements ConsoleTaskInterface
             Database::UPDATE,
             "UPDATE :users_table AS u
 LEFT JOIN :states_table AS s ON (:states_id = :users_status_id)
-SET :approved_at = NOW(), :users_status_id = (SELECT :states_id FROM :states_table AS s WHERE :states_codename = :state_approved)
+SET :users_approved_at = NOW(), :users_status_id = (SELECT :states_id FROM :states_table AS s WHERE :states_codename = :state_approved)
 WHERE :states_codename = :state_created;"
         )
 //            ->bind(':users_alias', $usersAlias)
