@@ -37,9 +37,14 @@ readonly class CustomErrorPageMiddleware implements MiddlewareInterface
             $page = $this->detectCustomPage($e);
 
             if ($page) {
+                $stack = ServerRequestHelper::getUrlElementStack($request);
+
                 // Push this page to UrlElementStack to make "inertia" module happy
+                // Prevent duplicates if custom page is requested directly via URL
                 // @see DefaultInertiaTemplateContextFactory
-                ServerRequestHelper::getUrlElementStack($request)->push($page);
+                if (!$stack->hasCurrent() || $stack->getCurrent() !== $page) {
+                    $stack->push($page);
+                }
 
                 return $this->renderer->render($page, $request);
             }
