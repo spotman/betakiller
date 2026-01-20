@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BetaKiller\Url\Parameter;
 
 use BetaKiller\Config\AppConfigInterface;
+use Throwable;
 
 /**
  * Class RawUrlParameterFactory
@@ -39,7 +40,14 @@ readonly class RawUrlParameterFactory
             ]);
         }
 
-        return $className::fromUriValue($uriValue);
+        try {
+            return $className::fromUriValue($uriValue);
+        } catch (Throwable $e) {
+            throw new UrlParameterException('Can not create :name from ":value"', [
+                ':name' => $codename,
+                ':value' => $uriValue,
+            ], 0, $e);
+        }
     }
 
     /**
