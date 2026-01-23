@@ -233,6 +233,14 @@ class UserRepository extends AbstractOrmBasedHasWorkflowStateRepository implemen
         return $this;
     }
 
+    protected function filterStateCodename(ExtendedOrmInterface $orm, string $codename): self
+    {
+        // Already joined by default
+        $orm->where(ORM::col(User::getWorkflowStateRelationKey(), UserState::COL_CODENAME), '=', $codename);
+
+        return $this;
+    }
+
     protected function filterApprovedAtBefore(ExtendedOrmInterface $orm, DateTimeImmutable $before): self
     {
         $orm->filter_datetime_column_value($orm->object_column(User::COL_APPROVED_AT), $before, '<');
