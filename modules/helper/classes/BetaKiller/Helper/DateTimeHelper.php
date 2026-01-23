@@ -113,18 +113,7 @@ final class DateTimeHelper
      */
     public static function isSameDate(DateTimeImmutable $left, DateTimeImmutable $right): bool
     {
-        $tz = self::getUtcTimezone();
-
-        $leftDate = $left
-            ->setTimezone($tz)
-            ->setTime(0, 0);
-
-        $rightDate = $right
-            ->setTimezone($tz)
-            ->setTime(0, 0);
-
-        // use non-strict comparison here
-        return $leftDate == $rightDate;
+        return $left->format('Y-m-d') === $right->format('Y-m-d');
     }
 
     /**
