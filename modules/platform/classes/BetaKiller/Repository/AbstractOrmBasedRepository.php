@@ -199,6 +199,13 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         return (int)$orm->execute_query()->get('total');
     }
 
+    protected function countDistinct(OrmInterface $orm, string $column, bool $joinWith = null, bool $selectWith = null): int
+    {
+        return $this->countCustom($orm, DB::expr('COUNT(DISTINCT :col)', [
+            ':col' => DB::expr($column),
+        ]), $joinWith, $selectWith);
+    }
+
     protected function countAll(OrmInterface $orm): int
     {
         return $orm->count_all();
