@@ -48,7 +48,7 @@ abstract class AbstractOrmBasedDispatchableRepository extends AbstractOrmBasedRe
         $this->customFilterForUrlDispatching($orm, $parameters);
 
         // Add ordering
-        $this->customOrderBy($orm);
+        $this->applyDefaultOrderBy($orm);
 
         $keyName   = $this->getUrlKeyName();
         $keyColumn = $orm->object_column($keyName);

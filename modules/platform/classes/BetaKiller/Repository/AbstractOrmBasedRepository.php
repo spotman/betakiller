@@ -76,7 +76,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         $orm = $this->getOrmInstance();
 
         // Add ordering
-        $this->customOrderBy($orm);
+        $this->applyDefaultOrderBy($orm);
 
         return $this->findAll($orm);
     }
@@ -92,7 +92,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         $orm = $this->getOrmInstance();
 
         // Add ordering
-        $this->customOrderBy($orm);
+        $this->applyDefaultOrderBy($orm);
 
         return $this->findAll($orm, $currentPage, $itemsPerPage);
     }
@@ -249,7 +249,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     {
         try {
             // Add ordering
-            $this->customOrderBy($orm);
+            $this->applyDefaultOrderBy($orm);
 
             if (!$currentPage || !$itemsPerPage) {
                 // Raw data
@@ -286,7 +286,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     ): SearchResultsInterface {
         try {
             // Add ordering
-            $this->customOrderBy($orm);
+            $this->applyDefaultOrderBy($orm);
 
             // Wrap in a pager
             $pager = PaginateHelper::create(
@@ -391,6 +391,13 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         $orm->order_by(DB::expr('RAND()'));
 
         return $this;
+    }
+
+    protected function applyDefaultOrderBy(OrmInterface $orm): void
+    {
+        if (!$orm->hasPendingOrderBy()) {
+            $this->customOrderBy($orm);
+        }
     }
 
     protected function customOrderBy(OrmInterface $orm): void
