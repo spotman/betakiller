@@ -9,12 +9,18 @@ use BetaKiller\Session\SessionCause;
 use DateInterval;
 use DateTimeImmutable;
 
-class UserSession extends \ORM implements UserSessionInterface
+class UserSession extends AbstractCreatedAt implements UserSessionInterface
 {
     public const TOKEN_LENGTH = 40;
 
+    public const COL_TOKEN          = 'token';
+    public const COL_USER_ID        = 'user_id';
+    public const COL_CONTENTS       = 'contents';
+    public const COL_LAST_ACTIVE_AT = 'last_active_at';
     public const COL_IS_REGENERATED = 'is_regenerated';
     public const COL_CAUSE          = 'cause';
+
+    public const REL_USER = 'user';
 
     /**
      * Custom configuration (set table name, configure relations, load_with(), etc)
@@ -25,47 +31,35 @@ class UserSession extends \ORM implements UserSessionInterface
         $this->_primary_key = 'token';
 
         $this->belongs_to([
-            'user' => [
+            self::REL_USER => [
                 'model'       => User::getModelName(),
-                'foreign_key' => 'user_id',
+                'foreign_key' => self::COL_USER_ID,
             ],
         ]);
 
-        $this->load_with(['user']);
+        $this->load_with([self::REL_USER]);
     }
 
     public function setToken(string $value): UserSessionInterface
     {
-        $this->set('token', $value);
+        $this->set(self::COL_TOKEN, $value);
 
         return $this;
     }
 
     public function getToken(): string
     {
-        return $this->get('token');
-    }
-
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return $this->get_datetime_column_value('created_at');
-    }
-
-    public function setCreatedAt(DateTimeImmutable $value): UserSessionInterface
-    {
-        $this->set_datetime_column_value('created_at', $value);
-
-        return $this;
+        return $this->get(self::COL_TOKEN);
     }
 
     public function getLastActiveAt(): DateTimeImmutable
     {
-        return $this->get_datetime_column_value('last_active_at');
+        return $this->get_datetime_column_value(self::COL_LAST_ACTIVE_AT);
     }
 
     public function setLastActiveAt(DateTimeImmutable $value): UserSessionInterface
     {
-        $this->set_datetime_column_value('last_active_at', $value);
+        $this->set_datetime_column_value(self::COL_LAST_ACTIVE_AT, $value);
 
         return $this;
     }
@@ -76,26 +70,26 @@ class UserSession extends \ORM implements UserSessionInterface
             throw new DomainException('Can not link session :id to a guest user', [':id' => $this->getID()]);
         }
 
-        $this->set('user', $user);
+        $this->set(self::REL_USER, $user);
 
         return $this;
     }
 
     public function setUserID(string $id): UserSessionInterface
     {
-        $this->set('user_id', $id);
+        $this->set(self::COL_USER_ID, $id);
 
         return $this;
     }
 
     public function hasUser(): bool
     {
-        return (bool)$this->get('user_id');
+        return (bool)$this->get(self::COL_USER_ID);
     }
 
     public function getUser(): UserInterface
     {
-        return $this->getRelatedEntity('user', true);
+        return $this->getRelatedEntity(self::REL_USER, true);
     }
 
     public function isExpiredIn(DateInterval $interval): bool
@@ -105,12 +99,12 @@ class UserSession extends \ORM implements UserSessionInterface
 
     public function getContents(): string
     {
-        return (string)$this->get('contents');
+        return (string)$this->get(self::COL_CONTENTS);
     }
 
     public function setContents(string $value): UserSessionInterface
     {
-        $this->set('contents', $value);
+        $this->set(self::COL_CONTENTS, $value);
 
         return $this;
     }

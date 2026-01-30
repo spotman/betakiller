@@ -6,6 +6,7 @@ namespace BetaKiller\Factory;
 
 use BetaKiller\Model\UserSession;
 use BetaKiller\Model\UserSessionInterface;
+use DateTimeImmutable;
 
 final readonly class UserSessionFactory implements UserSessionFactoryInterface
 {
@@ -15,7 +16,7 @@ final readonly class UserSessionFactory implements UserSessionFactoryInterface
 
         $model
             ->setToken($id)
-            ->setCreatedAt(new \DateTimeImmutable());
+            ->setCreatedAt(new DateTimeImmutable());
 
         return $model;
     }

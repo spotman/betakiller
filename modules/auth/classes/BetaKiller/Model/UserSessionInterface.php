@@ -8,15 +8,11 @@ use BetaKiller\Session\SessionCause;
 use DateInterval;
 use DateTimeImmutable;
 
-interface UserSessionInterface extends AbstractEntityInterface
+interface UserSessionInterface extends AbstractEntityInterface, CreatedAtInterface
 {
     public function setToken(string $value): UserSessionInterface;
 
     public function getToken(): string;
-
-    public function getCreatedAt(): DateTimeImmutable;
-
-    public function setCreatedAt(DateTimeImmutable $value): UserSessionInterface;
 
     public function getLastActiveAt(): DateTimeImmutable;
 

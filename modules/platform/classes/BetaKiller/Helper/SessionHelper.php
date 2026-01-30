@@ -29,14 +29,19 @@ class SessionHelper
         return self::SERVICE_KEY_PREFIX.$name;
     }
 
-    public static function transferData(SessionInterface $from, SessionInterface $to): void
+    public static function importData(array $data, SessionInterface $to): void
     {
-        foreach ($from->toArray() as $key => $value) {
+        foreach ($data as $key => $value) {
             // Skip existing keys
             if (!$to->has($key)) {
                 $to->set($key, $value);
             }
         }
+    }
+
+    public static function transferData(SessionInterface $from, SessionInterface $to): void
+    {
+        self::importData($from->toArray(), $to);
     }
 
     public static function getId(SessionInterface $session): string
@@ -141,6 +146,27 @@ class SessionHelper
     public static function setCause(SessionInterface $session, SessionCause $value): void
     {
         $session->set(self::getCauseKey(), $value->getCodename());
+    }
+
+    public static function hasUserAgentHash(SessionInterface $session): bool
+    {
+        return $session->has(self::getUserAgentHashKey());
+
+    }
+
+    public static function getUserAgentHash(SessionInterface $session): string
+    {
+        return $session->get(self::getUserAgentHashKey());
+    }
+
+    public static function setUserAgentHash(SessionInterface $session, string $value): void
+    {
+        $session->set(self::getUserAgentHashKey(), $value);
+    }
+
+    private static function getUserAgentHashKey(): string
+    {
+        return self::makeServiceKey('ua');
     }
 
     private static function getCauseKey(): string

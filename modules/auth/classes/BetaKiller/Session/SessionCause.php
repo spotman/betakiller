@@ -11,6 +11,7 @@ enum SessionCause: string
     case Regenerated = 'regenerated';
     case Expired = 'expired';
     case Invalid = 'invalid';
+    case Transitioned = 'transitioned';
     case Missing = 'missing';
     case Fake = 'fake';
     case Unknown = 'unknown';
@@ -23,5 +24,14 @@ enum SessionCause: string
     public function getCodename(): string
     {
         return $this->value;
+    }
+
+    public function isValid(): bool
+    {
+        return in_array($this, [
+            self::Auth,
+            self::Regenerated,
+            self::Transitioned,
+        ]);
     }
 }

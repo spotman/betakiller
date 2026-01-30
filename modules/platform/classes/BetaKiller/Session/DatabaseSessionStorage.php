@@ -71,15 +71,15 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
 
         // No session (cleared by browser or new visitor) => regenerate empty session
         if (!$token) {
-            return $this->createSession(SessionCause::Absent);
+            return $this->createSession(SessionCause::Absent, $userAgent);
         }
 
         // Bots, fake requests, etc => reuse empty session
         if (!$userAgent) {
-            return $this->createSession(SessionCause::Fake, $token);
+            return $this->createSession(SessionCause::Fake, $userAgent, $token);
         }
 
-        return $this->getByToken($token);
+        return $this->getByToken($token, $userAgent);
     }
 
     private function isExpired(UserSessionInterface $model): bool
@@ -106,7 +106,9 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
         $cause = $model->hasCause() ? $model->getCause() : SessionCause::Unknown;
 
         // Create session DTO
-        $session = $this->createSession($cause, $model->getToken(), $data);
+        $session = $this->createSession($cause, null, $model->getToken());
+
+        SessionHelper::importData($data, $session);
 
         // Restore user in session if exists
         if ($model->hasUser()) {
@@ -120,28 +122,35 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
     /**
      * @inheritDoc
      */
-    public function getByToken(string $token): SessionInterface
+    public function getByToken(string $token, string $userAgent = null): SessionInterface
     {
         $model = $this->sessionRepo->findByToken($token);
 
         if (!$model) {
             // Missing session (cleared by gc or stale) => regenerate empty session
-            return $this->createSession(SessionCause::Missing, $token);
+            return $this->createSession(SessionCause::Missing, $userAgent, $token);
         }
 
         if ($model->isRegenerated()) {
             // Session exists, but was regenerated => create empty (for security purpose)
-            return $this->createSession(SessionCause::Invalid);
+            return $this->createSession(SessionCause::Invalid, $userAgent);
         }
 
         if ($this->isExpired($model)) {
             // Session exists, but expired => create empty
-            return $this->createSession(SessionCause::Expired);
+            return $this->createSession(SessionCause::Expired, $userAgent);
         }
 
         // No user agent / IP checks coz of annoying session issues
         // They are constantly changing after browser update + inconsistent behaviour
-        return $this->restoreSession($model);
+        $session = $this->restoreSession($model);
+
+        // User-Agent changed (possible session forgery attack) => create empty session
+        if ($userAgent && !$this->verifyUserAgent($session, $userAgent)) {
+            return $this->createSession(SessionCause::Transitioned, $userAgent);
+        }
+
+        return $session;
     }
 
     /**
@@ -157,12 +166,16 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
     /**
      * @inheritDoc
      */
-    public function createSession(SessionCause $cause, ?string $id = null, array $data = null): SessionInterface
+    public function createSession(SessionCause $cause, ?string $userAgent, ?string $id = null): SessionInterface
     {
         // Generate new token and fresh session object without data
-        $session = new Session($data ?? [], $id ?? $this->generateToken());
+        $session = new Session([], $id ?? $this->generateToken());
 
         SessionHelper::setCause($session, $cause);
+
+        if ($userAgent) {
+            SessionHelper::setUserAgentHash($session, $this->hashUserAgent($userAgent));
+        }
 
         return $session;
     }
@@ -216,6 +229,21 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
         }
     }
 
+    private function verifyUserAgent(SessionInterface $session, string $userAgent): bool
+    {
+        if (!SessionHelper::hasUserAgentHash($session)) {
+            return false;
+        }
+
+        return SessionHelper::getUserAgentHash($session) === $this->hashUserAgent($userAgent);
+    }
+
+    private function hashUserAgent(string $userAgent): string
+    {
+        // Using here fast, non-cryptographic function (full session data encrypted already)
+        return hash('xxh128', $userAgent);
+    }
+
     private function storeSession(SessionInterface $session): void
     {
 //        // Do not store empty sessions
@@ -261,7 +289,12 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
             : SessionCause::Regenerated;
 
         // Generate new token and create fresh session with empty data
-        $newSession = $this->createSession($oldCause);
+        $newSession = $this->createSession($oldCause, null);
+
+        // Transfer User-Agent from old session (for guests too)
+        if (SessionHelper::hasUserAgentHash($oldSession)) {
+            SessionHelper::setUserAgentHash($newSession, SessionHelper::getUserAgentHash($oldSession));
+        }
 
         $userID = SessionHelper::getUserID($oldSession);
 

@@ -132,7 +132,7 @@ class IsAlive extends AbstractTask
 
     private function createSession(): void
     {
-        $this->session = $this->sessionStorage->createSession(SessionCause::Auth);
+        $this->session = $this->sessionStorage->createSession(SessionCause::Auth, null);
 
         SessionHelper::setUserID($this->session, $this->user);
 
