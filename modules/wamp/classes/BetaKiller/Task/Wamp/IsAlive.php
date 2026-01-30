@@ -134,7 +134,7 @@ class IsAlive extends AbstractTask
     {
         $this->session = $this->sessionStorage->createSession(SessionCause::Auth, null);
 
-        SessionHelper::setUserID($this->session, $this->user);
+        SessionHelper::setUser($this->session, $this->user);
 
         $response = ResponseHelper::text('ok');
 

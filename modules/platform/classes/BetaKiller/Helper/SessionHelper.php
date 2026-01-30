@@ -59,13 +59,18 @@ class SessionHelper
         return empty(array_filter(array_keys($session->toArray()), fn(string $key) => !str_starts_with($key, self::SERVICE_KEY_PREFIX)));
     }
 
-    public static function setUserID(SessionInterface $session, UserInterface $user): void
+    public static function setUserID(SessionInterface $session, string $userId): void
+    {
+        $session->set(self::AUTH_USER_ID, $userId);
+    }
+
+    public static function setUser(SessionInterface $session, UserInterface $user): void
     {
         if ($user instanceof GuestUserInterface) {
             throw new LogicException('Session user can not be a guest but real user only');
         }
 
-        $session->set(self::AUTH_USER_ID, $user->getID());
+        self::setUserID($session, $user->getID());
     }
 
     public static function hasUserID(SessionInterface $session): bool

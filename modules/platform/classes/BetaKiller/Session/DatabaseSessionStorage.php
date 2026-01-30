@@ -112,7 +112,7 @@ final readonly class DatabaseSessionStorage implements SessionStorageInterface
 
         // Restore user in session if exists
         if ($model->hasUser()) {
-            SessionHelper::setUserID($session, $model->getUser());
+            SessionHelper::setUserID($session, $model->getUserId());
         }
 
         // Valid session => return it

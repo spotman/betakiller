@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\Model;
 
 use Psr\Http\Message\UriInterface;
@@ -118,6 +119,14 @@ class Hit extends AbstractCreatedByAt implements HitInterface
     public function getSessionToken(): string
     {
         return (string)$this->get(self::COL_SESSION_TOKEN);
+    }
+
+    public function setCreatedById(string $userId): HitInterface
+    {
+        // Speed up processing by using plain value instead of fully initialized User object
+        $this->set(self::getCreatedByColumnName(), $userId);
+
+        return $this;
     }
 
     /**

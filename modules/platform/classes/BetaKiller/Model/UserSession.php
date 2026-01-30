@@ -37,7 +37,8 @@ class UserSession extends AbstractCreatedAt implements UserSessionInterface
             ],
         ]);
 
-        $this->load_with([self::REL_USER]);
+        // Speedup a bit
+//        $this->load_with([self::REL_USER]);
     }
 
     public function setToken(string $value): UserSessionInterface
@@ -89,7 +90,12 @@ class UserSession extends AbstractCreatedAt implements UserSessionInterface
 
     public function getUser(): UserInterface
     {
-        return $this->getRelatedEntity(self::REL_USER, true);
+        return $this->fetchRelatedEntity(self::REL_USER, true);
+    }
+
+    public function getUserId(): string
+    {
+        return $this->get(self::COL_USER_ID);
     }
 
     public function isExpiredIn(DateInterval $interval): bool

@@ -173,7 +173,7 @@ class ProcessHits extends AbstractTask
                 $session = $this->sessionRepo->findByToken($hit->getSessionToken());
 
                 if ($session && $session->hasUser()) {
-                    $hit->setCreatedBy($session->getUser());
+                    $hit->setCreatedById($session->getUserId());
                 }
             }
 

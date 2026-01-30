@@ -26,6 +26,8 @@ interface UserSessionInterface extends AbstractEntityInterface, CreatedAtInterfa
 
     public function getUser(): UserInterface;
 
+    public function getUserId(): string;
+
     public function setCause(SessionCause $value): UserSessionInterface;
 
     public function hasCause(): bool;

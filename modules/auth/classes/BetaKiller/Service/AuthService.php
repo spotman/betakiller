@@ -163,7 +163,7 @@ class AuthService
         $this->userRepo->save($user);
 
         // Store user in session
-        SessionHelper::setUserID($session, $user);
+        SessionHelper::setUser($session, $user);
         SessionHelper::setCause($session, SessionCause::Auth);
 
         // Always create new session on successful login to prevent stale sessions
