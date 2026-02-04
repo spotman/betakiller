@@ -16,6 +16,17 @@ return [
         'is_redirect_missing_enabled' => false,
         'circular_link_href'          => '#',
 
+        'query' => [
+            'ignored' => [
+                // UTM markers
+                UtmCampaign::getQueryKey(),
+                UtmContent::getQueryKey(),
+                UtmMedium::getQueryKey(),
+                UtmSource::getQueryKey(),
+                UtmTerm::getQueryKey(),
+            ],
+        ],
+
         'parameters' => [
             // Common params
             ID::class,
