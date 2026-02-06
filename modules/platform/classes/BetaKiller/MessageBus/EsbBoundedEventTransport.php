@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\MessageBus;
@@ -24,5 +25,10 @@ final class EsbBoundedEventTransport extends AbstractEsbTransport implements Bou
     public function subscribeBounded(string $eventName, callable $handler): void
     {
         $this->subscribeSingle($eventName, $handler);
+    }
+
+    public function subscribeAnyBounded(callable $handler): void
+    {
+        $this->subscribePattern('*', $handler);
     }
 }

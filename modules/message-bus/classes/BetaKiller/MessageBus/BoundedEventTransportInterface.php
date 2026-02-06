@@ -1,9 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\MessageBus;
-
-use React\EventLoop\LoopInterface;
 
 /**
  * Interface BoundedEventTransportInterface
@@ -22,4 +21,11 @@ interface BoundedEventTransportInterface extends EventTransportInterface
      * @param callable $handler
      */
     public function subscribeBounded(string $eventName, callable $handler): void;
+
+    /**
+     * @param callable $handler
+     *
+     * @return void
+     */
+    public function subscribeAnyBounded(callable $handler): void;
 }
