@@ -15,7 +15,6 @@ use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
 use React\Promise\PromiseInterface;
 use Throwable;
-use Thruway\Logging\Logger;
 
 use function React\Promise\resolve;
 
@@ -87,8 +86,6 @@ final class EsbPingDaemon extends AbstractDaemon
 
     public function startDaemon(LoopInterface $loop): PromiseInterface
     {
-        Logger::set($this->logger);
-
         // Emit heartbeat every 5 seconds
         $this->heartbeatTimer = $loop->addPeriodicTimer(self::HEARTBEAT_INTERVAL, function () {
             $boundedEvent  = new HeartbeatBoundedEvent();
