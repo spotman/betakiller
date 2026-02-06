@@ -8,7 +8,9 @@ use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Env\AppEnvInterface;
 use DateInterval;
 use DateTimeImmutable;
-use HansOtt\PSR7Cookies\SetCookie;
+use Dflydev\FigCookies\FigResponseCookies;
+use Dflydev\FigCookies\Modifier\SameSite;
+use Dflydev\FigCookies\SetCookie;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -66,20 +68,17 @@ class CookieHelper
         DateInterval $expiresIn
     ): ResponseInterface {
         $dt        = new DateTimeImmutable();
-        $expiresAt = $dt->setTimezone(DateTimeHelper::getUtcTimezone())->add($expiresIn)->getTimestamp();
+        $expiresAt = $dt->setTimezone(DateTimeHelper::getUtcTimezone())->add($expiresIn);
 
-        $cookie = new SetCookie(
-            $name,
-            $value,
-            $expiresAt,
-            $this->path,
-            '', // No domain defined => lock cookies to current domain only
-            $this->secureOnly,
-            $this->httpOnly,
-            $this->sameSite
-        );
+        // No domain defined => lock cookies to current domain only
+        $cookie = SetCookie::create($name, $value)
+            ->withExpires($expiresAt)
+            ->withPath($this->path)
+            ->withSecure($this->secureOnly)
+            ->withHttpOnly($this->httpOnly)
+            ->withSameSite(SameSite::fromString($this->sameSite));
 
-        return $cookie->addToResponse($response);
+        return FigResponseCookies::set($response, $cookie);
     }
 
     public function delete(ResponseInterface $response, string $name): ResponseInterface
