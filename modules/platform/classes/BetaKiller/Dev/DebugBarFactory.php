@@ -4,21 +4,20 @@ declare(strict_types=1);
 
 namespace BetaKiller\Dev;
 
-use BetaKiller\Env\AppEnvInterface;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Log\LoggerInterface;
 use DebugBar\Bridge\MonologCollector;
 use DebugBar\DataCollector\MemoryCollector;
 use DebugBar\DebugBar;
-use DebugBar\Storage\FileStorage;
+use DebugBar\Storage\StorageInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Twig\Environment;
 
 readonly class DebugBarFactory implements DebugBarFactoryInterface
 {
     public function __construct(
-        private AppEnvInterface $appEnv,
+        private StorageInterface $storage,
         private Environment $twigEnv,
         private LoggerInterface $logger
     ) {
@@ -61,7 +60,7 @@ readonly class DebugBarFactory implements DebugBarFactoryInterface
         $debugBar->setStackDataSessionNamespace(SessionHelper::makeServiceKey('stack_data'));
 
         // Storage for processing data for AJAX calls and redirects
-        $debugBar->setStorage(new FileStorage($this->appEnv->getTempPath('debugbar-storage')));
+        $debugBar->setStorage($this->storage);
 
         // Prepare renderer
         $renderer = $debugBar

@@ -89,6 +89,8 @@ use BetaKiller\View\TwigViewFactory;
 use BetaKiller\View\ViewFactoryInterface;
 use BetaKiller\Web\ServerRequestErrorResponseGenerator;
 use BetaKiller\WebAppRunnerInterface;
+use DebugBar\Storage\FileStorage;
+use DebugBar\Storage\StorageInterface;
 use Enqueue\Redis\RedisConnectionFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
@@ -369,6 +371,10 @@ return [
 
         DebugBarFactoryInterface::class       => autowire(DebugBarFactory::class),
         DebugBarAccessControlInterface::class => autowire(DebugBarAccessControl::class),
+
+        StorageInterface::class => factory(function(AppEnvInterface $appEnv) {
+            return new FileStorage($appEnv->getTempPath('phpdebugbar-storage'));
+        }),
     ],
 
 ];
