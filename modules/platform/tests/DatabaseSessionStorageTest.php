@@ -23,6 +23,7 @@ use DateTimeImmutable;
 use Dflydev\FigCookies\SetCookies;
 use Laminas\Diactoros\ServerRequest;
 use Middlewares\Utils\RequestHandler;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class DatabaseSessionStorageTest extends AbstractTestCase
@@ -40,11 +41,63 @@ final class DatabaseSessionStorageTest extends AbstractTestCase
         self::assertInstanceOf(SessionStorageInterface::class, $object);
     }
 
+    public function testSessionStability(): void
+    {
+        $storage    = $this->createStorage();
+        $middleware = new SessionMiddleware($storage);
+
+        $firstId = $secondId = null;
+
+        $firstRequest = $this->prepareRequest(null);
+
+        // Generate session ID
+        $firstResp = $middleware->process(
+            $firstRequest,
+            new RequestHandler(function (ServerRequestInterface $request) use (&$firstId) {
+                $session = ServerRequestHelper::getSession($request);
+
+                $firstId = $session->getId();
+
+                return ResponseHelper::html('OK');
+            })
+        );
+
+        // Check data is saved
+        self::assertArrayHasKey($firstId, $this->sessionMocks, 'Session data has not been stored');
+
+        // Fetch session ID
+        $firstToken = $this->getResponseSessionToken($firstResp);
+
+        // Preset session ID in request
+        $secondReq = $this->prepareRequest($firstToken);
+
+        // Check data and regenerate session ID
+        $secondResp = $middleware->process(
+            $secondReq,
+            new RequestHandler(function (ServerRequestInterface $request) use ($firstId, &$secondId) {
+                $session = ServerRequestHelper::getSession($request);
+
+                $secondId = $session->getId();
+
+                self::assertEquals($firstId, $secondId, 'Session ID has not kept (first => second)');
+
+                return ResponseHelper::html('OK');
+            })
+        );
+
+        // Check data is saved
+        self::assertArrayHasKey($secondId, $this->sessionMocks, 'Session data has not been stored');
+
+        $secondToken = $this->getResponseSessionToken($secondResp);
+
+        self::assertEquals($firstToken, $secondToken, 'Session token has changed (first => second)');
+    }
+
     public function testClearSessionOnLogout(): void
     {
         $storage = $this->createStorage();
 
-        $firstRequest = new ServerRequest();
+        $firstRequest = $this->prepareRequest(null);
 
         $middleware = new SessionMiddleware($storage);
 
@@ -66,13 +119,8 @@ final class DatabaseSessionStorageTest extends AbstractTestCase
             })
         );
 
-//        d($this->sessionMocks, $firstResp);
-
-        // Check data is saved
-        self::assertArrayHasKey($firstId, $this->sessionMocks, 'Session data has not been stored');
-
         // Fetch session ID
-        $firstToken = SetCookies::fromResponse($firstResp)->get(DatabaseSessionStorage::COOKIE_NAME)->getValue();
+        $firstToken = $this->getResponseSessionToken($firstResp);
 
         // Preset session ID in request
         $secondReq = $this->prepareRequest($firstToken);
@@ -98,7 +146,7 @@ final class DatabaseSessionStorageTest extends AbstractTestCase
             })
         );
 
-        $secondToken = SetCookies::fromResponse($secondResp)->get(DatabaseSessionStorage::COOKIE_NAME)->getValue();
+        $secondToken = $this->getResponseSessionToken($secondResp);
 
         self::assertNotEquals($firstToken, $secondToken, 'Session token has not changed (first => second)');
 
@@ -122,7 +170,7 @@ final class DatabaseSessionStorageTest extends AbstractTestCase
             })
         );
 
-        $thirdToken = SetCookies::fromResponse($thirdResponse)->get(DatabaseSessionStorage::COOKIE_NAME)->getValue();
+        $thirdToken = $this->getResponseSessionToken($thirdResponse);
 
         self::assertEquals($secondToken, $thirdToken, 'Session token has not kept (second => third)');
 
@@ -141,7 +189,7 @@ final class DatabaseSessionStorageTest extends AbstractTestCase
             })
         );
 
-        $fourthToken = SetCookies::fromResponse($fourthResponse)->get(DatabaseSessionStorage::COOKIE_NAME)->getValue();
+        $fourthToken = $this->getResponseSessionToken($fourthResponse);
 
         self::assertEquals($thirdId, $fourthId, 'Session ID has not kept (third => fourth)');
         self::assertEquals($thirdToken, $fourthToken, 'Session token has no kept (third => fourth)');
@@ -151,7 +199,7 @@ final class DatabaseSessionStorageTest extends AbstractTestCase
     {
         $storage = $this->createStorage();
 
-        $firstRequest = new ServerRequest();
+        $firstRequest = $this->prepareRequest(null);
 
         $middleware = new SessionMiddleware($storage);
 
@@ -171,11 +219,8 @@ final class DatabaseSessionStorageTest extends AbstractTestCase
             })
         );
 
-        // Check data is saved
-        self::assertArrayHasKey($firstId, $this->sessionMocks, 'Session data has not been stored');
-
         // Fetch session ID
-        $firstToken = SetCookies::fromResponse($firstResp)->get(DatabaseSessionStorage::COOKIE_NAME)->getValue();
+        $firstToken = $this->getResponseSessionToken($firstResp);
 
         // Preset session ID in request
         $secondReq = $this->prepareRequest($firstToken);
@@ -201,7 +246,7 @@ final class DatabaseSessionStorageTest extends AbstractTestCase
             })
         );
 
-        $secondToken = SetCookies::fromResponse($secondResp)->get(DatabaseSessionStorage::COOKIE_NAME)->getValue();
+        $secondToken = $this->getResponseSessionToken($secondResp);
 
         self::assertNotEquals($firstToken, $secondToken, 'Session token has not changed (first => second)');
 
@@ -225,7 +270,7 @@ final class DatabaseSessionStorageTest extends AbstractTestCase
             })
         );
 
-        $thirdToken = SetCookies::fromResponse($thirdResponse)->get(DatabaseSessionStorage::COOKIE_NAME)->getValue();
+        $thirdToken = $this->getResponseSessionToken($thirdResponse);
 
         self::assertEquals($secondToken, $thirdToken, 'Session token has not kept (second => third)');
 
@@ -244,10 +289,66 @@ final class DatabaseSessionStorageTest extends AbstractTestCase
             })
         );
 
-        $fourthToken = SetCookies::fromResponse($fourthResponse)->get(DatabaseSessionStorage::COOKIE_NAME)->getValue();
+        $fourthToken = $this->getResponseSessionToken($fourthResponse);
 
         self::assertEquals($thirdId, $fourthId, 'Session ID has not kept (third => fourth)');
         self::assertEquals($thirdToken, $fourthToken, 'Session token has no kept (third => fourth)');
+    }
+
+    public function testTransitionOnUserAgentChange(): void
+    {
+        /* Create new session with default User-Agent */
+
+        $storage = $this->createStorage();
+
+        $firstRequest = $this->prepareRequest(null);
+
+        $middleware = new SessionMiddleware($storage);
+
+        $firstId = $secondId = null;
+
+        // Generate session ID
+        $firstResp = $middleware->process(
+            $firstRequest,
+            new RequestHandler(function (ServerRequestInterface $request) use (&$firstId) {
+                $session = ServerRequestHelper::getSession($request);
+
+                $firstId = $session->getId();
+
+                $session->set(self::FAKE_KEY, true);
+
+                return ResponseHelper::html('OK');
+            })
+        );
+
+        // Fetch session ID
+        $firstToken = $this->getResponseSessionToken($firstResp);
+
+        /* Make request with another User-Agent */
+
+        // Preset session ID in request
+        $secondReq = $this->prepareRequest($firstToken, 'Another User-Agent');
+
+        // Trigger session ID change
+        $secondResp = $middleware->process(
+            $secondReq,
+            new RequestHandler(function (ServerRequestInterface $request) use ($firstId, &$secondId) {
+                $session = ServerRequestHelper::getSession($request);
+
+                $secondId = $session->getId();
+
+                self::assertNotEquals($firstId, $secondId, 'Session ID was kept (first => second)');
+
+                self::assertFalse($session->has(self::FAKE_KEY), 'Session data was kept (second)');
+
+                return ResponseHelper::html('OK');
+            })
+        );
+
+        $secondToken = $this->getResponseSessionToken($secondResp);
+
+        // Check Session ID is changed
+        self::assertNotEquals($firstToken, $secondToken, 'Session token has not changed (first => second)');
     }
 
     private function createStorage(): DatabaseSessionStorage
@@ -299,14 +400,25 @@ final class DatabaseSessionStorageTest extends AbstractTestCase
         return new DatabaseSessionStorage($sessionFactory, $sessionRepo, $sessionConfig, $encryption, $cookies);
     }
 
-    private function prepareRequest(string $sid): ServerRequestInterface
+    private function prepareRequest(?string $sid, string $userAgent = null): ServerRequestInterface
     {
         $serverParams = [
-            'HTTP_USER_AGENT' => 'Chrome webkit',
+            'HTTP_USER_AGENT' => $userAgent ?? 'Default User-Agent',
         ];
 
-        return (new ServerRequest($serverParams))->withCookieParams([
-            DatabaseSessionStorage::COOKIE_NAME => $sid,
-        ]);
+        $req = new ServerRequest($serverParams);
+
+        if ($sid) {
+            $req = $req->withCookieParams([
+                DatabaseSessionStorage::COOKIE_NAME => $sid,
+            ]);
+        }
+
+        return $req;
+    }
+
+    private function getResponseSessionToken(ResponseInterface $response): string
+    {
+        return SetCookies::fromResponse($response)->get(DatabaseSessionStorage::COOKIE_NAME)->getValue();
     }
 }
