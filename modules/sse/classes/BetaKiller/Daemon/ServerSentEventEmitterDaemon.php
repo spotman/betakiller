@@ -7,6 +7,7 @@ namespace BetaKiller\Daemon;
 use BetaKiller\Event\ServerSentEventInterface;
 use BetaKiller\Event\SseGreetingEvent;
 use BetaKiller\Helper\LoggerHelper;
+use BetaKiller\Helper\SessionHelper;
 use BetaKiller\MessageBus\EventBus;
 use BetaKiller\MessageBus\OutboundEventMessageInterface;
 use BetaKiller\MessageBus\OutboundEventTransportInterface;
@@ -86,9 +87,17 @@ final class ServerSentEventEmitterDaemon extends AbstractDaemon
 
             $this->logger->debug('Client connected');
 
+            if (!$request->hasHeader('User-Agent')) {
+                return new Response(StatusCodeInterface::STATUS_BAD_REQUEST);
+            }
+
             $id = $request->getHeaderLine('Last-Event-ID');
 
             $reqSession = $this->getRequestSession($request);
+
+            if (!SessionHelper::hasUserID($reqSession)) {
+                return new Response(StatusCodeInterface::STATUS_UNAUTHORIZED);
+            }
 
             $stream = new ThroughStream();
             $client = new ClientConnection($reqSession, $stream);

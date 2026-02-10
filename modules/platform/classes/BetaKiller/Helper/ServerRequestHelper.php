@@ -34,9 +34,11 @@ class ServerRequestHelper
 
     public static function getUserAgent(ServerRequestInterface $request): ?string
     {
-        $serverParams = $request->getServerParams();
+        $headerName = 'User-Agent';
 
-        return $serverParams['HTTP_USER_AGENT'] ?? null;
+        return $request->hasHeader($headerName)
+            ? $request->getHeaderLine($headerName)
+            : null;
     }
 
     /**
