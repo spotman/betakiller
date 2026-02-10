@@ -17,6 +17,7 @@ use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Sse\ClientConnection;
 use Fig\Http\Message\StatusCodeInterface;
 use Mezzio\Session\SessionInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -77,75 +78,7 @@ final class ServerSentEventEmitterDaemon extends AbstractDaemon
     private function configureSseServer(LoopInterface $loop): void
     {
         $http = new HttpServer($loop, function (ServerRequestInterface $request) use ($loop) {
-            if ($request->getUri()->getPath() === '/status') {
-                return new Response(
-                    StatusCodeInterface::STATUS_NOT_IMPLEMENTED,
-                    ['Content-Type' => 'text/html'],
-                    'Not Implemented'
-                );
-            }
-
-            $this->logger->debug('Client connected');
-
-            if (!$request->hasHeader('User-Agent')) {
-                return new Response(StatusCodeInterface::STATUS_BAD_REQUEST);
-            }
-
-            $id = $request->getHeaderLine('Last-Event-ID');
-
-            $reqSession = $this->getRequestSession($request);
-
-            if (!SessionHelper::hasUserID($reqSession)) {
-                return new Response(StatusCodeInterface::STATUS_UNAUTHORIZED);
-            }
-
-            $stream = new ThroughStream();
-            $client = new ClientConnection($reqSession, $stream);
-
-            $sessionId = $client->getId();
-
-            // Check for duplicate sessions
-            if ($this->hasClient($client)) {
-                $this->logger->warning('Duplicate connection for Client Session ":id"', [
-                    ':id' => $sessionId,
-                ]);
-
-                return new Response(
-                    StatusCodeInterface::STATUS_BAD_REQUEST,
-                    [],
-                    'Bad Request'
-                );
-            }
-
-            // Register new session (onConnect)
-            $this->addClient($client);
-
-            // Register session close handler (onDisconnect)
-            $stream->on('close', function () use ($stream, $client) {
-                $this->logger->debug('Client disconnected');
-
-                $this->removeClient($client);
-            });
-
-            // Wait for response to be initialized (messages are not sent otherwise)
-            $loop->futureTick(function () use ($client) {
-                // Retry interval
-                $this->sendRetry($client);
-
-                // Initial greeting
-                $this->forwardEventTo(new SseGreetingEvent(), $client);
-            });
-
-            return new Response(
-                StatusCodeInterface::STATUS_OK,
-                [
-                    'Content-Type'      => 'text/event-stream',
-                    'Cache-Control'     => 'no-cache',
-                    'Connection'        => 'keep-alive',
-                    'X-Accel-Buffering' => 'no',
-                ],
-                $stream
-            );
+            return $this->injectRequestHeaders($request, $this->dispatchHttpRequest($request, $loop));
         });
 
         $ip   = '0.0.0.0';
@@ -159,6 +92,74 @@ final class ServerSentEventEmitterDaemon extends AbstractDaemon
         $this->logger->info('SSE Server is bound to :uri', [
             ':uri' => $uri,
         ]);
+    }
+
+    private function dispatchHttpRequest(ServerRequestInterface $request, LoopInterface $loop): ResponseInterface
+    {
+        if ($request->getUri()->getPath() === '/status') {
+            return $this->makeStatusResponse();
+        }
+
+        $this->logger->debug('Client connected');
+
+        if (!$request->hasHeader('User-Agent')) {
+            return Response::plaintext('Missing User-Agent')
+                ->withStatus(StatusCodeInterface::STATUS_BAD_REQUEST);
+        }
+
+        $id = $request->getHeaderLine('Last-Event-ID');
+
+        $reqSession = $this->getRequestSession($request);
+
+        if (!SessionHelper::hasUserID($reqSession)) {
+            return Response::plaintext('Unauthorized')
+                ->withStatus(StatusCodeInterface::STATUS_UNAUTHORIZED);
+        }
+
+        $stream = new ThroughStream();
+        $client = new ClientConnection($reqSession, $stream);
+
+        $sessionId = $client->getId();
+
+        // Check for duplicate sessions
+        if ($this->hasClient($client)) {
+            $this->logger->warning('Duplicate connection for Client Session ":id"', [
+                ':id' => $sessionId,
+            ]);
+
+            return Response::plaintext('Multiple sessions are not allowed')
+                ->withStatus(StatusCodeInterface::STATUS_BAD_REQUEST);
+        }
+
+        // Register new session (onConnect)
+        $this->addClient($client);
+
+        // Register session close handler (onDisconnect)
+        $stream->on('close', function () use ($stream, $client) {
+            $this->logger->debug('Client disconnected');
+
+            $this->removeClient($client);
+        });
+
+        // Wait for response to be initialized (messages are not sent otherwise)
+        $loop->futureTick(function () use ($client) {
+            // Retry interval
+            $this->sendRetry($client);
+
+            // Initial greeting
+            $this->forwardEventTo(new SseGreetingEvent(), $client);
+        });
+
+        return new Response(
+            StatusCodeInterface::STATUS_OK,
+            [
+                'Content-Type'      => 'text/event-stream',
+                'Cache-Control'     => 'no-cache',
+                'Connection'        => 'keep-alive',
+                'X-Accel-Buffering' => 'no',
+            ],
+            $stream
+        );
     }
 
     private function getRequestSession(ServerRequestInterface $request): SessionInterface
@@ -256,16 +257,24 @@ final class ServerSentEventEmitterDaemon extends AbstractDaemon
 
     private function forwardEventTo(OutboundEventMessageInterface $event, ClientConnection $client): void
     {
+        // Data field is required for JavaScript processing, even if empty
         $client->stream->write(sprintf('event: %s'.PHP_EOL, $event->getOutboundName()));
-        $data = $event->getOutboundData();
-
-        if ($data !== null) {
-            $client->stream->write(sprintf('data: %s'.PHP_EOL.PHP_EOL, json_encode($data)));
-        }
+        $client->stream->write(sprintf('data: %s'.PHP_EOL.PHP_EOL, json_encode($event->getOutboundData())));
     }
 
     private function sendRetry(ClientConnection $client): void
     {
         $client->stream->write(sprintf('retry: %d'.PHP_EOL.PHP_EOL, 5));
+    }
+
+    private function makeStatusResponse(): ResponseInterface
+    {
+        return Response::plaintext('Not Implemented')
+            ->withStatus(StatusCodeInterface::STATUS_NOT_IMPLEMENTED);
+    }
+
+    private function injectRequestHeaders(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    {
+        return $response->withHeader('Cookie', $request->getHeader('Cookie'));
     }
 }
