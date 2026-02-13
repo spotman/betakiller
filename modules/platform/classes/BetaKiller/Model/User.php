@@ -7,6 +7,7 @@ namespace BetaKiller\Model;
 use BetaKiller\Auth\AuthorizationRequiredException;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\MessageBus\RestrictionTargetInterface;
+use BetaKiller\Workflow\WorkflowStateInterface;
 use DateTimeImmutable;
 
 /**
@@ -42,6 +43,8 @@ class User extends AbstractCreatedAt implements UserInterface
     public const  REL_ROLES    = 'roles';
     public const  REL_SESSIONS = 'sessions';
 
+    public const  REL_STATE_HISTORY = 'state_history';
+
     public const  DEFAULT_IP   = '127.0.0.1';
     public const  CLI_USERNAME = 'minion';
 
@@ -60,6 +63,11 @@ class User extends AbstractCreatedAt implements UserInterface
         ]);
 
         $this->has_many([
+            self::REL_STATE_HISTORY => [
+                'model'       => UserStateHistory::getModelName(),
+                'foreign_key' => UserStateHistory::getEntityForeignKey(),
+            ],
+
             self::REL_SESSIONS => [
                 'model'       => UserSession::getModelName(),
                 'foreign_key' => 'user_id',
@@ -159,6 +167,20 @@ class User extends AbstractCreatedAt implements UserInterface
 //            'password' => 'password',
 //        ];
 //    }
+
+    public function addWorkflowStateHistory(UserInterface $byUser, WorkflowStateInterface $state, string $transitionName): WorkflowStateHistoryInterface
+    {
+        $record = UserStateHistory::createFrom($byUser, $this, $state, $transitionName);
+        $record->save();
+
+        return $record;
+    }
+
+    public function getWorkflowStateHistory(): array
+    {
+        return $this->getAllRelated(self::REL_STATE_HISTORY);
+    }
+
     public function isMinion(): bool
     {
         return $this->hasUsername() && $this->getUsername() === self::CLI_USERNAME;

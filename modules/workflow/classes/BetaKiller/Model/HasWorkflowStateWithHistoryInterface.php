@@ -1,10 +1,19 @@
 <?php
+
 namespace BetaKiller\Model;
+
+use BetaKiller\Workflow\WorkflowStateInterface;
 
 interface HasWorkflowStateWithHistoryInterface extends HasWorkflowStateInterface
 {
+    public function addWorkflowStateHistory(
+        UserInterface $byUser,
+        WorkflowStateInterface $state,
+        string $transitionName
+    ): WorkflowStateHistoryInterface;
+
     /**
-     * @return string
+     * @return WorkflowStateHistoryInterface[]
      */
-    public static function getWorkflowStateHistoryModelName(): string;
+    public function getWorkflowStateHistory(): array;
 }

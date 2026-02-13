@@ -82,9 +82,7 @@ final class StatusWorkflow implements StatusWorkflowInterface
 
         // Write history record if needed
         if ($model instanceof HasWorkflowStateWithHistoryInterface) {
-            // TODO Model_Status_Workflow_History + tables in selected projects
-            // TODO Store user, transition, related model_id (auto timestamp in mysql column)
-            throw new NotImplementedHttpException();
+            $model->addWorkflowStateHistory($user, $targetState, $transition);
         }
     }
 

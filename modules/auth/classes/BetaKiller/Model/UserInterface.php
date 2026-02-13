@@ -17,7 +17,7 @@ use Spotman\Acl\AclUserInterface;
  *
  * @package BetaKiller\Model
  */
-interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWorkflowStateInterface,
+interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWorkflowStateWithHistoryInterface,
     EmailMessageTargetInterface, PhoneMessageTargetInterface, OnlineMessageTargetInterface, AclUserInterface,
     EntityWithAclSpecInterface, RequestUserInterface, CreatedAtInterface, RestrictionTargetInterface
 {
