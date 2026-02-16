@@ -55,7 +55,7 @@ trait HasWorkflowStateEnumEntityTrait
     /**
      * @param \BetaKiller\Workflow\WorkflowStateInterface $state
      *
-     * @return \BetaKiller\Workflow\WorkflowStateInterface
+     * @return string
      */
     abstract protected function exportWorkflowStateToColumnValue(WorkflowStateInterface $state): string;
 }
