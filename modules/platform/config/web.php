@@ -7,6 +7,7 @@ use BetaKiller\Middleware\CustomErrorPageMiddleware;
 use BetaKiller\Middleware\DebugMiddleware;
 use BetaKiller\Middleware\I18nMiddleware;
 use BetaKiller\Middleware\SessionMiddleware;
+use BetaKiller\Middleware\UrlElementCheckMiddleware;
 use BetaKiller\Middleware\UrlElementDispatchMiddleware;
 use BetaKiller\Middleware\UrlElementRenderMiddleware;
 use BetaKiller\Middleware\UrlHelperMiddleware;
@@ -66,6 +67,9 @@ return [
 
             // Depends on UrlHelper
             UrlElementDispatchMiddleware::class,
+
+            // Depends on dispatched URL
+            UrlElementCheckMiddleware::class,
         ],
 
         // Prevent access for locked users

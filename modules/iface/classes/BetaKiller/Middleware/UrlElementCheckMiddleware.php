@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BetaKiller\Url;
+namespace BetaKiller\Middleware;
 
 use BetaKiller\Acl\EntityPermissionResolverInterface;
 use BetaKiller\Acl\UrlElementAccessResolverInterface;
@@ -11,72 +11,41 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\EntityLinkedUrlElementInterface;
+use BetaKiller\Url\EntityNotAllowedException;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
+use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\UrlElementNotAllowedException;
 use BetaKiller\Url\Zone\ZoneAccessSpecFactory;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-class RequestDispatcher
+readonly class UrlElementCheckMiddleware implements MiddlewareInterface
 {
-    /**
-     * @var \BetaKiller\Url\UrlDispatcherInterface
-     */
-    private UrlDispatcherInterface $urlDispatcher;
-
-    /**
-     * @var \BetaKiller\Url\Zone\ZoneAccessSpecFactory
-     */
-    private ZoneAccessSpecFactory $specFactory;
-
-    /**
-     * @var \BetaKiller\Acl\UrlElementAccessResolverInterface
-     */
-    private UrlElementAccessResolverInterface $elementAccessResolver;
-
-    /**
-     * @var \BetaKiller\Acl\EntityPermissionResolverInterface
-     */
-    private EntityPermissionResolverInterface $entityPermissionResolver;
-
-    /**
-     * RequestDispatcher constructor.
-     *
-     * @param \BetaKiller\Url\UrlDispatcherInterface            $urlDispatcher
-     * @param \BetaKiller\Factory\UrlElementInstanceFactory     $instanceFactory
-     * @param \BetaKiller\Acl\UrlElementAccessResolverInterface $elementAccessResolver
-     * @param \BetaKiller\Acl\EntityPermissionResolverInterface $entityPermissionResolver
-     * @param \BetaKiller\Url\Zone\ZoneAccessSpecFactory        $specFactory
-     */
     public function __construct(
-        UrlDispatcherInterface $urlDispatcher,
-        UrlElementAccessResolverInterface $elementAccessResolver,
-        EntityPermissionResolverInterface $entityPermissionResolver,
-        ZoneAccessSpecFactory $specFactory
+        private UrlElementAccessResolverInterface $elementAccessResolver,
+        private EntityPermissionResolverInterface $entityPermissionResolver,
+        private ZoneAccessSpecFactory $specFactory
     ) {
-        $this->urlDispatcher            = $urlDispatcher;
-        $this->elementAccessResolver    = $elementAccessResolver;
-        $this->entityPermissionResolver = $entityPermissionResolver;
-        $this->specFactory              = $specFactory;
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @throws \BetaKiller\Auth\AccessDeniedException
-     * @throws \BetaKiller\Auth\AuthorizationRequiredException
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Url\MissingUrlElementException
-     * @throws \BetaKiller\Url\UrlElementException
-     * @throws \Spotman\Acl\AclException
+     * @inheritDoc
      */
-    public function process(ServerRequestInterface $request): void
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        $this->checkAccessRestrictions($request);
+
+        return $handler->handle($request);
+    }
+
+    private function checkAccessRestrictions(ServerRequestInterface $request): void
     {
         $stack  = ServerRequestHelper::getUrlElementStack($request);
         $params = ServerRequestHelper::getUrlContainer($request);
         $user   = ServerRequestHelper::getUser($request);
-        $i18n   = ServerRequestHelper::getI18n($request);
-        $url    = ServerRequestHelper::getUrl($request);
-
-        $this->urlDispatcher->process($url, $stack, $params, $user, $i18n);
 
         $skippedEntities = [];
 

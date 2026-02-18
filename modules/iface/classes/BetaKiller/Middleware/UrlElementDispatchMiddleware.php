@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
@@ -10,46 +11,28 @@ use BetaKiller\Exception\SeeOtherHttpException;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Url\MissingUrlElementException;
-use BetaKiller\Url\RequestDispatcher;
+use BetaKiller\Url\UrlDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class UrlElementDispatchMiddleware implements MiddlewareInterface
+readonly class UrlElementDispatchMiddleware implements MiddlewareInterface
 {
-    /**
-     * @var \BetaKiller\Url\RequestDispatcher
-     */
-    private RequestDispatcher $requestDispatcher;
-
-    /**
-     * @var \BetaKiller\MessageBus\EventBusInterface
-     */
-    private EventBusInterface $eventBus;
-
     /**
      * UrlElementDispatchMiddleware constructor.
      *
-     * @param \BetaKiller\Url\RequestDispatcher        $urlProcessor
+     * @param \BetaKiller\Url\UrlDispatcherInterface   $urlDispatcher
      * @param \BetaKiller\MessageBus\EventBusInterface $eventBus
      */
     public function __construct(
-        RequestDispatcher $urlProcessor,
-        EventBusInterface $eventBus
+        private UrlDispatcherInterface $urlDispatcher,
+        private EventBusInterface $eventBus
     ) {
-        $this->requestDispatcher = $urlProcessor;
-        $this->eventBus          = $eventBus;
     }
 
     /**
-     * Process an incoming server request and return a response, optionally delegating
-     * response creation to a handler.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Psr\Http\Server\RequestHandlerInterface $handler
-     *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @inheritDoc
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -64,7 +47,13 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
         $pid = RequestProfiler::begin($request, 'UrlElement dispatch');
 
         try {
-            $this->requestDispatcher->process($request);
+            $stack  = ServerRequestHelper::getUrlElementStack($request);
+            $params = ServerRequestHelper::getUrlContainer($request);
+            $user   = ServerRequestHelper::getUser($request);
+            $i18n   = ServerRequestHelper::getI18n($request);
+            $url    = ServerRequestHelper::getUrl($request);
+
+            $this->urlDispatcher->process($url, $stack, $params, $user, $i18n);
 
             // Emit event about successful url parsing
             $this->eventBus->emit(new UrlDispatchedEvent($request));

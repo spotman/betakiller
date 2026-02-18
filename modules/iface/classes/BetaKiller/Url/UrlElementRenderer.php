@@ -48,7 +48,7 @@ class UrlElementRenderer implements UrlElementRendererInterface
      */
     public function render(UrlElementInterface $urlElement, ServerRequestInterface $request): ResponseInterface
     {
-        $pid = RequestProfiler::begin($request, 'UrlElement processing');
+        $pid = RequestProfiler::begin($request, 'UrlElement rendering');
 
         // Use forward target for Dummy
         if ($urlElement instanceof DummyModelInterface) {

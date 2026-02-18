@@ -1,9 +1,9 @@
 <?php
-namespace BetaKiller\HitStat;
+
+namespace BetaKiller\EventHandler;
 
 use BetaKiller\Event\UrlDispatchedEvent;
 use BetaKiller\Exception\DomainException;
-use BetaKiller\Service\HitService;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
 use BetaKiller\Url\Parameter\UtmCampaign;
 use BetaKiller\Url\Parameter\UtmContent;
@@ -11,17 +11,25 @@ use BetaKiller\Url\Parameter\UtmMedium;
 use BetaKiller\Url\Parameter\UtmSource;
 use BetaKiller\Url\Parameter\UtmTerm;
 
-class HitStatUrlDispatchedEventHandler
+final readonly class UrlDispatchedProceedUtmMarkers
 {
-    /**
-     * @param \BetaKiller\Event\UrlDispatchedEvent $message
-     */
+    public static function getUtmQueryKeys(): array
+    {
+        return [
+            UtmSource::getQueryKey(),
+            UtmMedium::getQueryKey(),
+            UtmCampaign::getQueryKey(),
+            UtmContent::getQueryKey(),
+            UtmTerm::getQueryKey(),
+        ];
+    }
+
     public function __invoke(UrlDispatchedEvent $message): void
     {
         $params = $message->getUrlContainer();
 
         // Fetch UTM tags if exists so IFace would not warn about unused parameters
-        foreach (HitService::getUtmQueryKeys() as $queryKey) {
+        foreach (self::getUtmQueryKeys() as $queryKey) {
             $value = $params->getQueryPart($queryKey);
 
             if ($value) {

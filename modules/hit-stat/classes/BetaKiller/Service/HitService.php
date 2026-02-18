@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Service;
@@ -58,17 +59,6 @@ class HitService
      * @var \BetaKiller\Repository\HitPageRedirectRepository
      */
     private $redirectRepo;
-
-    public static function getUtmQueryKeys(): array
-    {
-        return [
-            UtmSource::getQueryKey(),
-            UtmMedium::getQueryKey(),
-            UtmCampaign::getQueryKey(),
-            UtmContent::getQueryKey(),
-            UtmTerm::getQueryKey(),
-        ];
-    }
 
     /**
      * HitService constructor.
