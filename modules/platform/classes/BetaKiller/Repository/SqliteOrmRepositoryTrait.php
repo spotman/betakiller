@@ -10,6 +10,13 @@ use DB;
 
 trait SqliteOrmRepositoryTrait
 {
+    protected function getOrmInstance()
+    {
+        $this->createTableIfNotExists();
+
+        return parent::getOrmInstance();
+    }
+
     public function save($entity): void
     {
         $this->createTableIfNotExists();
