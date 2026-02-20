@@ -9,7 +9,7 @@ use BetaKiller\Url\UrlElementForMenuPlainModelTrait;
 use Carbon\CarbonInterval;
 use DateInterval;
 
-final class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFaceModelInterface
+final class IFaceUrlElement extends AbstractPlainEntityLinkedUrlElement implements IFaceModelInterface
 {
     use UrlElementForMenuPlainModelTrait;
 
@@ -99,9 +99,15 @@ final class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implemen
     }
 
     /**
-     * Returns array representation of the model data
-     *
-     * @return array
+     * @inheritDoc
+     */
+    public function getLayoutCodename(): ?string
+    {
+        return $this->layoutCodename;
+    }
+
+    /**
+     * @inheritDoc
      */
     public function asArray(): array
     {
@@ -119,11 +125,6 @@ final class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implemen
     /**
      * @inheritDoc
      */
-    public function getLayoutCodename(): ?string
-    {
-        return $this->layoutCodename;
-    }
-
     public function fromArray(array $data): void
     {
         $this->label = $data[self::OPTION_LABEL] ?? null;

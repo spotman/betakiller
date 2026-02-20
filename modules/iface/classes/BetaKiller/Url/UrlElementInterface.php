@@ -6,6 +6,11 @@ interface UrlElementInterface extends \JsonSerializable
     public const URL_KEY = 'codename';
 
     /**
+     * @return string
+     */
+    public static function getXmlTagName(): string;
+
+    /**
      * Returns codename
      *
      * @return string
@@ -96,4 +101,20 @@ interface UrlElementInterface extends \JsonSerializable
      * @return string[]
      */
     public function getAllowedEnvironments(): array;
+
+    /**
+     * Fill internal data from provided array representation
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    public function fromArray(array $data): void;
+
+    /**
+     * Returns array representation of the model data
+     *
+     * @return array
+     */
+    public function asArray(): array;
 }

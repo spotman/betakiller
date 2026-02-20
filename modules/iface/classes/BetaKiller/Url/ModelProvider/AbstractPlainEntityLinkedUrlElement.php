@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Url\ModelProvider;
@@ -14,17 +15,15 @@ abstract class AbstractPlainEntityLinkedUrlElement extends AbstractPlainUrlEleme
     /**
      * @var string|null
      */
-    private $entityName;
+    private ?string $entityName = null;
 
     /**
      * @var string|null
      */
-    private $entityAction;
+    private ?string $entityAction = null;
 
     /**
-     * Returns array representation of the model data
-     *
-     * @return array
+     * @inheritDoc
      */
     public function asArray(): array
     {
@@ -34,6 +33,9 @@ abstract class AbstractPlainEntityLinkedUrlElement extends AbstractPlainUrlEleme
         ]);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function fromArray(array $data): void
     {
         if (isset($data[self::OPTION_ENTITY_NAME])) {
@@ -48,9 +50,7 @@ abstract class AbstractPlainEntityLinkedUrlElement extends AbstractPlainUrlEleme
     }
 
     /**
-     * Returns model name of the linked entity
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getEntityModelName(): ?string
     {
@@ -58,9 +58,7 @@ abstract class AbstractPlainEntityLinkedUrlElement extends AbstractPlainUrlEleme
     }
 
     /**
-     * Returns entity [primary] action, applied by this IFace
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getEntityActionName(): ?string
     {

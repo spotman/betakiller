@@ -5,20 +5,23 @@ declare(strict_types=1);
 namespace BetaKiller\Url;
 
 use BetaKiller\Dev\StartupProfiler;
+use BetaKiller\Factory\UrlElementFactoryInterface;
 use BetaKiller\Helper\LoggerHelper;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Throwable;
 
 use function count;
+use function is_array;
 
 final readonly class UrlElementTreeFactory
 {
-    private const CACHE_KEY = 'ifaceModelTree';
+    private const CACHE_KEY = 'UrlElementTree.models';
 
     public function __construct(
         private UrlElementTreeLoader $loader,
         private UrlElementTreeValidatorInterface $validator,
+        private UrlElementFactoryInterface $urlElementFactory,
         private CacheInterface $cache,
         private LoggerInterface $logger
     ) {
@@ -53,9 +56,9 @@ final readonly class UrlElementTreeFactory
      */
     private function loadFromCache(UrlElementTreeInterface $tree): bool
     {
-        $serializedModels = $this->cache->get(self::CACHE_KEY);
+        $serializedData = $this->cache->get(self::CACHE_KEY);
 
-        if (!$serializedModels) {
+        if (!$serializedData) {
             return false;
         }
 
@@ -63,14 +66,10 @@ final readonly class UrlElementTreeFactory
         $counter = 0;
 
         try {
-            $data = unserialize($serializedModels, [UrlElementInterface::class]);
-
-            if (!$data || !\is_array($data)) {
-                throw new UrlElementException('Cached UrlElementTree data is invalid');
-            }
+            $models = $this->unpackModels($serializedData);
 
             // Simply add all models, validation already done upon inserting data into cache
-            foreach ($data as $urlElement) {
+            foreach ($models as $urlElement) {
                 $tree->add($urlElement, true); // No duplication is allowed here
                 $counter++;
             }
@@ -94,17 +93,61 @@ final readonly class UrlElementTreeFactory
      */
     private function storeInCache(UrlElementTreeInterface $tree): void
     {
-        $data = [];
+        $models = [];
 
         // Get models in the order when the parent iface is always populated before child
         foreach ($tree->getRecursiveIteratorIterator() as $model) {
-            $data[] = $model;
+            $models[] = $model;
         }
 
         $this->logger->debug('Storing :count URL elements in cache', [
-            ':count' => count($data),
+            ':count' => count($models),
         ]);
 
-        $this->cache->set(self::CACHE_KEY, serialize($data), 86400); // 1 day
+        $this->cache->set(self::CACHE_KEY, $this->packModels($models), 86400); // 1 day
+    }
+
+    /**
+     * @param \BetaKiller\Url\UrlElementInterface[] $models
+     *
+     * @return string
+     */
+    private function packModels(array $models): string
+    {
+        $data = [];
+
+        foreach ($models as $model) {
+            $tag = $model::getXmlTagName();
+
+            $data[$tag] ??= [];
+
+            $data[$tag][] = $model->asArray();
+        }
+
+        return json_encode($data);
+    }
+
+    /**
+     * @param string $packed
+     *
+     * @return \BetaKiller\Url\UrlElementInterface[]
+     */
+    private function unpackModels(string $packed): array
+    {
+        $data = json_decode($packed, true);
+
+        if (!$data || !is_array($data)) {
+            throw new UrlElementException('Cached UrlElementTree data is invalid');
+        }
+
+        $models = [];
+
+        foreach ($data as $tag => $configs) {
+            foreach ($configs as $config) {
+                $models[] = $this->urlElementFactory->createFrom($tag, $config);
+            }
+        }
+
+        return $models;
     }
 }

@@ -4,7 +4,7 @@ namespace BetaKiller\Url\ModelProvider;
 use BetaKiller\Model\HiddenInSitemapUrlElementModelTrait;
 use BetaKiller\Url\ActionModelInterface;
 
-class ActionPlainModel extends AbstractPlainEntityLinkedUrlElement implements ActionModelInterface
+final class ActionUrlElement extends AbstractPlainEntityLinkedUrlElement implements ActionModelInterface
 {
     /**
      * @return string

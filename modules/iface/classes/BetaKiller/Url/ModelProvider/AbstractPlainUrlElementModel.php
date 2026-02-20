@@ -99,7 +99,7 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
      */
     public static function factory(array $data): UrlElementInterface
     {
-        $instance = new static;
+        $instance = new static();
         $instance->fromArray($data);
 
         return $instance;
@@ -236,9 +236,7 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     }
 
     /**
-     * Returns array representation of the model data
-     *
-     * @return array
+     * @inheritDoc
      */
     public function asArray(): array
     {
@@ -257,6 +255,9 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
         ];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function fromArray(array $data): void
     {
         $this->uri      = $data[self::OPTION_URI];
@@ -311,11 +312,6 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     {
         return $this->asArray();
     }
-
-    /**
-     * @return string
-     */
-    abstract public static function getXmlTagName(): string;
 
     protected function validateBooleanOption(array $data, string $key, bool $default): bool
     {

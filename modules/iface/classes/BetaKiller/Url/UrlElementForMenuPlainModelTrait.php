@@ -8,17 +8,17 @@ trait UrlElementForMenuPlainModelTrait
     /**
      * @var string|null
      */
-    private $menuName;
+    private ?string $menuName = null;
 
     /**
      * @var string|null
      */
-    private $menuCounter;
+    private ?string $menuCounter = null;
 
     /**
      * @var string[]
      */
-    private $menuOrder = [];
+    private array $menuOrder = [];
 
     /**
      * Returns menu codename to which URL is assigned

@@ -6,30 +6,30 @@ use BetaKiller\Model\DummyModelTrait;
 use BetaKiller\Url\DummyModelInterface;
 use BetaKiller\Url\UrlElementForMenuPlainModelTrait;
 
-class DummyPlainModel extends AbstractPlainEntityLinkedUrlElement implements DummyModelInterface
+final class DummyUrlElement extends AbstractPlainEntityLinkedUrlElement implements DummyModelInterface
 {
     use DummyModelTrait;
     use UrlElementForMenuPlainModelTrait;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $label;
+    private ?string $label;
 
     /**
      * @var string|null
      */
-    private $redirect;
+    private ?string $redirect = null;
 
     /**
      * @var string|null
      */
-    private $forward;
+    private ?string $forward = null;
 
     /**
      * @var string|null
      */
-    private $layoutCodename;
+    private ?string $layoutCodename = null;
 
     /**
      * @return string
@@ -89,6 +89,9 @@ class DummyPlainModel extends AbstractPlainEntityLinkedUrlElement implements Dum
         return $this->layoutCodename;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function fromArray(array $data): void
     {
         $this->label = $data[self::OPTION_LABEL] ?? null;
@@ -111,9 +114,7 @@ class DummyPlainModel extends AbstractPlainEntityLinkedUrlElement implements Dum
     }
 
     /**
-     * Returns array representation of the model data
-     *
-     * @return array
+     * @inheritDoc
      */
     public function asArray(): array
     {

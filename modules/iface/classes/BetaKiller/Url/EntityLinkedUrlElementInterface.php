@@ -8,14 +8,14 @@ interface EntityLinkedUrlElementInterface extends UrlElementInterface
     /**
      * Returns model name of the linked entity
      *
-     * @return string
+     * @return string|null
      */
     public function getEntityModelName(): ?string;
 
     /**
      * Returns entity [primary] action, applied by this URL element
      *
-     * @return string
+     * @return string|null
      */
     public function getEntityActionName(): ?string;
 }

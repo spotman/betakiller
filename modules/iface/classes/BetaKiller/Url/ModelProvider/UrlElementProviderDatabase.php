@@ -5,6 +5,9 @@ namespace BetaKiller\Url\ModelProvider;
 use BetaKiller\Model\UrlElement;
 use BetaKiller\Repository\UrlElementRepository;
 
+/**
+ * @deprecated
+ */
 readonly class UrlElementProviderDatabase implements UrlElementProviderInterface
 {
     /**

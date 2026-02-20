@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Url\ModelProvider;
 
+use BetaKiller\Factory\UrlElementFactoryInterface;
 use BetaKiller\Url\UrlElementException;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementWithLayoutInterface;
@@ -12,22 +13,22 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
     /**
      * @var AbstractPlainUrlElementModel[]
      */
-    private $models;
+    private array $models = [];
 
     /**
      * @var string[]
      */
-    private $allowedTags = [];
+    private array $allowedTags = [];
 
     /**
      * UrlElementProviderXmlConfig constructor.
      */
-    public function __construct()
+    public function __construct(private readonly UrlElementFactoryInterface $urlElementFactory)
     {
         $this->allowedTags = [
-            IFacePlainModel::getXmlTagName(),
-            DummyPlainModel::getXmlTagName(),
-            ActionPlainModel::getXmlTagName(),
+            IFaceUrlElement::getXmlTagName(),
+            DummyUrlElement::getXmlTagName(),
+            ActionUrlElement::getXmlTagName(),
         ];
     }
 
@@ -212,21 +213,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
      */
     private function createModelFromConfig(string $tagName, array $config): UrlElementInterface
     {
-        switch ($tagName) {
-            case IFacePlainModel::getXmlTagName():
-                return IFacePlainModel::factory($config);
-
-            case ActionPlainModel::getXmlTagName():
-                return ActionPlainModel::factory($config);
-
-            case DummyPlainModel::getXmlTagName():
-                return DummyPlainModel::factory($config);
-
-            default:
-                throw new UrlElementException('Unknown XML tag <:tag> in URL elements config', [
-                    ':tag' => $tagName,
-                ]);
-        }
+        return $this->urlElementFactory->createFrom($tagName, $config);
     }
 
     private function getModelByCodename(string $codename): AbstractPlainUrlElementModel

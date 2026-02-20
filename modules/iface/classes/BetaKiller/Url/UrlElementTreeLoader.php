@@ -5,22 +5,14 @@ declare(strict_types=1);
 namespace BetaKiller\Url;
 
 use BetaKiller\Env\AppEnvInterface;
-use BetaKiller\Url\ModelProvider\UrlElementProviderDatabase;
 use BetaKiller\Url\ModelProvider\UrlElementProviderXmlConfig;
 
 use function in_array;
 
 readonly class UrlElementTreeLoader
 {
-    /**
-     * UrlElementTreeLoader constructor.
-     *
-     * @param \BetaKiller\Url\ModelProvider\UrlElementProviderDatabase  $databaseProvider
-     * @param \BetaKiller\Url\ModelProvider\UrlElementProviderXmlConfig $xmlProvider
-     * @param \BetaKiller\Env\AppEnvInterface                           $appEnv
-     */
     public function __construct(
-        private UrlElementProviderDatabase $databaseProvider,
+//        private UrlElementProviderDatabase $databaseProvider,
         private UrlElementProviderXmlConfig $xmlProvider,
         private AppEnvInterface $appEnv
     ) {
