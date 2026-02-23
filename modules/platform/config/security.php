@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use BetaKiller\Session\DatabaseSessionStorage;
+use BetaKiller\Session\SessionStorage;
 
 return [
     'csp' => [
@@ -22,7 +22,7 @@ return [
     'cookies' => [
         'protected' => [
             // This cookie is used by WAMP JS client as auth id
-            DatabaseSessionStorage::COOKIE_NAME,
+            SessionStorage::COOKIE_NAME,
         ],
     ],
 ];

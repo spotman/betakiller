@@ -1,11 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Test;
 
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\User;
-use BetaKiller\Task\AbstractTask;
 
 final class OrmTest extends AbstractTestCase
 {

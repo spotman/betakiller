@@ -26,12 +26,12 @@ use Psr\Http\Message\ServerRequestInterface;
 use Random\Engine\Secure;
 use Random\Randomizer;
 
-final readonly class DatabaseSessionStorage implements SessionStorageInterface
+final readonly class SessionStorage implements SessionStorageInterface
 {
     public const COOKIE_NAME = 'sid';
 
     /**
-     * DatabaseSessionStorage constructor.
+     * SessionStorage constructor.
      *
      * @param \BetaKiller\Factory\UserSessionFactoryInterface       $modelFactory
      * @param \BetaKiller\Repository\UserSessionRepositoryInterface $sessionRepo

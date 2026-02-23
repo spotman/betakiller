@@ -79,7 +79,7 @@ use BetaKiller\Repository\UserSessionRepository;
 use BetaKiller\Repository\UserSessionRepositoryInterface;
 use BetaKiller\Repository\UserStateRepository;
 use BetaKiller\Repository\UserStateRepositoryInterface;
-use BetaKiller\Session\DatabaseSessionStorage;
+use BetaKiller\Session\SessionStorage;
 use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
@@ -212,7 +212,7 @@ return [
         ResolvableMiddlewareFactoryInterface::class => autowire(ResolvableMiddlewareFactory::class),
 
         UserSessionFactoryInterface::class => autowire(UserSessionFactory::class),
-        SessionStorageInterface::class     => autowire(DatabaseSessionStorage::class),
+        SessionStorageInterface::class     => autowire(SessionStorage::class),
         SessionPersistenceInterface::class => get(SessionStorageInterface::class),
 
         // Deprecated DI objects
