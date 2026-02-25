@@ -6,36 +6,19 @@ namespace BetaKiller\Task\Assets;
 
 use BetaKiller\Console\ConsoleInputInterface;
 use BetaKiller\Console\ConsoleOptionBuilderInterface;
+use BetaKiller\Console\ConsoleTaskInterface;
 use BetaKiller\Env\AppEnvInterface;
-use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Kohana;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
-class Deploy extends AbstractTask
+readonly class Deploy implements ConsoleTaskInterface
 {
     private const ARG_TARGET = 'target';
 
-    /**
-     * @var \BetaKiller\Env\AppEnvInterface
-     */
-    private $appEnv;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * Deploy constructor.
-     *
-     * @param \BetaKiller\Env\AppEnvInterface $appEnv
-     * @param \Psr\Log\LoggerInterface        $logger
-     */
-    public function __construct(AppEnvInterface $appEnv, LoggerInterface $logger)
+    public function __construct(private AppEnvInterface $appEnv, private LoggerInterface $logger)
     {
-        $this->appEnv = $appEnv;
-        $this->logger = $logger;
     }
 
     public function defineOptions(ConsoleOptionBuilderInterface $builder): array
@@ -47,15 +30,34 @@ class Deploy extends AbstractTask
 
     public function run(ConsoleInputInterface $params): void
     {
-        $staticFilesList = Kohana::list_files('assets'.DIRECTORY_SEPARATOR.'static');
-
         $relativeDir = $params->getString(self::ARG_TARGET);
         $targetDir   = $this->appEnv->getDocRootPath().DIRECTORY_SEPARATOR.$relativeDir;
 
-        $this->logger->debug('Build target dir is :dir', [':dir' => $targetDir]);
+        $this->logger->debug('Build target dir is :dir', [
+            ':dir' => $targetDir,
+        ]);
 
-        foreach ($staticFilesList as $file) {
-            $this->processFile($file, $targetDir);
+        if (!is_writable($targetDir)) {
+            throw new TaskException('Target directory is not writable: :path', [
+                ':path' => $targetDir,
+            ]);
+        }
+
+        $staticFilesList = Kohana::list_files('assets'.DIRECTORY_SEPARATOR.'static');
+
+        foreach ($staticFilesList as $listItem) {
+            $this->processListItem($listItem, $targetDir);
+        }
+    }
+
+    protected function processListItem(string|array $listItem, string $targetDir): void
+    {
+        if (is_array($listItem)) {
+            foreach ($listItem as $item) {
+                $this->processListItem($item, $targetDir);
+            }
+        } else {
+            $this->processFile($listItem, $targetDir);
         }
     }
 
@@ -67,36 +69,35 @@ class Deploy extends AbstractTask
      * @throws \RuntimeException
      * @throws \Kohana_Exception
      */
-    protected function processFile($original, string $targetBase): void
+    protected function processFile(string $original, string $targetBase): void
     {
-        if (\is_array($original)) {
-            foreach ($original as $item) {
-                $this->processFile($item, $targetBase);
-            }
-        } else {
-            $fileArray = explode('static', $original, 2);
+        $fileArray = explode('static', $original, 2);
 
-            $target = $targetBase.$fileArray[1];
+        $target = $targetBase.$fileArray[1];
 
-            $targetBaseDir = \dirname($target);
+        // Skip existing
+        if (file_exists($target)) {
+            return;
+        }
 
-            if (!file_exists($targetBaseDir) && !mkdir($targetBaseDir, 0777, true) && !is_dir($targetBaseDir)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $targetBaseDir));
-            }
+        $targetBaseDir = dirname($target);
 
-            $deployed = @symlink($original, $target);
+        if (!file_exists($targetBaseDir) && !mkdir($targetBaseDir, 0777, true) && !is_dir($targetBaseDir)) {
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $targetBaseDir));
+        }
 
-            if (!$deployed) {
-                throw new TaskException('Can not deploy file :original to :target', [
-                    ':original' => $original,
-                    ':target'   => $target,
-                ]);
-            }
+        $deployed = @symlink($original, $target);
 
-            $this->logger->debug('Symlink created from :from to :to', [
-                ':from' => $original,
-                ':to'   => $target,
+        if (!$deployed) {
+            throw new TaskException('Can not deploy file :original to :target', [
+                ':original' => $original,
+                ':target'   => $target,
             ]);
         }
+
+        $this->logger->debug('Symlink created from :from to :to', [
+            ':from' => $original,
+            ':to'   => $target,
+        ]);
     }
 }
