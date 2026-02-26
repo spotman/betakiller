@@ -4,24 +4,18 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
+use BetaKiller\Factory\OrmFactory;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use Database;
 use DB;
 
 trait SqliteOrmRepositoryTrait
 {
-    protected function getOrmInstance()
+    public function __construct(OrmFactory $ormFactory)
     {
+        parent::__construct($ormFactory);
+
         $this->createTableIfNotExists();
-
-        return parent::getOrmInstance();
-    }
-
-    public function save($entity): void
-    {
-        $this->createTableIfNotExists();
-
-        parent::save($entity);
     }
 
     public function delete($entity): void
