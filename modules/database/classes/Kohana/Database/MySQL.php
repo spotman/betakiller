@@ -416,7 +416,7 @@ class Kohana_Database_MySQL extends Database
      */
     public function ping(): bool
     {
-        $this->_connection && $this->connect();
+        $this->_connection || $this->connect();
 
         /** @var PDO $c */
         $c = $this->_connection;

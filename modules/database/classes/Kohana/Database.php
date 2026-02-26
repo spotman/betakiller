@@ -99,8 +99,8 @@ abstract class Kohana_Database
                     continue;
                 }
 
-                $errors[] = new Database_Exception('Database ping failed for :config', [
-                    ':config' => json_encode($instance->_config),
+                $errors[] = new Database_Exception('Database ping failed for :name', [
+                    ':name' => $instance->_instance,
                 ]);
 
                 // Reconnect if ping failed
