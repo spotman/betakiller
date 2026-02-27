@@ -107,7 +107,7 @@ final readonly class UserWorkflow
             $user->enableEmailNotification();
         }
 
-        $this->state->setStartState($user);
+        $this->state->setStartState($user, $user);
 
         // Create new model via save so ID will be populated for adding roles
         $this->userRepo->save($user);

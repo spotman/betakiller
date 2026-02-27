@@ -79,7 +79,7 @@ class ContentCommentWorkflow
      */
     public function draft(ContentCommentInterface $comment): void
     {
-        $this->status->setStartState($comment);
+        $this->status->setStartState($comment, $comment->getAuthorUser());
     }
 
     public function initAsPending(ContentCommentInterface $comment): void

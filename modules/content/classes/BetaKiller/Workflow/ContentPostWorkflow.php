@@ -55,7 +55,7 @@ class ContentPostWorkflow
      */
     public function draft(ContentPostInterface $post): void
     {
-        $this->status->setStartState($post);
+        $this->status->setStartState($post, $post->getCreatedBy());
     }
 
     /**

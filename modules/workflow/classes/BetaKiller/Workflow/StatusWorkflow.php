@@ -81,9 +81,7 @@ final class StatusWorkflow implements StatusWorkflowInterface
         $model->changeWorkflowState($targetState);
 
         // Write history record if needed
-        if ($model instanceof HasWorkflowStateWithHistoryInterface) {
-            $model->addWorkflowStateHistory($user, $targetState, $transition);
-        }
+        $this->addHistoryRecord($user, $model, $targetState, $transition);
     }
 
     public function isTransitionAllowed(
@@ -94,7 +92,7 @@ final class StatusWorkflow implements StatusWorkflowInterface
         return $this->permissionResolver->isAllowed($user, $model, $codename);
     }
 
-    public function setStartState(HasWorkflowStateInterface $model): void
+    public function setStartState(HasWorkflowStateInterface $model, UserInterface $user): void
     {
         if ($model->hasWorkflowState()) {
             throw new WorkflowStateException(
@@ -110,6 +108,8 @@ final class StatusWorkflow implements StatusWorkflowInterface
         $startState = $this->getStateRepositoryFor($model)->getStartState();
 
         $model->initWorkflowState($startState);
+
+        $this->addHistoryRecord($user, $model, $startState, 'init');
     }
 
     private function getStateRepositoryFor(HasWorkflowStateInterface $model): WorkflowStateRepositoryInterface
@@ -131,5 +131,12 @@ final class StatusWorkflow implements StatusWorkflowInterface
         }
 
         return $stateRepo;
+    }
+
+    private function addHistoryRecord(UserInterface $user, HasWorkflowStateInterface $model, WorkflowStateInterface $state, string $transition): void
+    {
+        if ($model instanceof HasWorkflowStateWithHistoryInterface) {
+            $model->addWorkflowStateHistory($user, $state, $transition);
+        }
     }
 }

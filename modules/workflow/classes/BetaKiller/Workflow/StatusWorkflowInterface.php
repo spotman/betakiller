@@ -8,10 +8,11 @@ interface StatusWorkflowInterface
 {
     /**
      * @param \BetaKiller\Model\HasWorkflowStateInterface $model
+     * @param \BetaKiller\Model\UserInterface             $user
      *
      * @throws \BetaKiller\Workflow\WorkflowStateException
      */
-    public function setStartState(HasWorkflowStateInterface $model): void;
+    public function setStartState(HasWorkflowStateInterface $model, UserInterface $user): void;
 
     /**
      * @param \BetaKiller\Model\HasWorkflowStateInterface $model
