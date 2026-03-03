@@ -3,7 +3,6 @@ namespace BetaKiller\Workflow;
 
 use BetaKiller\Acl\EntityPermissionResolverInterface;
 use BetaKiller\Config\WorkflowConfigInterface;
-use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Factory\RepositoryFactoryInterface;
 use BetaKiller\Model\HasWorkflowStateInterface;
 use BetaKiller\Model\HasWorkflowStateWithHistoryInterface;
@@ -108,8 +107,11 @@ final class StatusWorkflow implements StatusWorkflowInterface
         $startState = $this->getStateRepositoryFor($model)->getStartState();
 
         $model->initWorkflowState($startState);
+    }
 
-        $this->addHistoryRecord($user, $model, $startState, 'init');
+    public function addInitialHistoryRecord(UserInterface $user, HasWorkflowStateWithHistoryInterface $model): void
+    {
+        $this->addHistoryRecord($user, $model, $model->getWorkflowState(), 'init');
     }
 
     private function getStateRepositoryFor(HasWorkflowStateInterface $model): WorkflowStateRepositoryInterface

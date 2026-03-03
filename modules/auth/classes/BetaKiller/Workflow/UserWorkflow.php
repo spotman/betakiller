@@ -112,6 +112,8 @@ final readonly class UserWorkflow
         // Create new model via save so ID will be populated for adding roles
         $this->userRepo->save($user);
 
+        $this->state->addInitialHistoryRecord($user, $user);
+
         if ($primaryRole) {
             $user->addRole($primaryRole);
         }
