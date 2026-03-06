@@ -6,10 +6,18 @@
     <div class="valign center-block">
       <div class="container">
         {% for iface in ifaces %}
-          <a href="{{ iface.url }}" class="btn btn-large blue darken-2" title="{{ iface.label }}">
+          <a href="{{ iface.url }}" class="btn btn-lg btn-primary btn-block mb-4" title="{{ iface.label }}">
             {{ iface.codename }}
           </a>
         {% endfor %}
+
+        <button class="btn btn-lg btn-warning btn-block mb-4" onclick="throw new Error('Test error')">
+          JavaScript error
+        </button>
+
+        <a href="https://{{ random() }}.{{ base_host() }}" class="btn btn-lg btn-danger btn-block mb-4">
+          Non-existing sub-domain
+        </a>
       </div>
     </div>
   </div>
