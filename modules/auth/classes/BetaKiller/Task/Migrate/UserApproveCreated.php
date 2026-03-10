@@ -61,7 +61,6 @@ final readonly class UserApproveCreated implements ConsoleTaskInterface
         $usersTable      = DB::expr($userEntity->table_name());
         $usersId         = DB::expr(ORM::col($usersAlias, $userEntity->primary_key()));
         $usersStatusId   = DB::expr(ORM::col($usersAlias, $userEntity::getWorkflowStateForeignKey()));
-        $usersApprovedAt = DB::expr(ORM::col($usersAlias, $userEntity::COL_APPROVED_AT));
 
         $statesAlias    = 's';
         $statesTable    = DB::expr($stateEntity->table_name());
@@ -75,14 +74,13 @@ final readonly class UserApproveCreated implements ConsoleTaskInterface
             Database::UPDATE,
             "UPDATE :users_table AS u
 LEFT JOIN :states_table AS s ON (:states_id = :users_status_id)
-SET :users_approved_at = NOW(), :users_status_id = (SELECT :states_id FROM :states_table AS s WHERE :states_codename = :state_approved)
+SET :users_status_id = (SELECT :states_id FROM :states_table AS s WHERE :states_codename = :state_approved)
 WHERE :states_codename = :state_created;"
         )
 //            ->bind(':users_alias', $usersAlias)
             ->bind(':users_table', $usersTable)
             ->bind(':users_id', $usersId)
             ->bind(':users_status_id', $usersStatusId)
-            ->bind(':users_approved_at', $usersApprovedAt)
             //
 //            ->bind(':states_alias', $statesAlias)
             ->bind(':states_table', $statesTable)

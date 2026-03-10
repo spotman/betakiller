@@ -71,6 +71,24 @@ return [
             UserState::APPROVED => [
                 WorkflowConfig::ACTIONS => [
                     UserResource::ACTION_READ   => [
+                        RoleInterface::USER_MANAGEMENT,
+                    ],
+                    UserResource::ACTION_UPDATE => [
+                        RoleInterface::LOGIN,
+                    ],
+                ],
+
+                WorkflowConfig::TRANSITIONS => [
+                    UserWorkflow::TRANSITION_ACTIVATE => UserState::ACTIVATED,
+                    UserWorkflow::TRANSITION_SUSPEND  => UserState::SUSPENDED,
+                    UserWorkflow::TRANSITION_BAN      => UserState::BANNED,
+                    UserWorkflow::TRANSITION_REMOVE   => UserState::REMOVED,
+                ],
+            ],
+
+            UserState::ACTIVATED => [
+                WorkflowConfig::ACTIONS => [
+                    UserResource::ACTION_READ   => [
                         RoleInterface::LOGIN,
                         RoleInterface::USER_MANAGEMENT,
                     ],
@@ -80,9 +98,28 @@ return [
                 ],
 
                 WorkflowConfig::TRANSITIONS => [
-                    UserWorkflow::TRANSITION_SUSPEND => UserState::SUSPENDED,
-                    UserWorkflow::TRANSITION_BAN     => UserState::BANNED,
-                    UserWorkflow::TRANSITION_REMOVE  => UserState::REMOVED,
+                    UserWorkflow::TRANSITION_DEACTIVATE => UserState::DEACTIVATED,
+                    UserWorkflow::TRANSITION_SUSPEND    => UserState::SUSPENDED,
+                    UserWorkflow::TRANSITION_BAN        => UserState::BANNED,
+                    UserWorkflow::TRANSITION_REMOVE     => UserState::REMOVED,
+                ],
+            ],
+
+            UserState::DEACTIVATED => [
+                WorkflowConfig::ACTIONS => [
+                    UserResource::ACTION_READ   => [
+                        RoleInterface::USER_MANAGEMENT,
+                    ],
+                    UserResource::ACTION_UPDATE => [
+                        RoleInterface::LOGIN,
+                    ],
+                ],
+
+                WorkflowConfig::TRANSITIONS => [
+                    UserWorkflow::TRANSITION_ACTIVATE => UserState::ACTIVATED,
+                    UserWorkflow::TRANSITION_SUSPEND  => UserState::SUSPENDED,
+                    UserWorkflow::TRANSITION_BAN      => UserState::BANNED,
+                    UserWorkflow::TRANSITION_REMOVE   => UserState::REMOVED,
                 ],
             ],
 
@@ -149,6 +186,20 @@ return [
                 // Self-service via auto-approve
                 RoleInterface::LOGIN,
                 // Approved by moderator
+                RoleInterface::USER_MANAGEMENT,
+            ],
+
+            UserWorkflow::TRANSITION_ACTIVATE => [
+                // Self-service via auto-activation
+                RoleInterface::LOGIN,
+                // Activated by moderator or business rules
+                RoleInterface::USER_MANAGEMENT,
+            ],
+
+            UserWorkflow::TRANSITION_DEACTIVATE => [
+                // Self-service via auto-deactivation
+                RoleInterface::LOGIN,
+                // Deactivated by moderator or business rules
                 RoleInterface::USER_MANAGEMENT,
             ],
 

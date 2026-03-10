@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace BetaKiller\Workflow;
 
 use BetaKiller\Auth\PasswordHasherInterface;
+use BetaKiller\Event\UserActivatedEvent;
 use BetaKiller\Event\UserApprovedEvent;
 use BetaKiller\Event\UserBannedEvent;
 use BetaKiller\Event\UserConfirmationEmailRequestedEvent;
 use BetaKiller\Event\UserCreatedEvent;
+use BetaKiller\Event\UserDeactivatedEvent;
 use BetaKiller\Event\UserEmailChangedEvent;
 use BetaKiller\Event\UserEmailConfirmedEvent;
 use BetaKiller\Event\UserPendingEvent;
@@ -30,15 +32,17 @@ use BetaKiller\Repository\UserRepositoryInterface;
 
 final readonly class UserWorkflow
 {
-    public const TRANSITION_CHECK   = 'check';
-    public const TRANSITION_APPROVE = 'approve';
-    public const TRANSITION_REJECT  = 'reject';
-    public const TRANSITION_BAN     = 'ban';
-    public const TRANSITION_UNBAN   = 'unban';
-    public const TRANSITION_SUSPEND = 'suspend';
-    public const TRANSITION_RESUME  = 'resume';
-    public const TRANSITION_REMOVE  = 'remove';
-    public const TRANSITION_RESTORE = 'restore';
+    public const TRANSITION_CHECK    = 'check';
+    public const TRANSITION_APPROVE  = 'approve';
+    public const TRANSITION_ACTIVATE = 'activate';
+    public const TRANSITION_DEACTIVATE = 'deactivate';
+    public const TRANSITION_REJECT   = 'reject';
+    public const TRANSITION_BAN      = 'ban';
+    public const TRANSITION_UNBAN    = 'unban';
+    public const TRANSITION_SUSPEND  = 'suspend';
+    public const TRANSITION_RESUME   = 'resume';
+    public const TRANSITION_REMOVE   = 'remove';
+    public const TRANSITION_RESTORE  = 'restore';
 
     /**
      * UserWorkflow constructor.
@@ -120,11 +124,6 @@ final readonly class UserWorkflow
 
         $this->eventBus->emit(new UserCreatedEvent($user));
 
-        // Auto-approve (if enabled)
-        if ($user::isAutoApproveEnabled()) {
-            $this->requestCheck($user);
-        }
-
         return $user;
     }
 
@@ -134,22 +133,35 @@ final readonly class UserWorkflow
 
         $this->userRepo->save($user);
 
-        // Auto-approve (if enabled)
-        if ($user::isAutoApproveEnabled()) {
-            $this->approve($user, $user);
-        } else {
-            $this->eventBus->emit(new UserPendingEvent($user));
-        }
+        $this->eventBus->emit(new UserPendingEvent($user));
     }
 
     public function approve(UserInterface $user, UserInterface $byUser): void
     {
         $this->state->doTransition($user, self::TRANSITION_APPROVE, $byUser);
 
-        $user->setApprovedAt();
         $this->userRepo->save($user);
 
         $this->eventBus->emit(new UserApprovedEvent($user));
+    }
+
+    public function activate(UserInterface $user, UserInterface $byUser): void
+    {
+        $this->state->doTransition($user, self::TRANSITION_ACTIVATE, $byUser);
+
+        $user->setActivatedAt();
+        $this->userRepo->save($user);
+
+        $this->eventBus->emit(new UserActivatedEvent($user));
+    }
+
+    public function deactivate(UserInterface $user, UserInterface $byUser): void
+    {
+        $this->state->doTransition($user, self::TRANSITION_DEACTIVATE, $byUser);
+
+        $this->userRepo->save($user);
+
+        $this->eventBus->emit(new UserDeactivatedEvent($user));
     }
 
     public function reject(UserInterface $user, UserInterface $byUser): void

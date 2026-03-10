@@ -1,6 +1,8 @@
 user.status.created: "Just created"
 user.status.pending: "Pending"
 user.status.approved: "Approved"
+user.status.activated: "Activated"
+user.status.deactivated: "Deactivated"
 user.status.rejected: "Rejected"
 user.status.banned: "Banned"
 user.status.claimed: "Claimed"

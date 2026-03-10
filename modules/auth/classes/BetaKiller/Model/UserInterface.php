@@ -22,6 +22,7 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
     EntityWithAclSpecInterface, RequestUserInterface, CreatedAtInterface, RestrictionTargetInterface
 {
     public static function isAutoApproveEnabled(): bool;
+    public static function isAutoActivationEnabled(): bool;
 
     public static function isIpAddressEnabled(): bool;
 
@@ -91,6 +92,16 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
      * @return bool
      */
     public function inStateApproved(): bool;
+
+    /**
+     * @return bool
+     */
+    public function inStateActivated(): bool;
+
+    /**
+     * @return bool
+     */
+    public function inStateDeactivated(): bool;
 
     /**
      * @return bool
@@ -325,9 +336,9 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, HasWo
      */
     public function setCreatedFromIP(string $ip): UserInterface;
 
-    public function setApprovedAt(DateTimeImmutable $date = null): UserInterface;
+    public function setActivatedAt(DateTimeImmutable $date = null): UserInterface;
 
-    public function hasApprovedAt(): bool;
+    public function hasActivatedAt(): bool;
 
-    public function getApprovedAt(): DateTimeImmutable;
+    public function getActivatedAt(): DateTimeImmutable;
 }

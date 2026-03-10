@@ -35,7 +35,7 @@ class User extends AbstractCreatedAt implements UserInterface
     public const COL_NOTIFY_BY_EMAIL   = 'notify_by_email';
     public const COL_LOGINS            = 'logins';
     public const COL_LAST_LOGIN_AT     = 'last_login_at';
-    public const COL_APPROVED_AT       = 'approved_at';
+    public const COL_ACTIVATED_AT      = 'activated_at';
     public const COL_CREATED_FROM_IP   = 'created_from_ip';
     public const COL_IS_CLAIMED        = 'is_reg_claimed';
 
@@ -213,6 +213,22 @@ class User extends AbstractCreatedAt implements UserInterface
     public function inStateApproved(): bool
     {
         return $this->isInWorkflowState(UserState::APPROVED);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function inStateActivated(): bool
+    {
+        return $this->isInWorkflowState(UserState::ACTIVATED);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function inStateDeactivated(): bool
+    {
+        return $this->isInWorkflowState(UserState::DEACTIVATED);
     }
 
     /**
@@ -727,21 +743,21 @@ class User extends AbstractCreatedAt implements UserInterface
         return $this->get_datetime_column_value(self::COL_LAST_LOGIN_AT);
     }
 
-    public function setApprovedAt(DateTimeImmutable $date = null): UserInterface
+    public function setActivatedAt(DateTimeImmutable $date = null): UserInterface
     {
-        $this->set_datetime_column_value(self::COL_APPROVED_AT, $date ?? new DateTimeImmutable());
+        $this->set_datetime_column_value(self::COL_ACTIVATED_AT, $date ?? new DateTimeImmutable());
 
         return $this;
     }
 
-    public function hasApprovedAt(): bool
+    public function hasActivatedAt(): bool
     {
-        return !empty($this->get(self::COL_APPROVED_AT));
+        return !empty($this->get(self::COL_ACTIVATED_AT));
     }
 
-    public function getApprovedAt(): DateTimeImmutable
+    public function getActivatedAt(): DateTimeImmutable
     {
-        return $this->get_datetime_column_value(self::COL_APPROVED_AT);
+        return $this->get_datetime_column_value(self::COL_ACTIVATED_AT);
     }
 
     public function equalsTo(RestrictionTargetInterface $target): bool
@@ -992,6 +1008,11 @@ class User extends AbstractCreatedAt implements UserInterface
     }
 
     public static function isAutoApproveEnabled(): bool
+    {
+        return false;
+    }
+
+    public static function isAutoActivationEnabled(): bool
     {
         return false;
     }

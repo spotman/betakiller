@@ -1,6 +1,8 @@
 user.status.created: "Создан"
 user.status.pending: "На проверке"
 user.status.approved: "Одобрен"
+user.status.activated: "Активирован"
+user.status.deactivated: "Деактивирован"
 user.status.rejected: "Отклонён"
 user.status.banned: "Бан"
 user.status.claimed: "Жалоба"

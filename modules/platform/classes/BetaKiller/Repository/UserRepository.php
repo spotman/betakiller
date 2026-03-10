@@ -241,16 +241,16 @@ class UserRepository extends AbstractOrmBasedHasWorkflowStateRepository implemen
         return $this;
     }
 
-    protected function filterApprovedAtBefore(ExtendedOrmInterface $orm, DateTimeImmutable $before): self
+    protected function filterActivatedAtBefore(ExtendedOrmInterface $orm, DateTimeImmutable $before): self
     {
-        $orm->filter_datetime_column_value($orm->object_column(User::COL_APPROVED_AT), $before, '<');
+        $orm->filter_datetime_column_value($orm->object_column(User::COL_ACTIVATED_AT), $before, '<');
 
         return $this;
     }
 
-    protected function filterApprovedAtAfter(ExtendedOrmInterface $orm, DateTimeImmutable $after): self
+    protected function filterActivatedAtAfter(ExtendedOrmInterface $orm, DateTimeImmutable $after): self
     {
-        $orm->filter_datetime_column_value($orm->object_column(User::COL_APPROVED_AT), $after, '>');
+        $orm->filter_datetime_column_value($orm->object_column(User::COL_ACTIVATED_AT), $after, '>');
 
         return $this;
     }
