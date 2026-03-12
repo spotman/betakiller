@@ -1,27 +1,33 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Config;
 
-use BetaKiller\Config\AbstractConfig;
 use BetaKiller\Exception;
 use DateInterval;
 
 class SessionConfig extends AbstractConfig implements SessionConfigInterface
 {
+    public const HASH_KEY    = 'hash_key';
+    public const HASH_METHOD = 'hash_method';
+    public const LIFETIME    = 'lifetime';
+    public const ENCRYPT_KEY = 'encrypt_key';
+    public const BIND_TO_UA  = 'bind_to_ua';
+
     public function getHashKey(): string
     {
-        return (string)$this->get(['hash_key']);
+        return (string)$this->get([self::HASH_KEY]);
     }
 
     public function getHashMethod(): string
     {
-        return (string)$this->get(['hash_method']);
+        return (string)$this->get([self::HASH_METHOD]);
     }
 
     public function getLifetime(): DateInterval
     {
-        $seconds = (int)$this->get(['lifetime']);
+        $seconds = (int)$this->get([self::LIFETIME]);
 
         if (!$seconds) {
             throw new Exception('Session lifetime must be configured');
@@ -32,7 +38,7 @@ class SessionConfig extends AbstractConfig implements SessionConfigInterface
 
     public function getEncryptionKey(): ?string
     {
-        return $this->get(['encrypt_key']) ?: null;
+        return $this->get([self::ENCRYPT_KEY]) ?: null;
     }
 
     /**
@@ -40,7 +46,7 @@ class SessionConfig extends AbstractConfig implements SessionConfigInterface
      */
     public function isBoundToUserAgent(): bool
     {
-        return (bool)$this->get(['bind_to_ua']);
+        return (bool)$this->get([self::BIND_TO_UA]);
     }
 
     protected function getConfigRootGroup(): string

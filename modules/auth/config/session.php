@@ -1,10 +1,12 @@
 <?php
 
+use BetaKiller\Config\SessionConfig;
+
 return [
     // DO NOT CHANGE 2 LINES BELOW - ALL PASSWORD HASHES in DB WOULD BECOME INCORRECT
-    'encrypt_key' => \getenv('SESSION_ENCRYPT_KEY'),
-    'hash_key'    => 'the_secret_hash_key_which_nobody_can_hack',
-    'hash_method' => 'sha256',
-    'lifetime'    => 1209600,
-    'bind_to_ua'  => false,
+    SessionConfig::ENCRYPT_KEY => \getenv('SESSION_ENCRYPT_KEY'),
+    SessionConfig::HASH_KEY    => 'the_secret_hash_key_which_nobody_can_hack',
+    SessionConfig::HASH_METHOD => 'sha256',
+    SessionConfig::LIFETIME    => 1209600,
+    SessionConfig::BIND_TO_UA  => false,
 ];
