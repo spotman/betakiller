@@ -35,6 +35,14 @@ class SessionConfig extends AbstractConfig implements SessionConfigInterface
         return $this->get(['encrypt_key']) ?: null;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function isBoundToUserAgent(): bool
+    {
+        return (bool)$this->get(['bind_to_ua']);
+    }
+
     protected function getConfigRootGroup(): string
     {
         return 'session';

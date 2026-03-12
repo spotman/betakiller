@@ -26,4 +26,9 @@ interface SessionConfigInterface
      * @return string|null
      */
     public function getEncryptionKey(): ?string;
+
+    /**
+     * @return bool
+     */
+    public function isBoundToUserAgent(): bool;
 }

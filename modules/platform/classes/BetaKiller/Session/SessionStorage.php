@@ -146,7 +146,7 @@ final readonly class SessionStorage implements SessionStorageInterface
         $session = $this->restoreSession($model);
 
         // User-Agent changed (possible session forgery attack) => create empty session
-        if ($userAgent && !$this->verifyUserAgent($session, $userAgent)) {
+        if ($userAgent && !$this->isValidUserAgent($session, $userAgent)) {
             return $this->createSession(SessionCause::Transitioned, $userAgent);
         }
 
@@ -229,8 +229,12 @@ final readonly class SessionStorage implements SessionStorageInterface
         }
     }
 
-    private function verifyUserAgent(SessionInterface $session, string $userAgent): bool
+    private function isValidUserAgent(SessionInterface $session, string $userAgent): bool
     {
+        if (!$this->config->isBoundToUserAgent()) {
+            return true;
+        }
+
         if (!SessionHelper::hasUserAgentHash($session)) {
             return false;
         }
