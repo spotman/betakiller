@@ -21,9 +21,9 @@
       {% elseif item.is_succeeded %}
         {% set item_classes = "" %}
       {% elseif item.is_pending %}
-        {% set item_classes = "grey" %}
+        {% set item_classes = "grey lighten-3" %}
       {% elseif item.is_rejected %}
-        {% set item_classes = "red white-text" %}
+        {% set item_classes = "yellow white-text" %}
       {% elseif item.is_failed %}
         {% set item_classes = "red white-text" %}
       {% endif %}
