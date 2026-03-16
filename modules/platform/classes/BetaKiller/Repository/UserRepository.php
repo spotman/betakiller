@@ -8,6 +8,7 @@ use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\UserState;
+use BetaKiller\Model\UserStateHistory;
 use BetaKiller\Utils\Kohana\ORM;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use DateTimeImmutable;
@@ -237,6 +238,20 @@ class UserRepository extends AbstractOrmBasedHasWorkflowStateRepository implemen
     {
         // Already joined by default
         $orm->where(ORM::col(User::getWorkflowStateRelationKey(), UserState::COL_CODENAME), '=', $codename);
+
+        return $this;
+    }
+
+    protected function filterWasInStateCodename(ExtendedOrmInterface $orm, string $codename): self
+    {
+        $orm
+            // User -> UserStateHistory
+            ->join([UserStateHistory::TABLE_NAME, 'fsh'], 'INNER')
+            ->on(ORM::col('fsh', UserStateHistory::getEntityForeignKey()), '=', $orm->object_primary_key())
+            // UserStateHistory -> UserState
+            ->join([UserState::TABLE_NAME, 'fshs'], 'INNER')
+            ->on(ORM::col('fshs', UserState::COL_ID), '=', ORM::col('fsh', UserStateHistory::COL_STATUS_ID))
+            ->on(ORM::col('fshs', UserState::COL_CODENAME), '=', DB::expr(sprintf('"%s"', $codename)));
 
         return $this;
     }
