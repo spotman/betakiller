@@ -114,6 +114,17 @@ final class StatusWorkflow implements StatusWorkflowInterface
         $this->addHistoryRecord($user, $model, $model->getWorkflowState(), 'init');
     }
 
+    public function wasInState(HasWorkflowStateWithHistoryInterface $model, WorkflowStateInterface $state): bool
+    {
+        foreach ($model->getWorkflowStateHistory() as $record) {
+            if ($record->getState()->getCodename() === $state->getCodename()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function getStateRepositoryFor(HasWorkflowStateInterface $model): WorkflowStateRepositoryInterface
     {
         $stateModelName = $model::getWorkflowStateModelName();

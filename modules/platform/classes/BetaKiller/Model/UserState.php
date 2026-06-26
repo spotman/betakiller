@@ -29,6 +29,13 @@ class UserState extends AbstractWorkflowStateOrmModel implements WorkflowStateIn
         ];
     }
 
+    public static function createFromCodename(string $codename): static
+    {
+        return new static([
+           static::COL_CODENAME => $codename,
+        ]);
+    }
+
     protected function configure(): void
     {
         $this->_table_name = self::TABLE_NAME;

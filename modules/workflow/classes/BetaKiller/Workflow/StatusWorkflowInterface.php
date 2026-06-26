@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\Workflow;
 
 use BetaKiller\Model\HasWorkflowStateInterface;
@@ -43,4 +44,14 @@ interface StatusWorkflowInterface
      * @return void
      */
     public function addInitialHistoryRecord(UserInterface $user, HasWorkflowStateWithHistoryInterface $model): void;
+
+    /**
+     * Returns TRUE if provided model has provided state in the state history records
+     *
+     * @param \BetaKiller\Model\HasWorkflowStateWithHistoryInterface $model
+     * @param \BetaKiller\Workflow\WorkflowStateInterface            $state
+     *
+     * @return bool
+     */
+    public function wasInState(HasWorkflowStateWithHistoryInterface $model, WorkflowStateInterface $state): bool;
 }
