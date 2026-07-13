@@ -39,7 +39,7 @@ class ResponseHelper
         return new HtmlResponse($text, $status ?? 200);
     }
 
-    public static function file(string $fullPath, string $mimeType, DateInterval $ttl = null): ResponseInterface
+    public static function file(string $fullPath, string $mimeType = null, DateInterval $ttl = null): ResponseInterface
     {
         $stream   = new Stream($fullPath, 'rb');
         $response = new Response($stream);
@@ -53,7 +53,7 @@ class ResponseHelper
 
         return $response
             ->withHeader('Content-Length', $stream->getSize())
-            ->withHeader('Content-Type', $mimeType);
+            ->withHeader('Content-Type', $mimeType ?? mime_content_type($fullPath));
     }
 
     /**
