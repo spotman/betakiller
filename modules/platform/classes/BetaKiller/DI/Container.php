@@ -64,7 +64,7 @@ final class Container implements ContainerInterface
             $builder->enableCompilation($compileTo);
 
             if (function_exists('apcu_enabled') && apcu_enabled()) {
-                $builder->enableDefinitionCache();
+                $builder->enableDefinitionCache($appEnv->getCachePrefix());
             }
         }
 

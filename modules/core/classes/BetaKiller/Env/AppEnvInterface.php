@@ -151,6 +151,13 @@ interface AppEnvInterface
     public function isHuman(): bool;
 
     /**
+     * Returns app-, mode- and revision-related string (for using as a namespace in caching subsystem)
+     *
+     * @return string
+     */
+    public function getCachePrefix(): string;
+
+    /**
      * Returns full path for logging purpose
      * Appends provided target to the app root path
      *

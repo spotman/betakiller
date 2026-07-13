@@ -317,6 +317,27 @@ final class AppEnv implements AppEnvInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getCachePrefix(): string
+    {
+        if (!$this->isAppRunning) {
+            return 'core';
+        }
+
+        $parts = [
+            $this->getAppCodename(),
+            $this->getModeName(),
+        ];
+
+        if ($this->inProductionMode() || $this->inStagingMode()) {
+            $parts[] = $this->getRevisionKey();
+        }
+
+        return implode('.', $parts);
+    }
+
+    /**
      * Returns absolute path to the global temp directory (must be readable/writable between requests)
      *
      * @see https://serverfault.com/a/615054

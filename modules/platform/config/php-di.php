@@ -255,12 +255,6 @@ return [
         ClientInterface::class => autowire(\Http\Adapter\Guzzle7\Client::class),
 
         Context::class => factory(static function (AppEnvInterface $appEnv) {
-            $prefix = implode('.', [
-                $appEnv->getAppCodename(),
-                $appEnv->getRevisionKey(),
-                $appEnv->getModeName(),
-            ]);
-
             $factory = new RedisConnectionFactory([
                 'scheme_extensions' => ['phpredis'],
 
@@ -270,7 +264,7 @@ return [
                 'async' => true,
 
                 'predis_options' => [
-                    'prefix' => $prefix,
+                    'prefix' => $appEnv->getCachePrefix(),
                 ],
 
                 'redelivery_delay'        => 300,

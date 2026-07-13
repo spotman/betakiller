@@ -1,4 +1,5 @@
 <?php
+
 namespace BetaKiller\Cache;
 
 use BetaKiller\Config\ConfigProviderInterface;
@@ -32,11 +33,7 @@ class SymfonyCacheProvider extends ProxyAdapter
      */
     public function __construct(AppEnvInterface $appEnv, ConfigProviderInterface $config)
     {
-        $nsPrefix = $appEnv->isAppRunning()
-            ? implode('.', [$appEnv->getAppCodename(), $appEnv->getModeName(), $appEnv->getRevisionKey()])
-            : 'core';
-
-        $this->ns = $nsPrefix.'.default';
+        $this->ns = $appEnv->getCachePrefix().'.default';
 
         $settings = (array)$config->load('cache', ['default']);
 
