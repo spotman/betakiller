@@ -14,18 +14,12 @@ use Psr\Http\Message\ServerRequestInterface;
 class DebugBarSessionDataCollector extends DataCollector implements Renderable
 {
     /**
-     * @var \Mezzio\Session\SessionInterface
-     */
-    private SessionInterface $session;
-
-    /**
      * DebugBarSessionDataCollector constructor.
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request
      */
-    public function __construct(ServerRequestInterface $request)
+    public function __construct(private readonly ServerRequestInterface $request)
     {
-        $this->session = ServerRequestHelper::getSession($request);
     }
 
     /**
@@ -45,7 +39,7 @@ class DebugBarSessionDataCollector extends DataCollector implements Renderable
      */
     public function collect(): array
     {
-        return $this->getSessionData($this->session);
+        return $this->getSessionData();
     }
 
     private function getSessionID(SessionInterface $session): ?string
@@ -57,8 +51,10 @@ class DebugBarSessionDataCollector extends DataCollector implements Renderable
         return $session->getId();
     }
 
-    private function getSessionData(SessionInterface $session): array
+    private function getSessionData(): array
     {
+        $session = ServerRequestHelper::getSession($this->request);
+
         $data = [];
 
         $id = $this->getSessionID($session);

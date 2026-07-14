@@ -28,34 +28,30 @@ readonly class DebugBarFactory implements DebugBarFactoryInterface
         $debugBar = new DebugBar();
 
         $session = ServerRequestHelper::getSession($request);
-        $user    = ServerRequestHelper::getUser($request);
 
         // Initialize http driver
         $debugBar->setHttpDriver(new DebugBarHttpDriver($session));
 
-        // Developer collectors
-        if ($user->isDeveloper()) {
-            $debugBar
-                ->addCollector(new DebugBarTimeDataCollector($request))
-                ->addCollector(new DebugBarCookiesDataCollector($request));
-        }
-
         // Common collectors
         $debugBar
-            ->addCollector(new DebugBarSessionDataCollector($request))
-            ->addCollector(new DebugBarUserDataCollector($request));
+            ->addCollector(new DebugBarTimeDataCollector($request))
+            ->addCollector(new DebugBarRequestDataCollector($request))
+            ->addCollector(new DebugBarCookiesDataCollector($request))
+            ->addCollector(new DebugBarSessionDataCollector($request));
 
-        // Developer collectors
-        if ($user->isDeveloper()) {
-            $debugBar
-                ->addCollector(new MemoryCollector())
-                ->addCollector(new DebugBarTwigDataCollector($this->twigEnv))
-                ->addCollector(new MonologCollector($this->logger->getMonologInstance()));
+        if (SessionHelper::hasUserID($session)) {
+            $debugBar->addCollector(new DebugBarUserDataCollector($request));
+
+            $user = ServerRequestHelper::getUser($request);
+
+            // Developer collectors
+            if ($user->isDeveloper()) {
+                $debugBar
+                    ->addCollector(new MemoryCollector())
+                    ->addCollector(new DebugBarTwigDataCollector($this->twigEnv))
+                    ->addCollector(new MonologCollector($this->logger->getMonologInstance()));
+            }
         }
-
-//        if (ServerRequestHelper::isHtmlPreferred($request)) {
-//            $debugBar->addCollector(new DebugBarTwigDataCollector($this->twigEnv));
-//        }
 
         $debugBar->setStackDataSessionNamespace(SessionHelper::makeServiceKey('stack_data'));
 

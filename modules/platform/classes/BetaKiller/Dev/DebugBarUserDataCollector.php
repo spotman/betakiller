@@ -64,7 +64,6 @@ class DebugBarUserDataCollector extends DataCollector implements Renderable
             'email'    => $user->getEmail(),
             'state'    => $user->hasWorkflowState() ? $user->getWorkflowState()->getCodename() : null,
             'roles'    => implode('", "', $this->getAssignedRoles($user)),
-            'ip'       => ServerRequestHelper::getIpAddress($this->request),
         ]);
     }
 
