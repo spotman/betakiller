@@ -135,30 +135,19 @@ class SitemapService
         $path = $this->getSitemapFilePath();
 
         if (!\is_file($path)) {
-            $this->generate();
-        }
-
-        $content = file_get_contents($path);
-
-        if (!$content) {
             throw new NotFoundHttpException();
         }
 
-        return ResponseHelper::xml($content);
+        return ResponseHelper::file($path);
     }
 
     protected function getSitemapFilePath(): string
     {
-        return $this->getDocumentRootPath().DIRECTORY_SEPARATOR.'sitemap.xml';
+        return $this->appEnv->getPublicPath('sitemap.xml');
     }
 
     protected function getSitemapIndexFilePath(): string
     {
-        return $this->getDocumentRootPath().DIRECTORY_SEPARATOR.'sitemap_index.xml';
-    }
-
-    protected function getDocumentRootPath(): string
-    {
-        return $this->appEnv->getDocRootPath();
+        return $this->appEnv->getPublicPath('sitemap_index.xml');
     }
 }
