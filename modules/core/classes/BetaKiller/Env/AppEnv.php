@@ -338,6 +338,14 @@ final class AppEnv implements AppEnvInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getPublicPath(string $target): string
+    {
+        return $this->getDocRootPath().\DIRECTORY_SEPARATOR.$target;
+    }
+
+    /**
      * Returns absolute path to the global temp directory (must be readable/writable between requests)
      *
      * @see https://serverfault.com/a/615054

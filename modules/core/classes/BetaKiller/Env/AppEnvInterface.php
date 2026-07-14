@@ -158,6 +158,16 @@ interface AppEnvInterface
     public function getCachePrefix(): string;
 
     /**
+     * Returns full path for public file
+     * Appends provided target to the doc root path
+     *
+     * @param string $target
+     *
+     * @return string
+     */
+    public function getPublicPath(string $target): string;
+
+    /**
      * Returns full path for logging purpose
      * Appends provided target to the app root path
      *
