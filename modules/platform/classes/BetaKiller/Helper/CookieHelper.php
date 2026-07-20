@@ -19,6 +19,11 @@ class CookieHelper
     /**
      * @var string
      */
+    private string $domain;
+
+    /**
+     * @var string
+     */
     private string $path = '/';
 
     /**
@@ -32,11 +37,9 @@ class CookieHelper
     private string $sameSite = 'lax';
 
     /**
-     * Session ID cookie is used for WAMP auth
-     *
      * @var bool
      */
-    private bool $httpOnly = false;
+    private bool $httpOnly = true;
 
     /**
      * CookieHelper constructor.
@@ -49,6 +52,8 @@ class CookieHelper
         if ($appConfig->isSecure() && !$appEnv->isInternalWebServer()) {
             $this->secureOnly = true;
         }
+
+        $this->domain = $appConfig->getBaseUri()->getHost();
     }
 
     public static function has(ServerRequestInterface $request, string $name): bool
@@ -73,6 +78,7 @@ class CookieHelper
         // No domain defined => lock cookies to current domain only
         $cookie = SetCookie::create($name, $value)
             ->withExpires($expiresAt)
+            ->withDomain($this->domain)
             ->withPath($this->path)
             ->withSecure($this->secureOnly)
             ->withHttpOnly($this->httpOnly)
