@@ -6,14 +6,16 @@ namespace BetaKiller\Config;
 
 use BetaKiller\Exception;
 use DateInterval;
+use Dflydev\FigCookies\Modifier\SameSite;
 
 class SessionConfig extends AbstractConfig implements SessionConfigInterface
 {
-    public const HASH_KEY    = 'hash_key';
-    public const HASH_METHOD = 'hash_method';
-    public const LIFETIME    = 'lifetime';
-    public const ENCRYPT_KEY = 'encrypt_key';
-    public const BIND_TO_UA  = 'bind_to_ua';
+    public const HASH_KEY         = 'hash_key';
+    public const HASH_METHOD      = 'hash_method';
+    public const LIFETIME         = 'lifetime';
+    public const ENCRYPT_KEY      = 'encrypt_key';
+    public const BIND_TO_UA       = 'bind_to_ua';
+    public const COOKIE_SAME_SITE = 'cookie_same_site';
 
     public function getHashKey(): string
     {
@@ -47,6 +49,13 @@ class SessionConfig extends AbstractConfig implements SessionConfigInterface
     public function isBoundToUserAgent(): bool
     {
         return (bool)$this->get([self::BIND_TO_UA]);
+    }
+
+    public function getCookieSameSite(): ?SameSite
+    {
+        $raw = $this->get([self::COOKIE_SAME_SITE], true);
+
+        return $raw ? SameSite::fromString($raw) : null;
     }
 
     protected function getConfigRootGroup(): string

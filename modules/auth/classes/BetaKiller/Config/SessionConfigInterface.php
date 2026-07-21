@@ -1,9 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Config;
 
 use DateInterval;
+use Dflydev\FigCookies\Modifier\SameSite;
 
 interface SessionConfigInterface
 {
@@ -31,4 +33,9 @@ interface SessionConfigInterface
      * @return bool
      */
     public function isBoundToUserAgent(): bool;
+
+    /**
+     * @return \Dflydev\FigCookies\Modifier\SameSite|null
+     */
+    public function getCookieSameSite(): ?SameSite;
 }

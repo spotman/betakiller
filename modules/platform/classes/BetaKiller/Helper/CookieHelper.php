@@ -70,7 +70,8 @@ class CookieHelper
         ResponseInterface $response,
         string $name,
         string $value,
-        DateInterval $expiresIn
+        DateInterval $expiresIn,
+        SameSite $sameSite = null
     ): ResponseInterface {
         $dt        = new DateTimeImmutable();
         $expiresAt = $dt->setTimezone(DateTimeHelper::getUtcTimezone())->add($expiresIn);
@@ -82,7 +83,7 @@ class CookieHelper
             ->withPath($this->path)
             ->withSecure($this->secureOnly)
             ->withHttpOnly($this->httpOnly)
-            ->withSameSite(SameSite::fromString($this->sameSite));
+            ->withSameSite($sameSite ?? SameSite::fromString($this->sameSite));
 
         return FigResponseCookies::set($response, $cookie);
     }

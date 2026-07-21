@@ -212,7 +212,8 @@ final readonly class SessionStorage implements SessionStorageInterface
             $response,
             self::COOKIE_NAME,
             $session->getId(),
-            $this->config->getLifetime()
+            $this->config->getLifetime(),
+            $this->config->getCookieSameSite(),
         );
     }
 
