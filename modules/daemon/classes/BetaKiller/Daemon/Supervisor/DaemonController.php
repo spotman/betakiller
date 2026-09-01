@@ -32,7 +32,7 @@ use function React\Promise\resolve;
 
 final class DaemonController
 {
-    public const RETRY_LIMIT = 60;
+    public const RETRY_LIMIT = 30;
 
     private const AUTO_RESTART_STATUSES = [
         DaemonUnit::STATUS_FINISHED,
@@ -147,6 +147,7 @@ final class DaemonController
         // Check workflow is OK
         $validator->validate($definition, 'Daemon workflow');
 
+        /* @see \BetaKiller\Daemon\Supervisor\DaemonUnit::$status */
         $marking = new MethodMarkingStore(true, 'status');
 
         return new Workflow($definition, $marking);
@@ -154,10 +155,10 @@ final class DaemonController
 
     public function bindSystemCounters(): void
     {
-        // Reset failure counters each 60 seconds
-        $this->systemTimers[] = $this->loop->addPeriodicTimer(60, function () {
+        // Leak failure counters each 10 seconds (emulate "leaky bucket" algorithm)
+        $this->systemTimers[] = $this->loop->addPeriodicTimer(10, function () {
             foreach ($this->registry->getRunning() as $unit) {
-                $unit->resetFailureCounter();
+                $this->leakFailureCounter($unit);
             }
         });
     }
@@ -365,6 +366,13 @@ final class DaemonController
         }
 
         return $unit->getFailureCounter() > self::RETRY_LIMIT;
+    }
+
+    private function leakFailureCounter(DaemonUnitInterface $unit): void
+    {
+        if ($unit->getFailureCounter() > 0) {
+            $unit->decrementFailureCounter();
+        }
     }
 
     private function startDaemon(DaemonUnitInterface $unit, bool $clearCounter = null): PromiseInterface
@@ -710,10 +718,8 @@ final class DaemonController
                 ':name' => $unit->getName(),
             ]);
 
-            if (!$this->appEnv->inProductionMode()) {
-                // Prevent high CPU usage on local errors
-                sleep(2);
-            }
+            // Prevent high CPU usage on errors
+            sleep(2);
 
             // Restart failed task
             $this->restartDaemon($unit, false);

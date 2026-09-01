@@ -131,6 +131,11 @@ final class DaemonUnit implements DaemonUnitInterface
         $this->failureCounter++;
     }
 
+    public function decrementFailureCounter(): void
+    {
+        $this->failureCounter--;
+    }
+
     public function resetFailureCounter(): void
     {
         $this->failureCounter = 0;

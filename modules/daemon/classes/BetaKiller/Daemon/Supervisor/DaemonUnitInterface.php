@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace BetaKiller\Daemon\Supervisor;
@@ -27,6 +28,9 @@ interface DaemonUnitInterface
     /**
      * @param string $status
      * @param array  $context
+     *
+     * @see \BetaKiller\Daemon\Supervisor\DaemonController::applyUnitCommand()
+     * @see \Symfony\Component\Workflow\WorkflowInterface::apply()
      */
     public function setStatus(string $status, array $context = []): void;
 
@@ -57,6 +61,8 @@ interface DaemonUnitInterface
 //    public function onFailedEvent(callable $cb): void;
 
     public function incrementFailureCounter(): void;
+
+    public function decrementFailureCounter(): void;
 
     public function resetFailureCounter(): void;
 
