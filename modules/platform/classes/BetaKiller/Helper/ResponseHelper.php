@@ -129,6 +129,11 @@ class ResponseHelper
         return $response->hasHeader('location');
     }
 
+    public static function notFound(): ResponseInterface
+    {
+        return new Response('Not Found', 404);
+    }
+
     public static function disableCaching(ResponseInterface $response): ResponseInterface
     {
         $expiresAt = (new DateTimeImmutable())->sub(new DateInterval('PT1H'));
