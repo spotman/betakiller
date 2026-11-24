@@ -256,14 +256,14 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
             foreach ([$subsystemX, $originalX] as $e) {
                 if ($e) {
-                    $message .= $this->getExceptionText($e).PHP_EOL.$e->getTraceAsString().PHP_EOL.PHP_EOL;
+                    $message .= $this->getExceptionText($e).PHP_EOL.PHP_EOL.$e->getTraceAsString().PHP_EOL.PHP_EOL.PHP_EOL;
                 }
             }
 
             $address = getenv('DEBUG_EMAIL_ADDRESS');
 
             // Send plain message
-            if (!mail($address, 'Exception handling error', nl2br($message))) {
+            if (!mail($address, 'Exception handling error', $message)) {
                 throw new Exception(sprintf('Can not send email to %s via PHP mail() function', $address));
             }
         } catch (Throwable $emailX) {
