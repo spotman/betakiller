@@ -10,6 +10,7 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\PhpExceptionRepositoryInterface;
 use Debug;
 use ErrorException;
+use Exception;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 use Monolog\LogRecord;
@@ -259,12 +260,12 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
                 }
             }
 
+            $address = getenv('DEBUG_EMAIL_ADDRESS');
+
             // Send plain message
-            mail(
-                getenv('DEBUG_EMAIL_ADDRESS'),
-                'Exception handling error',
-                nl2br($message)
-            );
+            if (!mail($address, 'Exception handling error', nl2br($message))) {
+                throw new Exception(sprintf('Can not send email to %s via PHP mail() function', $address));
+            }
         } catch (Throwable $emailX) {
             // Nothing we can do here, store exceptions in a system log as a last resort
             if ($originalX) {

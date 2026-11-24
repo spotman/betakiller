@@ -20,7 +20,7 @@ class PhpException extends ORM implements PhpExceptionModelInterface
         return sha1($message);
     }
 
-    public static function createFrom(UserInterface $user, string $message, string $hash): PhpExceptionModelInterface
+    public static function createFrom(?UserInterface $user, string $message, string $hash): PhpExceptionModelInterface
     {
         $model = new self();
 
