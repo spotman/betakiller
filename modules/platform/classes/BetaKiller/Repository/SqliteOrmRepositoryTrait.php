@@ -11,11 +11,25 @@ use DB;
 
 trait SqliteOrmRepositoryTrait
 {
-    public function __construct(OrmFactory $ormFactory)
-    {
-        parent::__construct($ormFactory);
+//    public function __construct(OrmFactory $ormFactory)
+//    {
+//        parent::__construct($ormFactory);
+//
+//        $this->createTableIfNotExists();
+//    }
 
+    protected function getOrmInstance()
+    {
         $this->createTableIfNotExists();
+
+        return parent::getOrmInstance();
+    }
+
+    public function save($entity): void
+    {
+        $this->createTableIfNotExists();
+
+        parent::save($entity);
     }
 
     public function delete($entity): void
