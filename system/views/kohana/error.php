@@ -4,7 +4,7 @@
 $error_id = uniqid('error');
 
 if (!defined('DUMP_LENGTH')) {
-    define('DUMP_LENGTH', 2048);
+    define('DUMP_LENGTH', 8192);
 }
 
 if (!defined('DUMP_DEPTH')) {
