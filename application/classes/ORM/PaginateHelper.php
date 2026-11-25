@@ -85,10 +85,12 @@ class PaginateHelper
             throw new \LogicException('Search results are null');
         }
 
+        $data = $result->as_array();
+
         $this->totalItems = $this->paginate->count_total();
         $this->totalPages = ceil($this->totalItems / $this->itemsPerPage);
 
-        return $result->as_array();
+        return $data;
     }
 
     /**
