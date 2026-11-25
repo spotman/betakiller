@@ -3,6 +3,14 @@
 // Unique error identifier
 $error_id = uniqid('error');
 
+if (!defined('DUMP_LENGTH')) {
+    define('DUMP_LENGTH', 2048);
+}
+
+if (!defined('DUMP_DEPTH')) {
+    define('DUMP_DEPTH', 5);
+}
+
 ?>
 <style type="text/css">
     #kohana_error {
@@ -144,7 +152,7 @@ $error_id = uniqid('error');
                                     <tr>
                                         <td><code><?php echo $name ?></code></td>
                                         <td>
-                                            <pre><?php echo Debug::dump($arg) ?></pre>
+                                            <pre><?php echo Debug::dump($arg, DUMP_LENGTH, DUMP_DEPTH) ?></pre>
                                         </td>
                                     </tr>
                                 <?php endforeach ?>
@@ -198,7 +206,7 @@ $error_id = uniqid('error');
 				<?php foreach ($GLOBALS[$var] as $key => $value): ?>
 				<tr>
 					<td><code><?php echo HTML::chars($key) ?></code></td>
-					<td><pre><?php echo Debug::dump($value) ?></pre></td>
+					<td><pre><?php echo Debug::dump($value, DUMP_LENGTH, DUMP_DEPTH) ?></pre></td>
 				</tr>
 				<?php endforeach ?>
 			</table>
@@ -229,7 +237,7 @@ $error_id = uniqid('error');
                         <tr>
                             <td><code><?php echo HTML::chars($key) ?></code></td>
                             <td>
-                                <pre><?php echo Debug::dump($value) ?></pre>
+                                <pre><?php echo Debug::dump($value, DUMP_LENGTH, DUMP_DEPTH) ?></pre>
                             </td>
                         </tr>
                     <?php endforeach ?>
