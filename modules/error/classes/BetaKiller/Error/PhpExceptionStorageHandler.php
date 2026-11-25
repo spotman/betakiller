@@ -30,6 +30,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     private const REWRITE_KEYS = [
         'MySQL server has gone away',
         'Error while sending QUERY packet',
+        'The MySQL server is running with the --read-only option',
     ];
 
     private const IGNORE_KEYS = [
